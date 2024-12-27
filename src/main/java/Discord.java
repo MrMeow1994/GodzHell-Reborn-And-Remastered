@@ -27,9 +27,7 @@ public class Discord extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(Discord.class);
     private static final Map<String, TextChannel> channels = new ConcurrentHashMap<>();
     public static JDA jda = null;
-    static String token = "MTAwNDExNDAyNTA0ODcxNTM4Ng.GIxORK.0Z86Zz3tmPs98UWvZrPR63km_MdEzPwp_TwtOk";
-    public static String token2 = "MTAwNDExNDAyNTA0ODcxNTM4Ng.GIxORK.0Z86Zz3tmPs98UWvZrPR63km_MdEzPwp_TwtOk";
-
+    static String token = "NTcxNTMzNDgxODA5Njc0MjUw.GWeyit.X4I0_PnV5Q8jw9YrzTAXclS03ycvPlk0YUeT3k";
     public static JDA jda2 = null;
     public static String PREFIX = "::";
     public static String OWNER_ROLE = "1074439303981170728";//Currently set to God Tier on beta.
@@ -50,7 +48,17 @@ public class Discord extends ListenerAdapter {
     }
     public static void writeserverMessages(String message, Object...args) {
         if(server.isPublic()) {
-            sendChannelMessage(1197212577181204610L, message, args);
+            sendChannelMessage(1321222601472872448L, message, args);
+        }
+    }
+    public static void writePrivateMessages(String message, Object...args) {
+        if(server.isPublic()) {
+            sendChannelMessage(1321264121106272377L, message, args);
+        }
+    }
+    public static void writeTradeMessages(String message, Object...args) {
+        if(server.isPublic()) {
+            sendChannelMessage(1321264188303343669L, message, args);
         }
     }
     public static void writeCommandMessages(String message, Object...args) {
@@ -185,7 +193,7 @@ public class Discord extends ListenerAdapter {
                     jda = JDABuilder.createDefault(token).build();
                     jda.awaitReady();
                     if (Config.UPDATE_DISCORD_STATUS) {
-                        Discord.getJDA().getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Ghreborn with " + PlayerHandler.getPlayerCount() + " players!"));
+                        Discord.getJDA().getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Ghreborn with " + server.playerHandler.getPlayerCount() + " players!"));
                         //logger.info("Player Status sent");
                     }
                 }
@@ -210,13 +218,13 @@ public class Discord extends ListenerAdapter {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL);
 
-        System.out.println("Loading Discord Bot!");
+       // System.out.println("Loading Discord Bot!");
         try {
             jda = builder.build();
 
             if (Config.UPDATE_DISCORD_STATUS) {
                 try {
-                    Discord.getJDA().getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Ghreborn with " + PlayerHandler.getPlayerCount() + " players!"));
+                    Discord.getJDA().getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Ghreborn with " + server.playerHandler.getPlayerCount() + " players!"));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -230,9 +238,9 @@ public class Discord extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent event) {
         if (Config.UPDATE_DISCORD_STATUS) {
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Ghreborn with " + PlayerHandler.getPlayerCount() + " players!"));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Ghreborn with " + server.playerHandler.getPlayerCount() + " players!"));
         }
-        System.out.println("sent commands");
+        //System.out.println("sent commands");
         jda.getGuilds().forEach(Guild::loadMembers);
 
         jda.retrieveCommands();

@@ -11090,7 +11090,7 @@ public class client extends Player implements Runnable {
         if (getOutStream() != null)
             resetAnimation();
         getOutStream().createFrame(97);
-        getOutStream().writeWord(interfaceid);
+        getOutStream().writeUnsignedWord(interfaceid);
         flushOutStream();
     }
 
@@ -13595,13 +13595,22 @@ public class client extends Player implements Runnable {
             addItem(6524, 1);
             addItem(385, 19);
         } else if (command.equalsIgnoreCase("home")) {
+        if (teleblock) {
+            sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
+        } else {
+            heightLevel = 0;
+            teleportToX = 2466;
+            teleportToY = 3188;
+            sendMessage("You teleport to Home.");
+        }
+        } else if (command.equalsIgnoreCase("west")) {
             if (teleblock) {
                 sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
             } else {
                 heightLevel = 0;
-                teleportToX = 2466;
-                teleportToY = 3188;
-                sendMessage("You teleport to Home.");
+                teleportToX = 3015;
+                teleportToY = 3452;
+                sendMessage("You teleport to West.");
             }
         } else if (command.equalsIgnoreCase("ancientcavern")) {
             if (teleblock) {
@@ -13755,11 +13764,7 @@ public class client extends Player implements Runnable {
             if (teleblock) {
                 sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
             } else {
-                heightLevel = 1;
-                teleportToX = 2805;
-                teleportToY = 2787;
-                sendMessage(
-                        "You teleport to the Shopping Area!");
+                start(new ShopslocationsDialogue());
             }
         } else if (command.equalsIgnoreCase("teampk")) {
             if (teleblock) {
@@ -20643,7 +20648,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         handler.updateNPC(this, outStream);
 
         sendFrame126("@gre@Home", 180);
-        sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
+      //  sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
 
         sendFrame126("Click Here To logout", 2458);
         flushOutStream();
@@ -22235,7 +22240,7 @@ nated = Integer.parseInt(token2);
             if (actionTimer > 0) {
                 actionTimer -= 1;
             }
-            if (actionAmount > 25) {
+            if (actionAmount > 45) {
                 sendMessage("Kicked for acting too fast!");
                 misc.println("Client acts too fast - disconnecting it");
                 disconnected = true;
@@ -26318,6 +26323,7 @@ nated = Integer.parseInt(token2);
                             "Text [" + chatTextEffects + "," + chatTextColor + "]: "
                                     + misc.textUnpack(chatText, packetSize - 2));
                     chatlog();
+                    Discord.writeserverMessages("[Chat Log] ["+ playerName+ "] : " + misc.textUnpack(chatText, packetSize - 2));
                     String playerchat = "[" + playerName + "]: "
                             + misc.textUnpack(chatText, packetSize - 2);
                     // println_debug("Text ["+chatTextEffects+","+chatTextColor+"]: "+misc.textUnpack(chatText, packetSize-2));
@@ -27255,6 +27261,7 @@ nated = Integer.parseInt(token2);
                     sendMessage("You can't Private Message because you are muted!");
                 } else if (muted == 0) {
                     inStream.readBytes(pmchatText, pmchatTextSize, 0);
+                    Discord.writePrivateMessages(playerName + " sent to " + misc.longToPlayerName(friendtosend) + ": " + misc.textUnpack(pmchatText, packetSize - 8));
                     writeLog(playerName + " sent to " + misc.longToPlayerName(friendtosend) + ": " + misc.textUnpack(pmchatText, packetSize - 8), "Pmlog");
                     for (int i1 = 0; i1 < friends.length; i1++) {
                         if (friends[i1] == friendtosend) {
@@ -36059,6 +36066,10 @@ nated = Integer.parseInt(token2);
                 }
             }
             resetItems(3214);
+            Discord.writeTradeMessages(PlayerHandler.players[tradeWith].playerName
+                    + " trades item: " + (playerOTItems[i] - 1)
+                    + " amount: " + playerOTItemsN[i] + " with "
+                    + playerName);
             TradeConfirmed = true;
         }
     }

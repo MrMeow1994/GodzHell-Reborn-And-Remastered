@@ -1,4 +1,6 @@
 import com.Ghreborn.jagcached.FileServer;
+import net.dv8tion.jda.api.EmbedBuilder;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -6,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashSet;
+import java.util.Objects;
 //import org.Vote.*;
 
 
@@ -49,9 +52,8 @@ public class server implements Runnable {
     public static potions potions = null;
     public static clickingMost clickingMost = null;
     public static NPCHandler npcHandler = null;
-    public static GarbageCollectorManager garbageCollectorManager = null;
+   // public static GarbageCollectorManager garbageCollectorManager = null;
     public static PickableObjects PickableObjects = null;
-    public static Discord discordBot = null;
     public static TextHandler textHandler = null;
     //public static int serverlistenerPort2 = 43594; // 5555=default
     public static ItemHandler itemHandler = null;
@@ -105,16 +107,32 @@ public class server implements Runnable {
      * Starts the minute counter
      */
     public static void main(String[] args) {
+
         startServer();
     }
 
     public static void startServer() {
-        EventManager.initialise();
+        Discord discordBot = new Discord();
+        discordBot.init();
+        System.out.println("Loading Discord Bot!");
+        // Set log level for debug mode
+        if(Config.UPDATE_DISCORD_STATUS) {
+            try {
+                EmbedBuilder db = new EmbedBuilder();
+                db.setTitle("GodzHell Reborn  Server Status");
+                db.setDescription("Server is now online!");
+                db.setImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoSmAVrqtIPw74nnybWxoWvz6fgCYi4u_ywQ&s");
+                db.setColor(new java.awt.Color(0xB00D03));
+                Objects.requireNonNull(Discord.getJDA().getTextChannelById("694587639361437748")).sendMessageEmbeds(db.build()).queue();
+            }catch (Exception e){
+                System.out.println("failed to send message");
+            }
 
+        }
+        EventManager.initialise();
         NPCCacheDefinition.unpackConfig();
         AnimationLength.startup();
         lottery.loadLists();
-
        // server.lottery.loadLists();
         Region.init();
         textHandler = new TextHandler();
@@ -129,7 +147,7 @@ public class server implements Runnable {
         objectManager = new ObjectManager();
         shopHandler = new ShopHandler();
         PickableObjects = new PickableObjects();
-        garbageCollectorManager = new GarbageCollectorManager();
+      //  garbageCollectorManager = new GarbageCollectorManager();
         clickingMost = new clickingMost();
         fishing = new Fishing();
         antilag = new antilag();
@@ -138,13 +156,11 @@ public class server implements Runnable {
         objectHandler = new ObjectHandler();
         GlobalDrops = new GlobalDrops();
         npcDrops = new NPCDrops();
-        discordBot = new Discord();
 
         clientHandler = new server();
         (new Thread(clientHandler)).start();
         playerHandler = new PlayerHandler();
         ConnectionList.getInstance();
-
 
         scheduler.schedule(new Task() {
             @Override
@@ -159,7 +175,7 @@ public class server implements Runnable {
             playerHandler.process();            // updates all player related stuff
             npcHandler.process();
             itemHandler.process();
-            garbageCollectorManager.process();
+            //garbageCollectorManager.process();
             shopHandler.process();
              lottery.process();
                 globalObjects.pulse();
@@ -169,11 +185,11 @@ public class server implements Runnable {
             itemspawnpoints.process();
             objectHandler.process();
             objectHandler.firemaking_process();
-           // discordBot.init();
             System.gc();
             // doNpcs()		// all npc related stuff
             // doObjects()
             // doWhatever()
+            discordBot.init();
             }
         });
     }
