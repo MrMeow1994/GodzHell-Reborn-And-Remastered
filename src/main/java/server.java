@@ -47,7 +47,7 @@ public class server implements Runnable {
     public static ServerSocket clientListener2 = null;
     public static boolean shutdownServer = false;        // set this to true in order to shut down and kill the server
     public static boolean shutdownClientHandler;            // signals ClientHandler to shut down
-    public static int serverlistenerPort = 29432; //29432=default
+    public static int serverlistenerPort = 19562; //29432=default
     public static PlayerHandler playerHandler = null;
     public static potions potions = null;
     public static clickingMost clickingMost = null;
@@ -113,7 +113,7 @@ public class server implements Runnable {
 
     public static void startServer() {
         Discord discordBot = new Discord();
-        discordBot.init();
+      //  discordBot.init();
         System.out.println("Loading Discord Bot!");
         // Set log level for debug mode
         if(Config.UPDATE_DISCORD_STATUS) {
@@ -189,7 +189,7 @@ public class server implements Runnable {
             // doNpcs()		// all npc related stuff
             // doObjects()
             // doWhatever()
-            discordBot.init();
+//            discordBot.init();
             }
         });
     }

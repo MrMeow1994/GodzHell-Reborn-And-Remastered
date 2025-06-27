@@ -20,6 +20,7 @@ java {
 
 repositories {
     mavenCentral()  // Standard Maven repository
+    maven { url = uri('https://jitpack.io') }
     maven {
         name 'm2-dv8tion'
         url 'https://m2.dv8tion.net/releases'
@@ -38,6 +39,10 @@ dependencies {
     implementation group: 'org.jfree', name: 'jfreechart', version: '1.5.5'
 // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.13.0'
+// https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.1'
+    // https://mvnrepository.com/artifact/com.formdev/flatlaf
+    implementation group: 'com.formdev', name: 'flatlaf', version: '3.6'
 // https://mvnrepository.com/artifact/com.squareup.okio/okio
     implementation group: 'com.squareup.okio', name: 'okio', version: '1.17.2'
 // https://mvnrepository.com/artifact/log4j/log4j
@@ -55,6 +60,13 @@ tasks.register('runFileServer', JavaExec) {
     description = 'Runs the FileServer'
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.Ghreborn.jagcached.FileServer'  // Specify the FileServer main class
+}
+// Define additional run tasks for FileServer
+tasks.register('runGuardianServer', JavaExec) {
+    group = 'application'
+    description = 'Runs the FileServer'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.mystycdh.GuardianServer'  // Specify the FileServer main class
 }
 sourceSets {
     main {

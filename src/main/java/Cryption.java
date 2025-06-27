@@ -3,235 +3,153 @@
  **/
 
 public class Cryption {
-    private static final int SIZEL = 8; // Log of size of rsl[] and mem[]
-    private static final int SIZE = 1 << SIZEL; // Size of rsl[] and mem[]
-    private static final int MASK = (SIZE - 1) << 2; // For pseudorandom lookup
-    private int count; // Count through the results in rsl[]
-    private final int[] rsl; // The results given to the user
-    private final int[] mem; // The internal state
-    private int a; // Accumulator
-    private int b; // The last result
-    private int c; // Counter, guarantees cycle is at least 2^40
 
-    /**
-     * This constructor creates and initializes an new instance without using a
-     * seed.<br>
-     * Equivalent to <code>randinit(ctx,FALSE)</code> in the C implementation.
-     */
-    public Cryption() {
-        mem = new int[SIZE];
-        rsl = new int[SIZE];
+    private static final int[] SIZES = {
+            64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768
+    };
 
-        init(false);
-    }
+    private static final int GOLDEN_RATIO = 0x9e3779b9;
 
-    /**
-     * This constructor creates and initializes an new instance using a
-     * user-provided seed.<br>
-     * Equivalent to <code>randinit(ctx, TRUE)</code> after putting seed in
-     * <code>randctx</code> in the C implementation.
-     *
-     * @param seed The seed.
-     */
+    private final long[][] results = new long[10][];
+    private final long[][] memory = new long[10][];
+
+    private final long[] a = new long[10];
+    private final long[] b = new long[10];
+    private final long[] c = new long[10];
+
+    private final int[] indices = new int[10];
+
     public Cryption(int[] seed) {
-        mem = new int[SIZE];
-        rsl = new int[SIZE];
-
-        // This is slow and throws an ArrayIndexOutOfBoundsException if
-        // seed.length > rsl.length ...
-        /*
-         * for (int i = 0; i < seed.length; ++i) rsl[i] = seed[i];
-         */
-        // ... this is faster and safe:
-        System.arraycopy(seed, 0, rsl, 0,
-				Math.min(seed.length, rsl.length));
-
-        init(true);
+        for (int layer = 0; layer < 10; layer++) {
+            int size = SIZES[layer];
+            results[layer] = new long[size];
+            memory[layer] = new long[size];
+            long[] expandedSeed = expandSeed(seed, size);
+            System.arraycopy(expandedSeed, 0, results[layer], 0, size);
+            initializeState(memory[layer], results[layer], size, (layer % 3 == 0) ? this::mix1 : (layer % 3 == 1) ? this::mix2 : this::mix3);
+            isaac(memory[layer], results[layer], size, size - 1, true, layer);
+            indices[layer] = size;
+        }
     }
 
-    /**
-     * Get a random integer value.
-     */
-    public final int getNextKey() {
-        if (0 == count--) {
-            isaac();
-            count = SIZE - 1;
-        }
+    public long getNextKey() {
+        long output = 0;
+        for (int layer = 0; layer < 10; layer++) {
+            int size = SIZES[layer];
+            int mask = size - 1;
 
-        return (rsl[count]);
-    }
-
-    /**
-     * Initialize or reinitialize this instance.
-     *
-     * @param flag If <code>true</code> then use the seed (which the constructor
-     *             placed in <code>rsl[]</code>) for initialization.
-     */
-    private void init(boolean flag) {
-        int i;
-        int a, b, c, d, e, f, g, h;
-        a = b = c = d = e = f = g = h = 0x9e3779b9; // The golden ratio
-
-        for (i = 0; i < 4; ++i) {
-            a ^= b << 11;
-            d += a;
-            b += c;
-            b ^= c >>> 2;
-            e += b;
-            c += d;
-            c ^= d << 8;
-            f += c;
-            d += e;
-            d ^= e >>> 16;
-            g += d;
-            e += f;
-            e ^= f << 10;
-            h += e;
-            f += g;
-            f ^= g >>> 4;
-            a += f;
-            g += h;
-            g ^= h << 8;
-            b += g;
-            h += a;
-            h ^= a >>> 9;
-            c += h;
-            a += b;
-        }
-
-        for (i = 0; i < SIZE; i += 8) { // Fill in mem[] with messy stuff
-            if (flag) {
-                a += rsl[i];
-                b += rsl[i + 1];
-                c += rsl[i + 2];
-                d += rsl[i + 3];
-                e += rsl[i + 4];
-                f += rsl[i + 5];
-                g += rsl[i + 6];
-                h += rsl[i + 7];
+            if (--indices[layer] < 0) {
+                isaac(memory[layer], results[layer], size, mask, false, layer);
+                indices[layer] = size - 1;
             }
-            a ^= b << 11;
-            d += a;
-            b += c;
-            b ^= c >>> 2;
-            e += b;
-            c += d;
-            c ^= d << 8;
-            f += c;
-            d += e;
-            d ^= e >>> 16;
-            g += d;
-            e += f;
-            e ^= f << 10;
-            h += e;
-            f += g;
-            f ^= g >>> 4;
-            a += f;
-            g += h;
-            g ^= h << 8;
-            b += g;
-            h += a;
-            h ^= a >>> 9;
-            c += h;
-            a += b;
-            mem[i] = a;
-            mem[i + 1] = b;
-            mem[i + 2] = c;
-            mem[i + 3] = d;
-            mem[i + 4] = e;
-            mem[i + 5] = f;
-            mem[i + 6] = g;
-            mem[i + 7] = h;
-        }
 
-        if (flag) { // Second pass: makes all of seed affect all of mem[]
-            for (i = 0; i < SIZE; i += 8) {
-                a += mem[i];
-                b += mem[i + 1];
-                c += mem[i + 2];
-                d += mem[i + 3];
-                e += mem[i + 4];
-                f += mem[i + 5];
-                g += mem[i + 6];
-                h += mem[i + 7];
-                a ^= b << 11;
-                d += a;
-                b += c;
-                b ^= c >>> 2;
-                e += b;
-                c += d;
-                c ^= d << 8;
-                f += c;
-                d += e;
-                d ^= e >>> 16;
-                g += d;
-                e += f;
-                e ^= f << 10;
-                h += e;
-                f += g;
-                f ^= g >>> 4;
-                a += f;
-                g += h;
-                g ^= h << 8;
-                b += g;
-                h += a;
-                h ^= a >>> 9;
-                c += h;
-                a += b;
-                mem[i] = a;
-                mem[i + 1] = b;
-                mem[i + 2] = c;
-                mem[i + 3] = d;
-                mem[i + 4] = e;
-                mem[i + 5] = f;
-                mem[i + 6] = g;
-                mem[i + 7] = h;
-            }
+            output ^= Long.rotateRight(results[layer][indices[layer]], layer + 1);
         }
-
-        isaac();
-        count = SIZE;
+        return output;
     }
 
-    /**
-     * Generate 256 results.<br>
-     * This is a small (not fast) implementation.
-     */
-    private void isaac() {
-        int i, x, y;
+    public long getNextKey(long salt) {
+        for (int i = 0; i < 10; i++) {
+            c[i] ^= salt >>> (i % 32);
+        }
+        return getNextKey();
+    }
 
-        b += ++c;
-        for (i = 0; i < SIZE; ++i) {
-            x = mem[i];
+    private void isaac(long[] memory, long[] results, int size, int mask, boolean init, int layer) {
+        if (init) b[layer] += ++c[layer];
+
+        long aVal = a[layer], bVal = b[layer], cVal = c[layer];
+
+        for (int i = 0; i < size; i++) {
+            long x = memory[i];
             switch (i & 3) {
-                case 0:
-                    a ^= a << 13;
-                    break;
-                case 1:
-                    a ^= a >>> 6;
-                    break;
-                case 2:
-                    a ^= a << 2;
-                    break;
-                case 3:
-                    a ^= a >>> 16;
-                    break;
+                case 0: aVal ^= aVal << 21; break;
+                case 1: aVal ^= aVal >>> 7; break;
+                case 2: aVal ^= aVal << 3; break;
+                case 3: aVal ^= aVal >>> 13; break;
             }
-            a += mem[(i + SIZE / 2) & (SIZE - 1)];
-            mem[i] = y = mem[((x) & MASK) >> 2] + a + b;
-            rsl[i] = b = mem[((y >> SIZEL) & MASK) >> 2] + x;
+            aVal += memory[(i + (size / 2)) & mask];
+            long y = memory[i] = memory[(int)(x >>> 2) & mask] + aVal + bVal;
+            results[i] = bVal = memory[(int)(y >>> 10) & mask] + x;
+        }
+
+        a[layer] = aVal; b[layer] = bVal;
+    }
+
+    private void initializeState(long[] memory, long[] results, int size, MixFunction mixer) {
+        long a = GOLDEN_RATIO, b = GOLDEN_RATIO, c = GOLDEN_RATIO, d = GOLDEN_RATIO;
+        long e = GOLDEN_RATIO, f = GOLDEN_RATIO, g = GOLDEN_RATIO, h = GOLDEN_RATIO;
+
+        for (int i = 0; i < 4; i++) {
+            a ^= b << 11; d += a; b += c;
+            b ^= c >>> 2; e += b; c += d;
+            c ^= d << 8; f += c; d += e;
+            d ^= e >>> 16; g += d; e += f;
+            e ^= f << 10; h += e; f += g;
+            f ^= g >>> 4; a += f; g += h;
+            g ^= h << 8; b += g; h += a;
+            h ^= a >>> 9; c += h; a += b;
+        }
+
+        for (int i = 0; i < size; i += 8) {
+            a += results[i];     b += results[i + 1];
+            c += results[i + 2]; d += results[i + 3];
+            e += results[i + 4]; f += results[i + 5];
+            g += results[i + 6]; h += results[i + 7];
+            mixer.mix(memory, i, a, b, c, d, e, f, g, h);
+        }
+
+        for (int i = 0; i < size; i += 8) {
+            a += memory[i];     b += memory[i + 1];
+            c += memory[i + 2]; d += memory[i + 3];
+            e += memory[i + 4]; f += memory[i + 5];
+            g += memory[i + 6]; h += memory[i + 7];
+            mixer.mix(memory, i, a, b, c, d, e, f, g, h);
         }
     }
 
-    /**
-     * Reseeds this random object.<br>
-     * The given seed supplements (using bitwise xor), rather than replaces, the
-     * existing seed.
-     *
-     * @param seed An integer array containing the seed.
-     */
-    public final void supplementSeed(int[] seed) {
-        for (int i = 0; i < seed.length; i++)
-            mem[i % mem.length] ^= seed[i];
+    private void mix1(long[] memory, int i, long a, long b, long c, long d, long e, long f, long g, long h) {
+        a ^= b << 11; d += a; b += c;
+        b ^= c >>> 2; e += b; c += d;
+        c ^= d << 8; f += c; d += e;
+        d ^= e >>> 16; g += d; e += f;
+        e ^= f << 10; h += e; f += g;
+        f ^= g >>> 4; a += f; g += h;
+        g ^= h << 8; b += g; h += a;
+        h ^= a >>> 9; c += h; a += b;
+        for (int j = 0; j < 8; j++) memory[i + j] = new long[]{a, b, c, d, e, f, g, h}[j];
+    }
+
+    private void mix2(long[] memory, int i, long a, long b, long c, long d, long e, long f, long g, long h) {
+        a ^= c << 10; d += b; c += e;
+        b ^= e >>> 3; f += a; e += g;
+        c ^= g << 5; g += h; f += b;
+        d ^= a >>> 7; h += c; g += d;
+        e ^= b << 12; a += e; h += f;
+        f ^= c >>> 6; b += f; a += g;
+        g ^= d << 9; c += g; b += h;
+        h ^= e >>> 11; d += h; c += a;
+        for (int j = 0; j < 8; j++) memory[i + j] = new long[]{a, b, c, d, e, f, g, h}[j];
+    }
+
+    private void mix3(long[] memory, int i, long a, long b, long c, long d, long e, long f, long g, long h) {
+        a += f ^ (h >>> 3); b += g ^ (a << 7);
+        c ^= b << 11; d ^= c >>> 5;
+        e += d ^ (f << 3); f += e ^ (g >>> 13);
+        g ^= a << 9; h ^= g >>> 6;
+        for (int j = 0; j < 8; j++) memory[i + j] = new long[]{a, b, c, d, e, f, g, h}[j];
+    }
+
+    private long[] expandSeed(int[] seed, int size) {
+        long[] result = new long[size];
+        for (int i = 0; i < size; i++) {
+            result[i] = seed[i % seed.length];
+        }
+        return result;
+    }
+
+    @FunctionalInterface
+    private interface MixFunction {
+        void mix(long[] memory, int i, long a, long b, long c, long d, long e, long f, long g, long h);
     }
 }

@@ -22812,7 +22812,7 @@ nated = Integer.parseInt(token2);
                 packetType = in.read() & 0xFF;
 
                 if (inStreamDecryption != null) {
-                    packetType = (packetType - inStreamDecryption.getNextKey()) & 0xFF;
+                    packetType = (int) ((packetType - inStreamDecryption.getNextKey()) & 0xFF);
                 }
 
                 packetSize = getPacketSize(packetType);

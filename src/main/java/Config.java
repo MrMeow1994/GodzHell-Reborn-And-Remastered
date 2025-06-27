@@ -41,7 +41,7 @@ public class Config {
 	public static boolean WORLD_TWO = false;
 
 	public static boolean bonusXP;
-	public static boolean UPDATE_DISCORD_STATUS = true;
+	public static boolean UPDATE_DISCORD_STATUS = false;
 	public static int WOODCUTTING_EXPERIENCE = 50;
 	public static int SMITHING_EXPERIENCE = 50;
 	public static int FLETCHING_EXPERIENCE = 50;
