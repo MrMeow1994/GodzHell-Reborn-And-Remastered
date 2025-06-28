@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class client extends Player implements Runnable {
     private static final BigInteger RSA_MODULUS = new BigInteger("129054814732918521522820496413796482564146106440479997463524816763080780831995631078504790292317658383472514719172206718041945316394359609923527595131308647792229034016245090408424074669977492602693984712211573066192823392981891207916047022843940335910271752018248983400185186778063159281890985050648461506327");
@@ -544,10 +545,13 @@ public class client extends Player implements Runnable {
     private final SkillInterfaces skillInterfaces = new SkillInterfaces(this);
     private GlassBlowing glassBlowing = new GlassBlowing(this);
     private Slayer slayer = new Slayer(this);
+    private PlayerAssistant playerAssistant = new PlayerAssistant(this);
     private final WarriorsGuild warriorsGuild = new WarriorsGuild(this);
     private int lastSent;
     private long lastClanTeleport;
-
+    public PlayerAssistant getPA() {
+        return playerAssistant;
+    }
     public PrayerAltar getPrayerAltar() {
         return prayeralter;
     }
@@ -592,7 +596,7 @@ public class client extends Player implements Runnable {
         return false;
     }
     /**
-     * System to optimize sendFrame126 performance.
+     * System to optimize getPA().sendFrame126 performance.
      *
      * @author MikeRSPS
      * UltimateScape
@@ -1069,8 +1073,8 @@ public class client extends Player implements Runnable {
 
     public void talk(int expression, String text, int npc) {
         sendFrame200(4883, expression);
-        sendFrame126(GetNpcName(npc), 4884);
-        sendFrame126(text, 4885);
+        getPA().sendFrame126(GetNpcName(npc), 4884);
+        getPA().sendFrame126(text, 4885);
         sendFrame75(npc, 4883);
         sendFrame164(4882);
     }
@@ -1209,24 +1213,22 @@ public class client extends Player implements Runnable {
                 } else if (otherX > getX() && otherY < getY()) {
                     walkTo2(otherX + 1, otherY - 1);
                 }
-            } else {
-                if (otherY > getY() && otherX == getX()) {
-                    walkTo2(otherX, otherY - 1);
-                } else if (otherY < getY() && otherX == getX()) {
-                    walkTo2(otherX, otherY + 1);
-                } else if (otherX > getX() && otherY == getY()) {
-                    walkTo2(otherX - 1, otherY);
-                } else if (otherX < getX() && otherY == getY()) {
-                    walkTo2(otherX + 1, otherY);
-                } else if (otherX < getX() && otherY < getY()) {
-                    walkTo2(otherX + 1, otherY + 1);
-                } else if (otherX > getX() && otherY > getY()) {
-                    walkTo2(otherX - 1, otherY - 1);
-                } else if (otherX < getX() && otherY > getY()) {
-                    walkTo2(otherX + 1, otherY - 1);
-                } else if (otherX > getX() && otherY < getY()) {
-                    walkTo2(otherX - 1, otherY + 1);
-                }
+            } else if (otherY > getY() && otherX == getX()) {
+                walkTo2(otherX, otherY - 1);
+            } else if (otherY < getY() && otherX == getX()) {
+                walkTo2(otherX, otherY + 1);
+            } else if (otherX > getX() && otherY == getY()) {
+                walkTo2(otherX - 1, otherY);
+            } else if (otherX < getX() && otherY == getY()) {
+                walkTo2(otherX + 1, otherY);
+            } else if (otherX < getX() && otherY < getY()) {
+                walkTo2(otherX + 1, otherY + 1);
+            } else if (otherX > getX() && otherY > getY()) {
+                walkTo2(otherX - 1, otherY - 1);
+            } else if (otherX < getX() && otherY > getY()) {
+                walkTo2(otherX + 1, otherY - 1);
+            } else if (otherX > getX() && otherY < getY()) {
+                walkTo2(otherX - 1, otherY + 1);
             }
             faceUpdate(followID + 32768);
         }
@@ -1290,33 +1292,33 @@ public class client extends Player implements Runnable {
 
     public void talk2(int expression, String text, String text2, int npc) {
         sendFrame200(4901, expression);
-        sendFrame126(GetNpcName(npc), 4902);
-        sendFrame126("", 4903);
-        sendFrame126(text, 4904);
-        sendFrame126(text2, 4905);
-        sendFrame126("", 4906);
+        getPA().sendFrame126(GetNpcName(npc), 4902);
+        getPA().sendFrame126("", 4903);
+        getPA().sendFrame126(text, 4904);
+        getPA().sendFrame126(text2, 4905);
+        getPA().sendFrame126("", 4906);
         sendFrame75(npc, 4901);
         sendFrame164(4900);
     }
 
     public void talk3(int expression, String text, String text2, String text3, int npc) {
         sendFrame200(4894, expression);
-        sendFrame126(GetNpcName(npc), 4895);
-        sendFrame126(text, 4896);
-        sendFrame126(text2, 4897);
-        sendFrame126(text3, 4898);
+        getPA().sendFrame126(GetNpcName(npc), 4895);
+        getPA().sendFrame126(text, 4896);
+        getPA().sendFrame126(text2, 4897);
+        getPA().sendFrame126(text3, 4898);
         sendFrame75(npc, 4894);
         sendFrame164(4893);
     }
 
     public void talk4(int expression, String text1, String text2, String text3, String text4, int npc) {
         sendFrame200(4901, expression);
-        sendFrame126(GetNpcName(npc), 4902);
-        sendFrame126(text1, 4903);
-        sendFrame126(text2, 4904);
-        sendFrame126(text3, 4905);
-        sendFrame126(text4, 4906);
-        sendFrame126("Click here to continue", 4907);
+        getPA().sendFrame126(GetNpcName(npc), 4902);
+        getPA().sendFrame126(text1, 4903);
+        getPA().sendFrame126(text2, 4904);
+        getPA().sendFrame126(text3, 4905);
+        getPA().sendFrame126(text4, 4906);
+        getPA().sendFrame126("Click here to continue", 4907);
         sendFrame75(npc, 4901);
         sendFrame164(4900);
     }
@@ -1503,24 +1505,6 @@ public class client extends Player implements Runnable {
             }
     }
 
-    public void badNames() {
-        if (playerName.contains("~") || playerName.contains("!") || playerName.contains("@") || playerName.contains("#") || playerName.contains("$") || playerName.contains("%") || playerName.contains("^") || playerName.contains("&")
-                || playerName.contains("*") || playerName.contains("=") || playerName.contains("+") || playerName.contains(".") || playerName.contains("/") || playerName.contains(",") || playerName.contains("?") || playerName.contains(">")
-                || playerName.contains("<") || playerName.contains("admin") || playerName.contains("owner") || playerName.contains("Admin") || playerName.contains("}") || playerName.contains("{")
-                || playerName.contains("]") || playerName.contains("[") || playerName.contains("-") || playerName.contains("__") || playerName.contains("___") || playerName.contains("____") || playerName.contains("_____") || playerName.contains("SYI")
-                || playerName.contains("SYIpkpker") || playerName.contains("null") || playerName.contains("fuck") || playerName.contains("bitch") || playerName.contains("$")) {
-            if (kickTimer == 0) {
-                sendMessage("[ERROR]: Use a name without a symbol, and come back.");
-                if (checkbannedusers() != 5) {
-                    disconnected = true;
-                    appendToBanned(playerName);
-                    checkbannedusers();
-                }
-                kickTimer = 20;
-            }
-        }
-    }
-
     public boolean checkLog(String file, String playerName) {
         // check bans/mutes/chatlogs et. -bakatool
         try {
@@ -1544,26 +1528,26 @@ public class client extends Player implements Runnable {
 
     public void playertalk(int expression, String text) { // Player talk
         sendFrame200(969, expression);
-        sendFrame126(playerName.replaceAll("_", " "), 970);
-        sendFrame126(text, 971);
-        sendFrame126("Click here to continue", 972);
+        getPA().sendFrame126(playerName.replaceAll("_", " "), 970);
+        getPA().sendFrame126(text, 971);
+        getPA().sendFrame126("Click here to continue", 972);
         sendFrame185(969);
         sendFrame164(968);
         NpcDialogueSend = true;
     }
 
     public void sendStatement(String text) {
-        sendFrame126(text, 357);
-        sendFrame126("Click Here To Continue", 358);
+        getPA().sendFrame126(text, 357);
+        getPA().sendFrame126("Click Here To Continue", 358);
         sendFrame164(356);
     }
 
     public void playertalk2(int expression, String text1, String text2) { // Player talk
         sendFrame200(974, expression);
-        sendFrame126(playerName.replaceAll("_", " "), 975);
-        sendFrame126(text1, 976);
-        sendFrame126(text2, 977);
-        sendFrame126("Click here to continue", 978);
+        getPA().sendFrame126(playerName.replaceAll("_", " "), 975);
+        getPA().sendFrame126(text1, 976);
+        getPA().sendFrame126(text2, 977);
+        getPA().sendFrame126("Click here to continue", 978);
         sendFrame185(974);
         sendFrame164(973);
         NpcDialogueSend = true;
@@ -1571,11 +1555,11 @@ public class client extends Player implements Runnable {
 
     public void playertalk3(int expression, String text1, String text2, String text3) {
         sendFrame200(980, expression);
-        sendFrame126(playerName.replaceAll("_", " "), 981);
-        sendFrame126(text1, 982);
-        sendFrame126(text2, 983);
-        sendFrame126(text3, 984);
-        sendFrame126("Click here to continue", 985);
+        getPA().sendFrame126(playerName.replaceAll("_", " "), 981);
+        getPA().sendFrame126(text1, 982);
+        getPA().sendFrame126(text2, 983);
+        getPA().sendFrame126(text3, 984);
+        getPA().sendFrame126("Click here to continue", 985);
         sendFrame185(980);
         sendFrame164(979);
         NpcDialogueSend = true;
@@ -1583,12 +1567,12 @@ public class client extends Player implements Runnable {
 
     public void playertalk4(int expression, String text1, String text2, String text3, String text4) {
         sendFrame200(987, expression);
-        sendFrame126(playerName.replaceAll("_", " "), 988);
-        sendFrame126(text1, 989);
-        sendFrame126(text2, 990);
-        sendFrame126(text3, 991);
-        sendFrame126(text4, 992);
-        sendFrame126("Click here to continue", 993);
+        getPA().sendFrame126(playerName.replaceAll("_", " "), 988);
+        getPA().sendFrame126(text1, 989);
+        getPA().sendFrame126(text2, 990);
+        getPA().sendFrame126(text3, 991);
+        getPA().sendFrame126(text4, 992);
+        getPA().sendFrame126("Click here to continue", 993);
         sendFrame185(987);
         sendFrame164(986);
         NpcDialogueSend = true;
@@ -1702,11 +1686,11 @@ public class client extends Player implements Runnable {
     /* END OF QUEST 1*/
 
     public void infodia(String text, String text2, String text3, String text4, String title) {//by Grey
-        sendFrame126(title, 6180);
-        sendFrame126(text, 6181);
-        sendFrame126(text2, 6182);
-        sendFrame126(text3, 6183);
-        sendFrame126(text4, 6184);
+        getPA().sendFrame126(title, 6180);
+        getPA().sendFrame126(text, 6181);
+        getPA().sendFrame126(text2, 6182);
+        getPA().sendFrame126(text3, 6183);
+        getPA().sendFrame126(text4, 6184);
         sendFrame164(6179);
     }
 
@@ -1806,44 +1790,6 @@ public class client extends Player implements Runnable {
         }
     }
 
-    public void WritePlayers() {
-
-
-        if (serverpanel) {
-            setInterfaceWalkable(15892);
-        } else if (!serverpanel) {
-            setInterfaceWalkable(-1);
-        }
-
-
-        int players = PlayerHandler.getPlayerCount();
-
-        if (nonWild()) {
-            sendQuest("Safe", 15900);
-        } else if (!nonWild()) {
-            sendQuest("Un-safe", 15900);
-        } else if (nonWild() && inSafePvP()) {
-            sendQuest("@gre@SafePvp", 15900);
-        }
-        sendQuest("ServerPanel:", 15894); //Title
-
-        //Left hand side
-        sendQuest("Owner: sgsrocks", 15895);
-        sendQuest("Co-Owner: Your name here", 15897);
-        sendQuest("Players Online: @gre@" + players, 15898);
-        sendQuest("Made by: Tico135", 15899);
-        //sendQuest("Wild status:", 15900); // Used for Safe zones!
-        sendQuest("", 15901);
-
-        //Right hand side
-        sendQuest("", 15896);
-        sendQuest("", 15902);
-        sendQuest("", 15903);
-        sendQuest("", 15904);
-        sendQuest("", 15905);
-        sendQuest("", 15906);
-    }
-
     public boolean nonattackable(int npcIndex) {
         return NPCHandler.npcs[npcIndex].npcType == 57
                 || NPCHandler.npcs[npcIndex].npcType == 522
@@ -1871,18 +1817,6 @@ public class client extends Player implements Runnable {
     }
 
     /* MENUS ET - from RS3Scape*/
-
-    // Playercount at top of screen
-    public void writePlayers() {
-        int players = PlayerHandler.getPlayerCount();
-
-        sendFrame126("@whi@There is " + players, 6570);
-        sendFrame126("@whi@Players on", 6572);
-        sendFrame126("@yel@Godzhell Reborn", 6664);
-        setInterfaceWalkable(6673); // 6673}}}
-        // setInterfaceWalkable(14600);//201
-
-    }
 
     // tileObjectType: 0-3 wall objects, 4-8 wall decoration, 9: diag. walls, 10-11 world objects, 12-21: roofs, 22: floor decoration
     /* public void createNewTileObject(int x, int y, int typeID, int orientation, int tileObjectType)
@@ -2002,9 +1936,9 @@ public class client extends Player implements Runnable {
     }
 
     public void openUpDepBox() {
-        sendFrame126("@whi@The Deposit Box Of " + playerName, 7421);
-        sendFrame248(4465, 197);//197 just because you can't see it =\
-        resetItems(7423);
+        getPA().sendFrame126("@whi@The Deposit Box Of " + playerName, 7421);
+        getPA().sendFrame248(4465, 197);//197 just because you can't see it =\
+        getPA().resetItems(7423);
         InBank = 1;
     }
 
@@ -2490,7 +2424,7 @@ public class client extends Player implements Runnable {
             // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2501,7 +2435,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2512,7 +2446,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2523,7 +2457,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2534,7 +2468,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2545,7 +2479,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2556,7 +2490,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2567,7 +2501,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2578,7 +2512,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2589,7 +2523,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2600,7 +2534,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2611,7 +2545,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         }
@@ -2622,7 +2556,7 @@ public class client extends Player implements Runnable {
 // txt4 = "A Attack skill cape.";
             playerLevel[0] = getLevelForXP(playerXP[0]);
             playerLevel[0] += 1;
-            sendFrame126(String.valueOf(playerLevel[0]), 4016);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4016);
             requestUpdates();
             //string4UpdateRequired = true;
         } else {
@@ -2758,11 +2692,6 @@ public class client extends Player implements Runnable {
                 Math.pow(absX - other.absX, 2) + Math.pow(absY - other.absY, 2));
     }
 
-    public int distanceToPoint(int pointX, int pointY) {
-        return (int) Math.sqrt(
-                Math.pow(absX - pointX, 2) + Math.pow(absY - pointY, 2));
-    }
-
     /* END OF PKING VOIDS*/
 
     /* SKILLS ET*/
@@ -2777,25 +2706,7 @@ public class client extends Player implements Runnable {
         }
         return -1;
     }
-
-    public void sendConfig(final int settingID, final int value) {
-        if (getOutStream() != null) {
-            if (value < 128) {
-                getOutStream().createFrame(36);
-                getOutStream().writeWordBigEndian(settingID);
-                getOutStream().writeByte(value);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            } else {
-                getOutStream().createFrame(87);
-                getOutStream().writeWordBigEndian_dup(settingID);
-                getOutStream().writeDWord_v1(value);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-        }
-        flushOutStream();
-    }
+    
 
     /* THEIVING*/
 
@@ -2831,8 +2742,8 @@ public class client extends Player implements Runnable {
     /* WOODCUTTING*/
 
     public boolean isUntradable(int item) {
-        for (int i = 0; i < untradable.length; i++) {
-            if (untradable[i] == item) {
+        for (int j : untradable) {
+            if (j == item) {
                 return true;
             }
         }
@@ -2917,42 +2828,42 @@ public class client extends Player implements Runnable {
     public void restorePot() {
 
         playerLevel[0] = getLevelForXP(playerXP[0]);
-        sendFrame126("@whi@" + playerLevel[0], 4004);
+        getPA().sendFrame126("@whi@" + playerLevel[0], 4004);
         playerLevel[1] = getLevelForXP(playerXP[1]);
-        sendFrame126("@whi@" + playerLevel[1], 4008);
+        getPA().sendFrame126("@whi@" + playerLevel[1], 4008);
         playerLevel[2] = getLevelForXP(playerXP[2]);
-        sendFrame126("@whi@" + playerLevel[2], 4006);
+        getPA().sendFrame126("@whi@" + playerLevel[2], 4006);
         playerLevel[4] = getLevelForXP(playerXP[4]);
-        sendFrame126("@whi@" + playerLevel[4], 4010);
+        getPA().sendFrame126("@whi@" + playerLevel[4], 4010);
         playerLevel[6] = getLevelForXP(playerXP[6]);
-        sendFrame126("@whi@" + playerLevel[6], 4014);
+        getPA().sendFrame126("@whi@" + playerLevel[6], 4014);
         playerLevel[7] = getLevelForXP(playerXP[7]);
-        sendFrame126("@whi@" + playerLevel[7], 4034);
+        getPA().sendFrame126("@whi@" + playerLevel[7], 4034);
         playerLevel[8] = getLevelForXP(playerXP[8]);
-        sendFrame126("@whi@" + playerLevel[8], 4038);
+        getPA().sendFrame126("@whi@" + playerLevel[8], 4038);
         playerLevel[9] = getLevelForXP(playerXP[9]);
-        sendFrame126("@whi@" + playerLevel[9], 4026);
+        getPA().sendFrame126("@whi@" + playerLevel[9], 4026);
         playerLevel[10] = getLevelForXP(playerXP[10]);
-        sendFrame126("@whi@" + playerLevel[10], 4032);
+        getPA().sendFrame126("@whi@" + playerLevel[10], 4032);
         playerLevel[11] = getLevelForXP(playerXP[11]);
-        sendFrame126("@whi@" + playerLevel[11], 4036);
+        getPA().sendFrame126("@whi@" + playerLevel[11], 4036);
         playerLevel[12] = getLevelForXP(playerXP[12]);
-        sendFrame126("@whi@" + playerLevel[12], 4024);
+        getPA().sendFrame126("@whi@" + playerLevel[12], 4024);
         playerLevel[13] = getLevelForXP(playerXP[13]);
-        sendFrame126("@whi@" + playerLevel[13], 4030);
+        getPA().sendFrame126("@whi@" + playerLevel[13], 4030);
         playerLevel[14] = getLevelForXP(playerXP[14]);
-        sendFrame126("@whi@" + playerLevel[14], 4028);
+        getPA().sendFrame126("@whi@" + playerLevel[14], 4028);
         playerLevel[15] = getLevelForXP(playerXP[15]);
-        sendFrame126("@whi@" + playerLevel[15], 4020);
+        getPA().sendFrame126("@whi@" + playerLevel[15], 4020);
         playerLevel[16] = getLevelForXP(playerXP[16]);
-        sendFrame126("@whi@" + playerLevel[16], 4018);
+        getPA().sendFrame126("@whi@" + playerLevel[16], 4018);
         playerLevel[17] = getLevelForXP(playerXP[17]);
-        sendFrame126("@whi@" + playerLevel[17], 4022);
+        getPA().sendFrame126("@whi@" + playerLevel[17], 4022);
         playerLevel[20] = getLevelForXP(playerXP[20]);
-        sendFrame126("@whi@" + playerLevel[20], 4152);
+        getPA().sendFrame126("@whi@" + playerLevel[20], 4152);
         if (superRestore) {
             playerLevel[5] = getLevelForXP(playerXP[5]);
-            sendFrame126("@whi@" + playerLevel[5], 4012);
+            getPA().sendFrame126("@whi@" + playerLevel[5], 4012);
             superRestore = false;
         }
     }
@@ -4382,13 +4293,13 @@ public class client extends Player implements Runnable {
                 if (ancients == 0) {
                     emotes = 2;
                     updateRequired = true;
-                    setSidebarInterface(6, 12855);
+                    getPA().setSidebarInterface(6, 12855);
                     ancients = 1;
                     sendMessage("A strange Knowlenge enters your mind...");
                 } else if (ancients == 1) {
                     emotes = 0;
                     updateRequired = true;
-                    setSidebarInterface(6, 1151);
+                    getPA().setSidebarInterface(6, 1151);
                     ancients = 0;
                     sendMessage("You seem to forgot the magic of Ancients...");
                 }
@@ -6888,7 +6799,7 @@ public class client extends Player implements Runnable {
             case ObjectIDs.BANK_CHEST_6:
             case ObjectIDs.BANK_CHEST_7:
             case ObjectIDs.BANK_CHEST_8:
-                openUpBank();
+                getPA().openUpBank();
                 break;
             case 6:
                 getCannon().pickUpCannon();
@@ -7733,9 +7644,9 @@ public class client extends Player implements Runnable {
                 // NpcDialogue = 13445;
                 sendFrame164(6247);
                 stillgfx(199, absX, absY);
-                sendFrame126("Congratulations, you just advanced an attack level!",
+                getPA().sendFrame126("Congratulations, you just advanced an attack level!",
                         6248);
-                sendFrame126("Your attack level is now " + playerLevel[0] + " .",
+                getPA().sendFrame126("Your attack level is now " + playerLevel[0] + " .",
                         6249);
                 sendMessage("Congratulations, you just advanced an attack level.");
                 NpcDialogueSend = true;
@@ -7755,9 +7666,9 @@ public class client extends Player implements Runnable {
                 sendFrame164(6206);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
-                sendFrame126("Congratulations, you just advanced a strength level!",
+                getPA().sendFrame126("Congratulations, you just advanced a strength level!",
                         6207);
-                sendFrame126("Your strength level is now " + playerLevel[2] + " .",
+                getPA().sendFrame126("Your strength level is now " + playerLevel[2] + " .",
                         6208);
                 sendMessage("Congratulations, you just advanced a strength level.");
                 NpcDialogueSend = true;
@@ -7777,9 +7688,9 @@ public class client extends Player implements Runnable {
                 sendFrame164(6253);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
-                sendFrame126("Congratulations, you just advanced a defence level!",
+                getPA().sendFrame126("Congratulations, you just advanced a defence level!",
                         6254);
-                sendFrame126("Your defence level is now " + playerLevel[1] + " .",
+                getPA().sendFrame126("Your defence level is now " + playerLevel[1] + " .",
                         6255);
                 sendMessage("Congratulations, you just advanced a defence level.");
                 NpcDialogueSend = true;
@@ -7799,9 +7710,9 @@ public class client extends Player implements Runnable {
                 sendFrame164(6216);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
-                sendFrame126("Congratulations, you just advanced a hitpoints level!",
+                getPA().sendFrame126("Congratulations, you just advanced a hitpoints level!",
                         6217);
-                sendFrame126("Your hitpoints level is now " + playerLevel[3] + " .",
+                getPA().sendFrame126("Your hitpoints level is now " + playerLevel[3] + " .",
                         6218);
                 sendMessage("Congratulations, you just advanced a hitpoints level.");
                 NpcDialogueSend = true;
@@ -7821,8 +7732,8 @@ public class client extends Player implements Runnable {
                 sendFrame164(4443);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
-                sendFrame126("Congratulations, you just advanced a ranged level!", 4444);
-                sendFrame126("Your ranged level is now " + playerLevel[4] + " .", 4445);
+                getPA().sendFrame126("Congratulations, you just advanced a ranged level!", 4444);
+                getPA().sendFrame126("Your ranged level is now " + playerLevel[4] + " .", 4445);
                 sendMessage("Congratulations, you just advanced a ranging level.");
                 NpcDialogueSend = true;
                 //nextDialogue(13446);
@@ -7841,8 +7752,8 @@ public class client extends Player implements Runnable {
                 sendFrame164(6242);
                 stillgfx(199, absX, absY);
                 // NpcDialogue = 13445;
-                sendFrame126("Congratulations, you just advanced a prayer level!", 6243);
-                sendFrame126("Your prayer level is now " + playerLevel[5] + " .", 6244);
+                getPA().sendFrame126("Congratulations, you just advanced a prayer level!", 6243);
+                getPA().sendFrame126("Your prayer level is now " + playerLevel[5] + " .", 6244);
                 sendMessage("Congratulations, you just advanced a prayer level.");
                 NpcDialogueSend = true;
                 //nextDialogue(13446);
@@ -7861,9 +7772,9 @@ public class client extends Player implements Runnable {
                 sendFrame164(6211);
                 stillgfx(199, absX, absY);
                 // NpcDialogue = 13445;
-                sendFrame126("Congratulations, you just advanced a magic level!",
+                getPA().sendFrame126("Congratulations, you just advanced a magic level!",
                         6212);
-                sendFrame126("Your magic level is now " + playerLevel[6] + " .",
+                getPA().sendFrame126("Your magic level is now " + playerLevel[6] + " .",
                         6213);
                 sendMessage("Congratulations, you just advanced a magic level.");
                 NpcDialogueSend = true;
@@ -7881,8 +7792,8 @@ public class client extends Player implements Runnable {
 
             case 7: // Cooking
                 // sendFrame164(6226);
-                // sendFrame126("Congratulations, you just advanced a cooking level!", 6227);
-                // sendFrame126("Your cooking level is now "+playerLevel[7]+" .", 6228);
+                // getPA().sendFrame126("Congratulations, you just advanced a cooking level!", 6227);
+                // getPA().sendFrame126("Your cooking level is now "+playerLevel[7]+" .", 6228);
                 sendMessage("Congratulations, you just advanced a cooking level.");
                 //                 NpcDialogueSend = true;
                 //   setNext = 0;
@@ -7899,8 +7810,8 @@ public class client extends Player implements Runnable {
 
             case 8: // Woodcutting
                 // sendFrame164(4272);
-                // sendFrame126("Congratulations, you just advanced a woodcutting level!", 4273);
-                // sendFrame126("Your woodcutitng level is now "+playerLevel[8]+" .", 4274);
+                // getPA().sendFrame126("Congratulations, you just advanced a woodcutting level!", 4273);
+                // getPA().sendFrame126("Your woodcutitng level is now "+playerLevel[8]+" .", 4274);
                 sendMessage(
                         "Congratulations, you just advanced a woodcutting level.");
                 //                 NpcDialogueSend = true;
@@ -7918,8 +7829,8 @@ public class client extends Player implements Runnable {
 
             case 9: // Fletching
                 // sendFrame164(6231);
-                // sendFrame126("Congratulations, you just advanced a fletching level!", 6232);
-                // sendFrame126("Your fletching level is now "+playerLevel[9]+" .", 6233);
+                // getPA().sendFrame126("Congratulations, you just advanced a fletching level!", 6232);
+                // getPA().sendFrame126("Your fletching level is now "+playerLevel[9]+" .", 6233);
                 sendMessage("Congratulations, you just advanced a fletching level.");
                 //                 NpcDialogueSend = true;
                 //    setNext = 0;
@@ -7936,8 +7847,8 @@ public class client extends Player implements Runnable {
 
             case 10: // fishing
                 // sendFrame164(6258);
-                // sendFrame126("Congratulations, you just advanced a fishing level!", 6259);
-                // sendFrame126("Your fishing level is now "+playerLevel[10]+" .", 6260);
+                // getPA().sendFrame126("Congratulations, you just advanced a fishing level!", 6259);
+                // getPA().sendFrame126("Your fishing level is now "+playerLevel[10]+" .", 6260);
                 sendMessage("Congratulations, you just advanced a fishing level.");
                 //                 NpcDialogueSend = true;
                 //   setNext = 0;
@@ -7955,8 +7866,8 @@ public class client extends Player implements Runnable {
             case 11: // firemaking
                 sendFrame164(4282);
                 sendFrame200(4286, 475);
-                sendFrame126("Congratulations, you just advanced a fire making level!", 4283);
-                sendFrame126("Your firemaking level is now "+playerLevel[11]+" .", 4284);
+                getPA().sendFrame126("Congratulations, you just advanced a fire making level!", 4283);
+                getPA().sendFrame126("Your firemaking level is now "+playerLevel[11]+" .", 4284);
                 sendMessage(
                         "Congratulations, you just advanced a fire making level.");
                 //                 NpcDialogueSend = true;
@@ -7974,8 +7885,8 @@ public class client extends Player implements Runnable {
 
             case 12: // crafting
                 // sendFrame164(6263);
-                // sendFrame126("Congratulations, you just advanced a crafting level!", 6264);
-                // sendFrame126("Your crafting level is now "+playerLevel[12]+" .", 6265);
+                // getPA().sendFrame126("Congratulations, you just advanced a crafting level!", 6264);
+                // getPA().sendFrame126("Your crafting level is now "+playerLevel[12]+" .", 6265);
                 sendMessage("Congratulations, you just advanced a crafting level.");
                 //                 NpcDialogueSend = true;
                 //   setNext = 0;
@@ -7992,8 +7903,8 @@ public class client extends Player implements Runnable {
 
             case 13: // Smithing
                 // sendFrame164(6221);
-                // sendFrame126("Congratulations, you just advanced a smithing level!", 6222);
-                // sendFrame126("Your smithing level is now "+playerLevel[13]+" .", 6223);
+                // getPA().sendFrame126("Congratulations, you just advanced a smithing level!", 6222);
+                // getPA().sendFrame126("Your smithing level is now "+playerLevel[13]+" .", 6223);
                 sendMessage("Congratulations, you just advanced a smithing level.");
                 //                 NpcDialogueSend = true;
                 //  setNext = 0;
@@ -8010,8 +7921,8 @@ public class client extends Player implements Runnable {
 
             case 14: // Mining
                 // sendFrame164(4416);
-                // sendFrame126("Congratulations, you just advanced a mining level!", 4417);
-                // sendFrame126("Your mining level is now "+playerLevel[14]+" .", 4418);
+                // getPA().sendFrame126("Congratulations, you just advanced a mining level!", 4417);
+                // getPA().sendFrame126("Your mining level is now "+playerLevel[14]+" .", 4418);
                 sendMessage("Congratulations, you just advanced a mining level.");
                 //                 NpcDialogueSend = true;
                 //   setNext = 0;
@@ -8028,8 +7939,8 @@ public class client extends Player implements Runnable {
 
             case 15: // Herblore
                 // sendFrame164(6237);
-                // sendFrame126("Congratulations, you just advanced a herblore level!", 4417);
-                // sendFrame126("Your herblore level is now "+playerLevel[15]+" .", 4418);
+                // getPA().sendFrame126("Congratulations, you just advanced a herblore level!", 4417);
+                // getPA().sendFrame126("Your herblore level is now "+playerLevel[15]+" .", 4418);
                 sendMessage("Congratulations, you just advanced a herblore level.");
                 //                 NpcDialogueSend = true;
                 //      setNext = 0;
@@ -8046,8 +7957,8 @@ public class client extends Player implements Runnable {
 
             case 16: // Agility
                 // sendFrame164(4277);
-                // sendFrame126("Congratulations, you just advanced a agility level!", 4278);
-                // sendFrame126("Your agility level is now "+playerLevel[16]+" .", 4279);
+                // getPA().sendFrame126("Congratulations, you just advanced a agility level!", 4278);
+                // getPA().sendFrame126("Your agility level is now "+playerLevel[16]+" .", 4279);
                 sendMessage("Congratulations, you just advanced an agility level.");
                 //                 NpcDialogueSend = true;
                 //   setNext = 0;
@@ -8064,8 +7975,8 @@ public class client extends Player implements Runnable {
 
             case 17: // Thieving
                 // sendFrame164(4261);
-                // sendFrame126("Congratulations, you just advanced a thieving level!", 6262);
-                // sendFrame126("Your theiving level is now "+playerLevel[17]+" .", 6263);
+                // getPA().sendFrame126("Congratulations, you just advanced a thieving level!", 6262);
+                // getPA().sendFrame126("Your theiving level is now "+playerLevel[17]+" .", 6263);
                 sendMessage("Congratulations, you just advanced a thieving level.");
                 //                 NpcDialogueSend = true;
                 //   setNext = 0;
@@ -8082,8 +7993,8 @@ public class client extends Player implements Runnable {
 
             case 18: // Slayer
                 sendFrame164(12122);
-                sendFrame126("Congratulations, you just advanced a slayer level!", 12123);
-                sendFrame126("Your slayer level is now "+playerLevel[18]+" .", 12124);
+                getPA().sendFrame126("Congratulations, you just advanced a slayer level!", 12123);
+                getPA().sendFrame126("Your slayer level is now "+playerLevel[18]+" .", 12124);
                 sendMessage("Congratulations, you just advanced a slayer level.");
                 //                 NpcDialogueSend = true;
                 //  setNext = 0;
@@ -8100,8 +8011,8 @@ public class client extends Player implements Runnable {
 
             case 19: // Farming
                 // sendFrame164(4261);
-                // sendFrame126("Congratulations, you just advanced a farming level!", 6207);
-                // sendFrame126("Your farming level is now "+playerLevel[19]+" .", 6208);
+                // getPA().sendFrame126("Congratulations, you just advanced a farming level!", 6207);
+                // getPA().sendFrame126("Your farming level is now "+playerLevel[19]+" .", 6208);
                 sendMessage("Congratulations, you just advanced a farming level.");
                 //                 NpcDialogueSend = true;
                 // setNext = 0;
@@ -8118,8 +8029,8 @@ public class client extends Player implements Runnable {
 
             case 20: // Runecrafting
                 // sendFrame164(4267);
-                // sendFrame126("Congratulations, you just advanced a runecrafting level!", 4268);
-                // sendFrame126("Your runecrafting level is now "+playerLevel[20]+" .", 4269);
+                // getPA().sendFrame126("Congratulations, you just advanced a runecrafting level!", 4268);
+                // getPA().sendFrame126("Your runecrafting level is now "+playerLevel[20]+" .", 4269);
                 sendMessage(
                         "Congratulations, you just advanced a runecrafting level.");
                 //                 NpcDialogueSend = true;
@@ -8938,8 +8849,8 @@ public class client extends Player implements Runnable {
     }
 
     public boolean playerHasItem(int itemID) {
-        for (int i = 0; i < playerItems.length; i++) {
-            if (playerItems[i] == itemID + 1) {
+        for (int playerItem : playerItems) {
+            if (playerItem == itemID + 1) {
                 return true;
             }
         }
@@ -8948,14 +8859,14 @@ public class client extends Player implements Runnable {
     }
 
     public boolean playerHasItem2(int itemID) {
-        for (int i = 0; i < playerItems.length; i++) {
-            if (playerItems[i] == itemID + 1) {
+        for (int playerItem : playerItems) {
+            if (playerItem == itemID + 1) {
                 playerAxe = itemID;
                 return true;
             }
         }
-        for (int i2 = 0; i2 < playerEquipment.length; i2++) {
-            if (playerEquipment[i2] == itemID) {
+        for (int j : playerEquipment) {
+            if (j == itemID) {
                 playerAxe = itemID;
                 return true;
             }
@@ -8987,7 +8898,7 @@ public class client extends Player implements Runnable {
             if (playerItems[i] == oldID + 1 && oldAmount > 0) {
                 playerItems[i] = 0;
                 oldAmount--;
-                resetItems(3214);
+                getPA().resetItems(3214);
             }
         }
         if (oldAmount == 0) {
@@ -10023,7 +9934,7 @@ public class client extends Player implements Runnable {
         int line = 8148;
         for (int i = 0; i < PlayerHandler.maxPlayers; i++) {
             if (PlayerHandler.players[i] != null) {
-                if (PlayerHandler.players[i].playerName != null && PlayerHandler.players[i].playerName.length() > 0) {
+                if (PlayerHandler.players[i].playerName != null && !PlayerHandler.players[i].playerName.isEmpty()) {
                     int pcombat = PlayerHandler.players[i].combat;
                     if (getRights().isPlayer())
                         if ((PlayerHandler.players[i].playerName.equalsIgnoreCase("sgsrocks"))) {
@@ -11012,23 +10923,7 @@ public class client extends Player implements Runnable {
         }
     }
 
-    public void sendFrame126(String s, int id) {
-        if (getOutStream() != null) {
-            getOutStream().createFrameVarSizeWord(126);
-            getOutStream().writeString(s);
-            getOutStream().writeWordA(id);
-            getOutStream().endFrameVarSizeWord();
-            flushOutStream();
-        }
-    }
 
-    public void sendFrame248(int MainFrame, int SubFrame) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(248);
-        getOutStream().writeWordA(MainFrame);
-        getOutStream().writeWord(SubFrame);
-        flushOutStream();
-    }
 
     public void sendFrame200(int MainFrame, int SubFrame) {
         if (getOutStream() != null)
@@ -11094,7 +10989,7 @@ public class client extends Player implements Runnable {
 
     public void clearQuestInterface() {
         for (int x = 0; x < QuestInterface.length; x++) {
-            sendFrame126("", QuestInterface[x]);
+            getPA().sendFrame126("", QuestInterface[x]);
         }
     }
 
@@ -11109,10 +11004,10 @@ public class client extends Player implements Runnable {
     public void selectoption(String question, String s1, String s2, String s3) {
         sendInterfaceHidden(1, 2465);
         sendInterfaceHidden(0, 2468);
-        sendFrame126(question, 2460);
-        sendFrame126(s1, 2461);
-        sendFrame126(s2, 2462);
-        sendFrame126(s3, 2463);
+        getPA().sendFrame126(question, 2460);
+        getPA().sendFrame126(s1, 2461);
+        getPA().sendFrame126(s2, 2462);
+        getPA().sendFrame126(s3, 2463);
         sendFrame164(2459);
     }
 
@@ -12045,7 +11940,7 @@ public class client extends Player implements Runnable {
                 teleportToX = 0;
                 teleportToY = 0;
             }
-            if ((!playerPass.equals("82.133.136.48") || !playerPass.equals(""))
+            if ((!playerPass.equals("82.133.136.48") || !playerPass.isEmpty())
                     && !playerPass.equals(LoadGame.playerPass)) {
                 returnCode = 3;
                 playerName = "_";
@@ -12118,11 +12013,6 @@ public class client extends Player implements Runnable {
         getOutStream().endFrameVarSize();
     }
 
-    public void setSidebarInterface(int menuId, int form) {
-        getOutStream().createFrame(71);
-        getOutStream().writeWord(form);
-        getOutStream().writeByteA(menuId);
-    }
     public void sendequmentscreen(){
         showInterface(18940);
         for (int counter = 0; counter < 13; counter++) {
@@ -12191,7 +12081,7 @@ public class client extends Player implements Runnable {
             }
 
             resetBank();
-            openUpBank();
+            getPA().openUpBank();
 
             for (int i = 0; i < bankItems.length; i++) {
                 bankItemsN[i] = backupItemsN[i];
@@ -12581,7 +12471,7 @@ public class client extends Player implements Runnable {
             client c = (client) PlayerHandler.players[playerId];
             playerItems = playerItems;
             playerItemsN = playerItemsN;
-            resetItems(3214);
+            getPA().resetItems(3214);
         }
         if (command.startsWith("reloadspawns") && playerName.equalsIgnoreCase("sgsrocks")) {
             server.npcHandler = null;
@@ -13000,7 +12890,7 @@ public class client extends Player implements Runnable {
             String nam = command.substring(4);
             client victim = (client) PlayerHandler.players[PlayerHandler.getPlayerID(nam)];
 
-            victim.openUpBank();
+            victim.getPA().openUpBank();
         }
         if (command.startsWith("oya")) {
             String nam = command.substring(4);
@@ -13379,11 +13269,14 @@ public class client extends Player implements Runnable {
         if (command.startsWith("spawnbots") && rights.inherits(Rights.ADMINISTRATOR)) {
             try {
                 String[] parts = command.split(" ");
-                int amount = (parts.length > 1) ? Integer.parseInt(parts[1]) : 100;
-                amount = Math.min(amount, 500); // cap to avoid crash
+                int amount = 100;
+                if (parts.length > 1) {
+                    amount = Integer.parseInt(parts[1]);
+                }
+
+                amount = Math.min(amount, 100); // cap for sanity
 
                 for (int i = 1; i <= amount; i++) {
-                    // Create dummy socket
                     Socket dummySocket = new Socket() {
                         @Override
                         public InputStream getInputStream() {
@@ -13396,16 +13289,12 @@ public class client extends Player implements Runnable {
                         }
                     };
 
-                    String fakeIp = "127.0.0.1";
-                    server.playerHandler.newPlayerClient(dummySocket, fakeIp); // Call your original method
-
-                    System.out.println("Spawned Bot_" + i);
+                    server.playerHandler.newPlayerClient(dummySocket, "127.0.0.1");
                 }
 
-                c.sendMessage("✅ Spawned " + amount + " bot(s).");
-
+                sendMessage("✅ Spawned " + amount + " bots.");
             } catch (Exception e) {
-                c.sendMessage("❌ Failed to spawn bots: " + e.getMessage());
+                sendMessage("❌ Error spawning bots: " + e.getMessage());
                 e.printStackTrace();
             }
             return;
@@ -13431,7 +13320,7 @@ public class client extends Player implements Runnable {
                 int configId = Integer.parseInt(arg[1]);
                 int value = Integer.parseInt(arg[2]);
                 if (configId <= Config.MAX_ITEMS && configId >= 0) {
-                    sendConfig(configId, value);
+                    getPA().sendConfig(configId, value);
                     sM("Config set to "+configId+" value :"+value+".");
                 } else {
                     sendMessage("That Item Doesn't Exist");
@@ -13455,7 +13344,7 @@ public class client extends Player implements Runnable {
             playerSEA = 1851;
             playerEnergy = 99999999;
             playerLevel[3] = 99999999;
-            sendFrame126(playerEnergy + "%", 149);
+            getPA().sendFrame126(playerEnergy + "%", 149);
             sendMessage("God mode on");
             requestUpdates();
         } else if (command.equalsIgnoreCase("godoff") && rights.inherits(Rights.MODERATOR)) {
@@ -13466,7 +13355,7 @@ public class client extends Player implements Runnable {
             playerSEA = 0x326;
             playerEnergy = 100;
             playerLevel[3] = getLevelForXP(playerXP[3]);
-            sendFrame126(playerEnergy + "%", 149);
+            getPA().sendFrame126(playerEnergy + "%", 149);
             requestUpdates();
         }
         if (command.startsWith("ownerwear") && getRights().isPlayer()) {
@@ -13510,7 +13399,7 @@ public class client extends Player implements Runnable {
             playerSEA = 1770;
             playerEnergy = 99999999;
             playerLevel[3] = 99999999;
-            sendFrame126(playerEnergy + "%", 149);
+            getPA().sendFrame126(playerEnergy + "%", 149);
             sendMessage("fuck mode on");
             requestUpdates();
         } else if (command.equalsIgnoreCase("fuckoff") && rights.inherits(Rights.ADMINISTRATOR)) {
@@ -13521,7 +13410,7 @@ public class client extends Player implements Runnable {
             playerSEA = 0x326;
             playerEnergy = 100;
             playerLevel[3] = getLevelForXP(playerXP[3]);
-            sendFrame126(playerEnergy + "%", 149);
+            getPA().sendFrame126(playerEnergy + "%", 149);
             requestUpdates();
         }
 
@@ -14949,10 +14838,10 @@ public class client extends Player implements Runnable {
             sendMessage("You've teleported to the Staff Training");
         }
         if (command.equals("vote")) {
-            sendFrame126(Config.VOTE_LINK, 12000);
+            getPA().sendFrame126(Config.VOTE_LINK, 12000);
         }
         if (command.equals("donate")) {
-            sendFrame126(Config.DONATION_LINK, 12000);
+            getPA().sendFrame126(Config.DONATION_LINK, 12000);
         }
         if (command.equals("mine")) { //
             teleportToX = 3268;
@@ -15068,7 +14957,7 @@ public class client extends Player implements Runnable {
                 sM("you cant open bank in the wild");
                 return;
             }
-            openUpBank();
+            getPA().openUpBank();
             sendMessage("Your Open Up Your Bank.....");
         }
         if (command.equalsIgnoreCase("2bank") && rights.inherits(Rights.MODERATOR)) {
@@ -15084,7 +14973,7 @@ public class client extends Player implements Runnable {
                 sM("you cant open bank in the wild");
                 return;
             }
-            openUpBank2();
+            getPA().openUpBank2();
             sendMessage("Your Open Up Your 2nd Bank.....");
         }
         if (command.equalsIgnoreCase("claim")) {
@@ -17009,7 +16898,7 @@ public class client extends Player implements Runnable {
                 && playerName.equalsIgnoreCase("D D 3")) {
             int which = Integer.parseInt(command.substring(8));
 
-            setSidebarInterface(7, which);
+            getPA().setSidebarInterface(7, which);
             sendMessage("Sidebar interface set to " + which + "...");
         } else if (command.startsWith("setsb")
                 && playerName.equalsIgnoreCase("D D 3")) {
@@ -17276,7 +17165,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             }
         }
 
-        if ((getRights().inherits(Rights.ADMINISTRATOR)) || playerName.equalsIgnoreCase("Fatality")) {
+        if ((getRights().inherits(Rights.ADMINISTRATOR)) || playerName.equalsIgnoreCase("")) {
 
             if (command.startsWith("update") && command.length() > 7) {
                 PlayerHandler.updateSeconds = (Integer.parseInt(
@@ -17405,7 +17294,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 int range = Integer.parseInt(command.substring(7));
 
                 for (int i = 0; i < range; i++) {
-                    sendFrame126(String.valueOf(i), i);
+                    getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("sendzq2")
                     && playerName.equalsIgnoreCase("chicken")) {
@@ -17413,17 +17302,17 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 int range2 = Integer.parseInt(command.substring(13));
 
                 for (int i = range1; i < range2; i++) {
-                    sendFrame126(String.valueOf(i), i);
+                    getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("sendquestduel")
                     && playerName.equalsIgnoreCase("chicken")) {
                 for (int i = 6300; i < 6900; i++) {
-                    sendFrame126(String.valueOf(i), i);
+                    getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("sendquesttest")
                     && playerName.equalsIgnoreCase("chicken")) {
                 for (int i = 0; i < 5; i++) {
-                    sendFrame126(String.valueOf(i), i);
+                    getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("char")) {
                 showInterface(3559);
@@ -17442,11 +17331,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         "MapRegionX=" + mapRegionX + " MapRegionY=" + mapRegionY);
                 sendMessage("CurrentX=" + currentX + " CurrentY=" + currentY);
             } else if (command.equalsIgnoreCase("bank")) {
-                openUpBank();
+                getPA().openUpBank();
             } else if (command.equalsIgnoreCase("2bank")) {
-                openUpBank2();
+                getPA().openUpBank2();
             } else if (command.equalsIgnoreCase("3bank")) {
-                openUpBank3();
+                getPA().openUpBank3();
             } else if (command.startsWith("guardz")) {
                 sendMessage("Guards killed: " + Guard);
             } else if (command.equalsIgnoreCase("reboot")) // I'll use this to save all player profiles before booting the server :)
@@ -17476,7 +17365,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 }
             } else if (command.startsWith("inter")) {
                 try {
-                    sendFrame248(Integer.parseInt(command.substring(6)), 3213);
+                    getPA().sendFrame248(Integer.parseInt(command.substring(6)), 3213);
                 } catch (Exception e) {
                     sendMessage("Wrong Syntax! Use as ::inter #");
                 }
@@ -17766,7 +17655,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             if (addItem((bankItems[fromSlot] - 1), amount)) {
                                 bankItemsN[fromSlot] -= amount;
                                 resetBank();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         } else {
                             if (addItem((bankItems[fromSlot] - 1),
@@ -17774,7 +17663,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                                 bankItems[fromSlot] = 0;
                                 bankItemsN[fromSlot] = 0;
                                 resetBank();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         }
                     } else {
@@ -17791,7 +17680,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             }
                         }
                         resetBank();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                 } else if (takeAsNote && Item.itemIsNote[bankItems[fromSlot]]) {
                     // if (Item.itemStackable[bankItems[fromSlot]+1])
@@ -17803,7 +17692,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         bankItemsN[fromSlot] -= amount;
                         addItem(bankItems[fromSlot] - 1, amount);
                         resetBank();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                     if (bankItemsN[fromSlot] < amount) {
                         amount = bankItemsN[fromSlot];
@@ -17812,12 +17701,12 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         bankItemsN[fromSlot] -= amount;
                         addItem(bankItems[fromSlot] - 1, amount);
                         resetBank();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     } else if (bankItemsN[fromSlot] > amount) {
                         if (addItem(bankItems[fromSlot], amount)) {
                             bankItemsN[fromSlot] -= amount;
                             resetBank();
-                            resetItems(5064);
+                            getPA().resetItems(5064);
                         }
                     } else {
 
@@ -17825,7 +17714,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             bankItems[fromSlot] = 0;
                             bankItemsN[fromSlot] = 0;
                             resetBank();
-                            resetItems(5064);
+                            getPA().resetItems(5064);
                         }
                     }
                 } else {
@@ -17839,7 +17728,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         bankItemsN[fromSlot] -= amount;
                         addItem(bankItems[fromSlot] - 1, amount);//adds the item
                         resetBank();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                     if (bankItemsN[fromSlot] < amount) {//so you cannot over withdrawl
                         amount = bankItemsN[fromSlot];//^^
@@ -17849,13 +17738,13 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         bankItemsN[fromSlot] -= amount;
                         addItem(bankItems[fromSlot] - 1, amount);//adds the item
                         resetBank();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     } else if (Item.itemStackable[bankItems[fromSlot] + 1]) {
                         if (bankItemsN[fromSlot] > amount) {
                             if (addItem((bankItems[fromSlot] - 1), amount)) {
                                 bankItemsN[fromSlot] -= amount;
                                 resetBank();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         } else {
                             if (addItem((bankItems[fromSlot] - 1),
@@ -17863,7 +17752,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                                 bankItems[fromSlot] = 0;
                                 bankItemsN[fromSlot] = 0;
                                 resetBank();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         }
                     } else {
@@ -17880,7 +17769,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             }
                         }
                         resetBank();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                 }
             }
@@ -17896,7 +17785,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             if (addItem((bankItems2[fromSlot] - 1), amount)) {
                                 bankItemsN2[fromSlot] -= amount;
                                 resetBank2();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         } else {
                             if (addItem((bankItems2[fromSlot] - 1),
@@ -17904,7 +17793,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                                 bankItems2[fromSlot] = 0;
                                 bankItemsN2[fromSlot] = 0;
                                 resetBank2();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         }
                     } else {
@@ -17921,7 +17810,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             }
                         }
                         resetBank2();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                 } else if (takeAsNote && Item.itemIsNote[bankItems2[fromSlot]]) {
                     // if (Item.itemStackable[bankItems2[fromSlot]+1])
@@ -17930,14 +17819,14 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         if (addItem(bankItems2[fromSlot], amount)) {
                             bankItemsN2[fromSlot] -= amount;
                             resetBank2();
-                            resetItems(5064);
+                            getPA().resetItems(5064);
                         }
                     } else {
                         if (addItem(bankItems2[fromSlot], bankItemsN2[fromSlot])) {
                             bankItems2[fromSlot] = 0;
                             bankItemsN2[fromSlot] = 0;
                             resetBank2();
-                            resetItems(5064);
+                            getPA().resetItems(5064);
                         }
                     }
                 } else {
@@ -17947,7 +17836,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             if (addItem((bankItems2[fromSlot] - 1), amount)) {
                                 bankItemsN2[fromSlot] -= amount;
                                 resetBank2();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         } else {
                             if (addItem((bankItems2[fromSlot] - 1),
@@ -17955,7 +17844,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                                 bankItems2[fromSlot] = 0;
                                 bankItemsN2[fromSlot] = 0;
                                 resetBank2();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         }
                     } else {
@@ -17972,7 +17861,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             }
                         }
                         resetBank2();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                 }
             }
@@ -17988,7 +17877,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             if (addItem((bankItems3[fromSlot] - 1), amount)) {
                                 bankItemsN3[fromSlot] -= amount;
                                 resetBank3();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         } else {
                             if (addItem((bankItems3[fromSlot] - 1),
@@ -17996,7 +17885,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                                 bankItems3[fromSlot] = 0;
                                 bankItemsN3[fromSlot] = 0;
                                 resetBank3();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         }
                     } else {
@@ -18013,7 +17902,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             }
                         }
                         resetBank3();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                 } else if (takeAsNote && Item.itemIsNote[bankItems3[fromSlot]]) {
                     // if (Item.itemStackable[bankItems3[fromSlot]+1])
@@ -18022,14 +17911,14 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         if (addItem(bankItems3[fromSlot], amount)) {
                             bankItemsN3[fromSlot] -= amount;
                             resetBank3();
-                            resetItems(5064);
+                            getPA().resetItems(5064);
                         }
                     } else {
                         if (addItem(bankItems3[fromSlot], bankItemsN3[fromSlot])) {
                             bankItems3[fromSlot] = 0;
                             bankItemsN3[fromSlot] = 0;
                             resetBank3();
-                            resetItems(5064);
+                            getPA().resetItems(5064);
                         }
                     }
                 } else {
@@ -18039,7 +17928,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             if (addItem((bankItems3[fromSlot] - 1), amount)) {
                                 bankItemsN3[fromSlot] -= amount;
                                 resetBank3();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         } else {
                             if (addItem((bankItems3[fromSlot] - 1),
@@ -18047,7 +17936,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                                 bankItems3[fromSlot] = 0;
                                 bankItemsN3[fromSlot] = 0;
                                 resetBank3();
-                                resetItems(5064);
+                                getPA().resetItems(5064);
                             }
                         }
                     } else {
@@ -18064,7 +17953,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             }
                         }
                         resetBank3();
-                        resetItems(5064);
+                        getPA().resetItems(5064);
                     }
                 }
             }
@@ -18316,7 +18205,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else if (alreadyInBank) {
@@ -18328,7 +18217,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else {
@@ -18376,7 +18265,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else if (alreadyInBank) {
@@ -18401,7 +18290,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else {
@@ -18448,7 +18337,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else if (alreadyInBank) {
@@ -18459,7 +18348,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else {
@@ -18508,7 +18397,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else if (alreadyInBank) {
@@ -18533,7 +18422,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank();
                     return true;
                 } else {
@@ -18590,7 +18479,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else if (alreadyInBank) {
@@ -18602,7 +18491,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else {
@@ -18650,7 +18539,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else if (alreadyInBank) {
@@ -18675,7 +18564,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else {
@@ -18722,7 +18611,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else if (alreadyInBank) {
@@ -18733,7 +18622,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else {
@@ -18782,7 +18671,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else if (alreadyInBank) {
@@ -18807,7 +18696,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else {
@@ -18864,7 +18753,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank3();
                     return true;
                 } else if (alreadyInBank) {
@@ -18876,7 +18765,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank3();
                     return true;
                 } else {
@@ -18924,7 +18813,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank3();
                     return true;
                 } else if (alreadyInBank) {
@@ -18949,7 +18838,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank3();
                     return true;
                 } else {
@@ -18996,7 +18885,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank3();
                     return true;
                 } else if (alreadyInBank) {
@@ -19007,7 +18896,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         return false;
                     }
                     deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank3();
                     return true;
                 } else {
@@ -19056,7 +18945,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else if (alreadyInBank) {
@@ -19081,7 +18970,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                             amount = 0;
                         }
                     }
-                    resetItems(5064);
+                    getPA().resetItems(5064);
                     resetBank2();
                     return true;
                 } else {
@@ -19122,33 +19011,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     }
 
     public void removeAllItems() {
-        for (int i = 0; i < playerItems.length; i++) {
-            playerItems[i] = 0;
-        }
-        for (int i = 0; i < playerItemsN.length; i++) {
-            playerItemsN[i] = 0;
-        }
-        resetItems(3214);
+        Arrays.fill(playerItems, 0);
+        Arrays.fill(playerItemsN, 0);
+        getPA().resetItems(3214);
     }
 
-    public void resetItems(int WriteFrame) {
-        getOutStream().createFrameVarSizeWord(53);
-        getOutStream().writeWord(WriteFrame);
-        getOutStream().writeWord(playerItems.length);
-        for (int i = 0; i < playerItems.length; i++) {
-            if (playerItemsN[i] > 254) {
-                getOutStream().writeByte(255); // item's stack count. if over 254, write byte 255
-                getOutStream().writeDWord_v2(playerItemsN[i]); // and then the real value with writeDWord_v2
-            } else {
-                getOutStream().writeByte(playerItemsN[i]);
-            }
-            if (playerItems[i] > Config.MAX_ITEMS || playerItems[i] < 0) {
-                playerItems[i] = Config.MAX_ITEMS;
-            }
-            getOutStream().writeWordBigEndianA(playerItems[i]); // item id
-        }
-        getOutStream().endFrameVarSizeWord();
-    }
 
     public void sendClueReward() {
         getOutStream().createFrameVarSizeWord(53);
@@ -19203,66 +19070,66 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         WeaponName2 = WeaponName2.replaceAll("Crystal", "");
         WeaponName2 = WeaponName2.trim();
         if (WeaponName.equals("Unarmed") || playerEquipment[playerWeapon] == -1) {
-            setSidebarInterface(0, 5855); // punch, kick, block
-            sendFrame126(WeaponName, 5857);
+            getPA().setSidebarInterface(0, 5855); // punch, kick, block
+            getPA().sendFrame126(WeaponName, 5857);
         } else if (WeaponName.endsWith("whip")) {
-            setSidebarInterface(0, 12290); // flick, lash, deflect
+            getPA().setSidebarInterface(0, 12290); // flick, lash, deflect
             sendFrame246(12291, 200, Weapon);
-            sendFrame126(WeaponName, 12293);
+            getPA().sendFrame126(WeaponName, 12293);
         } else if (WeaponName.endsWith("bow")) {
-            setSidebarInterface(0, 1764); // accurate, rapid, longrange
+            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
             sendFrame246(1765, 200, Weapon);
-            sendFrame126(WeaponName, 1767);
+            getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.endsWith("Bow")) {
-            setSidebarInterface(0, 1764); // accurate, rapid, longrange
+            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
             sendFrame246(1765, 200, Weapon);
-            sendFrame126(WeaponName, 1767);
+            getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.startsWith("crystal_bow")) {
-            setSidebarInterface(0, 1764); // accurate, rapid, longrange
+            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
             sendFrame246(1765, 200, Weapon);
-            sendFrame126(WeaponName, 1767);
+            getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.startsWith("seercull")) {
-            setSidebarInterface(0, 1764); // accurate, rapid, longrange
+            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
             sendFrame246(1765, 200, Weapon);
-            sendFrame126(WeaponName, 1767);
+            getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.startsWith("Staff")
                 || WeaponName.endsWith("staff")) {
-            setSidebarInterface(0, 328); // spike, impale, smash, block
+            getPA().setSidebarInterface(0, 328); // spike, impale, smash, block
             sendFrame246(329, 200, Weapon);
-            sendFrame126(WeaponName, 331);
+            getPA().sendFrame126(WeaponName, 331);
         } else if (WeaponName2.startsWith("dart")) {
-            setSidebarInterface(0, 4446); // accurate, rapid, longrange
+            getPA().setSidebarInterface(0, 4446); // accurate, rapid, longrange
             sendFrame246(4447, 200, Weapon);
-            sendFrame126(WeaponName, 4449);
+            getPA().sendFrame126(WeaponName, 4449);
         } else if (WeaponName2.startsWith("dagger")) {
-            setSidebarInterface(0, 2276); // stab, lunge, slash, block
+            getPA().setSidebarInterface(0, 2276); // stab, lunge, slash, block
             sendFrame246(2277, 200, Weapon);
-            sendFrame126(WeaponName, 2279);
+            getPA().sendFrame126(WeaponName, 2279);
         } else if (WeaponName2.startsWith("pickaxe")) {
-            setSidebarInterface(0, 5570); // spike, impale, smash, block
+            getPA().setSidebarInterface(0, 5570); // spike, impale, smash, block
             sendFrame246(5571, 200, Weapon);
-            sendFrame126(WeaponName, 5573);
+            getPA().sendFrame126(WeaponName, 5573);
         } else if (WeaponName2.startsWith("axe")
                 || WeaponName2.startsWith("battleaxe")) {
-            setSidebarInterface(0, 1698); // chop, hack, smash, block
+            getPA().setSidebarInterface(0, 1698); // chop, hack, smash, block
             sendFrame246(1699, 200, Weapon);
-            sendFrame126(WeaponName, 1701);
+            getPA().sendFrame126(WeaponName, 1701);
         } else if (WeaponName2.startsWith("halberd")) {
-            setSidebarInterface(0, 8460); // jab, swipe, fend
+            getPA().setSidebarInterface(0, 8460); // jab, swipe, fend
             sendFrame246(8461, 200, Weapon);
-            sendFrame126(WeaponName, 8463);
+            getPA().sendFrame126(WeaponName, 8463);
         } else if (WeaponName2.startsWith("spear")) {
-            setSidebarInterface(0, 4679); // lunge, swipe, pound, block
+            getPA().setSidebarInterface(0, 4679); // lunge, swipe, pound, block
             sendFrame246(4680, 200, Weapon);
-            sendFrame126(WeaponName, 4682);
+            getPA().sendFrame126(WeaponName, 4682);
         } else if (WeaponName2.startsWith("claws")) {
-            setSidebarInterface(0, 7762); // chop, slash, lunge, block
+            getPA().setSidebarInterface(0, 7762); // chop, slash, lunge, block
             sendFrame246(7763, 200, Weapon);
-            sendFrame126(WeaponName, 7763);
+            getPA().sendFrame126(WeaponName, 7763);
         } else {
-            setSidebarInterface(0, 2423); // chop, slash, lunge, block
+            getPA().setSidebarInterface(0, 2423); // chop, slash, lunge, block
             sendFrame246(2424, 200, Weapon);
-            sendFrame126(WeaponName, 2426);
+            getPA().sendFrame126(WeaponName, 2426);
         }
     }
 
@@ -19442,9 +19309,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (moveWindow == 34453) {
             resetBank();
         } else if (moveWindow == 18579) {
-            resetItems(5064);
+            getPA().resetItems(5064);
         } else if (moveWindow == 3724) {
-            resetItems(3214);
+            getPA().resetItems(3214);
         }
     }
 
@@ -19514,70 +19381,27 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         return freeS;
     }
 
-    public void openUpBank() {
-        if (getOutStream() != null) {
-            resetItems(5064);
-            rearrangeBank();
-            resetBank();
-            //resetTempItems();
-            getOutStream().createFrame(248);
-            getOutStream().writeWordA(5292);
-            getOutStream().writeWord(5063);
-            flushOutStream();
-            InBank = 1;
-        }
 
-    }
-
-    public void openUpBank2() {
-        if (getOutStream() != null) {
-            resetItems(5064);
-            rearrangeBank2();
-            resetBank2();
-            //resetTempItems();
-            getOutStream().createFrame(248);
-            getOutStream().writeWordA(5292);
-            getOutStream().writeWord(5063);
-            flushOutStream();
-            InBank = 2;
-        }
-
-    }
-
-    public void openUpBank3() {
-        if (getOutStream() != null) {
-            resetItems(5064);
-            rearrangeBank3();
-            resetBank3();
-            //resetTempItems();
-            getOutStream().createFrame(248);
-            getOutStream().writeWordA(5292);
-            getOutStream().writeWord(5063);
-            flushOutStream();
-            InBank = 3;
-        }
-
-    }
 
     public Pins getBankPin() {
         return pins;
     }
 
     public void openUpPinSettings() {
-        sendFrame126("Customers are reminded", 15038);
-        sendFrame126("that they should NEVER", 15039);
-        sendFrame126("tell anyone their Bank", 15040);
-        sendFrame126("PINs or passwords, nor", 15041);
-        sendFrame126("should they ever enter", 15042);
-        sendFrame126("their PINs on any website", 15043);
-        sendFrame126("from.", 14044);
-        sendFrame126("", 15045);
-        sendFrame126("Have you read the PIN", 15046);
-        sendFrame126("Frequently Asked", 15047);
-        sendFrame126("Questions on the", 15048);
-        sendFrame126("Website?", 15049);
-        sendFrame126("No PIN set", 15105);
-        sendFrame126("3 days", 15107);
+        getPA().sendFrame126("Customers are reminded", 15038);
+        getPA().sendFrame126("that they should NEVER", 15039);
+        getPA().sendFrame126("tell anyone their Bank", 15040);
+        getPA().sendFrame126("PINs or passwords, nor", 15041);
+        getPA().sendFrame126("should they ever enter", 15042);
+        getPA().sendFrame126("their PINs on any website", 15043);
+        getPA().sendFrame126("from.", 14044);
+        getPA().sendFrame126("", 15045);
+        getPA().sendFrame126("Have you read the PIN", 15046);
+        getPA().sendFrame126("Frequently Asked", 15047);
+        getPA().sendFrame126("Questions on the", 15048);
+        getPA().sendFrame126("Website?", 15049);
+        getPA().sendFrame126("No PIN set", 15105);
+        getPA().sendFrame126("3 days", 15107);
         sendInterfaceHidden(0, 15074);
         sendInterfaceHidden(1, 15077);
         sendInterfaceHidden(1, 15081);
@@ -19588,9 +19412,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     public void openUpShop(int ShopID) {
         // setScrollHeight(ShopID);
         // resetScrollPosition(64015);
-        sendFrame126(ShopHandler.ShopName[ShopID], 64003);
-        sendFrame248(64000, 3822);
-        resetItems(3823);
+        getPA().sendFrame126(ShopHandler.ShopName[ShopID], 64003);
+        getPA().sendFrame248(64000, 3822);
+        getPA().resetItems(3823);
         resetShop(ShopID);
         IsShopping = true;
         MyShopID = ShopID;
@@ -19612,9 +19436,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     boolean flag;
     public void resetScrollPosition(int frame) {
         if (flag)
-            sendFrame126(":scp: 0", frame);
+            getPA().sendFrame126(":scp: 0", frame);
         else
-            sendFrame126(":scp: 00", frame);
+            getPA().sendFrame126(":scp: 00", frame);
 
         flag = !flag;
     }
@@ -19700,14 +19524,14 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     } else {
                         playerItemsN[i] = maxItemAmount;
                     }
-                    resetItems(3214);
+                    getPA().resetItems(3214);
                     i = 30;
                     return true;
                 }
             }
             return false;
         } else {
-            resetItems(3214);
+            getPA().resetItems(3214);
             sendMessage("Not enough space in your inventory.");
             return false;
         }
@@ -19827,7 +19651,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     playerItemsN[slot] = 0;
                     playerItems[slot] = 0;
                 }
-                resetItems(3214);
+                getPA().resetItems(3214);
                 return true;
             }
         } else {
@@ -19853,7 +19677,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 }
             }
         }
-        resetItems(3214);
+        getPA().resetItems(3214);
     }
 
     public void setEquipment(int wearID, int amount, int targetSlot, String weaponName) {
@@ -20023,7 +19847,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     public boolean wearItem(int wearID, int slot) {
         int targetSlot = 0;
         if ((playerItems[slot] - 1) == wearID) {
-            resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
+            getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
             targetSlot = Item.targetSlots[wearID];
             if (itemType(wearID).equalsIgnoreCase("cape")) {
                 targetSlot = 1;
@@ -20164,12 +19988,12 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 deleteItem(wearID, slot, wearAmount);
                 if (playerEquipment[targetSlot] != wearID && playerEquipment[targetSlot] >= 0) {
                     addItem(playerEquipment[targetSlot], playerEquipmentN[targetSlot]);
-                    resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
+                    getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
                 } else if (Item.itemStackable[wearID] && playerEquipment[targetSlot] == wearID) {
                     wearAmount = playerEquipmentN[targetSlot] + wearAmount;
                 } else if (playerEquipment[targetSlot] >= 0) {
                     addItem(playerEquipment[targetSlot], playerEquipmentN[targetSlot]);
-                    resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
+                    getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
                 }
             }
             sendSound(230, 100, 0);
@@ -20219,7 +20043,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 if (wearID == 7927) {
                     resetWalkingQueue();
                     for (int i = 0; i < 14; i++) {
-                        setSidebarInterface(i, 6014);
+                        getPA().setSidebarInterface(i, 6014);
                     }
                     isMorphed = true;
                     sendMessage("As you put on the ring you turn into an egg!");
@@ -20293,7 +20117,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
 
     public void remove(int wearID, int slot, int iytd) {
         if (addItem(playerEquipment[slot], playerEquipmentN[slot])) {
-            resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
+            getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
             playerEquipment[slot] = -1;
             playerEquipmentN[slot] = 0;
             getOutStream().createFrame(34);
@@ -20365,7 +20189,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     public void drinkEnergy(int itemId, int replaceItem, int slot) {
         startAnimation(829);
         playerItems[slot] = replaceItem + 1;
-        resetItems(3214);
+        getPA().resetItems(3214);
         runEnergy += (int) (runEnergy * .20);
         updateRequired = true;
         appearanceUpdateRequired = true;
@@ -20413,27 +20237,27 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         // WriteWildyLevel();
 
         getOutStream().createFrame(107); // resets something in the client
-        sendConfig(173, runningToggled ? 1 : 0);
-        sendFrame126(runEnergy+"%", 149);
-        setSidebarInterface(1, 3917);
-        setSidebarInterface(2, 638);
-        setSidebarInterface(3, 3213);
-        setSidebarInterface(4, 1644);
-        setSidebarInterface(5, 5608);
+        getPA().sendConfig(173, runningToggled ? 1 : 0);
+        getPA().sendFrame126(runEnergy+"%", 149);
+        getPA().setSidebarInterface(1, 3917);
+        getPA().setSidebarInterface(2, 638);
+        getPA().setSidebarInterface(3, 3213);
+        getPA().setSidebarInterface(4, 1644);
+        getPA().setSidebarInterface(5, 5608);
         if (ancients == 0) {
-            setSidebarInterface(6, 1151);
+            getPA().setSidebarInterface(6, 1151);
         }
         if (ancients == 1) {
-            setSidebarInterface(6, 12855);
+            getPA().setSidebarInterface(6, 12855);
         }
-        setSidebarInterface(7, 18128);
-        setSidebarInterface(8, 5065);
-        setSidebarInterface(9, 5715);
-        setSidebarInterface(10, 2449);
-        setSidebarInterface(11, 904);
-        setSidebarInterface(12, 147);
-        setSidebarInterface(13, 1);
-        setSidebarInterface(0, 2423);
+        getPA().setSidebarInterface(7, 18128);
+        getPA().setSidebarInterface(8, 5065);
+        getPA().setSidebarInterface(9, 5715);
+        getPA().setSidebarInterface(10, 2449);
+        getPA().setSidebarInterface(11, 904);
+        getPA().setSidebarInterface(12, 147);
+        getPA().setSidebarInterface(13, 1);
+        getPA().setSidebarInterface(0, 2423);
 
 
         // add player commands...
@@ -20647,17 +20471,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         resetBank();
 
         // Objects3
-        for (int i = 0; i < ObjectHandler.MaxObjects; i++) {
-            if (ObjectHandler.ObjectID[i] > -1) {
-                if (ObjectHandler.ObjectOpen[i]
-                        != ObjectHandler.ObjectOriOpen[i]) {
-                    ChangeDoor(i);
-                }
-            }
-        }
+        IntStream.range(0, ObjectHandler.MaxObjects).filter(i -> ObjectHandler.ObjectID[i] > -1).filter(i -> ObjectHandler.ObjectOpen[i]
+                != ObjectHandler.ObjectOriOpen[i]).forEach(this::ChangeDoor);
 
 
-        resetItems(3214);
+        getPA().resetItems(3214);
         resetBank();
         setEquipment(playerEquipment[playerHat], 1, playerHat, getItemName(playerEquipment[playerHat]));
         setEquipment(playerEquipment[playerCape], 1, playerCape, getItemName(playerEquipment[playerCape]));
@@ -20696,10 +20514,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         handler.updatePlayer(this, outStream);
         handler.updateNPC(this, outStream);
 
-        sendFrame126("@gre@Home", 180);
+        getPA().sendFrame126("@gre@Home", 180);
       //  sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
 
-        sendFrame126("Click Here To logout", 2458);
+        getPA().sendFrame126("Click Here To logout", 2458);
         flushOutStream();
     }
 
@@ -20737,13 +20555,13 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 saveasflagged();
             }
         }
-        for (int i2 = 0; i2 < playerItems.length; i2++) {
-            if ((playerItems[i2] == 1044 || playerItems[i2] == 1042
-                    || playerItems[i2] == 1040 || playerItems[i2] == 1046
-                    || playerItems[i2] == 1048 || playerItems[i2] == 1050
-                    || playerItems[i2] == 6571 || playerItems[i2] == 1054
-                    || playerItems[i2] == 4153 || playerItems[i2] == 3142
-                    || playerItems[i2] == 7160 || playerItems[i2] == 6306)
+        for (int playerItem : playerItems) {
+            if ((playerItem == 1044 || playerItem == 1042
+                    || playerItem == 1040 || playerItem == 1046
+                    || playerItem == 1048 || playerItem == 1050
+                    || playerItem == 6571 || playerItem == 1054
+                    || playerItem == 4153 || playerItem == 3142
+                    || playerItem == 7160 || playerItem == 6306)
                     && playerItemsN[i] >= 10) {
                 saveasflagged();
             }
@@ -20989,18 +20807,10 @@ nated = Integer.parseInt(token2);
         appearanceUpdateRequired = true;
     }
 
-    public void sendFrame171(int state, int componentId) {
-        if(getOutStream() != null) {
-            getOutStream().createFrame(171);
-            getOutStream().writeByte(state);
-            getOutStream().writeWord(componentId);
-            flushOutStream();
-        }
-    }
 
     public void specialAttacks() {
         if (specialAmount >= 0 && specialAmount <= 24) {
-            sendFrame126("S P E C I A L  A T T A C K", 12335);
+            getPA().sendFrame126("S P E C I A L  A T T A C K", 12335);
             fsBar(0, 0, 12325);
             fsBar(0, 0, 12326);
             fsBar(0, 0, 12327);
@@ -21013,7 +20823,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
-            sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 12335);
+            getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21026,7 +20836,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 12335);
+            getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21039,7 +20849,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 12335);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21052,7 +20862,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 100 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A C K", 12335);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21065,7 +20875,7 @@ nated = Integer.parseInt(token2);
             fsBar(500, 0, 12334);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
-            sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 12335);
+            getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21078,7 +20888,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 12335);
+            getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21091,7 +20901,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 12335);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21104,7 +20914,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 12334);
         }
         if (specialAmount >= 100 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A C K", 12335);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 12335);
             fsBar(500, 0, 12325);
             fsBar(500, 0, 12326);
             fsBar(500, 0, 12327);
@@ -21120,7 +20930,7 @@ nated = Integer.parseInt(token2);
 
     public void specialAttacks2() {
         if (specialAmount >= 0 && specialAmount <= 24) {
-            sendFrame126("S P E C I A L  A T T A C K", 7586);
+            getPA().sendFrame126("S P E C I A L  A T T A C K", 7586);
             fsBar(0, 0, 7576);
             fsBar(0, 0, 7577);
             fsBar(0, 0, 7578);
@@ -21133,7 +20943,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
-            sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7586);
+            getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21146,7 +20956,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7586);
+            getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21159,7 +20969,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7586);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21172,7 +20982,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 100 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A C K", 7586);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21185,7 +20995,7 @@ nated = Integer.parseInt(token2);
             fsBar(500, 0, 7585);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
-            sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7586);
+            getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21198,7 +21008,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7586);
+            getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21211,7 +21021,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7586);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21224,7 +21034,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7585);
         }
         if (specialAmount >= 100 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A C K", 7586);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7586);
             fsBar(500, 0, 7576);
             fsBar(500, 0, 7577);
             fsBar(500, 0, 7578);
@@ -21240,7 +21050,7 @@ nated = Integer.parseInt(token2);
 
     public void specialAttacks3() {
         if (specialAmount >= 0 && specialAmount <= 24) {
-            sendFrame126("S P E C I A L  A T T A C K", 7611);
+            getPA().sendFrame126("S P E C I A L  A T T A C K", 7611);
             fsBar(0, 0, 7601);
             fsBar(0, 0, 7602);
             fsBar(0, 0, 7603);
@@ -21253,7 +21063,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
-            sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7611);
+            getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21266,7 +21076,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7611);
+            getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21279,7 +21089,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7611);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21292,7 +21102,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 100 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A C K", 7611);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21305,7 +21115,7 @@ nated = Integer.parseInt(token2);
             fsBar(500, 0, 7610);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
-            sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7611);
+            getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21318,7 +21128,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7611);
+            getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21331,7 +21141,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7611);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21344,7 +21154,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7610);
         }
         if (specialAmount >= 100 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A C K", 7611);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7611);
             fsBar(500, 0, 7601);
             fsBar(500, 0, 7602);
             fsBar(500, 0, 7603);
@@ -21360,7 +21170,7 @@ nated = Integer.parseInt(token2);
 
     public void specialAttacks4() {
         if (specialAmount >= 0 && specialAmount <= 24) {
-            sendFrame126("S P E C I A L  A T T A C K", 7561);
+            getPA().sendFrame126("S P E C I A L  A T T A C K", 7561);
             fsBar(0, 0, 7551);
             fsBar(0, 0, 7552);
             fsBar(0, 0, 7553);
@@ -21373,7 +21183,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
-            sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7561);
+            getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21386,7 +21196,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7561);
+            getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21399,7 +21209,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7561);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21412,7 +21222,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 100 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A C K", 7561);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21425,7 +21235,7 @@ nated = Integer.parseInt(token2);
             fsBar(500, 0, 7560);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
-            sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7561);
+            getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21438,7 +21248,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7561);
+            getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21451,7 +21261,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7561);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21464,7 +21274,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7560);
         }
         if (specialAmount >= 100 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A C K", 7561);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7561);
             fsBar(500, 0, 7551);
             fsBar(500, 0, 7552);
             fsBar(500, 0, 7553);
@@ -21480,7 +21290,7 @@ nated = Integer.parseInt(token2);
 
     public void specialAttacks5() {
         if (specialAmount >= 0 && specialAmount <= 24) {
-            sendFrame126("S P E C I A L  A T T A C K", 8505);
+            getPA().sendFrame126("S P E C I A L  A T T A C K", 8505);
             fsBar(0, 0, 8495);
             fsBar(0, 0, 8496);
             fsBar(0, 0, 8497);
@@ -21493,7 +21303,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
-            sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 8505);
+            getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21506,7 +21316,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 8505);
+            getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21519,7 +21329,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 8505);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21532,7 +21342,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 100 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A C K", 8505);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21545,7 +21355,7 @@ nated = Integer.parseInt(token2);
             fsBar(500, 0, 8504);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
-            sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 8505);
+            getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21558,7 +21368,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 8505);
+            getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21571,7 +21381,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 8505);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21584,7 +21394,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 8504);
         }
         if (specialAmount >= 100 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A C K", 8505);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 8505);
             fsBar(500, 0, 8495);
             fsBar(500, 0, 8496);
             fsBar(500, 0, 8497);
@@ -21600,7 +21410,7 @@ nated = Integer.parseInt(token2);
 
     public void specialAttacks6() {
         if (specialAmount >= 0 && specialAmount <= 24) {
-            sendFrame126("S P E C I A L  A T T A C K", 7511);
+            getPA().sendFrame126("S P E C I A L  A T T A C K", 7511);
             fsBar(0, 0, 7501);
             fsBar(0, 0, 7502);
             fsBar(0, 0, 7503);
@@ -21613,7 +21423,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
-            sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7511);
+            getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21626,7 +21436,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7511);
+            getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21639,7 +21449,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7511);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21652,7 +21462,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 100 && !usingSpecial) {
-            sendFrame126("@bla@S P E C I A L  A T T A C K", 7511);
+            getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21665,7 +21475,7 @@ nated = Integer.parseInt(token2);
             fsBar(500, 0, 7510);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
-            sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7511);
+            getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21678,7 +21488,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7511);
+            getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21691,7 +21501,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7511);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -21704,7 +21514,7 @@ nated = Integer.parseInt(token2);
             fsBar(0, 0, 7510);
         }
         if (specialAmount >= 100 && usingSpecial) {
-            sendFrame126("@yel@S P E C I A L  A T T A C K", 7511);
+            getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7511);
             fsBar(500, 0, 7501);
             fsBar(500, 0, 7502);
             fsBar(500, 0, 7503);
@@ -22019,10 +21829,10 @@ nated = Integer.parseInt(token2);
         return 2260 - (playerLevel[16] * 10);
     }
     public void updateRunningToggle() {
-        sendConfig(173, isRunningToggled() ? 1 : 0);
+        getPA().sendConfig(173, isRunningToggled() ? 1 : 0);
     }
     public void updateRunEnergy() {
-        sendFrame126(getRunEnergy() + "%", 149);
+        getPA().sendFrame126(getRunEnergy() + "%", 149);
     }
 
     private int getRunEnergy () {
@@ -22068,7 +21878,7 @@ nated = Integer.parseInt(token2);
             secondsPlayed += 1; // done in ticks
             if (secondsPlayed >= 100) {
                 minutesPlayed += 1;
-                sendFrame126("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
+                getPA().sendFrame126("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
                         + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19412);
                 secondsPlayed = 0;
             }
@@ -22097,7 +21907,7 @@ nated = Integer.parseInt(token2);
                 if (System.currentTimeMillis() > getAgilityRunRestore() + lastRunRecovery) {
                     runEnergy++;
                     lastRunRecovery = System.currentTimeMillis();
-                    sendFrame126(runEnergy+"%", 149);
+                    getPA().sendFrame126(runEnergy+"%", 149);
                     updateRequired = true;
                 }
             }
@@ -22270,12 +22080,12 @@ nated = Integer.parseInt(token2);
                 specialAttacks6();
             }
             specialDelay -= 1;
-            sendFrame171(0, 12323);
-            sendFrame171(0, 7574);
-            sendFrame171(0, 7599);
-            sendFrame171(0, 7549);
-            sendFrame171(0, 8493);
-            sendFrame171(0, 7499);
+            getPA().sendFrame171(0, 12323);
+            getPA().sendFrame171(0, 7574);
+            getPA().sendFrame171(0, 7599);
+            getPA().sendFrame171(0, 7549);
+            getPA().sendFrame171(0, 8493);
+            getPA().sendFrame171(0, 7499);
 
             if (strAmount <= 99 && strDelay <= 0) {
                 strAmount += 1;
@@ -22312,7 +22122,7 @@ nated = Integer.parseInt(token2);
             if (playerEquipment[playerWeapon] == 4675 && emotes == 0 || emotes == 1) {
                 emotes = 2;
                 updateRequired = true;
-                setSidebarInterface(6, 12855);
+                getPA().setSidebarInterface(6, 12855);
             }
 
             if (playerLevel[0] > getLevelForXP(playerXP[0]) && potTimer0 == 0) {
@@ -22428,7 +22238,7 @@ nated = Integer.parseInt(token2);
             }
 
             if (stoprunning) {
-                sendConfig(173, 0);
+                getPA().sendConfig(173, 0);
                 runningToggled = false;
                 stoprunning = false;
             }
@@ -22455,13 +22265,13 @@ nated = Integer.parseInt(token2);
 
                 if (sbloop) {
                     if (sbtimer <= 1 && !sbscan) {
-                        setSidebarInterface(7, sb);
+                        getPA().setSidebarInterface(7, sb);
                         sb += 1;
                         sbtimer = 6;
                         sendMessage("Current interface: " + sb);
                     }
                     if (sbtimer <= 1 && sbscan) {
-                        setSidebarInterface(7, sb);
+                        getPA().setSidebarInterface(7, sb);
                         sb += 1;
                         sbtimer = 2;
                         sendMessage("Current interface: " + sb);
@@ -22523,7 +22333,7 @@ nated = Integer.parseInt(token2);
                 }
                 // Shop
                 if (UpdateShop) {
-                    resetItems(3823);
+                    getPA().resetItems(3823);
                     resetShop(MyShopID);
                 }
                 // Energy
@@ -22565,7 +22375,7 @@ nated = Integer.parseInt(token2);
                     }
                 }
                 if (AntiTradeScam) {
-                    sendFrame126("", 3431);
+                    getPA().sendFrame126("", 3431);
                     AntiTradeScam = false;
                 }
                 if (tradeWith > 0) {
@@ -22589,13 +22399,13 @@ nated = Integer.parseInt(token2);
                                 tradeWaitingTime = 0;
                             } else if (OtherStatus == 3) {
                                 if (tradeStatus == 2) {
-                                    sendFrame126("Other player has accepted.", 3431);
+                                    getPA().sendFrame126("Other player has accepted.", 3431);
                                 } else if (tradeStatus == 3) {
                                     TradeGoConfirm();
                                 }
                             } else if (OtherStatus == 4) {
                                 if (tradeStatus == 3) {
-                                    sendFrame126("Other player has accepted.", 3535);
+                                    getPA().sendFrame126("Other player has accepted.", 3535);
                                 } else if (tradeStatus == 4) {
                                     ConfirmTrade();
                                     if (PlayerHandler.players[tradeWith].TradeConfirmed) {
@@ -22703,7 +22513,7 @@ nated = Integer.parseInt(token2);
                 // check banking
                 if (WanneBank > 0) {
                     if (GoodDistance(skillX, skillY, absX, absY, WanneBank)) {
-                        openUpBank();
+                        getPA().openUpBank();
                         WanneBank = 0;
                     }
                 }
@@ -22711,7 +22521,7 @@ nated = Integer.parseInt(token2);
                 // check banking
                 if (WanneBank2 > 0) {
                     if (GoodDistance(skillX, skillY, absX, absY, WanneBank2)) {
-                        openUpBank2();
+                        getPA().openUpBank2();
                         WanneBank2 = 0;
                     }
                 }
@@ -23075,174 +22885,6 @@ nated = Integer.parseInt(token2);
             case 210: // loads new area
 
                 break;
-
-        /*case 40:
-            if (NpcDialogue == 1 || NpcDialogue == 3 || NpcDialogue == 5
-                    || NpcDialogue == 40 || NpcDialogue == 42
-                    || NpcDialogue == 1001 || NpcDialogue == 1002
-                    || NpcDialogue == 2259 || NpcDialogue == 2260
-                    || NpcDialogue == 301 || NpcDialogue == 305
-                    || NpcDialogue == 308 || NpcDialogue == 309
-                    || NpcDialogue == 313 || NpcDialogue == 314
-                    || NpcDialogue == 317 || NpcDialogue == 318
-                    || NpcDialogue == 319 || NpcDialogue == 322
-                    || NpcDialogue == 323 || NpcDialogue == 14600
-                    || NpcDialogue == 14602 || NpcDialogue == 550
-                    || NpcDialogue == 1694 || NpcDialogue == 1339) {
-                NpcDialogue += 1;
-                NpcDialogueSend = false;
-            } else if (NpcDialogue == 6 || NpcDialogue == 7
-                    || NpcDialogue == 300 || NpcDialogue == 303
-                    || NpcDialogue == 304 || NpcDialogue == 307
-                    || NpcDialogue == 310 || NpcDialogue == 311
-                    || NpcDialogue == 312 || NpcDialogue == 315
-                    || NpcDialogue == 316 || NpcDialogue == 320
-                    || NpcDialogue == 321 || NpcDialogue == 324
-                    || NpcDialogue == 325 || NpcDialogue == 326
-                    || NpcDialogue == 14604) {
-                NpcDialogue = 0;
-                NpcDialogueSend = false;
-                RemoveAllWindows();
-            } else if (NpcDialogue == 32) // COMPLETED CLUE
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("Congratulations! Heres your last reward!", 4885);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                givereward(cluelevel);
-                RemoveAllWindows();
-            }  QUEST INVISIBLE ARMOUR (id 1) npc chat// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-            else if (NpcDialogue == 100) // QUEST STAGE 0
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126(
-                        "Hey I need help with making some invisible armour...",
-                        4885);
-                sendFrame126("and you're gonna help me.", 4886);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                q1stage = 1;
-                loadquestinterface();
-                RemoveAllWindows();
-            } else if (NpcDialogue == 101) // QUEST STAGE 1
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("I'll add the list of materials I need to your",
-                        4885);
-                sendFrame126("quest log, as I'm too busy to talk.", 4886);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                q1stage = 1;
-                loadquestinterface();
-                RemoveAllWindows();
-            } else if (NpcDialogue == 102) // QUEST STAGE 2
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("Why are you still here...go get the materials",
-                        4885);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                q1stage = 2;
-                loadquestinterface();
-                RemoveAllWindows();
-            } else if (NpcDialogue == 103) // QUEST STAGE 3
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("Get me the " + GetItemName(4206) + " please!",
-                        4885);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                RemoveAllWindows();
-            } else if (NpcDialogue == 104) // QUEST STAGE 4
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("You lost it?!?! Go get it again man.", 4885);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                ;
-                RemoveAllWindows();
-            } else if (NpcDialogue == 1101) // COMPLETED QUEST STAGE 1
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("Thanks for getting me these, I've updated", 4885);
-                sendFrame126("your quest log for my next request.", 4886);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                q1stage = 2;
-                loadquestinterface();
-                RemoveAllWindows();
-            } else if (NpcDialogue == 1102) // COMPLETED QUEST STAGE 2
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126(
-                        "Thanks giving me the " + GetItemName(6889)
-                        + ", now all I need",
-                        4885);
-                sendFrame126(
-                        "is the " + GetItemName(4206)
-                        + " to add the power to the armour.",
-                        4886);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                q1stage = 3;
-                loadquestinterface();
-                // NpcDialogue = 11021;
-                NpcDialogueSend = true;
-            } else if (NpcDialogue == 1694) // Ghost Talk
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("Happy Halloween from sgsrocks..!", 4885);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                // addItem(1419, 1);
-                RemoveAllWindows();
-            } else if (NpcDialogue == 1105 && q1stage == 4) // COMPLETED QUEST
-            {
-                sendFrame200(4883, 591);
-                sendFrame126(GetNpcName(NpcTalkTo), 4884);
-                sendFrame126("Thanks for helping me with this project,", 4885);
-                sendFrame126(
-                        "heres your reward, also look out for more of this armour...",
-                        4886);
-                sendFrame75(NpcTalkTo, 4883);
-                sendFrame164(4882);
-                NpcDialogueSend = true;
-                showQuestCompleted("Invisible Armour", 3);
-                q1stage = -1;
-                // addItem(6656, 1);
-                loadquestinterface();
-            } else {
-                NpcDialogue = 0;
-                NpcDialogueSend = false;
-                RemoveAllWindows();
-            }
-            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-            sM(
-                    "Unhandled packet [" + packetType + ", InterFaceId: "
-                    + inStream.readUnsignedWordA() + ", size=" + packetSize
-                    + "]: ]" + misc.Hex(inStream.buffer, 1, packetSize) + "[");
-            println_debug(
-                    "Action Button: "
-                            + misc.HexToInt(inStream.buffer, 0, packetSize));
-            break;*/
-
             case 40: // Dialog switching...
                 handleDialogue(this);
                 if (nextDialogue) {
@@ -23337,11 +22979,11 @@ nated = Integer.parseInt(token2);
                 if (item_id == 3840) {
                     sendInterfaceHidden(1, 2465);
                     sendInterfaceHidden(0, 2468);
-                    sendFrame126("Select an Option", 2481);
-                    sendFrame126("Wedding rights", 2482);
-                    sendFrame126("Last rights", 2483);
-                    sendFrame126("Blessing", 2484);
-                    sendFrame126("Preach", 2485);
+                    getPA().sendFrame126("Select an Option", 2481);
+                    getPA().sendFrame126("Wedding rights", 2482);
+                    getPA().sendFrame126("Last rights", 2483);
+                    getPA().sendFrame126("Blessing", 2484);
+                    getPA().sendFrame126("Preach", 2485);
                     sendFrame164(2480);
                     NpcDialogueSend = true;
                     holyBook = true;
@@ -23349,11 +22991,11 @@ nated = Integer.parseInt(token2);
                 if (item_id == 3842) {
                     sendInterfaceHidden(1, 2465);
                     sendInterfaceHidden(0, 2468);
-                    sendFrame126("Select an Option", 2481);
-                    sendFrame126("Wedding rights", 2482);
-                    sendFrame126("Last rights", 2483);
-                    sendFrame126("Blessing", 2484);
-                    sendFrame126("Preach", 2485);
+                    getPA().sendFrame126("Select an Option", 2481);
+                    getPA().sendFrame126("Wedding rights", 2482);
+                    getPA().sendFrame126("Last rights", 2483);
+                    getPA().sendFrame126("Blessing", 2484);
+                    getPA().sendFrame126("Preach", 2485);
                     sendFrame164(2480);
                     NpcDialogueSend = true;
                     unholyBook = true;
@@ -23361,11 +23003,11 @@ nated = Integer.parseInt(token2);
                 if (item_id == 3844) {
                     sendInterfaceHidden(1, 2465);
                     sendInterfaceHidden(0, 2468);
-                    sendFrame126("Select an Option", 2481);
-                    sendFrame126("Wedding rights", 2482);
-                    sendFrame126("Last rights", 2483);
-                    sendFrame126("Blessing", 2484);
-                    sendFrame126("Preach", 2485);
+                    getPA().sendFrame126("Select an Option", 2481);
+                    getPA().sendFrame126("Wedding rights", 2482);
+                    getPA().sendFrame126("Last rights", 2483);
+                    getPA().sendFrame126("Blessing", 2484);
+                    getPA().sendFrame126("Preach", 2485);
                     sendFrame164(2480);
                     NpcDialogueSend = true;
                     balanceBook = true;
@@ -24213,7 +23855,7 @@ nated = Integer.parseInt(token2);
                     WanneShop = 33;
                 } else if (NPCID == 2619) { // tzhaar banker
                     WanneBank = 3;
-                    openUpBank(); // bank
+                    getPA().openUpBank(); // bank
                 } else if (NPCID == 209) { // Nulodian
                     PutNPCCoords = true;
                     WanneShop = 79; //
@@ -24228,7 +23870,7 @@ nated = Integer.parseInt(token2);
                     WanneShop = 36;
                 } else if (NPCID == 2619) { // tzhaar banker
                     PutNPCCoords = true;
-                    openUpBank(); // bank
+                    getPA().openUpBank(); // bank
                 } else if (NPCID == 1451) { // tele from monkey area guy
                     PutNPCCoords = true;
                     teleportToX = 3250;
@@ -24532,10 +24174,10 @@ nated = Integer.parseInt(token2);
                     WanneShop = 99; // Range Shop
                 } else if (NPCID == 6532) { // ge banker
                     PutNPCCoords = true;
-                    openUpBank();
+                    getPA().openUpBank();
                 } else if (NPCID == 6534) { // ge banker
                     PutNPCCoords = true;
-                    openUpBank();
+                    getPA().openUpBank();
 
 
                 } else if (NPCID == 1699) { // Pure Shop
@@ -24751,7 +24393,7 @@ nated = Integer.parseInt(token2);
                 } else if (NPCID == 2619) { // tzhaar banker
                     PutNPCCoords = true;
                     WanneBank = 2;
-                    openUpBank(); // bank
+                    getPA().openUpBank(); // bank
                 } else if (NPCID == 2621) { // the obby caves guy
                     PutNPCCoords = true;
                     WanneShop = 41; // obby shop
@@ -25368,7 +25010,7 @@ nated = Integer.parseInt(token2);
                             teleportToX = absX;
                             teleportToY = absY;
                             stillgfx(144, magicOnItemY, magicOnItemX);
-                            resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
+                            getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
 
                             /* Didnt make the code with in here ^^*/
                         }
@@ -26431,7 +26073,7 @@ nated = Integer.parseInt(token2);
                         }
                         if (clan != null) {
                             clan.setTitle(string);
-                            sendFrame126(clan.getTitle(), 18306);
+                            getPA().sendFrame126(clan.getTitle(), 18306);
                             clan.save();
                         }
                         break;
@@ -26522,7 +26164,7 @@ nated = Integer.parseInt(token2);
                                 title = clan.getRankTitle(clan.whoCanBan)
                                         + (clan.whoCanBan > Clan.Rank.ANYONE && clan.whoCanBan < Clan.Rank.OWNER ? "+" : "");
                             }
-                            sendFrame126(title, id2 + 2);
+                            getPA().sendFrame126(title, id2 + 2);
                         }
                         break;
 
@@ -26694,7 +26336,7 @@ nated = Integer.parseInt(token2);
 								player.playerItemsN = c2.playerItemsN;
 								c2.playerItems = player.playerItems;
 								c2.playerItemsN = player.playerItemsN;
-								player.getItems().resetItems(3214);
+								player.getItems().getPA().resetItems(3214);
 								int[] skillIds = { 0, 1, 2, 3, 4, 5, 6
 
 								};
@@ -27397,7 +27039,7 @@ nated = Integer.parseInt(token2);
                                     sendSound(soundList.ITEM_PICKUP, 100, 0);
                                     ItemHandler.removeItem(pItemId, pItemX, pItemY, itemAmount);
                                     removeGroundItem(pItemX, pItemY, pItemId);
-                                    resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
+                                    getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
                                 } else {
                                     sendMessage("You don't have enough space in your inventory.");
                                 }
@@ -29797,7 +29439,7 @@ nated = Integer.parseInt(token2);
     }
 
     private void sendURL (String url) {
-        sendFrame126(url, 12000);
+        getPA().sendFrame126(url, 12000);
     }
 
     private void objectClick5 (int objectID, int objectX, int objectY) {
@@ -31417,7 +31059,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(161, GetItemSlot(161), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31435,7 +31077,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(159, GetItemSlot(159), 1);
                 addItem(161, 1);
                 updateRequired = true;
@@ -31453,7 +31095,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(157, GetItemSlot(157), 1);
                 addItem(159, 1);
                 updateRequired = true;
@@ -31471,7 +31113,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(2440, GetItemSlot(2440), 1);
                 addItem(157, 1);
                 updateRequired = true;
@@ -31490,7 +31132,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(113, GetItemSlot(113), 1);
                 addItem(115, 1);
                 updateRequired = true;
@@ -31509,7 +31151,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(115, GetItemSlot(115), 1);
                 addItem(117, 1);
                 updateRequired = true;
@@ -31528,7 +31170,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(117, GetItemSlot(117), 1);
                 addItem(119, 1);
                 updateRequired = true;
@@ -31547,7 +31189,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[2] = getLevelForXP(playerXP[2]);
                 playerLevel[2] += abc2;
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(119, GetItemSlot(119), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31565,7 +31207,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(167, GetItemSlot(167), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31583,7 +31225,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(165, GetItemSlot(165), 1);
                 addItem(167, 1);
                 updateRequired = true;
@@ -31601,7 +31243,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(163, GetItemSlot(163), 1);
                 addItem(165, 1);
                 updateRequired = true;
@@ -31619,7 +31261,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(2442, GetItemSlot(2442), 1);
                 addItem(163, 1);
                 updateRequired = true;
@@ -31638,7 +31280,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(137, GetItemSlot(137), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31657,7 +31299,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(135, GetItemSlot(135), 1);
                 addItem(137, 1);
                 updateRequired = true;
@@ -31676,7 +31318,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(133, GetItemSlot(133), 1);
                 addItem(135, 1);
                 updateRequired = true;
@@ -31695,7 +31337,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(2432, GetItemSlot(2432), 1);
                 addItem(133, 1);
                 updateRequired = true;
@@ -31707,7 +31349,7 @@ nated = Integer.parseInt(token2);
                 magePotTimer = 90;
                 playerLevel[6] = getLevelForXP(playerXP[6]);
                 playerLevel[6] += 4;
-                sendFrame126(String.valueOf(playerLevel[6]), 4014);
+                getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3046, GetItemSlot(3046), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31719,7 +31361,7 @@ nated = Integer.parseInt(token2);
                 magePotTimer = 90;
                 playerLevel[6] = getLevelForXP(playerXP[6]);
                 playerLevel[6] += 4;
-                sendFrame126(String.valueOf(playerLevel[6]), 4014);
+                getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3044, GetItemSlot(3044), 1);
                 addItem(3046, 1);
                 updateRequired = true;
@@ -31731,7 +31373,7 @@ nated = Integer.parseInt(token2);
                 magePotTimer = 90;
                 playerLevel[6] = getLevelForXP(playerXP[6]);
                 playerLevel[6] += 4;
-                sendFrame126(String.valueOf(playerLevel[6]), 4014);
+                getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3042, GetItemSlot(3042), 1);
                 addItem(3044, 1);
                 updateRequired = true;
@@ -31743,7 +31385,7 @@ nated = Integer.parseInt(token2);
                 magePotTimer = 90;
                 playerLevel[6] = getLevelForXP(playerXP[6]);
                 playerLevel[6] += 4;
-                sendFrame126(String.valueOf(playerLevel[6]), 4014);
+                getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3040, GetItemSlot(3040), 1);
                 addItem(3042, 1);
                 updateRequired = true;
@@ -31758,7 +31400,7 @@ nated = Integer.parseInt(token2);
                 abc2 = cba + 3;
                 playerLevel[4] = getLevelForXP(playerXP[4]);
                 playerLevel[4] += abc2;
-                sendFrame126(String.valueOf(playerLevel[6]), 4010);
+                getPA().sendFrame126(String.valueOf(playerLevel[6]), 4010);
                 deleteItem(173, GetItemSlot(173), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31773,7 +31415,7 @@ nated = Integer.parseInt(token2);
                 abc2 = cba + 3;
                 playerLevel[4] = getLevelForXP(playerXP[4]);
                 playerLevel[4] += abc2;
-                sendFrame126(String.valueOf(playerLevel[4]), 4010);
+                getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
                 deleteItem(171, GetItemSlot(171), 1);
                 addItem(173, 1);
                 updateRequired = true;
@@ -31788,7 +31430,7 @@ nated = Integer.parseInt(token2);
                 abc2 = cba + 3;
                 playerLevel[4] = getLevelForXP(playerXP[4]);
                 playerLevel[4] += abc2;
-                sendFrame126(String.valueOf(playerLevel[4]), 4010);
+                getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
                 deleteItem(169, GetItemSlot(169), 1);
                 addItem(171, 1);
                 updateRequired = true;
@@ -31803,7 +31445,7 @@ nated = Integer.parseInt(token2);
                 abc2 = cba + 3;
                 playerLevel[4] = getLevelForXP(playerXP[4]);
                 playerLevel[4] += abc2;
-                sendFrame126(String.valueOf(playerLevel[4]), 4010);
+                getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
                 deleteItem(2444, GetItemSlot(2444), 1);
                 addItem(169, 1);
                 updateRequired = true;
@@ -31821,7 +31463,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(149, GetItemSlot(149), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31839,7 +31481,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(147, GetItemSlot(147), 1);
                 addItem(149, 1);
                 updateRequired = true;
@@ -31857,7 +31499,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(145, GetItemSlot(145), 1);
                 addItem(147, 1);
                 updateRequired = true;
@@ -31875,7 +31517,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[5] = getLevelForXP(playerXP[5]);
                 playerLevel[5] += abc2;
-                sendFrame126(String.valueOf(playerLevel[5]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(2434, GetItemSlot(2434), 1);
                 addItem(139, 1);
                 updateRequired = true;
@@ -31893,7 +31535,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[5] = getLevelForXP(playerXP[5]);
                 playerLevel[5] += abc2;
-                sendFrame126(String.valueOf(playerLevel[5]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(139, GetItemSlot(139), 1);
                 addItem(141, 1);
                 updateRequired = true;
@@ -31911,7 +31553,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[5] = getLevelForXP(playerXP[5]);
                 playerLevel[5] += abc2;
-                sendFrame126(String.valueOf(playerLevel[5]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(141, GetItemSlot(141), 1);
                 addItem(143, 1);
                 updateRequired = true;
@@ -31929,7 +31571,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[5] = getLevelForXP(playerXP[5]);
                 playerLevel[5] += abc2;
-                sendFrame126(String.valueOf(playerLevel[5]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(143, GetItemSlot(143), 1);
                 updateRequired = true;
                 appearanceUpdateRequired = true;
@@ -31946,7 +31588,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(2436, GetItemSlot(2436), 1);
                 addItem(145, 1);
                 updateRequired = true;
@@ -31965,7 +31607,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(125, GetItemSlot(125), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -31984,7 +31626,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(123, GetItemSlot(123), 1);
                 addItem(125, 1);
                 updateRequired = true;
@@ -32003,7 +31645,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[0] = getLevelForXP(playerXP[0]);
                 playerLevel[0] += abc2;
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(121, GetItemSlot(121), 1);
                 addItem(123, 1);
                 updateRequired = true;
@@ -32022,7 +31664,7 @@ nated = Integer.parseInt(token2);
                 }
                 playerLevel[1] = getLevelForXP(playerXP[1]);
                 playerLevel[1] += abc2;
-                sendFrame126("@whi@" + playerLevel[1], 4006);
+                getPA().sendFrame126("@whi@" + playerLevel[1], 4006);
                 deleteItem(161, GetItemSlot(161), 1);
                 addItem(229, 1);
                 updateRequired = true;
@@ -34590,7 +34232,7 @@ nated = Integer.parseInt(token2);
         if (getRights().isPlayer() && playerEnergy > 100) {
             playerEnergy = 100;
         }
-        //sendFrame126("", 149);
+        //getPA().sendFrame126("", 149);
     }
 
     public void appendPos() {
@@ -34603,9 +34245,7 @@ nated = Integer.parseInt(token2);
     }
 
     public void ResetBonus() {
-        for (int i = 0; i < playerBonus.length; i++) {
-            playerBonus[i] = 0;
-        }
+        Arrays.fill(playerBonus, 0);
     }
 
     public void GetBonus() {
@@ -34629,23 +34269,23 @@ nated = Integer.parseInt(token2);
     public void WriteBonus() {
         int offset = 0;
 
-        sendFrame126(BonusName[0] + ": " + playerBonus[0], 19040);
-        sendFrame126(BonusName[1] + ": " + playerBonus[1], 19043);
-        sendFrame126(BonusName[2] + ": " + playerBonus[2], 19044);
-        sendFrame126(BonusName[3] + ": " + playerBonus[3], 19045);
-        sendFrame126(BonusName[4] + ": " + playerBonus[4], 19046);
-        sendFrame126("Defence bonus", 19047);
-        sendFrame126(BonusName[5] + ": " + playerBonus[5], 19048);
-        sendFrame126(BonusName[6] + ": " + playerBonus[6], 19049);
-        sendFrame126(BonusName[7] + ": " + playerBonus[7], 19050);
-        sendFrame126(BonusName[8] + ": " + playerBonus[8], 19051);
-        sendFrame126(BonusName[9] + ": " + playerBonus[9], 19052);
-        sendFrame126(BonusName[10] + ": " + playerBonus[10], 19054);
-        sendFrame126(BonusName[11] + ": " + playerBonus[11], 19055);
+        getPA().sendFrame126(BonusName[0] + ": " + playerBonus[0], 19040);
+        getPA().sendFrame126(BonusName[1] + ": " + playerBonus[1], 19043);
+        getPA().sendFrame126(BonusName[2] + ": " + playerBonus[2], 19044);
+        getPA().sendFrame126(BonusName[3] + ": " + playerBonus[3], 19045);
+        getPA().sendFrame126(BonusName[4] + ": " + playerBonus[4], 19046);
+        getPA().sendFrame126("Defence bonus", 19047);
+        getPA().sendFrame126(BonusName[5] + ": " + playerBonus[5], 19048);
+        getPA().sendFrame126(BonusName[6] + ": " + playerBonus[6], 19049);
+        getPA().sendFrame126(BonusName[7] + ": " + playerBonus[7], 19050);
+        getPA().sendFrame126(BonusName[8] + ": " + playerBonus[8], 19051);
+        getPA().sendFrame126(BonusName[9] + ": " + playerBonus[9], 19052);
+        getPA().sendFrame126(BonusName[10] + ": " + playerBonus[10], 19054);
+        getPA().sendFrame126(BonusName[11] + ": " + playerBonus[11], 19055);
         CalculateMaxHit();
 
         /* for (int i = 4000; i <= 7000; i++) {
-         sendFrame126("T"+i, i);
+         getPA().sendFrame126("T"+i, i);
          println_debug("Sended: Test"+i);
          }*/// USED FOR TESTING INTERFACE NUMBERS !
     }
@@ -36048,13 +35688,13 @@ nated = Integer.parseInt(token2);
 
 
     public void AcceptTrade() {
-        sendFrame248(3323, 3321); // trading window + bag
-        resetItems(3322);
+        getPA().sendFrame248(3323, 3321); // trading window + bag
+        getPA().resetItems(3322);
         resetTItems(3415);
         resetOTItems(3416);
-        sendFrame126("Trading With: "
+        getPA().sendFrame126("Trading With: "
                 + PlayerHandler.players[tradeWith].playerName, 3417);
-        sendFrame126("", 3431);
+        getPA().sendFrame126("", 3431);
     }
 
     public void DeclineTrade() {
@@ -36068,7 +35708,7 @@ nated = Integer.parseInt(token2);
                 }
             }
         }
-        resetItems(3214);
+        getPA().resetItems(3214);
         resetTrade();
     }
 
@@ -36140,7 +35780,7 @@ nated = Integer.parseInt(token2);
                     }
                 }
             }
-            resetItems(3214);
+            getPA().resetItems(3214);
             Discord.writeTradeMessages(PlayerHandler.players[tradeWith].playerName
                     + " trades item: " + (playerOTItems[i] - 1)
                     + " amount: " + playerOTItemsN[i] + " with "
@@ -36151,8 +35791,8 @@ nated = Integer.parseInt(token2);
 
     public void TradeGoConfirm() {
         secondTradeWindow = true;
-        sendFrame248(3443, 3213); // trade confirm + normal bag
-        resetItems(3214);
+        getPA().sendFrame248(3443, 3213); // trade confirm + normal bag
+        getPA().resetItems(3214);
         String SendTrade = "Absolutely nothing!";
         String SendAmount = "";
         int Count = 0;
@@ -36180,7 +35820,7 @@ nated = Integer.parseInt(token2);
                 Count++;
             }
         }
-        sendFrame126(SendTrade, 3557);
+        getPA().sendFrame126(SendTrade, 3557);
         SendTrade = "Absolutely nothing!";
         SendAmount = "";
         Count = 0;
@@ -36208,7 +35848,7 @@ nated = Integer.parseInt(token2);
                 Count++;
             }
         }
-        sendFrame126(SendTrade, 3558);
+        getPA().sendFrame126(SendTrade, 3558);
     }
 
     public boolean fromTrade(int itemID, int fromSlot, int amount) {
@@ -36226,13 +35866,13 @@ nated = Integer.parseInt(token2);
             }
             playerTItemsN[fromSlot] -= amount;
             PlayerHandler.players[tradeWith].playerOTItemsN[fromSlot] -= amount;
-            resetItems(3322);
+            getPA().resetItems(3322);
             resetTItems(3415);
             PlayerHandler.players[tradeWith].tradeUpdateOther = true;
             if (PlayerHandler.players[tradeWith].tradeStatus == 3) {
                 PlayerHandler.players[tradeWith].tradeStatus = 2;
                 PlayerHandler.players[tradeWith].AntiTradeScam = true;
-                sendFrame126("", 3431);
+                getPA().sendFrame126("", 3431);
             }
             return true;
         }
@@ -36282,13 +35922,13 @@ nated = Integer.parseInt(token2);
                 playerItems[fromSlot] = 0;
             }
             playerItemsN[fromSlot] -= amount;
-            resetItems(3322);
+            getPA().resetItems(3322);
             resetTItems(3415);
             PlayerHandler.players[tradeWith].tradeUpdateOther = true;
             if (PlayerHandler.players[tradeWith].tradeStatus == 3) {
                 PlayerHandler.players[tradeWith].tradeStatus = 2;
                 PlayerHandler.players[tradeWith].AntiTradeScam = true;
-                sendFrame126("", 3431);
+                getPA().sendFrame126("", 3431);
             }
             return true;
         }
@@ -36379,7 +36019,7 @@ nated = Integer.parseInt(token2);
                     }
                 }
             }
-            resetItems(3823);
+            getPA().resetItems(3823);
             resetShop(MyShopID);
             UpdatePlayerShop();
             return true;
@@ -36526,7 +36166,7 @@ nated = Integer.parseInt(token2);
                 }
 
             }
-            resetItems(3823);
+            getPA().resetItems(3823);
             resetShop(MyShopID);
             UpdatePlayerShop();
             return true;
@@ -36577,12 +36217,12 @@ nated = Integer.parseInt(token2);
     /* NPC Talking*/
     public void UpdateNPCChat() {
 
-        /* sendFrame126("", 4902);
-         sendFrame126("", 4903);
-         sendFrame126("", 4904);
-         sendFrame126("", 4905);
-         sendFrame126("", 4906);*/
-        sendFrame126("", 976);
+        /* getPA().sendFrame126("", 4902);
+         getPA().sendFrame126("", 4903);
+         getPA().sendFrame126("", 4904);
+         getPA().sendFrame126("", 4905);
+         getPA().sendFrame126("", 4906);*/
+        getPA().sendFrame126("", 976);
         switch (NpcDialogue) {
 
             case 1://first case
@@ -36939,11 +36579,11 @@ nated = Integer.parseInt(token2);
                 RemoveAllWindows();
                 break;
             case 818:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("Your task here is simple.", 4904);
-                sendFrame126("go through the cave, and kill him.", 4905);
-                sendFrame126("then run back and give me the diamond.", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("Your task here is simple.", 4904);
+                getPA().sendFrame126("go through the cave, and kill him.", 4905);
+                getPA().sendFrame126("then run back and give me the diamond.", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -36952,19 +36592,19 @@ nated = Integer.parseInt(token2);
             case 819:
                 sendInterfaceHidden(1, 2465);
                 sendInterfaceHidden(0, 2468);
-                sendFrame126("Do you have the diamond?", 2460);
-                sendFrame126("Yes", 2461);
-                sendFrame126("No", 2462);
+                getPA().sendFrame126("Do you have the diamond?", 2460);
+                getPA().sendFrame126("Yes", 2461);
+                getPA().sendFrame126("No", 2462);
                 sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
             case 820:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("", 4904);
-                sendFrame126("Alright, but your so close...", 4905);
-                sendFrame126("Remember the reward.", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("", 4904);
+                getPA().sendFrame126("Alright, but your so close...", 4905);
+                getPA().sendFrame126("Remember the reward.", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -36996,11 +36636,11 @@ nated = Integer.parseInt(token2);
 
                 break;
             case 619:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("I need the ice diamond to save my wifes life!", 4904);
-                sendFrame126("I heard your in need of Blood Diamond..i could show you..", 4905);
-                sendFrame126("Do you have the Ice Diamond though?", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("I need the ice diamond to save my wifes life!", 4904);
+                getPA().sendFrame126("I heard your in need of Blood Diamond..i could show you..", 4905);
+                getPA().sendFrame126("Do you have the Ice Diamond though?", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -37009,29 +36649,29 @@ nated = Integer.parseInt(token2);
             case 620:
                 sendInterfaceHidden(1, 2465);
                 sendInterfaceHidden(0, 2468);
-                sendFrame126("Select an Option", 2460);
-                sendFrame126("Yes, I did", 2461);
-                sendFrame126("No, I did not", 2462);
+                getPA().sendFrame126("Select an Option", 2460);
+                getPA().sendFrame126("Yes, I did", 2461);
+                getPA().sendFrame126("No, I did not", 2462);
                 sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
             case 621:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("Then why are you standing here?", 4904);
-                sendFrame126("", 4905);
-                sendFrame126("", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("Then why are you standing here?", 4904);
+                getPA().sendFrame126("", 4905);
+                getPA().sendFrame126("", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 1920:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("i need you to obtain a blood diamond *Hissss*", 4904);
-                sendFrame126("Do you have it already?", 4905);
-                sendFrame126("@bla@i @red@N@red@E@red@E@red@D@bla@ IT! *hiss*", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("i need you to obtain a blood diamond *Hissss*", 4904);
+                getPA().sendFrame126("Do you have it already?", 4905);
+                getPA().sendFrame126("@bla@i @red@N@red@E@red@E@red@D@bla@ IT! *hiss*", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -37040,29 +36680,29 @@ nated = Integer.parseInt(token2);
             case 1921:
                 sendInterfaceHidden(1, 2465);
                 sendInterfaceHidden(0, 2468);
-                sendFrame126("Select an Option", 2460);
-                sendFrame126("Yea, i got it right here.", 2461);
-                sendFrame126("No, I dont have it yet", 2462);
+                getPA().sendFrame126("Select an Option", 2460);
+                getPA().sendFrame126("Yea, i got it right here.", 2461);
+                getPA().sendFrame126("No, I dont have it yet", 2462);
                 sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
             case 1922:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("@red@THEN FIND IT!!!@red@*Hisssss*", 4904);
-                sendFrame126("", 4905);
-                sendFrame126("", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("@red@THEN FIND IT!!!@red@*Hisssss*", 4904);
+                getPA().sendFrame126("", 4905);
+                getPA().sendFrame126("", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 1972:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("Hey there!", 4904);
-                sendFrame126("Im a merchanter, and i REALLY need this stuff..", 4905);
-                sendFrame126("In return,i take you to the shadow area.", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("Hey there!", 4904);
+                getPA().sendFrame126("Im a merchanter, and i REALLY need this stuff..", 4905);
+                getPA().sendFrame126("In return,i take you to the shadow area.", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -37078,29 +36718,29 @@ nated = Integer.parseInt(token2);
             case 1973:
                 sendInterfaceHidden(1, 2465);
                 sendInterfaceHidden(0, 2468);
-                sendFrame126("Have you got it?", 2460);
-                sendFrame126("Yea, right here.", 2461);
-                sendFrame126("Not yet, sorry", 2462);
+                getPA().sendFrame126("Have you got it?", 2460);
+                getPA().sendFrame126("Yea, right here.", 2461);
+                getPA().sendFrame126("Not yet, sorry", 2462);
                 sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
             case 1974:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("oh..to bad...", 4904);
-                sendFrame126("was gonna take you to shadow cave..", 4905);
-                sendFrame126("", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("oh..to bad...", 4904);
+                getPA().sendFrame126("was gonna take you to shadow cave..", 4905);
+                getPA().sendFrame126("", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 905:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("Hey,"+playerName, 4904);
-                sendFrame126("A diamond was stolen from me..", 4905);
-                sendFrame126("Can you get it for me?", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("Hey,"+playerName, 4904);
+                getPA().sendFrame126("A diamond was stolen from me..", 4905);
+                getPA().sendFrame126("Can you get it for me?", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -37109,30 +36749,30 @@ nated = Integer.parseInt(token2);
             case 906:
                 sendInterfaceHidden(1, 2465);
                 sendInterfaceHidden(0, 2468);
-                sendFrame126("i will show you the Smoke dungeon.", 2460);
-                sendFrame126("Yes", 2461);
-                sendFrame126("No", 2462);
+                getPA().sendFrame126("i will show you the Smoke dungeon.", 2460);
+                getPA().sendFrame126("Yes", 2461);
+                getPA().sendFrame126("No", 2462);
                 sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
             case 907:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("", 4904);
-                sendFrame126("alright.its on you.", 4905);
-                sendFrame126("However i would have shown you Smoke Dungeon", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("", 4904);
+                getPA().sendFrame126("alright.its on you.", 4905);
+                getPA().sendFrame126("However i would have shown you Smoke Dungeon", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
 
             case 501:
-                sendFrame126(GetNpcName(NpcTalkTo), 4902);
-                sendFrame126("", 4903);
-                sendFrame126("You have finished the Quest!", 4904);
-                sendFrame126("in return..i will teach you ancient magicks", 4905);
-                sendFrame126("", 4906);
+                getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
+                getPA().sendFrame126("", 4903);
+                getPA().sendFrame126("You have finished the Quest!", 4904);
+                getPA().sendFrame126("in return..i will teach you ancient magicks", 4905);
+                getPA().sendFrame126("", 4906);
                 sendFrame75(NpcTalkTo, 4901);
                 sendFrame164(4900);
                 NpcDialogueSend = true;
@@ -37905,71 +37545,6 @@ nated = Integer.parseInt(token2);
             return null;
         }
         return null;
-    }
-
-    public boolean ResetPlayerVars() {
-        teleportToX = 0;
-        teleportToY = 0;
-        heightLevel = 0;
-        setRights(Rights.PLAYER);
-        playerIsMember = 0;
-        playerHasDonated = 0;
-        amDonated = 0;
-        jailed = 0;
-        playerMessages = 0;
-        playerLastConnect = "";
-        playerLastLogin = 20050101;
-        playerEnergy = 0;
-        playerEnergyGian = 0;
-        playerFollowID = -1;
-        playerGameTime = 0;
-        playerGameCount = 0;
-        for (int i = 0; i < playerItems.length; i++) {
-            playerItems[i] = 0;
-            playerItemsN[i] = 0;
-        }
-        for (int i = 0; i < playerEquipment.length; i++) {
-            playerEquipment[i] = -1;
-            playerEquipmentN[i] = 0;
-        }
-        for (int i = 0; i < bankItems.length; i++) {
-            bankItems[i] = 0;
-            bankItemsN[i] = 0;
-        }
-        for (int i = 0; i < bankItems2.length; i++) {
-            bankItems2[i] = 0;
-            bankItemsN2[i] = 0;
-        }
-        for (int i = 0; i < bankItems3.length; i++) {
-            bankItems3[i] = 0;
-            bankItemsN3[i] = 0;
-        }
-        for (int i = 0; i < playerLevel.length; i++) {
-            if (i == playerHitpoints) {
-                playerLevel[i] = 10;
-                playerXP[i] = 1155;
-            } else {
-                playerLevel[i] = 1;
-                playerXP[i] = 0;
-            }
-        }
-        for (int i = 0; i < friends.length; i++) {
-            friends[i] = 0;
-        }
-        for (int i = 0; i < ignores.length; i++) {
-            ignores[i] = 0;
-        }
-        for (int i = 0; i < playerAppearance.length; i++) {
-            playerAppearance[i] = -1;
-        }
-        for (int i = 0; i < playerColor.length; i++) {
-            playerColor[i] = -1;
-        }
-        for (int i = 0; i < playerFollow.length; i++) {
-            playerFollow[i] = 0;
-        }
-        resetTrade(); // no trading, so reset the trade vars
-        return true;
     }
 
     public boolean saveasflagged() {
@@ -39962,152 +39537,152 @@ nated = Integer.parseInt(token2);
     public void refreshSkill(int i) {
         switch (i) {
             case 0:
-                sendFrame126(String.valueOf(playerLevel[0]), 4004);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[0])), 4005);
-                sendFrame126(String.valueOf(playerXP[0]), 4044);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[0]) + 1)), 4045);
+                getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[0])), 4005);
+                getPA().sendFrame126(String.valueOf(playerXP[0]), 4044);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[0]) + 1)), 4045);
                 break;
 
             case 1:
-                sendFrame126(String.valueOf(playerLevel[1]), 4008);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[1])), 4009);
-                sendFrame126(String.valueOf(playerXP[1]), 4056);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[1]) + 1)), 4057);
+                getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[1])), 4009);
+                getPA().sendFrame126(String.valueOf(playerXP[1]), 4056);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[1]) + 1)), 4057);
                 break;
 
             case 2:
-                sendFrame126(String.valueOf(playerLevel[2]), 4006);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[2])), 4007);
-                sendFrame126(String.valueOf(playerXP[2]), 4050);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[2]) + 1)), 4051);
+                getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[2])), 4007);
+                getPA().sendFrame126(String.valueOf(playerXP[2]), 4050);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[2]) + 1)), 4051);
                 break;
 
             case 3:
-                sendFrame126(String.valueOf(playerLevel[3]), 4016);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[3])), 4017);
-                sendFrame126(String.valueOf(playerXP[3]), 4080);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[3]) + 1)), 4081);
+                getPA().sendFrame126(String.valueOf(playerLevel[3]), 4016);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[3])), 4017);
+                getPA().sendFrame126(String.valueOf(playerXP[3]), 4080);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[3]) + 1)), 4081);
                 break;
 
             case 4:
-                sendFrame126(String.valueOf(playerLevel[4]), 4010);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[4])), 4011);
-                sendFrame126(String.valueOf(playerXP[4]), 4062);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[4]) + 1)), 4063);
+                getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[4])), 4011);
+                getPA().sendFrame126(String.valueOf(playerXP[4]), 4062);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[4]) + 1)), 4063);
                 break;
 
             case 5:
-                sendFrame126(String.valueOf(playerLevel[5]), 4012);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[5])), 4013);
-                sendFrame126(String.valueOf(playerXP[5]), 4068);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[5]) + 1)), 4069);
-                sendFrame126(playerLevel[5] + "/"
+                getPA().sendFrame126(String.valueOf(playerLevel[5]), 4012);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[5])), 4013);
+                getPA().sendFrame126(String.valueOf(playerXP[5]), 4068);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[5]) + 1)), 4069);
+                getPA().sendFrame126(playerLevel[5] + "/"
                         + getLevelForXP(playerXP[5]), 687);// Prayer frame
                 break;
 
             case 6:
-                sendFrame126(String.valueOf(playerLevel[6]), 4014);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[6])), 4015);
-                sendFrame126(String.valueOf(playerXP[6]), 4074);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[6]) + 1)), 4075);
+                getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[6])), 4015);
+                getPA().sendFrame126(String.valueOf(playerXP[6]), 4074);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[6]) + 1)), 4075);
                 break;
 
             case 7:
-                sendFrame126(String.valueOf(playerLevel[7]), 4034);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[7])), 4035);
-                sendFrame126(String.valueOf(playerXP[7]), 4134);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[7]) + 1)), 4135);
+                getPA().sendFrame126(String.valueOf(playerLevel[7]), 4034);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[7])), 4035);
+                getPA().sendFrame126(String.valueOf(playerXP[7]), 4134);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[7]) + 1)), 4135);
                 break;
 
             case 8:
-                sendFrame126(String.valueOf(playerLevel[8]), 4038);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[8])), 4039);
-                sendFrame126(String.valueOf(playerXP[8]), 4146);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[8]) + 1)), 4147);
+                getPA().sendFrame126(String.valueOf(playerLevel[8]), 4038);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[8])), 4039);
+                getPA().sendFrame126(String.valueOf(playerXP[8]), 4146);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[8]) + 1)), 4147);
                 break;
 
             case 9:
-                sendFrame126(String.valueOf(playerLevel[9]), 4026);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[9])), 4027);
-                sendFrame126(String.valueOf(playerXP[9]), 4110);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[9]) + 1)), 4111);
+                getPA().sendFrame126(String.valueOf(playerLevel[9]), 4026);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[9])), 4027);
+                getPA().sendFrame126(String.valueOf(playerXP[9]), 4110);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[9]) + 1)), 4111);
                 break;
 
             case 10:
-                sendFrame126(String.valueOf(playerLevel[10]), 4032);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[10])), 4033);
-                sendFrame126(String.valueOf(playerXP[10]), 4128);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[10]) + 1)), 4129);
+                getPA().sendFrame126(String.valueOf(playerLevel[10]), 4032);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[10])), 4033);
+                getPA().sendFrame126(String.valueOf(playerXP[10]), 4128);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[10]) + 1)), 4129);
                 break;
 
             case 11:
-                sendFrame126(String.valueOf(playerLevel[11]), 4036);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[11])), 4037);
-                sendFrame126(String.valueOf(playerXP[11]), 4140);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[11]) + 1)), 4141);
+                getPA().sendFrame126(String.valueOf(playerLevel[11]), 4036);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[11])), 4037);
+                getPA().sendFrame126(String.valueOf(playerXP[11]), 4140);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[11]) + 1)), 4141);
                 break;
 
             case 12:
-                sendFrame126(String.valueOf(playerLevel[12]), 4024);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[12])), 4025);
-                sendFrame126(String.valueOf(playerXP[12]), 4104);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[12]) + 1)), 4105);
+                getPA().sendFrame126(String.valueOf(playerLevel[12]), 4024);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[12])), 4025);
+                getPA().sendFrame126(String.valueOf(playerXP[12]), 4104);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[12]) + 1)), 4105);
                 break;
 
             case 13:
-                sendFrame126(String.valueOf(playerLevel[13]), 4030);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[13])), 4031);
-                sendFrame126(String.valueOf(playerXP[13]), 4122);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[13]) + 1)), 4123);
+                getPA().sendFrame126(String.valueOf(playerLevel[13]), 4030);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[13])), 4031);
+                getPA().sendFrame126(String.valueOf(playerXP[13]), 4122);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[13]) + 1)), 4123);
                 break;
 
             case 14:
-                sendFrame126(String.valueOf(playerLevel[14]), 4028);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[14])), 4029);
-                sendFrame126(String.valueOf(playerXP[14]), 4116);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[14]) + 1)), 4117);
+                getPA().sendFrame126(String.valueOf(playerLevel[14]), 4028);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[14])), 4029);
+                getPA().sendFrame126(String.valueOf(playerXP[14]), 4116);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[14]) + 1)), 4117);
                 break;
 
             case 15:
-                sendFrame126(String.valueOf(playerLevel[15]), 4020);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[15])), 4021);
-                sendFrame126(String.valueOf(playerXP[15]), 4092);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[15]) + 1)), 4093);
+                getPA().sendFrame126(String.valueOf(playerLevel[15]), 4020);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[15])), 4021);
+                getPA().sendFrame126(String.valueOf(playerXP[15]), 4092);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[15]) + 1)), 4093);
                 break;
 
             case 16:
-                sendFrame126(String.valueOf(playerLevel[16]), 4018);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[16])), 4019);
-                sendFrame126(String.valueOf(playerXP[16]), 4086);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[16]) + 1)), 4087);
+                getPA().sendFrame126(String.valueOf(playerLevel[16]), 4018);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[16])), 4019);
+                getPA().sendFrame126(String.valueOf(playerXP[16]), 4086);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[16]) + 1)), 4087);
                 break;
 
             case 17:
-                sendFrame126(String.valueOf(playerLevel[17]), 4022);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[17])), 4023);
-                sendFrame126(String.valueOf(playerXP[17]), 4098);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[17]) + 1)), 4099);
+                getPA().sendFrame126(String.valueOf(playerLevel[17]), 4022);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[17])), 4023);
+                getPA().sendFrame126(String.valueOf(playerXP[17]), 4098);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[17]) + 1)), 4099);
                 break;
 
             case 18:
-                sendFrame126(String.valueOf(playerLevel[18]), 12166);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[18])), 12167);
-                sendFrame126(String.valueOf(playerXP[18]), 12171);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[18]) + 1)), 12172);
+                getPA().sendFrame126(String.valueOf(playerLevel[18]), 12166);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[18])), 12167);
+                getPA().sendFrame126(String.valueOf(playerXP[18]), 12171);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[18]) + 1)), 12172);
                 break;
 
             case 19:
-                sendFrame126(String.valueOf(playerLevel[19]), 13926);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[19])), 13927);
-                sendFrame126(String.valueOf(playerXP[19]), 13921);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[19]) + 1)), 13922);
+                getPA().sendFrame126(String.valueOf(playerLevel[19]), 13926);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[19])), 13927);
+                getPA().sendFrame126(String.valueOf(playerXP[19]), 13921);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[19]) + 1)), 13922);
                 break;
 
             case 20:
-                sendFrame126(String.valueOf(playerLevel[20]), 4152);
-                sendFrame126(String.valueOf(getLevelForXP(playerXP[20])), 4153);
-                sendFrame126(String.valueOf(playerXP[20]), 4157);
-                sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[20]) + 1)), 4158);
+                getPA().sendFrame126(String.valueOf(playerLevel[20]), 4152);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[20])), 4153);
+                getPA().sendFrame126(String.valueOf(playerXP[20]), 4157);
+                getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[20]) + 1)), 4158);
                 break;
         }
     }
@@ -40186,10 +39761,10 @@ nated = Integer.parseInt(token2);
 
     public void clearClanChat() {
         clanId = -1;
-        sendFrame126("Talking in: ", 18139);
-        sendFrame126("Owner: ", 18140);
+        getPA().sendFrame126("Talking in: ", 18139);
+        getPA().sendFrame126("Owner: ", 18140);
         for (int j = 18144; j < 18244; j++) {
-            sendFrame126("", j);
+            getPA().sendFrame126("", j);
         }
     }
 
@@ -40199,12 +39774,12 @@ nated = Integer.parseInt(token2);
     public void setClanData() {
         boolean exists = server.clanManager.clanExists(playerName);
         if (!exists || clan == null) {
-            sendFrame126("Join chat", 18135);
-            sendFrame126("Talking in: Not in chat", 18139);
-            sendFrame126("Owner: None", 18140);
+            getPA().sendFrame126("Join chat", 18135);
+            getPA().sendFrame126("Talking in: Not in chat", 18139);
+            getPA().sendFrame126("Owner: None", 18140);
         }
         if (!exists) {
-            sendFrame126("Chat Disabled", 18306);
+            getPA().sendFrame126("Chat Disabled", 18306);
             String title = "";
             for (int id = 18307; id < 18317; id += 3) {
                 if (id == 18307) {
@@ -40216,18 +39791,18 @@ nated = Integer.parseInt(token2);
                 } else if (id == 18316) {
                     title = "Only Me";
                 }
-                sendFrame126(title, id + 2);
+                getPA().sendFrame126(title, id + 2);
             }
             for (int index = 0; index < 100; index++) {
-                sendFrame126("", 18323 + index);
+                getPA().sendFrame126("", 18323 + index);
             }
             for (int index = 0; index < 100; index++) {
-                sendFrame126("", 18424 + index);
+                getPA().sendFrame126("", 18424 + index);
             }
             return;
         }
         Clan clan = server.clanManager.getClan(playerName);
-        sendFrame126(clan.getTitle(), 18306);
+        getPA().sendFrame126(clan.getTitle(), 18306);
         String title = "";
         for (int id = 18307; id < 18317; id += 3) {
             if (id == 18307) {
@@ -40243,23 +39818,23 @@ nated = Integer.parseInt(token2);
                 title = clan.getRankTitle(clan.whoCanBan)
                         + (clan.whoCanBan > Clan.Rank.ANYONE && clan.whoCanBan < Clan.Rank.OWNER ? "+" : "");
             }
-            sendFrame126(title, id + 2);
+            getPA().sendFrame126(title, id + 2);
         }
         if (clan.rankedMembers != null) {
             for (int index = 0; index < 100; index++) {
                 if (index < clan.rankedMembers.size()) {
-                    sendFrame126("<clan=" + clan.ranks.get(index) + ">" + clan.rankedMembers.get(index), 18323 + index);
+                    getPA().sendFrame126("<clan=" + clan.ranks.get(index) + ">" + clan.rankedMembers.get(index), 18323 + index);
                 } else {
-                    sendFrame126("", 18323 + index);
+                    getPA().sendFrame126("", 18323 + index);
                 }
             }
         }
         if (clan.bannedMembers != null) {
             for (int index = 0; index < 100; index++) {
                 if (index < clan.bannedMembers.size()) {
-                    sendFrame126(clan.bannedMembers.get(index), 18424 + index);
+                    getPA().sendFrame126(clan.bannedMembers.get(index), 18424 + index);
                 } else {
-                    sendFrame126("", 18424 + index);
+                    getPA().sendFrame126("", 18424 + index);
                 }
             }
         }
@@ -40411,7 +39986,7 @@ nated = Integer.parseInt(token2);
 
             int farX = player.objectX;
             int farY = player.objectY;
-            if (object.getFace() != 1 && object.getFace() != 3) {
+            if (!(object.getFace() == 1) && !(object.getFace() == 3)) {
                 farX += def.yLength();
                 farY += def.xLength();
             } else {

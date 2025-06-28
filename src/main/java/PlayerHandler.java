@@ -4,8 +4,12 @@ import java.util.*;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.FileWriter;
@@ -86,9 +90,22 @@ public class PlayerHandler {
     }
     // Place this somewhere at the top of your class or as a static field if needed
     private static final ExecutorService playerThreadPool = Executors.newCachedThreadPool();
+    // Cache that tracks connection cooldown by IP or UID
+    private static final Cache<String, Long> connectionCache = Caffeine.newBuilder()
+            .expireAfterWrite(3, TimeUnit.SECONDS) // prevent reconnect spam
+            .maximumSize(5000)
+            .build();
 
-    // A new client connected
     public void newPlayerClient(Socket socket, String connectedFrom) {
+        // Block IPs that connect too frequently
+        if (connectionCache.getIfPresent(connectedFrom) != null) {
+            System.out.println("🚫  fast reconnect from " + connectedFrom);
+            //return;
+        }
+
+        // Store new connection in cache
+        connectionCache.put(connectedFrom, System.currentTimeMillis());
+
         int slot = -1;
 
         // Search from playerSlotSearchStart to maxPlayers
@@ -99,7 +116,6 @@ public class PlayerHandler {
             }
         }
 
-        // Wrap around to search lower indices
         if (slot == -1) {
             for (int i = 1; i < playerSlotSearchStart; i++) {
                 if (players[i] == null) {
@@ -109,43 +125,37 @@ public class PlayerHandler {
             }
         }
 
-        // No available slot
         if (slot == -1) {
             System.err.println("No free player slots available. Connection rejected from: " + connectedFrom);
             return;
         }
 
         try {
-            // Optional: timeout to prevent login hang
-            socket.setSoTimeout(10000); // 10 seconds
+            socket.setSoTimeout(10000); // prevent hangs
 
-            // Create and assign the new client
             client newClient = new client(socket, slot);
             newClient.handler = this;
             newClient.connectedFrom = connectedFrom;
 
-            // Register in player array
             players[slot] = newClient;
 
-            // Submit to thread pool
+            // Keep using your thread pool — this does NOT change
             playerThreadPool.execute(newClient);
 
-            // Update player name list
             updatePlayerNames();
 
-            // Increment slot search index
             playerSlotSearchStart = (slot + 1) % maxPlayers;
             if (playerSlotSearchStart == 0) {
-                playerSlotSearchStart = 1; // skip index 0
+                playerSlotSearchStart = 1;
             }
 
             System.out.println("✅ Accepted connection from " + connectedFrom + " in slot " + slot);
 
         } catch (IOException e) {
-            System.err.println("❌ Failed to initialize socket from: " + connectedFrom);
+            System.err.println("❌ Socket setup failed for " + connectedFrom);
             e.printStackTrace();
         } catch (Exception e) {
-            System.err.println("❌ Unexpected error during player connection:");
+            System.err.println("❌ Unexpected player connect error:");
             e.printStackTrace();
         }
     }
@@ -343,7 +353,7 @@ public class PlayerHandler {
                 plr.npcList[plr.npcListSize++] = plr.npcList[i];
             } else {
                 int id = plr.npcList[i].npcId;
-                plr.npcInListBitmap[id>>3] &= ~(1 << (id&7));		// clear the flag
+                plr.npcInListBitmap[id>>3] &= (byte) ~(1 << (id&7));		// clear the flag
                 str.writeBits(1, 1);
                 str.writeBits(2, 3);		// tells client to remove this npc from list
             }

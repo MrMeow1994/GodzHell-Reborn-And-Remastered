@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -74,7 +75,7 @@ public abstract class Player {
 		}
 		return false;
 	}
-	public Rights rights = Rights.PLAYER;
+	public Rights rights;
 	public boolean maxed = false;
 
 	public void isMaxed(){
@@ -283,7 +284,6 @@ public abstract class Player {
 				(absX >= 2946 && absX <= 2959 && absY >= 3816 && absY <= 3831) ||
 				(absX >= 3008 && absX <= 3199 && absY >= 3856 && absY <= 3903) ||
 				(absX >= 3008 && absX <= 3071 && absY >= 3600 && absY <= 3711) ||
-				(absX >= 3072 && absX <= 3327 && absY >= 3608 && absY <= 2567) ||
 				(absX >= 2624 && absX <= 2690 && absY >= 2550 && absY <= 2619) ||
 				(absX >= 2371 && absX <= 2422 && absY >= 5062 && absY <= 5117) ||
 				(absX >= 2896 && absX <= 2927 && absY >= 3595 && absY <= 3630) ||
@@ -474,9 +474,9 @@ public abstract class Player {
 	}
 	void destruct() {
 		playerListSize = 0;
-		for(int i = 0; i < maxPlayerListSize; i++) playerList[i] = null;
+        Arrays.fill(playerList, null);
 		npcListSize = 0;
-		for(int i = 0; i < maxNPCListSize; i++) npcList[i] = null;
+        Arrays.fill(npcList, null);
 		absX = absY = -1;
 		mapRegionX = mapRegionY = -1;
 		currentX = currentY = 0;
@@ -825,7 +825,7 @@ public abstract class Player {
 
 	public boolean withinDistance(NPC npc) {
 		if (heightLevel != npc.heightLevel) return false;
-		if (npc.NeedRespawn == true) return false;
+		if (npc.NeedRespawn) return false;
 		int deltaX = npc.absX-absX, deltaY = npc.absY-absY;
 		return deltaX <= 15 && deltaX >= -16 && deltaY <= 15 && deltaY >= -16;
 	}
@@ -866,10 +866,10 @@ public abstract class Player {
 	{
 		for(int i = 0; i < PlayerHandler.maxPlayers; i++)
 		{
-			if(server.playerHandler.players[i] == null || !server.playerHandler.players[i].isActive || server.playerHandler.players[i] == this)
+			if(PlayerHandler.players[i] == null || !PlayerHandler.players[i].isActive || PlayerHandler.players[i] == this)
 				continue;
 
-			int id = server.playerHandler.players[i].playerId;
+			int id = PlayerHandler.players[i].playerId;
 
 			if ((playerInListBitmap[id >> 3] & (1 << (id & 7))) != 0)
 			{
@@ -885,8 +885,8 @@ public abstract class Player {
 			addPlayerList.add(id);
 			addPlayerSize++;
 
-			server.playerHandler.players[i].addPlayerList.add(playerId);
-			server.playerHandler.players[i].addPlayerSize++;
+			PlayerHandler.players[i].addPlayerList.add(playerId);
+			PlayerHandler.players[i].addPlayerSize++;
 		}
 	}
 
@@ -1064,7 +1064,7 @@ public abstract class Player {
 			str.writeWord(mapRegionY+6);
 		}
 
-		if(didTeleport == true) {
+		if(didTeleport) {
 			str.createFrameVarSizeWord(81);
 			str.initBitAccess();
 			str.writeBits(1, 1);
@@ -1074,7 +1074,7 @@ public abstract class Player {
 			str.writeBits(1, (updateRequired) ? 1 : 0);
 			str.writeBits(7, currentY);
 			str.writeBits(7, currentX);
-			if (IsDead == true && IsDeadTimer == true && IsDeadTeleporting == true) {
+			if (IsDead && IsDeadTimer && IsDeadTeleporting) {
 				IsDead = false;
 				IsDeadTimer = false;
 				SafeMyLife = false;
@@ -1187,7 +1187,7 @@ public abstract class Player {
 	public void addNewNPC(NPC npc, stream str, stream updateBlock)
 	{
 		int id = npc.npcId;
-		npcInListBitmap[id >> 3] |= 1 << (id&7);	// set the flag
+		npcInListBitmap[id >> 3] |= (byte) (1 << (id&7));	// set the flag
 		npcList[npcListSize++] = npc;
 
 		str.writeBits(14, id);	// client doesn't seem to like id=0
@@ -1211,7 +1211,7 @@ public abstract class Player {
 
 	public void addNewPlayer(Player plr, stream str, stream updateBlock) {
 		int id = plr.playerId;
-		playerInListBitmap[id >> 3] |= 1 << (id&7);	// set the flag
+		playerInListBitmap[id >> 3] |= (byte) (1 << (id&7));	// set the flag
 		playerList[playerListSize++] = plr;
 
 		str.writeBits(11, id);	// client doesn't seem to like id=0
@@ -1262,7 +1262,7 @@ public abstract class Player {
 		// slot 0,8,11,1 is head part - missing additional things are beard and eyepatch like things either 11 or 1
 		// cape, apron, amulet... the remaining things...
 
-		if (isNpc == false) {
+		if (!isNpc) {
 			if (playerEquipment[playerHat] > 1) {
 				playerProps.writeWord(32768 + playerEquipment[playerHat]);
 			} else {
@@ -1615,11 +1615,11 @@ public abstract class Player {
 	protected void appendHitUpdate2(stream str) {
 		try {
 			str.writeByte(hitDiff); // What the perseon got 'hit' for
-			if (hitDiff > 0 && newhptype == false && poisondmg == false) {
+			if (hitDiff > 0 && !newhptype && !poisondmg) {
 				str.writeByteA(1); // 0: red hitting - 1: blue hitting
-			} else if (hitDiff > 0 && poisondmg == true) {
+			} else if (hitDiff > 0 && poisondmg) {
 				str.writeByteA(0); // 0: red hitting - 1: blue hitting 2: poison 3: orange
-			} else if (hitDiff > 0 && newhptype == true) {
+			} else if (hitDiff > 0 && newhptype) {
 				str.writeByteA(hptype); // 0: red hitting - 1: blue hitting
 			} else {
 				str.writeByteA(0); // 0: red hitting - 1: blue hitting
@@ -1639,11 +1639,11 @@ public abstract class Player {
 	protected void appendHitUpdate(stream str) {
 		try {
 			str.writeByte(hitDiff); // What the perseon got 'hit' for
-			if (hitDiff > 0 && newhptype == false && poisondmg == false) {
+			if (hitDiff > 0 && !newhptype && !poisondmg) {
 				str.writeByteS(1); // 0: red hitting - 1: blue hitting
-			} else if (hitDiff > 0 && poisondmg == true) {
+			} else if (hitDiff > 0 && poisondmg) {
 				str.writeByteS(2); // 0: red hitting - 1: blue hitting 2: poison 3: orange
-			} else if (hitDiff > 0 && newhptype == true) {
+			} else if (hitDiff > 0 && newhptype) {
 				str.writeByteS(hptype); // 0: red hitting - 1: blue hitting
 			} else {
 				str.writeByteS(0); // 0: red hitting - 1: blue hitting
@@ -1665,8 +1665,8 @@ public abstract class Player {
 		int output = 0;
 
 		for (int lvl = 1; lvl <= 150; lvl++) {
-			points += Math.floor((double)lvl + 300.0 * Math.pow(2.0, (double)lvl / 7.0));
-			output = (int)Math.floor(points / 4);
+			points += (int) Math.floor((double)lvl + 300.0 * Math.pow(2.0, (double)lvl / 7.0));
+			output = (int)Math.floor((double) points / 4);
 			if (output >= exp)
 				return lvl;
 		}
@@ -1820,14 +1820,14 @@ public abstract class Player {
 	public int WanneTradeWith = 0;
 	public boolean TradeConfirmed = false;
 	public boolean AntiTradeScam = false;
-	public int playerFollow[] = new int[PlayerHandler.maxPlayers];
+	public int[] playerFollow = new int[PlayerHandler.maxPlayers];
 	public int playerFollowID = -1;
 	public int DirectionCount = 0;
 	public boolean playerAncientMagics = false;
 	public String playerServer;
 	public int playerGameTime;
 	public int playerGameCount;
-	public boolean ChangeDoor[] = new boolean[server.objectHandler.MaxObjects];
+	public boolean ChangeDoor[] = new boolean[ObjectHandler.MaxObjects];
 	public int respawnTimer;
 	public int underAttackBy2;
 	public int underAttackBy;
