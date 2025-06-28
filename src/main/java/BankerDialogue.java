@@ -24,7 +24,7 @@ public class BankerDialogue extends Dialogue {
                 setNext(5);
                 break;
             case 5:
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
         }
@@ -34,17 +34,17 @@ public class BankerDialogue extends Dialogue {
     public boolean clickButton(int id) {
         switch(id) {
             case DialogueConstants.OPTIONS_2_1:
-                getPlayer().openUpBank();
+                getPlayer().getPA().openUpBank();
                 end();
                 break;
             case DialogueConstants.OPTIONS_2_2:
-                getPlayer().openUpBank2();
+                getPlayer().getPA().openUpBank2();
                 end();
                 break;
             case DialogueConstants.OPTIONS_4_1:
                 if(!getPlayer().rights.isStaff()) {
                     end();
-                    getPlayer().openUpBank();
+                    getPlayer().getPA().openUpBank();
                 } else {
                     DialogueManager.sendOption(getPlayer(), "Main bank", "Staff bank");
                 }

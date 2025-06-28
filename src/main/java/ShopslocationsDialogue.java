@@ -17,14 +17,14 @@ public class ShopslocationsDialogue extends Dialogue {
                     getPlayer().movePlayer(3351, 3343, 0);
                 getPlayer().sendMessage(
                         "You teleport to the GodzHell Shopping Area!");
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
             case DialogueConstants.OPTIONS_2_2://mining guild
                 getPlayer().movePlayer(2805,2787,1);
                 getPlayer().sendMessage(
                         "You teleport to the GodzHell Reborn Shopping Area!");
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
         }

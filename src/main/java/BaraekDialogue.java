@@ -36,7 +36,7 @@ public class BaraekDialogue extends Dialogue {
                 break;
             case 10:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 11:
                 if(getPlayer().playerHasItem(995, 18)) {
@@ -92,12 +92,12 @@ public class BaraekDialogue extends Dialogue {
                     getPlayer().deleteItem2(948, amount);
                     getPlayer().addItem(995, 12 * amount);
                     end();
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 } else {
                     getPlayer().deleteItem2(948, 1);
                     getPlayer().addItem(995, 12);
                     end();
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                break;
             case 21:

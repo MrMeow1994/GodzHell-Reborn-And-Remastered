@@ -25,7 +25,7 @@ public class BobDialogue extends Dialogue {
                 break;
             case 4:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 5:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "Of course I'll repair it, though the materials may cost", " you. Just hand me the item and I'll have a look.");

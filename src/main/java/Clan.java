@@ -37,10 +37,10 @@ public class Clan {
         player.clan = this;
         player.lastClanChat = getFounder();
         activeMembers.add(player.playerName);
-        player.sendFrame126("Leave Chat", 18135);
-        player.sendFrame126(
+        player.getPA().sendFrame126("Leave Chat", 18135);
+        player.getPA().sendFrame126(
                 "Talking in: <col=FFFF75>" + getTitle() + "</col>", 18139);
-        player.sendFrame126(
+        player.getPA().sendFrame126(
                 "Owner: <col=FFFFFF>" + misc.capitalize(getFounder())
                         + "</col>", 18140);
         player.sendMessage("Now talking in clan channel <col=255>" + getTitle()
@@ -70,10 +70,10 @@ public class Clan {
         player.clan = this;
         player.lastClanChat = getFounder();
         activeMembers.add(player.playerName);
-        player.sendFrame126("Leave Chat", 18135);
-        player.sendFrame126(
+        player.getPA().sendFrame126("Leave Chat", 18135);
+        player.getPA().sendFrame126(
                 "Talking in: <col=FFFF75>" + getTitle() + "</col>", 18139);
-        player.sendFrame126(
+        player.getPA().sendFrame126(
                 "Owner: <col=FFFFFF>" + misc.capitalize(getFounder())
                         + "</col>", 18140);
         player.sendMessage("Now talking in clan channel <col=255>" + getTitle()
@@ -129,22 +129,22 @@ public class Clan {
      * @param player
      */
     public void updateInterface(client player) {
-        player.sendFrame126(
+        player.getPA().sendFrame126(
                 "Talking in: <col=FFFF75>" + getTitle() + "</col>", 18139);
-        player.sendFrame126(
+        player.getPA().sendFrame126(
                 "Owner: <col=FFFFFF>" + misc.capitalize(getFounder())
                         + "</col>", 18140);
         Collections.sort(activeMembers);
         for (int index = 0; index < 100; index++) {
             if (index < activeMembers.size()) {
-                player.sendFrame126(
+                player.getPA().sendFrame126(
                         "<clan="
                                 + getRank(activeMembers.get(index))
                                 + ">"
                                 + misc.capitalize(activeMembers
                                 .get(index)), 18144 + index);
             } else {
-                player.sendFrame126("", 18144 + index);
+                player.getPA().sendFrame126("", 18144 + index);
             }
         }
     }
@@ -176,14 +176,14 @@ public class Clan {
 
     public void updateNewInterface(client player) {
         if(getTeleport()){
-            player.sendFrame126("<col=65280>Yes", 18530);
+            player.getPA().sendFrame126("<col=65280>Yes", 18530);
         } else if(!getTeleport()){
-            player.sendFrame126("<col=ff0000>No", 18530);
+            player.getPA().sendFrame126("<col=ff0000>No", 18530);
         }
         if(getCanCopy()){
-            player.sendFrame126("<col=65280>Yes", 18533);
+            player.getPA().sendFrame126("<col=65280>Yes", 18533);
         } else if(!getCanCopy()){
-            player.sendFrame126("<col=ff0000>No", 18533);
+            player.getPA().sendFrame126("<col=ff0000>No", 18533);
         }
     }
 
@@ -192,11 +192,11 @@ public class Clan {
      * @param player
      */
     public void resetInterface(client player) {
-        player.sendFrame126("Join chat", 18135);
-        player.sendFrame126("Talking in: Not in chat", 18139);
-        player.sendFrame126("Owner: None", 18140);
+        player.getPA().sendFrame126("Join chat", 18135);
+        player.getPA().sendFrame126("Talking in: Not in chat", 18139);
+        player.getPA().sendFrame126("Owner: None", 18140);
         for (int index = 0; index < 100; index++) {
-            player.sendFrame126("", 18144 + index);
+            player.getPA().sendFrame126("", 18144 + index);
         }
     }
 
@@ -489,13 +489,13 @@ public class Clan {
     public void allowTeleport(client player) {
         if(isFounder(player.playerName) && !getTeleport()) {
             setTeleport(true);
-            player.sendFrame126("<col=65280>Yes", 18530);
+            player.getPA().sendFrame126("<col=65280>Yes", 18530);
             player.sendMessage("You have <col=255>enabled<col=0> the ability for clan members to teleport to other clan members!");
             updateMembers();
         } else if(player.clan.isFounder(player.playerName) && getTeleport()) {
             //canTeleport = false;
             setTeleport(false);
-            player.sendFrame126("<col=ff0000>No", 18530);
+            player.getPA().sendFrame126("<col=ff0000>No", 18530);
             player.sendMessage("You have <col=255>disabled<col=0> the ability for clan members to teleport to other clan members!");
             updateMembers();
         }
@@ -504,12 +504,12 @@ public class Clan {
     public void allowCopyKit(client player) {
         if(player.clan.isFounder(player.playerName) && !getCanCopy()) {
             setCanCopy(true);
-            player.sendFrame126("<col=65280>Yes", 18533);
+            player.getPA().sendFrame126("<col=65280>Yes", 18533);
             player.sendMessage("You have <col=255>enabled<col=0> the ability for clan members to copy other members armour kits!");
             updateMembers();
         } else if(player.clan.isFounder(player.playerName) && getCanCopy()) {
             setCanCopy(false);
-            player.sendFrame126("<col=ff0000>No", 18533);
+            player.getPA().sendFrame126("<col=ff0000>No", 18533);
             player.sendMessage("You have <col=255>disabled<col=0> the ability for clan members to copy other members armour kits!");
             updateMembers();
         }

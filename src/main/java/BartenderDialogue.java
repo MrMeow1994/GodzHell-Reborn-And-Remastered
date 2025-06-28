@@ -23,7 +23,7 @@ public class BartenderDialogue extends Dialogue {
                 break;
             case 3:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 4:
                 if(getPlayer().playerHasItem(995, 2)) {

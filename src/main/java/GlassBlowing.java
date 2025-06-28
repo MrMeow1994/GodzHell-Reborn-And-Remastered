@@ -28,7 +28,7 @@ public class GlassBlowing {
 
     public void showInterface() {
         if(!started) {
-            c.showInterface(11462);
+            c.getPA().showInterface(11462);
         }
     }
 
@@ -45,25 +45,25 @@ public class GlassBlowing {
         for(int i = 0; i < data.length; i++) {
             if(data[i][0] == buttonId) {
                 makeItem(data[i][1], 1, i);
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
             }
 
             if(data[i][0] == buttonId+1) {
                 makeItem(data[i][1], 5, i);
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
             }
 
             if(data[i][0] == buttonId+2) {
                 makeItem(data[i][1], 10, i);
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
             }
 
             if(data[i][0] == buttonId+3) {
                 makeItem(data[i][1], 28, i);
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
             }
         }

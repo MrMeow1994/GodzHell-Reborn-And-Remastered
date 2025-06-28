@@ -343,7 +343,7 @@ public class PanelSettings {
             for (int i = 0; i < Config.MAX_PLAYERS; i++) {
                 if (validPlayer(i)) {
                     client c2 = getPlayer(i);
-                    c2.sendFrame126(Config.LOGOUT_MESSAGE, 2458);
+                    c2.getPA().sendFrame126(Config.LOGOUT_MESSAGE, 2458);
                 }
             }
             return;
@@ -564,7 +564,7 @@ public class PanelSettings {
             p.displayMessage("Command not added! Add it yourself :D", cmd, 1);
         }
         if (cmd.equals("Force Bank")) {
-            c.openUpBank();
+            c.getPA().openUpBank();
         }
         if (cmd.equals("Force Shop")) {
             int shop = -1;

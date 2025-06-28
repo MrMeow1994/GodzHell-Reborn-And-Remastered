@@ -35,7 +35,7 @@ public class TannerDialogue extends Dialogue {
                 break;
             case 6:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 7:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "I make leather from animal hides. Bring me some", "cowhides and one gold coin per hide, and I'll tan them", "into soft leather for you.");
@@ -43,7 +43,7 @@ public class TannerDialogue extends Dialogue {
                 break;
             case 8:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 9:
                 DialogueManager.sendOption(getPlayer(), "Yes please.","No thanks");
@@ -58,7 +58,7 @@ public class TannerDialogue extends Dialogue {
                 break;
             case 12:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
 

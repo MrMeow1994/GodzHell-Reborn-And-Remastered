@@ -41,7 +41,7 @@ public class FatherAereckDialogue extends Dialogue {
                 break;
             case 9:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 10:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "...");
@@ -68,7 +68,7 @@ public class FatherAereckDialogue extends Dialogue {
                 break;
             case 16:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 17:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "Aargh! Avaunt foul creature from another dimension!", " Avaunt! Begone in the name of Saradomin!");
@@ -80,7 +80,7 @@ public class FatherAereckDialogue extends Dialogue {
                 break;
             case 19:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 20:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "It is, isn't it? It was built over 230 years ago.");
@@ -88,7 +88,7 @@ public class FatherAereckDialogue extends Dialogue {
                 break;
             case 21:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 22:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "That's lucky, I need someone to do a quest for me.");
@@ -108,7 +108,7 @@ public class FatherAereckDialogue extends Dialogue {
             case 25:
                 getPlayer().sendMessage("Not added yet.");
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
 
                 break;
         }

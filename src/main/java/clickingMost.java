@@ -309,27 +309,27 @@ public class clickingMost {
 
             case 75247:
             case 75222:
-                c.setSidebarInterface(2, 18859);
+                c.getPA().setSidebarInterface(2, 18859);
                 break;
             case 73167:
             case 75248:
-                c.setSidebarInterface(2, 19409);
+                c.getPA().setSidebarInterface(2, 19409);
                 break;
 
             case 73202:
-                c.showInterface(17890);
+                c.getPA().showInterface(17890);
                 break;
 
             case 69230:
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
 
             case 73200:
-                c.setSidebarInterface(12, 18891);
+                c.getPA().setSidebarInterface(12, 18891);
                 break;
 
             case 73250:
-                c.setSidebarInterface(12, 147);
+                c.getPA().setSidebarInterface(12, 147);
                 break;
 
             case 73220:
@@ -625,26 +625,26 @@ public class clickingMost {
 
             case 23132: //unmorph
                 c.isMorphed = false;
-                c.setSidebarInterface(1, 3917);
-                c.setSidebarInterface(2, 638);
-                c.setSidebarInterface(3, 3213);
-                c.setSidebarInterface(4, 1644);
-                c.setSidebarInterface(5, 5608);
+                c.getPA().setSidebarInterface(1, 3917);
+                c.getPA().setSidebarInterface(2, 638);
+                c.getPA().setSidebarInterface(3, 3213);
+                c.getPA().setSidebarInterface(4, 1644);
+                c.getPA().setSidebarInterface(5, 5608);
                 if (c.ancients == 0) {
-                    c.setSidebarInterface(6, 1151);
+                    c.getPA().setSidebarInterface(6, 1151);
                 } else if (c.ancients == 1) {
-                    c.setSidebarInterface(6, 12855);
+                    c.getPA().setSidebarInterface(6, 12855);
 //} else if (c.playerMagicBook == 2) {
-                    //c.setSidebarInterface(6, 29999);
+                    //c.getPA().setSidebarInterface(6, 29999);
                 }
-                c.setSidebarInterface(7, 18128);
-                c.setSidebarInterface(8, 5065);
-                c.setSidebarInterface(9, 5715);
-                c.setSidebarInterface(10, 2449);
-                c.setSidebarInterface(11, 904);
-                c.setSidebarInterface(12, 147);
-                c.setSidebarInterface(13, 962);
-                c.setSidebarInterface(0, 2423);
+                c.getPA().setSidebarInterface(7, 18128);
+                c.getPA().setSidebarInterface(8, 5065);
+                c.getPA().setSidebarInterface(9, 5715);
+                c.getPA().setSidebarInterface(10, 2449);
+                c.getPA().setSidebarInterface(11, 904);
+                c.getPA().setSidebarInterface(12, 147);
+                c.getPA().setSidebarInterface(13, 962);
+                c.getPA().setSidebarInterface(0, 2423);
                 if (c.playerEquipment[c.playerRing] == 7927) {
                     c.deleteequiment(c.playerEquipment[c.playerRing], c.playerRing);
                     c.addItem(7927, 1);
@@ -656,7 +656,7 @@ public class clickingMost {
 
             case 73175:
             case 75221:
-                c.setSidebarInterface(2, 638);
+                c.getPA().setSidebarInterface(2, 638);
                 break;
 
             case 58025:
@@ -822,12 +822,12 @@ public class clickingMost {
             // These values speak for themselves
             // case 4126: windstrike break;
             case 14067: // Char design accept button
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
 
 
             case 9118:
-                c.RemoveAllWindows();
+                c.getPA().RemoveAllWindows();
                 break;
 
             case 33190:
@@ -916,7 +916,7 @@ public class clickingMost {
 
             case 9178:
                 if (c.holyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.holyBook1 = true;
                     if (c.preach1) {
@@ -927,7 +927,7 @@ public class clickingMost {
                         c.preach2 = true;
                     }
                 } else if (c.unholyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.unholyBook1 = true;
                     if (c.preach1) {
@@ -938,7 +938,7 @@ public class clickingMost {
                         c.preach2 = true;
                     }
                 } else if (c.balanceBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.balanceBook1 = true;
                     if (c.balanceBook1) {
@@ -953,7 +953,7 @@ public class clickingMost {
 
             case 9179:
                 if (c.holyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.holyBook2 = true;
                     if (c.preach1) {
@@ -964,7 +964,7 @@ public class clickingMost {
                         c.preach2 = true;
                     }
                 } else if (c.unholyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.unholyBook2 = true;
                     if (c.preach1) {
@@ -975,7 +975,7 @@ public class clickingMost {
                         c.	preach2 = true;
                     }
                 } else if (c.balanceBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.balanceBook2 = true;
                     if (c.preach1) {
@@ -998,7 +998,7 @@ public class clickingMost {
                 break;
             case 9180:
                 if (c.holyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.holyBook3 = true;
                     if (c.preach1) {
@@ -1009,7 +1009,7 @@ public class clickingMost {
                         c.	preach2 = true;
                     }
                 } else if (c.unholyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.unholyBook3 = true;
                     if (c.preach1) {
@@ -1020,7 +1020,7 @@ public class clickingMost {
                         c.	preach2 = true;
                     }
                 } else if (c.balanceBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.balanceBook3 = true;
                     if (c.preach1) {
@@ -1035,7 +1035,7 @@ public class clickingMost {
 
             case 9181:
                 if (c.holyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.holyBook4 = true;
                     if (c.preach1) {
@@ -1046,7 +1046,7 @@ public class clickingMost {
                         c.	preach2 = true;
                     }
                 } else if (c.unholyBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.unholyBook4 = true;
                     if (c.preach1) {
@@ -1057,7 +1057,7 @@ public class clickingMost {
                         c.	preach2 = true;
                     }
                 } else if (c.balanceBook) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.preach1 = true;
                     c.balanceBook4 = true;
                     if (c.preach1) {
@@ -1589,7 +1589,7 @@ public class clickingMost {
                 if (c.tradeWith > 0) {
                     if (PlayerHandler.players[c.tradeWith].tradeStatus == 2) {
                         c.	tradeStatus = 3;
-                        c.	sendFrame126("Waiting for other c...", 3431);
+                        c.	getPA().sendFrame126("Waiting for other c...", 3431);
                     } else if (PlayerHandler.players[c.tradeWith].tradeStatus == 3) {
                         c.	tradeStatus = 3;
                         // TradeGoConfirm();
@@ -1601,7 +1601,7 @@ public class clickingMost {
                 if (c.tradeWith > 0) {
                     if (PlayerHandler.players[c.tradeWith].tradeStatus == 3) {
                         c.	tradeStatus = 4;
-                        c.	sendFrame126("Waiting for other c...", 3535);
+                        c.	getPA().sendFrame126("Waiting for other c...", 3535);
                     } else if (PlayerHandler.players[c.tradeWith].tradeStatus == 4) {
                         c.	tradeStatus = 4;
                         // ConfirmTrade();
@@ -1613,7 +1613,7 @@ public class clickingMost {
                 if (c.NpcDialogue == 4) { // bank
                     c.NpcDialogue = 0;
                     c.NpcDialogueSend = false;
-                    c.openUpBank();
+                    c.getPA().openUpBank();
                 }
                 if (c.skillcape == 1) {
                     c.WanneShop = 61; // Skill Cape Shop
@@ -1633,7 +1633,7 @@ public class clickingMost {
                 }
                 break;
             case 74127:
-                c.showInterface(19073);
+                c.getPA().showInterface(19073);
                 break;
             case 9169:
                 if (c.NpcDialogue == 4) { // bank
@@ -1678,14 +1678,14 @@ public class clickingMost {
                 } else if (c.NpcDialogue == 41) {
                     c.NpcDialogue = 0;
                     c.NpcDialogueSend = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.sendMessage("You board the ship.");
                     c.travelboat1 = true;
                     c.traveltime = 30;
                 } else if (c.NpcDialogue == 43) {
                     c.NpcDialogue = 0;
                     c.NpcDialogueSend = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.sendMessage("You board the ship.");
                     c.travelboat2 = true;
                     c.traveltime = 30;
@@ -1698,8 +1698,8 @@ public class clickingMost {
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 0) {
                     c.NpcDialogue = 1340;
-                    c.sendFrame126("Mmk thanks for reading!", 4885);
-                    c.RemoveAllWindows();
+                    c.getPA().sendFrame126("Mmk thanks for reading!", 4885);
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 14601) {
                     c.NpcDialogue = 14602;
@@ -1717,13 +1717,13 @@ public class clickingMost {
                     c.NpcDialogue = 0;
                     c.NpcDialogueSend = false;
                     c.stillgfx(435, c.absY, c.absX);
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     if (c.ancients == 1) {
-                        c.	setSidebarInterface(6, 1151); // magic tab (ancient = 12855);
+                        c.	getPA().setSidebarInterface(6, 1151); // magic tab (ancient = 12855);
                         c.	ancients = 0;
                         c.	sendMessage("The dark mage converts back to normal magic!");
                     } else {
-                        c.	setSidebarInterface(6, 12855); // magic tab (ancient = 12855);
+                        c.	getPA().setSidebarInterface(6, 12855); // magic tab (ancient = 12855);
                         c.	ancients = 1;
                         c.	sendMessage("The dark mage converts you to ancient magicks!");
                     }
@@ -1734,20 +1734,20 @@ public class clickingMost {
                     c.sendMessage("You teleport to the TzTok-Jad's lair");
                     c.sendMessage("As you materialize, you feel the air around you grow hot");
                     c.duelring = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 } else if (c.OptionObject == 2466) {
                     c.sendMessage("Welcome to Saradomin's team!");
                     c.teleportToX = 2387;
                     c.teleportToY = 3116;
                     c.OptionObject = -1;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 } else if (c.JunaTele == 1) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.teleportToX = 3253;
                     c.teleportToY = c.absY;
                     c.JunaTele = -1;
                 } else if (c.JunaTele == 2) {
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.teleportToX = 3251;
                     c.teleportToY = c.absY;
                     c.JunaTele = -1;
@@ -1778,12 +1778,12 @@ public class clickingMost {
                         c.sendMessage("-He Teleports you then runs away-");
                         c.sendMessage("Go through the swamp, i would kill those ghasts if i were you..");
                         c.heightLevel = 0;
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     } else {
                         c.NpcDialogue = 0;
                         c.NpcDialogueSend = false;
                         c.sendMessage("You do not have the ice Diamond in your inventory.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     }
                 } else if (c.NpcDialogue == 819) {
                     if (c.playerHasItem(4672) == true) {
@@ -1804,12 +1804,12 @@ public class clickingMost {
                         c.addSkillXP((100000 * c.playerLevel[6]), 6);
                         PlayerHandler.messageToAll = c.playerName + " has just completed Desert Tresure!";
                         c.heightLevel = 0;
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     } else {
                         c.NpcDialogue = 0;
                         c.NpcDialogueSend = false;
                         c.sendMessage("You do not have the Smoke Diamond in your inventory.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     }
                 } else if (c.NpcDialogue == 906) {
                     if (c.playerHasItem(4673) == true) {
@@ -1822,12 +1822,12 @@ public class clickingMost {
                         c.sendMessage("-you get teleported to your last task");
                         c.IsSnowing = 5;
                         c.heightLevel = 0;
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     } else {
                         c.NpcDialogue = 0;
                         c.NpcDialogueSend = false;
                         c.sendMessage("You do not have the Shadow Diamond in your inventory.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     }
                 } else if (c.NpcDialogue == 665) {
                     if (c.playerHasItem(995) && c.playerHasItemAmount(995, 199999999) && (c.playerLevel[15] >= 56) && c.playerLevel[6] >= 82 == true) {
@@ -1847,12 +1847,12 @@ public class clickingMost {
                         c.teleportToX = 2843;
                         c.teleportToY = 3674;
                         c.heightLevel = 0;
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     } else {
                         c.NpcDialogue = 0;
                         c.NpcDialogueSend = false;
                         c.sendMessage("You must have 82 magic & 56 Herblore as well as 200m to start this quest.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     }
                 } else if (c.NpcDialogue == 1921) {
                     if (c.playerHasItem(4670) == true) {
@@ -1863,12 +1863,12 @@ public class clickingMost {
                         c.teleportToX = 2545;
                         c.teleportToY = 3422;
                         c.heightLevel = 0;
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     } else {
                         c.NpcDialogue = 0;
                         c.NpcDialogueSend = false;
                         c.sendMessage("You do not have the Blood Diamond in your inventory.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     }
                 } else if (c.NpcDialogue == 1973) {
                     if (c.playerHasItem(1515) && c.playerHasItemAmount(389, 1) && c.playerHasItemAmount(590, 1) && c.playerHasItemAmount(566, 1) && c.playerHasItemAmount(1117, 1) && c.playerHasItemAmount(1169, 1) == true) {
@@ -1884,12 +1884,12 @@ public class clickingMost {
                         c.teleportToX = 2629;
                         c.teleportToY = 5069;
                         c.heightLevel = 0;
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     } else {
                         c.NpcDialogue = 0;
                         c.NpcDialogueSend = false;
                         c.sendMessage("You do not have the items needed in your inventory.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                     }
                 }
 
@@ -1963,7 +1963,7 @@ public class clickingMost {
                                 c.talk3(9847, "You have an easier task from a different master.",
                                         "If you cannot complete their task, you cannot start",
                                         "one of mine. You must finish theirs first.", c.talkingNpc);
-                                c.RemoveAllWindows();
+                                c.getPA().RemoveAllWindows();
                                 c.NpcDialogueSend = false;
                                 return;
                             }
@@ -1991,22 +1991,22 @@ public class clickingMost {
                 if (c.NpcDialogue == 2) {
                     c.NpcDialogue = 0;
                     c.NpcDialogueSend = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 } else if (c.NpcDialogue == 15) {
                     c.NpcDialogue = 18;
                     c.NpcDialogueSend = false;
                     c.nextDialogue(18);
                 } else if (c.NpcDialogue == 620) {
                     c.NpcDialogue = 621;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 906) {
                     c.NpcDialogue = 907;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 665) {
                     c.NpcDialogue = 666;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else if(c.NpcDialogue == 1539){
                     c.NpcDialogue = 1540;
@@ -2014,22 +2014,22 @@ public class clickingMost {
                 } else  if (c.NpcDialogue == 325) {
                     //server.lottery.enterLottery(c);
                     //c.sM("Lottery Has been Disabled.");
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else  if (c.NpcDialogue == 186) {
                     c.NpcDialogue = 189;
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 1921) {
                     c.NpcDialogue = 1922;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 1973) {
                     c. NpcDialogue = 1974;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 } else if (c.NpcDialogue == 819) {
                     c.NpcDialogue = 820;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.NpcDialogueSend = false;
                 }
                 break;*/
@@ -2039,20 +2039,20 @@ public class clickingMost {
                     c.heightLevel = 0;
                     c.teleportToX = 2849;
                     c.teleportToY = 3436;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.Fishingspots = false;
                 } else if (c.Trainingteleports) {
                     c.teleportToX = 3097;
                     c.teleportToY = 9869;
                     c.heightLevel = 0;
                     c.Trainingteleports = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 } else if (c.Miningspots) {
                     c.teleportToX = 3229;
                     c.teleportToY = 3150;
                     c.heightLevel = 0;
                     c.Miningspots = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 }
                 break;
 
@@ -2061,20 +2061,20 @@ public class clickingMost {
                     c.heightLevel = 0;
                     c.teleportToX = 3105;
                     c.teleportToY = 3433;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.Fishingspots = false;
                 } else if (c.Trainingteleports) {
                     c.teleportToX = 2713;
                     c.teleportToY = 9564;
                     c.heightLevel = 0;
                     c.Trainingteleports = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 } else if (c.Miningspots) {
                     c.teleportToX = 3084;
                     c.teleportToY = 3417;
                     c.heightLevel = 0;
                     c.Miningspots = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 }
                 break;
 
@@ -2083,20 +2083,20 @@ public class clickingMost {
                     c.heightLevel = 0;
                     c.teleportToX = 2923;
                     c.teleportToY = 3172;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.Fishingspots = false;
                 } else if (c.Trainingteleports) {
                     c.teleportToX = 2884;
                     c.teleportToY = 9799;
                     c.heightLevel = 0;
                     c.Trainingteleports = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 } else if (c.Miningspots) {
                     c.teleportToX = 3185;
                     c.teleportToY = 3371;
                     c.heightLevel = 0;
                     c.Miningspots = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 }
                 break;
             case 32032:
@@ -2104,14 +2104,14 @@ public class clickingMost {
                     c.heightLevel = 0;
                     c.teleportToX = 3243;
                     c.teleportToY = 3161;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.Fishingspots = false;
                 } else if (c.Miningspots) {
                     c.teleportToX = 2976;
                     c.teleportToY = 3236;
                     c.heightLevel = 0;
                     c.Miningspots = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 }
                 break;
             case 32033:
@@ -2119,22 +2119,22 @@ public class clickingMost {
                     c.heightLevel = 0;
                     c.teleportToX = 2595;
                     c.teleportToY = 3420;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                     c.Fishingspots = false;
                 } else if (c.Miningspots) {
                     c.teleportToX = 3044;
                     c.teleportToY = 9778;
                     c.heightLevel = 0;
                     c.Miningspots = false;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
                 }
                 break;
             case 1097:
-                c.setSidebarInterface(0, 1829);
+                c.getPA().setSidebarInterface(0, 1829);
                 break;
 
             case 7212:
-                c.setSidebarInterface(0, 328);
+                c.getPA().setSidebarInterface(0, 328);
                 break;
 
             case 3162:

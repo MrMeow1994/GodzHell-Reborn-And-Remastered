@@ -2,14 +2,14 @@ object Spinning : CraftingData() {
     var BEFORE_AFTER = arrayOf(intArrayOf(1737, 1759, 3, 1), intArrayOf(1779, 1777, 15, 10))
     @JvmStatic
     fun showSpinning(player: client) {
-        player.sendFrame164(8880)
-        player.sendFrame126("What would you like to make?", 8879)
-        player.sendFrame246(8883, 180, 1737) // left
-        player.sendFrame246(8884, 180, 1779) // middle
-        player.sendFrame246(8885, 180, 6051) // right
-        player.sendFrame126("Wool", 8889)
-        player.sendFrame126("Flax", 8893)
-        player.sendFrame126("Magic tree", 8897)
+        player.getPA().sendFrame164(8880)
+        player.getPA().sendFrame126("What would you like to make?", 8879)
+        player.getPA().sendFrame246(8883, 180, 1737) // left
+        player.getPA().sendFrame246(8884, 180, 1779) // middle
+        player.getPA().sendFrame246(8885, 180, 6051) // right
+        player.getPA().sendFrame126("Wool", 8889)
+        player.getPA().sendFrame126("Flax", 8893)
+        player.getPA().sendFrame126("Magic tree", 8897)
         player.clickedSpinning = true
     }
 
@@ -21,7 +21,7 @@ object Spinning : CraftingData() {
     }
 
     fun spinItem(player: client) {
-        player.RemoveAllWindows()
+        player.getPA().RemoveAllWindows()
         for (element in BEFORE_AFTER) {
             val before = element[0]
             val after = element[1]

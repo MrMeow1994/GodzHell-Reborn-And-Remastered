@@ -19,10 +19,10 @@ public class EmptyDialogue extends Dialogue{
         switch(id) {
             case DialogueConstants.OPTIONS_2_1:
                 getPlayer().removeAllItems();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case DialogueConstants.OPTIONS_2_2:
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
 

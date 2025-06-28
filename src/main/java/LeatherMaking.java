@@ -6,27 +6,27 @@ public class LeatherMaking extends CraftingData {
             final int leather = itemUsed == 1733 ? usedWith : itemUsed;
             if (leather == l.getLeather()) {
                 if (l.getLeather() == 1741) {
-                    c.showInterface(2311);
+                    c.getPA().showInterface(2311);
                     c.leatherType = leather;
                     return;
                 }
                 String[] name = { "Body", "Chaps", "Bandana", "Boots", "Vamb", };
                 if (l.getLeather() == 1743) {
-                    c.sendFrame164(4429);
-                    c.sendFrame246(1746, 200, 1131);
-                    c.sendFrame126(
+                    c.getPA().sendFrame164(4429);
+                    c.getPA().sendFrame246(1746, 200, 1131);
+                    c.getPA().sendFrame126(
                             Item.getItemName(1131), 2799);
                     c.leatherType = leather;
                 }
                 if (l.getLeather() == 6289) {
-                    c.sendFrame164(8938);
-                    c.sendFrame246(8941, 180, 6322);
-                    c.sendFrame246(8942, 180, 6324);
-                    c.sendFrame246(8943, 180, 6326);
-                    c.sendFrame246(8944, 180, 6328);
-                    c.sendFrame246(8945, 180, 6330);
+                    c.getPA().sendFrame164(8938);
+                    c.getPA().sendFrame246(8941, 180, 6322);
+                    c.getPA().sendFrame246(8942, 180, 6324);
+                    c.getPA().sendFrame246(8943, 180, 6326);
+                    c.getPA().sendFrame246(8944, 180, 6328);
+                    c.getPA().sendFrame246(8945, 180, 6330);
                     for (int i = 0; i < name.length; i++) {
-                        c.sendFrame126(name[i], 8949 + i * 4);
+                        c.getPA().sendFrame126(name[i], 8949 + i * 4);
                     }
                     c.leatherType = leather;
                     return;
@@ -37,12 +37,12 @@ public class LeatherMaking extends CraftingData {
             final int leather = itemUsed == 1733 ? usedWith : itemUsed;
             String[] name = { "Vamb", "Body", "Chaps", };
             if (leather == d.getLeather()) {
-                c.sendFrame164(8880);
-                c.sendFrame246(8883, 180, d.getVamb());
-                c.sendFrame246(8884, 180, d.getChaps());
-                c.sendFrame246(8885, 180, d.getBody());
+                c.getPA().sendFrame164(8880);
+                c.getPA().sendFrame246(8883, 180, d.getVamb());
+                c.getPA().sendFrame246(8884, 180, d.getChaps());
+                c.getPA().sendFrame246(8885, 180, d.getBody());
                 for (int i = 0; i < name.length; i++) {
-                    c.sendFrame126(name[i], 8889 + i * 4);
+                    c.getPA().sendFrame126(name[i], 8889 + i * 4);
                 }
                 c.leatherType = leather;
                 return;
@@ -63,13 +63,13 @@ public class LeatherMaking extends CraftingData {
                         player.sendMessage(
                                 "You need a crafting level of " + l.getLevel()
                                         + " to make this.");
-                        player.RemoveAllWindows();
+                        player.getPA().RemoveAllWindows();
                         return;
                     }
                     if (!player.playerHasItem(1734)) {
                         player.sendMessage(
                                 "You need some thread to make this.");
-                        player.RemoveAllWindows();
+                        player.getPA().RemoveAllWindows();
                         return;
                     }
                     if (!player.playerHasItem(player.leatherType,
@@ -84,11 +84,11 @@ public class LeatherMaking extends CraftingData {
                                         + Item.getItemName(
                                         l.getProduct()).toLowerCase()
                                         + ".");
-                        player.RemoveAllWindows();
+                        player.getPA().RemoveAllWindows();
                         return;
                     }
                     player.startAnimation(1249);
-                    player.RemoveAllWindows();
+                    player.getPA().RemoveAllWindows();
                     player.isCrafting = true;
                     amount = l.getAmount(buttonId);
                     EventManager.getSingleton().addEvent(player,

@@ -2,19 +2,19 @@ object Tanning : CraftingData() {
     @OptIn(ExperimentalStdlibApi::class)
     @JvmStatic
     fun sendTanningInterface(c: client) {
-        c.showInterface(14670)
+        c.getPA().showInterface(14670)
         for (t in tanningData.entries) {
-            c.sendFrame246(
+            c.getPA().sendFrame246(
                 t.itemFrame, 250,
                 t.leatherId
             )
-            c.sendFrame126(t.getName(), t.nameFrame)
+            c.getPA().sendFrame126(t.getName(), t.nameFrame)
             if (c.playerHasItem(995, t.price)) {
-                c.sendFrame126(
+                c.getPA().sendFrame126(
                     "@gre@Price: " + t.price, t.costFrame
                 )
             } else {
-                c.sendFrame126(
+                c.getPA().sendFrame126(
                     "@red@Price: " + t.price, t.costFrame
                 )
             }

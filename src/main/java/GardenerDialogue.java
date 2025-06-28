@@ -19,7 +19,7 @@ public class GardenerDialogue extends Dialogue {
                 break;
             case 3:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
     }

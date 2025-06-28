@@ -34,7 +34,7 @@ public class PartyPeteDialogue extends Dialogue {
                 break;
             case 7:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 8:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "Simple. With the lever you can do some fun stuff.");
@@ -58,7 +58,7 @@ public class PartyPeteDialogue extends Dialogue {
                 break;
             case 13:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 14:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "Any items that are in the chest will be dropped inside", "the balloons when you pull the lever!");
@@ -78,7 +78,7 @@ public class PartyPeteDialogue extends Dialogue {
                 break;
             case 18:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 19:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "We used to be in Seers' Village, far to the west, but we", "had to move - the seers were complaining about the", "noise level, and the knights of Camelot got it into their", "heads that the Party Room knights were making fun of");
@@ -98,7 +98,7 @@ public class PartyPeteDialogue extends Dialogue {
                 break;
             case 23:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 24:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.HAPPY, "I've won the Dance Trophy at the Kandarin Ball three", "years in a trot!");
@@ -110,7 +110,7 @@ public class PartyPeteDialogue extends Dialogue {
                 break;
             case 26:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
     }

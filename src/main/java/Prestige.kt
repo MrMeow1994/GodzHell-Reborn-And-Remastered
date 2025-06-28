@@ -34,7 +34,7 @@ object Prestige {
             c.addItem(995, 1000000)
             c.sendMessage("You received 1m!")
             c.sendMessage("You've successfully prestiged !")
-            c.RemoveAllWindows()
+            c.getPA().RemoveAllWindows()
         } else {
             c.sendMessage("You need to be 99  to prestige.")
         }

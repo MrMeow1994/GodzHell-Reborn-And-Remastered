@@ -76,47 +76,47 @@ public class SkillInterfaces {
                            String op12, String op13) {
         int[] interfaceChilds = {8800, 8844, 8813, 8825, 8828, 8838, 8841, 8850, 8860, 8863, 15294, 15304, 15307};
         for (int i : interfaceChilds)
-            c.sendInterfaceHidden(0, i);
-        c.sendFrame126(title, 8716);
-        c.sendFrame126(currentTab, 8849);
-        c.sendFrame126(op1, 8846);
-        c.sendFrame126(op2, 8823);
-        c.sendFrame126(op3, 8824);
-        c.sendFrame126(op4, 8827);
-        c.sendFrame126(op5, 8837);
-        c.sendFrame126(op6, 8840);
-        c.sendFrame126(op7, 8843);
-        c.sendFrame126(op8, 8859);
-        c.sendFrame126(op9, 8862);
-        c.sendFrame126(op10, 8865);
-        c.sendFrame126(op11, 15303);
-        c.sendFrame126(op12, 15306);
-        c.sendFrame126(op13, 15309);
-        c.showInterface(8714);
+            c.getPA().sendInterfaceHidden(0, i);
+        c.getPA().sendFrame126(title, 8716);
+        c.getPA().sendFrame126(currentTab, 8849);
+        c.getPA().sendFrame126(op1, 8846);
+        c.getPA().sendFrame126(op2, 8823);
+        c.getPA().sendFrame126(op3, 8824);
+        c.getPA().sendFrame126(op4, 8827);
+        c.getPA().sendFrame126(op5, 8837);
+        c.getPA().sendFrame126(op6, 8840);
+        c.getPA().sendFrame126(op7, 8843);
+        c.getPA().sendFrame126(op8, 8859);
+        c.getPA().sendFrame126(op9, 8862);
+        c.getPA().sendFrame126(op10, 8865);
+        c.getPA().sendFrame126(op11, 15303);
+        c.getPA().sendFrame126(op12, 15306);
+        c.getPA().sendFrame126(op13, 15309);
+        c.getPA().showInterface(8714);
         if (op2 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[1]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[1]);
         if (op3 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[2]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[2]);
         if (op4 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[3]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[3]);
         if (op5 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[4]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[4]);
         if (op6 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[5]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[5]);
         if (op7 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[6]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[6]);
         if (op8 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[7]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[7]);
         if (op9 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[8]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[8]);
         if (op10 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[9]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[9]);
         if (op11 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[10]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[10]);
         if (op12 == "")
-            c.sendInterfaceHidden(1, interfaceChilds[11]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[11]);
         if (op13 == "") {
-            c.sendInterfaceHidden(1, interfaceChilds[12]);
+            c.getPA().sendInterfaceHidden(1, interfaceChilds[12]);
         }
     }
 
@@ -131,8 +131,8 @@ public class SkillInterfaces {
      */
     private void menuLine(final String levels, final String lines,
                           final int ids, final int lineCounter) {
-        c.sendFrame126(lines, 8760 + lineCounter);
-        c.sendFrame126(levels, 8720 + lineCounter);
+        c.getPA().sendFrame126(lines, 8760 + lineCounter);
+        c.getPA().sendFrame126(levels, 8720 + lineCounter);
         item[0 + lineCounter] = ids;
         writeInterfaceItem(item);
     }
@@ -145,7 +145,7 @@ public class SkillInterfaces {
             item[i] = 0;
         }
         for (int i = 8720; i < 8799; i++) {
-            c.sendFrame126("", i);
+            c.getPA().sendFrame126("", i);
         }
     }
 

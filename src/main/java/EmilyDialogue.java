@@ -37,7 +37,7 @@ public class EmilyDialogue extends Dialogue {
                 break;
             case 7:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 8:
                 if(getPlayer().playerHasItem(995, 3)){

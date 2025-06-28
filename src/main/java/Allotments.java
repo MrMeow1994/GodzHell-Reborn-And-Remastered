@@ -253,10 +253,10 @@ public class Allotments {
         }
 
         configValue = (configValues[0] << 16) + (configValues[1] << 8 << 16) + configValues[2] + (configValues[3] << 8);
-        player.sendConfig(FALADOR_AND_CATHERBY_CONFIG, configValue);
+        player.getPA().sendConfig(FALADOR_AND_CATHERBY_CONFIG, configValue);
 
         configValue = configValues[4] << 16 | configValues[5] << 8 << 16 | configValues[6] | configValues[7] << 8;
-        player.sendConfig(ARDOUGNE_AND_PHASMATYS_CONFIG, configValue);
+        player.getPA().sendConfig(ARDOUGNE_AND_PHASMATYS_CONFIG, configValue);
 
     }
 

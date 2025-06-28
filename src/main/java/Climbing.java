@@ -554,7 +554,7 @@ public class Climbing {
                 client.sendMessage(
                         "You go down the trapdoor.");
                 client.startAnimation(827);
-                client.RemoveAllWindows();
+                client.getPA().RemoveAllWindows();
                 client.resetWalkingQueue();
                 break;
 
@@ -567,7 +567,7 @@ public class Climbing {
                     client.startAnimation(827);
                     client.addSkillXP(.5,
                             client.playerThieving);
-                    client.RemoveAllWindows();
+                    client.getPA().RemoveAllWindows();
                 } else if (!client.playerHasItem(1523, 1)
                         && misc.random(5) < 2) {
                     client.movePlayer(3149, 9652, 0);
@@ -576,7 +576,7 @@ public class Climbing {
                     client.startAnimation(827);
                     client.addSkillXP(.5,
                             client.playerThieving);
-                    client.RemoveAllWindows();
+                    client.getPA().RemoveAllWindows();
                     client.resetWalkingQueue();
                 } else if (client.playerHasItem(1523, 1)
                         && misc.random(4) > 3) {
@@ -781,7 +781,7 @@ public class Climbing {
                 player.sendMessage("You climb up.");
                 player.startAnimation(CLIMB_UP);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             case 0:
                 player.movePlayer(player.absX, player.absY, 1);
@@ -789,7 +789,7 @@ public class Climbing {
                 player.sendMessage("You climb up.");
                 player.startAnimation(CLIMB_UP);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             case 1:
                 player.movePlayer(player.absX, player.absY, 2);
@@ -797,7 +797,7 @@ public class Climbing {
                 player.sendMessage("You climb up.");
                 player.startAnimation(CLIMB_UP);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             case 2:
                 player.movePlayer(player.absX, player.absY, 3);
@@ -805,7 +805,7 @@ public class Climbing {
                 player.sendMessage("You climb up.");
                 player.startAnimation(CLIMB_UP);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             default:
                 if (player.heightLevel > 3) {
@@ -828,7 +828,7 @@ public class Climbing {
             player.sendMessage("You climb down.");
             player.startAnimation(CLIMB_DOWN);
             player.resetWalkingQueue();
-            player.RemoveAllWindows();
+            player.getPA().RemoveAllWindows();
         }
         switch (player.heightLevel) {
             case 1:
@@ -837,7 +837,7 @@ public class Climbing {
                 player.sendMessage("You climb down.");
                 player.startAnimation(CLIMB_DOWN);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             case 2:
                 player.movePlayer(player.absX, player.absY, 1);
@@ -845,7 +845,7 @@ public class Climbing {
                 player.sendMessage("You climb down.");
                 player.startAnimation(CLIMB_DOWN);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             case 3:
                 player.movePlayer(player.absX, player.absY, 2);
@@ -853,7 +853,7 @@ public class Climbing {
                 player.sendMessage("You climb down.");
                 player.startAnimation(CLIMB_DOWN);
                 player.resetWalkingQueue();
-                player.RemoveAllWindows();
+                player.getPA().RemoveAllWindows();
                 break;
             default:
                 if (player.heightLevel < 0) {
@@ -880,7 +880,7 @@ public class Climbing {
             client.startAnimation(827);
             client.resetWalkingQueue();
         }
-        client.RemoveAllWindows();
+        client.getPA().RemoveAllWindows();
        // client.nextChat = 0;
     }
 

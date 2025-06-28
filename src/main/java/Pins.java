@@ -36,35 +36,35 @@ public class Pins {
 
 	public void open() {
 		if (!(fullPin.equalsIgnoreCase(""))) {
-			client.openUpBank();
+			client.getPA().openUpBank();
 			return;
 		}
-		client.showInterface(7424);
+		client.getPA().showInterface(7424);
 		resend();
 		state = State.ONE;
 	}
 
 	private void resend() {
 		if (!(fullPin.equalsIgnoreCase(""))) {
-			client.openUpBank();
+			client.getPA().openUpBank();
 			return;
 		}
 		mixNumbers();
 		switch(state) {
 		case ONE:
-			client.sendFrame126("First click the FIRST digit", 15313);
+			client.getPA().sendFrame126("First click the FIRST digit", 15313);
 			break;
 		case TWO:
-			client.sendFrame126("Then click the SECOND digit", 15313);
-			client.sendFrame126("*", 14913);
+			client.getPA().sendFrame126("Then click the SECOND digit", 15313);
+			client.getPA().sendFrame126("*", 14913);
 			break;
 		case THREE:
-			client.sendFrame126("Then click the THIRD digit", 15313);
-			client.sendFrame126("*", 14914);
+			client.getPA().sendFrame126("Then click the THIRD digit", 15313);
+			client.getPA().sendFrame126("*", 14914);
 			break;
 		case FOUR:
-			client.sendFrame126("And lastly click the FOURTH digit", 15313);
-			client.sendFrame126("*", 14915);
+			client.getPA().sendFrame126("And lastly click the FOURTH digit", 15313);
+			client.getPA().sendFrame126("*", 14915);
 			break;
 		}
 		sendPins();
@@ -124,11 +124,11 @@ public class Pins {
 
 	private void sendPins() {
 		if (!(fullPin.equalsIgnoreCase(""))) {
-			client.openUpBank();
+			client.getPA().openUpBank();
 			return;
 		}
 		for(int i = 0; i < getBankPins().length; i++) {
-			client.sendFrame126(""+getBankPins()[i], 14883+i);
+			client.getPA().sendFrame126(""+getBankPins()[i], 14883+i);
 		}
 	}
 

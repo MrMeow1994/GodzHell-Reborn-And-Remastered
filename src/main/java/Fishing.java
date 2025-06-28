@@ -150,7 +150,7 @@ public class Fishing  {
 
 	public static void resetFishing(client c) {
 		c.resetAnimation();
-		c.RemoveAllWindows();
+		c.getPA().RemoveAllWindows();
 		c.playerIsFishing = false;
 		for(int i = 0; i < 11; i++) {
 			c.fishingProp[i] = -1;

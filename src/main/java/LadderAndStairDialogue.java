@@ -16,35 +16,35 @@ public class LadderAndStairDialogue extends Dialogue {
             case DialogueConstants.OPTIONS_3_1://fishing guild
                 if(getPlayer().heightLevel == 0) {
                     getPlayer().movePlayer(getPlayer().getX(), getPlayer().getY(), 1);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                     end();
                 } else if(getPlayer().heightLevel == 1) {
                     getPlayer().movePlayer(getPlayer().getX(), getPlayer().getY(), 2);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                     end();
                 } else if(getPlayer().heightLevel == 2) {
                     getPlayer().movePlayer(getPlayer().getX(), getPlayer().getY(), 3);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                     end();
                 }
                 break;
             case DialogueConstants.OPTIONS_3_2://mining guild
                 if(getPlayer().heightLevel == 1) {
                     getPlayer().movePlayer(getPlayer().getX(), getPlayer().getY(), 0);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                     end();
                 } else if(getPlayer().heightLevel == 2) {
                     getPlayer().movePlayer(getPlayer().getX(), getPlayer().getY(), 1);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                     end();
                 } else if(getPlayer().heightLevel == 3) {
                     getPlayer().movePlayer(getPlayer().getX(), getPlayer().getY(), 2);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                     end();
                 }
                 break;
             case DialogueConstants.OPTIONS_3_3://crafting guild
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
         }

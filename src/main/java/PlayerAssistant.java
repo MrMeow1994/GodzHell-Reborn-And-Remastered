@@ -116,4 +116,137 @@ public class PlayerAssistant {
         }
 
     }
+    public void sendQuest(String s, int id) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrameVarSizeWord(126);
+        c.getOutStream().writeString(s);
+        c.getOutStream().writeWordA(id);
+        c.getOutStream().endFrameVarSizeWord();
+    }
+    public void randomize(int o, int oo, int ooo, int oooo) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(53);
+        c.getOutStream().writeWord(o);
+        c.getOutStream().writeWord(oo);
+        c.getOutStream().writeByte(ooo);
+        c.getOutStream().writeWordBigEndianA(oooo);
+        c.flushOutStream();
+    }
+
+    public void sendFrame34(int id, int slot, int column, int amount) {
+        if (c.getOutStream() != null) {
+            c.getOutStream().createFrameVarSizeWord(34);
+            c.getOutStream().writeWord(column);
+            c.getOutStream().writeByte(4);
+            c.getOutStream().writeDWord(slot);
+            c.getOutStream().writeWord(id + 1);
+            if (amount > 254) {
+                c.getOutStream().writeByte(255);
+                c.getOutStream().writeDWord(amount);
+            } else {
+                c.getOutStream().writeByte(amount);
+            }
+            c.getOutStream().endFrameVarSizeWord();
+            c.flushOutStream();
+        }
+    }
+
+
+
+    public void sendFrame200(int MainFrame, int SubFrame) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(200);
+        c.getOutStream().writeWord(MainFrame);
+        c.getOutStream().writeWord(SubFrame);
+        c.flushOutStream();
+    }
+
+    public void sendFrame75(int MainFrame, int SubFrame) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(75);
+        c.getOutStream().writeWordBigEndianA(MainFrame);
+        c.getOutStream().writeWordBigEndianA(SubFrame);
+        c.flushOutStream();
+    }
+
+    public void sendFrame164(int Frame) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(164);
+        c.getOutStream().writeWordBigEndian_dup(Frame);
+        c.flushOutStream();
+    }
+
+    public void sendFrame246(int MainFrame, int SubFrame, int SubFrame2) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(246);
+        c.getOutStream().writeWordBigEndian(MainFrame);
+        c.getOutStream().writeWord(SubFrame);
+        c.getOutStream().writeWord(SubFrame2);
+        c.flushOutStream();
+    }
+
+    public void sendFrame185(int Frame) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(185);
+        c.getOutStream().writeWordBigEndianA(Frame);
+        c.flushOutStream();
+    }
+
+    public void sendInterfaceHidden (int MainFrame, int SubFrame) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(171);
+        c.getOutStream().writeByte(MainFrame);
+        c.getOutStream().writeWord(SubFrame);
+        c.flushOutStream();
+    }
+
+    public void RemoveAllWindows() {
+        if (c.getOutStream() != null)
+            c.resetVariables();
+        c.getOutStream().createFrame(219);
+        c.flushOutStream();
+    }
+
+    public void sendQuestSomething(int id) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(79);
+        c.getOutStream().writeWordBigEndian(id);
+        c.getOutStream().writeWordA(0);
+        c.flushOutStream();
+    }
+    public void showInterface(int interfaceid) {
+        if (c.getOutStream() != null)
+            c.resetAnimation();
+        c.getOutStream().createFrame(97);
+        c.getOutStream().writeUnsignedWord(interfaceid);
+        c.flushOutStream();
+    }
+    public void setChatOptions(int publicChat, int privateChat, int tradeBlock) {
+        if (c.getOutStream() != null)
+            c.getOutStream().createFrame(206);
+        c.getOutStream().writeByte(publicChat); // On = 0, Friends = 1, Off = 2, Hide = 3
+        c. getOutStream().writeByte(privateChat); // On = 0, Friends = 1, Off = 2
+        c.getOutStream().writeByte(tradeBlock); // On = 0, Friends = 1, Off = 2
+    }
+    public void fsBar(int id1, int id2, int id3) {
+        if(c.getOutStream() != null) {
+            c.getOutStream().createFrame(70);
+            c.getOutStream().writeWord(id1);
+            c.getOutStream().writeWordBigEndian(id2);
+            c.getOutStream().writeWordBigEndian(id3);
+        }
+    }
+
+    public void sendFrame230(int i1, int i2, int i3, int i4) { // i2 being negative logs you out, otherwise it doesn't log you out :O
+        if(c.getOutStream() != null)
+            c.getOutStream().createFrame(230);
+        c.getOutStream().writeWordA(i1);
+        c.getOutStream().writeWord(i2); // interface id?
+        c.getOutStream().writeWord(i3);
+        c.getOutStream().writeWordBigEndianA(i4); // junk? not sure
+        c.updateRequired = true;
+        c.appearanceUpdateRequired = true;
+    }
+
+
 }

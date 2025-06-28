@@ -14,7 +14,7 @@ public class CassieDialogue extends Dialogue {
                 break;
             case 4:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
 

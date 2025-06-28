@@ -24,55 +24,55 @@ public class JewelryMaking {
     };
 
     public static void mouldInterface(client c) {
-        c.showInterface(4161);
+        c.getPA().showInterface(4161);
         /* Rings */
         if (c.playerHasItem(1592, 1)) {
             for (int i = 0; i < MOULD_INTERFACE_IDS[0].length; i++) {
-                c.sendFrame34(MOULD_INTERFACE_IDS[0][i],
+                c.getPA().sendFrame34(MOULD_INTERFACE_IDS[0][i],
                         i, 4233, 1);
             }
-            c.sendFrame34(1643, 4, 4233, 1);
-            c.sendFrame126("", 4230);
-            c.sendFrame246(4229, 0, -1);
+            c.getPA().sendFrame34(1643, 4, 4233, 1);
+            c.getPA().sendFrame126("", 4230);
+            c.getPA().sendFrame246(4229, 0, -1);
         } else {
-            c.sendFrame246(4229, 120, 1592);
+            c.getPA().sendFrame246(4229, 120, 1592);
             for (int i = 0; i < MOULD_INTERFACE_IDS[0].length; i++) {
-                c.sendFrame34(-1, i, 4233, 1);
+                c.getPA().sendFrame34(-1, i, 4233, 1);
             }
-            c.sendFrame126(
+            c.getPA().sendFrame126(
                     "You need a ring mould to craft rings.", 4230);
         }
         /* Necklace */
         if (c.playerHasItem(1597, 1)) {
             for (int i = 0; i < MOULD_INTERFACE_IDS[1].length; i++) {
-                c.sendFrame34(MOULD_INTERFACE_IDS[1][i],
+                c.getPA().sendFrame34(MOULD_INTERFACE_IDS[1][i],
                         i, 4239, 1);
             }
-            c.sendFrame34(1662, 4, 4239, 1);
-            c.sendFrame246(4235, 0, -1);
-            c.sendFrame126("", 4236);
+            c.getPA().sendFrame34(1662, 4, 4239, 1);
+            c.getPA().sendFrame246(4235, 0, -1);
+            c.getPA().sendFrame126("", 4236);
         } else {
-            c.sendFrame246(4235, 120, 1597);
-            c.sendFrame126("You need a necklace mould to craft necklaces", 4236);
+            c.getPA().sendFrame246(4235, 120, 1597);
+            c.getPA().sendFrame126("You need a necklace mould to craft necklaces", 4236);
             for (int i = 0; i < MOULD_INTERFACE_IDS[1].length; i++) {
-                c.sendFrame34(-1, i, 4239, 1);
+                c.getPA().sendFrame34(-1, i, 4239, 1);
             }
         }
         /* Amulets */
         if (c.playerHasItem(1595, 1)) {
             for (int i = 0; i < MOULD_INTERFACE_IDS[2].length; i++) {
-                c.sendFrame34(MOULD_INTERFACE_IDS[2][i],
+                c.getPA().sendFrame34(MOULD_INTERFACE_IDS[2][i],
                         i, 4245, 1);
             }
-            c.sendFrame34(1681, 4, 4245, 1);
-            c.sendFrame246(4241, 0, -1);
-            c.sendFrame126("", 4242);
+            c.getPA().sendFrame34(1681, 4, 4245, 1);
+            c.getPA().sendFrame246(4241, 0, -1);
+            c.getPA().sendFrame126("", 4242);
         } else {
-            c.sendFrame246(4241, 120, 1595);
-            c.sendFrame126(
+            c.getPA().sendFrame246(4241, 120, 1595);
+            c.getPA().sendFrame126(
                     "You need an amulet mould to craft necklaces", 4242);
             for (int i = 0; i < MOULD_INTERFACE_IDS[2].length; i++) {
-                c.sendFrame34(-1, i, 4245, 1);
+                c.getPA().sendFrame34(-1, i, 4245, 1);
             }
         }
     }
@@ -141,7 +141,7 @@ public class JewelryMaking {
                 player.sendMessage(getRequiredMessage(Item.getItemName(gem)));
                 return;
             }
-            player.RemoveAllWindows();
+            player.getPA().RemoveAllWindows();
             while (done < amount
                     && (Item.getItemName(gem).toLowerCase()
                     .contains("unarmed")

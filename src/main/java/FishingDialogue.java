@@ -20,28 +20,28 @@ public class FishingDialogue extends Dialogue{
                 if(getNext() == 0) {
                     getPlayer().movePlayer(2849, 3436, 0);
                     end();
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                 break;
             case DialogueConstants.OPTIONS_5_2:
                 if(getNext() == 0) {
                     getPlayer().movePlayer(3105, 3433, 0);
                     end();
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                 break;
             case DialogueConstants.OPTIONS_5_3:
                 if(getNext() == 0) {
                     getPlayer().movePlayer(2923, 3173, 0);
                     end();
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                 break;
             case DialogueConstants.OPTIONS_5_4:
                 if(getNext() == 0) {
                     getPlayer().movePlayer(3243, 3161, 0);
                     end();
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                 break;
             case DialogueConstants.OPTIONS_5_5:

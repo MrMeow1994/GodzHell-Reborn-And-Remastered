@@ -9,40 +9,40 @@ public class Pottery {
     public static int softClay = 1761;
 
     public static void showUnfire(client c) {
-        c.sendFrame164(8938);
-        c.sendFrame126("What would you like to make?", 8879);
-        c.sendFrame246(8941, 120, 1787); // first
-        c.sendFrame246(8942, 150, 1789); // second
-        c.sendFrame246(8943, 150, 1791); // third
-        c.sendFrame246(8944, 120, 5352); // 4th
-        c.sendFrame246(8945, 150, 4438); // 5th
-        c.sendFrame126("Pot", 8949);
-        c.sendFrame126("Pie Dish", 8953);
-        c.sendFrame126("Bowl", 8957);
-        c.sendFrame126("Plant pot", 8961);
-        c.sendFrame126("Pot lid", 8965);
+        c.getPA().sendFrame164(8938);
+        c.getPA().sendFrame126("What would you like to make?", 8879);
+        c.getPA().sendFrame246(8941, 120, 1787); // first
+        c.getPA().sendFrame246(8942, 150, 1789); // second
+        c.getPA().sendFrame246(8943, 150, 1791); // third
+        c.getPA().sendFrame246(8944, 120, 5352); // 4th
+        c.getPA().sendFrame246(8945, 150, 4438); // 5th
+        c.getPA().sendFrame126("Pot", 8949);
+        c.getPA().sendFrame126("Pie Dish", 8953);
+        c.getPA().sendFrame126("Bowl", 8957);
+        c.getPA().sendFrame126("Plant pot", 8961);
+        c.getPA().sendFrame126("Pot lid", 8965);
         c.showedUnfire = true;
     }
 
     public static void showFire(client c) {
-        c.sendFrame164(8938);
-        c.sendFrame126("What would you like to make?", 8879);
-        c.sendFrame246(8941, 120, 1931); // first
-        c.sendFrame246(8942, 150, 2313); // second
-        c.sendFrame246(8943, 150, 1923); // third
-        c.sendFrame246(8944, 120, 5350); // 4th
-        c.sendFrame246(8945, 150, 4440); // 5th
-        c.sendFrame126("Pot", 8949);
-        c.sendFrame126("Pie Dish", 8953);
-        c.sendFrame126("Bowl", 8957);
-        c.sendFrame126("Plant pot", 8961);
-        c.sendFrame126("Pot lid", 8965);
+        c.getPA().sendFrame164(8938);
+        c.getPA().sendFrame126("What would you like to make?", 8879);
+        c.getPA().sendFrame246(8941, 120, 1931); // first
+        c.getPA().sendFrame246(8942, 150, 2313); // second
+        c.getPA().sendFrame246(8943, 150, 1923); // third
+        c.getPA().sendFrame246(8944, 120, 5350); // 4th
+        c.getPA().sendFrame246(8945, 150, 4440); // 5th
+        c.getPA().sendFrame126("Pot", 8949);
+        c.getPA().sendFrame126("Pie Dish", 8953);
+        c.getPA().sendFrame126("Bowl", 8957);
+        c.getPA().sendFrame126("Plant pot", 8961);
+        c.getPA().sendFrame126("Pot lid", 8965);
         c.showedFire = true;
     }
 
     public static void makeUnfire(final client c, final int id,
                                   final double xp, final int level, int amount) {
-        c.RemoveAllWindows();
+        c.getPA().RemoveAllWindows();
         c.doAmount = amount;
 
         c.isPotCrafting = true;
@@ -102,7 +102,7 @@ public class Pottery {
 
     public static void makeFire(final client player, final int startId,
                                 final int finishId, final int level, final double xp, int amount) {
-        player.RemoveAllWindows();
+        player.getPA().RemoveAllWindows();
         player.doAmount = amount;
         player.isPotCrafting = true;
         if (player.playerHasItem(startId)

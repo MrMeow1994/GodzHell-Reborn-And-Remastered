@@ -98,6 +98,34 @@ public class server implements Runnable {
        // js.start();
 
     }
+    public static void ServerbroadcastGlobal() {
+        EventManager.getSingleton().addEvent(null, new Event() {
+            private int ticks = 0;
+
+            @Override
+            public void execute(EventContainer container) {
+                if (ticks++ >= 600) {
+                    for (Player p : PlayerHandler.players) { // loop so it effects all players
+                        if (p != null) {
+                            client castOn = (client) p; // specific player's client
+                            castOn.sendMessage("@blu@**********************************************************************************");
+                            castOn.sendMessage("@blu@Have you voted today?? if not go vote!! more votes = more players =)");
+                            castOn.sendMessage("@blu@Newest Update: Started to work on the stronghold of security.");
+                            castOn.sendMessage("@blu@We back Guys! Remember if You lose items on death!");
+                            castOn.sendMessage("@blu@Type ::help and ::commands also we have a fandom godzhellreborn.fandom.com");
+                            castOn.sendMessage("@blu@**********************************************************************************");
+                        }
+                    }
+                    ticks = 0;
+                }
+            }
+
+            @Override
+            public void stop() {
+            }
+
+        }, 600);
+    }
 
     public static long getTickCount() {
         return tickCount;
@@ -129,6 +157,7 @@ public class server implements Runnable {
             }
 
         }
+        ServerbroadcastGlobal();
         EventManager.initialise();
         NPCCacheDefinition.unpackConfig();
         AnimationLength.startup();

@@ -27,7 +27,7 @@ public class FaladorShopkeeperDialogue extends Dialogue {
                 break;
             case DialogueConstants.OPTIONS_2_2:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
         return false;

@@ -14,7 +14,7 @@ public class FlynnDialogue extends Dialogue {
                 break;
             case 2:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
 

@@ -15,12 +15,12 @@ public class ThevelocationsDialogue extends Dialogue {
         switch(id) {
             case DialogueConstants.OPTIONS_2_1://fishing guild
                     getPlayer().movePlayer(2964, 3378, 0);
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
             case DialogueConstants.OPTIONS_2_2://mining guild
                 getPlayer().movePlayer(2661,3307,0);
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
         }

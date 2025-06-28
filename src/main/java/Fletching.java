@@ -245,26 +245,26 @@ public class Fletching extends SkillHandler {
                 }
             }
         }
-        c.sendFrame164(8880);
-        c.sendFrame126("What would you like to make?", 8879);
-        c.sendFrame246(8884, 190, items[0]);
-        c.sendFrame246(8883, 190, items[1]);
-        c.sendFrame246(8885, 190, items[2]);
-        c.sendFrame126("" + c.getItemName(items[1]) + "", 8889);
-        c.sendFrame126("" + c.getItemName(items[0]) + "", 8893);
-        c.sendFrame126("" + c.getItemName(items[2]) + "", 8897);
+        c.getPA().sendFrame164(8880);
+        c.getPA().sendFrame126("What would you like to make?", 8879);
+        c.getPA().sendFrame246(8884, 190, items[0]);
+        c.getPA().sendFrame246(8883, 190, items[1]);
+        c.getPA().sendFrame246(8885, 190, items[2]);
+        c.getPA().sendFrame126("" + c.getItemName(items[1]) + "", 8889);
+        c.getPA().sendFrame126("" + c.getItemName(items[0]) + "", 8893);
+        c.getPA().sendFrame126("" + c.getItemName(items[2]) + "", 8897);
         c.playerIsfFetching = true;
     }
 
     private static void showInterfaceFletching(client c, int[] items, int type) {
-        c.sendFrame164(8880);
-        c.sendFrame126("What would you like to make?", 8879);
-        c.sendFrame246(8884, 190, items[0]);
-        c.sendFrame246(8883, 190, items[1]);
-        c.sendFrame246(8885, 190, items[2]);
-        c.sendFrame126("" + c.getItemName(items[1]) + "", 8889);
-        c.sendFrame126("" + c.getItemName(items[0]) + "", 8893);
-        c.sendFrame126("" + c.getItemName(items[2]) + "", 8897);
+        c.getPA().sendFrame164(8880);
+        c.getPA().sendFrame126("What would you like to make?", 8879);
+        c.getPA().sendFrame246(8884, 190, items[0]);
+        c.getPA().sendFrame246(8883, 190, items[1]);
+        c.getPA().sendFrame246(8885, 190, items[2]);
+        c.getPA().sendFrame126("" + c.getItemName(items[1]) + "", 8889);
+        c.getPA().sendFrame126("" + c.getItemName(items[0]) + "", 8893);
+        c.getPA().sendFrame126("" + c.getItemName(items[2]) + "", 8897);
         c.playerIsfFetching = true;
     }
 
@@ -276,7 +276,7 @@ public class Fletching extends SkillHandler {
                 if (c.fletchingType == l.getLogId()) {
                     if (c.playerLevel[9] < l.getLevel()) {
                         c.sendMessage("You need a Fletching level of " + l.getLevel() + " to make this.");
-                        c.RemoveAllWindows();
+                        c.getPA().RemoveAllWindows();
                         return;
                     }
                     int item = c.getItemAmount(l.getAmount(buttonId));
@@ -287,7 +287,7 @@ public class Fletching extends SkillHandler {
                     }
                     c.playerSkilling[9] = true;
                     c.stopPlayerSkill = true;
-                    c.RemoveAllWindows();
+                    c.getPA().RemoveAllWindows();
 
                     final int itemToDelete = l.getLogId();
 

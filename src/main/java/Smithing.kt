@@ -98,9 +98,9 @@ class Smithing(private val c: client) {
 
     fun sendSmelting() {
         for (j in SMELT_FRAME.indices) {
-            c.sendFrame246(SMELT_FRAME[j], 150, SMELT_BARS[j])
+            c.getPA().sendFrame246(SMELT_FRAME[j], 150, SMELT_BARS[j])
         }
-        c.sendFrame164(2400)
+        c.getPA().sendFrame164(2400)
         c.smeltInterface = true
     }
     fun doAmount(c: client, amount: Int, bartype: Int) {
@@ -115,7 +115,7 @@ class Smithing(private val c: client) {
                 if (bar.secondItemAmount == -1) c.sendMessage("You need " + name + " and " + fixName(item2name) + " to make this bar.") else c.sendMessage(
                     "You need " + name + " and " + abs(bar.secondItemAmount.toDouble()) + " " + item2name + " to make this bar."
                 )
-                c.RemoveAllWindows()
+                c.getPA().RemoveAllWindows()
                 return false
             }
         }
@@ -127,7 +127,7 @@ class Smithing(private val c: client) {
             val name: String = c.getItemName(bar.itemRequired1).lowercase(Locale.getDefault())
             if (!c.playerHasItem(bar.itemRequired1)) {
                 c.sendMessage("You need $name to make this bar.")
-                c.RemoveAllWindows()
+                c.getPA().RemoveAllWindows()
                 return false
             }
         }
@@ -139,7 +139,7 @@ class Smithing(private val c: client) {
             if (!c.playerHasItem(bar.itemRequired2, bar.secondItemAmount)) {
                 val name: String = c.getItemName(bar.itemRequired1).lowercase(Locale.getDefault())
                 c.sendMessage("You need " + name + " and " + bar.secondItemAmount + " coal ores to make this bar.")
-                c.RemoveAllWindows()
+                c.getPA().RemoveAllWindows()
                 return false
             }
         }
@@ -317,7 +317,7 @@ class Smithing(private val c: client) {
                 return
             }
             c.isSmething = true
-            c.RemoveAllWindows()
+            c.getPA().RemoveAllWindows()
             EventManager.getSingleton().addEvent(c,object : Event {
                 override fun execute(container: EventContainer) {
                     if (c.doAmount <= 0 || !c.isSmething) {
@@ -1204,7 +1204,7 @@ class Smithing(private val c: client) {
         ) {
             c!!.event = 3
             c.makeTimes = timestomake
-            c.RemoveAllWindows()
+            c.getPA().RemoveAllWindows()
             if (!c.playerHasItem(toremove, toremove2)) {
                 c.sendMessage("You don't have enough bars to make this item!")
                 return

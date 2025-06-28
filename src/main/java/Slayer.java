@@ -334,15 +334,15 @@ public class Slayer {
 
     public void handleInterface(String shop) {
         if (shop.equalsIgnoreCase("buy")) {
-            player.sendFrame126("Slayer Points: " + points, 41011);
-            player.showInterface(41000);
+            player.getPA().sendFrame126("Slayer Points: " + points, 41011);
+            player.getPA().showInterface(41000);
         } else if (shop.equalsIgnoreCase("learn")) {
-            player.sendFrame126("Slayer Points: " + points, 41511);
-            player.showInterface(41500);
+            player.getPA().sendFrame126("Slayer Points: " + points, 41511);
+            player.getPA().showInterface(41500);
         } else if (shop.equalsIgnoreCase("assignment")) {
-            player.sendFrame126("Slayer Points: " + points, 42011);
+            player.getPA().sendFrame126("Slayer Points: " + points, 42011);
             updateCurrentlyRemoved();
-            player.showInterface(42000);
+            player.getPA().showInterface(42000);
         }
     }
 
@@ -398,18 +398,18 @@ public class Slayer {
     }
 
     public void updatePoints() {
-        player.sendFrame126("Slayer Points: " + points, 41011);
-        player.sendFrame126("Slayer Points: " + points, 41511);
-        player.sendFrame126("Slayer Points: " + points, 42011);
-        player.sendFrame126("<col=DD5C3E>Slayer Points: @or2@" + points, 7336);
+        player.getPA().sendFrame126("Slayer Points: " + points, 41011);
+        player.getPA().sendFrame126("Slayer Points: " + points, 41511);
+        player.getPA().sendFrame126("Slayer Points: " + points, 42011);
+        player.getPA().sendFrame126("<col=DD5C3E>Slayer Points: @or2@" + points, 7336);
     }
 
     public void updateCurrentlyRemoved() {
         for (int index = 0; index < removed.length; index++) {
             if (removed[index].isEmpty()) {
-                player.sendFrame126("", 42014 + index);
+                player.getPA().sendFrame126("", 42014 + index);
             } else {
-                player.sendFrame126(removed[index], 42014 + index);
+                player.getPA().sendFrame126(removed[index], 42014 + index);
             }
         }
     }
@@ -634,7 +634,7 @@ public class Slayer {
                 return true;
 
             case 160058:
-                player.showInterface(10294);
+                player.getPA().showInterface(10294);
                 return true;
 
             case 40122:

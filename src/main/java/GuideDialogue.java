@@ -42,7 +42,7 @@ public class GuideDialogue extends Dialogue {
                 setNext(10);
                 break;
             case 10:
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 end();
                 break;
         }

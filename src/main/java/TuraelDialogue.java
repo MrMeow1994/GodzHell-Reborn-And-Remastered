@@ -27,7 +27,7 @@ public class TuraelDialogue extends Dialogue {
                 break;
             case 2:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 3:
                 break;
@@ -91,7 +91,7 @@ public class TuraelDialogue extends Dialogue {
             case 12:
                 getPlayer().movePlayer(player.getSlayer().getTask().get().getTeleportLocation()[0], player.getSlayer().getTask().get().getTeleportLocation()[1], 0);
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
             case 13:
                 DialogueManager.sendNpcChat(getPlayer(), getPlayer().talkingNpc, Emotion.CALM, "Okay, maybe next time.");
@@ -99,7 +99,7 @@ public class TuraelDialogue extends Dialogue {
                 break;
             case 14:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
     }
@@ -136,7 +136,7 @@ public class TuraelDialogue extends Dialogue {
                 break;
             case DialogueConstants.OPTIONS_2_2:
                 if(getNext() != 10) {
-                    getPlayer().RemoveAllWindows();
+                    getPlayer().getPA().RemoveAllWindows();
                 } else {
                     DialogueManager.sendPlayerChat(getPlayer(), Emotion.CALM, "No, Thanks.");
                     setNext(13);

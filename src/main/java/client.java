@@ -541,6 +541,7 @@ public class client extends Player implements Runnable {
     private final Farming farming = new Farming(this);
     private final PrayerAltar prayeralter = new PrayerAltar(this);
     private Smithing smith = new Smithing(this);
+        public TradeSystem tradeSystem = new TradeSystem(this);
     private SmithingInterface smithInt = new SmithingInterface(this);
     private final SkillInterfaces skillInterfaces = new SkillInterfaces(this);
     private GlassBlowing glassBlowing = new GlassBlowing(this);
@@ -561,7 +562,9 @@ public class client extends Player implements Runnable {
     public Smithing getSmithing() {
         return smith;
     }
-
+    public TradeSystem getTradeSystem() {
+        return tradeSystem;
+    }
     public GlassBlowing getGlassBlowing() {
         return glassBlowing;
     }
@@ -580,15 +583,15 @@ public class client extends Player implements Runnable {
     public void start(Dialogue dialogue) {
         this.dialogue = dialogue;
         if (dialogue != null) {
-            RemoveAllWindows();
+            getPA().RemoveAllWindows();
             dialogue.setNext(0);
             dialogue.setPlayer(this);
             dialogue.execute();
         }
     }
     public boolean handleDialogue(client c) {
-        if ((c.getDialogue() == null) || (c.getDialogue().getNext() == -1)) {
-            c.RemoveAllWindows();
+        if ((getDialogue() == null) || (getDialogue().getNext() == -1)) {
+            getPA().RemoveAllWindows();
         } else if (c.getDialogue().getNext() > -1) {
             c.getDialogue().execute();
             return true;
@@ -606,7 +609,7 @@ public class client extends Player implements Runnable {
     private House house;
     private client c;
     private final Pins pins = new Pins(this);
-    private final boolean hasAccepted = false;
+    public final boolean hasAccepted = false;
     private int XremoveSlot = 0;
     private int XinterfaceID = 0;
     private int XremoveID = 0;
@@ -1072,11 +1075,11 @@ public class client extends Player implements Runnable {
     }
 
     public void talk(int expression, String text, int npc) {
-        sendFrame200(4883, expression);
+        getPA().sendFrame200(4883, expression);
         getPA().sendFrame126(GetNpcName(npc), 4884);
         getPA().sendFrame126(text, 4885);
-        sendFrame75(npc, 4883);
-        sendFrame164(4882);
+        getPA().sendFrame75(npc, 4883);
+        getPA().sendFrame164(4882);
     }
 
     public void deleteItem(int id, int amount) {
@@ -1291,55 +1294,55 @@ public class client extends Player implements Runnable {
     }
 
     public void talk2(int expression, String text, String text2, int npc) {
-        sendFrame200(4901, expression);
+        getPA().sendFrame200(4901, expression);
         getPA().sendFrame126(GetNpcName(npc), 4902);
         getPA().sendFrame126("", 4903);
         getPA().sendFrame126(text, 4904);
         getPA().sendFrame126(text2, 4905);
         getPA().sendFrame126("", 4906);
-        sendFrame75(npc, 4901);
-        sendFrame164(4900);
+        getPA().sendFrame75(npc, 4901);
+        getPA().sendFrame164(4900);
     }
 
     public void talk3(int expression, String text, String text2, String text3, int npc) {
-        sendFrame200(4894, expression);
+        getPA().sendFrame200(4894, expression);
         getPA().sendFrame126(GetNpcName(npc), 4895);
         getPA().sendFrame126(text, 4896);
         getPA().sendFrame126(text2, 4897);
         getPA().sendFrame126(text3, 4898);
-        sendFrame75(npc, 4894);
-        sendFrame164(4893);
+        getPA().sendFrame75(npc, 4894);
+        getPA().sendFrame164(4893);
     }
 
     public void talk4(int expression, String text1, String text2, String text3, String text4, int npc) {
-        sendFrame200(4901, expression);
+        getPA().sendFrame200(4901, expression);
         getPA().sendFrame126(GetNpcName(npc), 4902);
         getPA().sendFrame126(text1, 4903);
         getPA().sendFrame126(text2, 4904);
         getPA().sendFrame126(text3, 4905);
         getPA().sendFrame126(text4, 4906);
         getPA().sendFrame126("Click here to continue", 4907);
-        sendFrame75(npc, 4901);
-        sendFrame164(4900);
+        getPA().sendFrame75(npc, 4901);
+        getPA().sendFrame164(4900);
     }
 
     public void choice(String text, String text2) {
         changeText126("Select an Option", 2460);
         changeText126(text, 2461);
         changeText126(text2, 2462);
-        sendFrame164(2459);
+        getPA().sendFrame164(2459);
     }
     public void choice(String title, String text, String text2) {
         changeText126(title, 2460);
         changeText126(text, 2461);
         changeText126(text2, 2462);
-        sendFrame164(2459);
+        getPA().sendFrame164(2459);
     }
     public void options2(String option, String option2) { //2 options (case 56109, case 56110) - Action buttons
         changeText126("Select an Option", 14444);
         changeText126(option, 14445);
         changeText126(option2, 14446);
-        sendFrame164(14443);
+        getPA().sendFrame164(14443);
     }
 
     public void options3(String option, String option2, String option3) { //3
@@ -1347,7 +1350,7 @@ public class client extends Player implements Runnable {
         changeText126(option, 2471);
         changeText126(option2, 2472);
         changeText126(option3, 2473);
-        sendFrame164(2469);
+        getPA().sendFrame164(2469);
     }
 
     public void options4(String option, String option2, String option3, String option4) {//4
@@ -1356,7 +1359,7 @@ public class client extends Player implements Runnable {
         changeText126(option2, 8210);
         changeText126(option3, 8211);
         changeText126(option4, 8212);
-        sendFrame164(8207);
+        getPA().sendFrame164(8207);
     }
 
 
@@ -1371,7 +1374,7 @@ public class client extends Player implements Runnable {
         changeText126(option3, 8223);
         changeText126(option4, 8224);
         changeText126(option5, 8225);
-        sendFrame164(8219);
+        getPA().sendFrame164(8219);
     }
 
     public boolean funPk() {
@@ -1428,15 +1431,15 @@ public class client extends Player implements Runnable {
 
     public void highscores() {
         clearQuestInterface();
-        sendQuest("<col=128>", 8144);  //Title
-        sendQuest("@whi@Godzhell Reborn High Scores", 8145);
+        getPA().sendQuest("<col=128>", 8144);  //Title
+        getPA().sendQuest("@whi@Godzhell Reborn High Scores", 8145);
         for (int i = 0; i < 10; i++) { // you also need to change this for it to display more, simply the number you want it to display, say 20 = for(int i = 0; i < 20; i++)
             if (server.ranks[i] > 0) {
-                sendQuest("@bla@Rank " + (i + 1) + ": @red@" + server.rankPpl[i] + "@bla@ - Total Lvl:@whi@ " + server.ranks[i], 8147 + i);
+                getPA().sendQuest("@bla@Rank " + (i + 1) + ": @red@" + server.rankPpl[i] + "@bla@ - Total Lvl:@whi@ " + server.ranks[i], 8147 + i);
             }
         }
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
@@ -1527,54 +1530,54 @@ public class client extends Player implements Runnable {
     /* END OF 2 HANDED */
 
     public void playertalk(int expression, String text) { // Player talk
-        sendFrame200(969, expression);
+        getPA().sendFrame200(969, expression);
         getPA().sendFrame126(playerName.replaceAll("_", " "), 970);
         getPA().sendFrame126(text, 971);
         getPA().sendFrame126("Click here to continue", 972);
-        sendFrame185(969);
-        sendFrame164(968);
+        getPA().sendFrame185(969);
+        getPA().sendFrame164(968);
         NpcDialogueSend = true;
     }
 
     public void sendStatement(String text) {
         getPA().sendFrame126(text, 357);
         getPA().sendFrame126("Click Here To Continue", 358);
-        sendFrame164(356);
+        getPA().sendFrame164(356);
     }
 
     public void playertalk2(int expression, String text1, String text2) { // Player talk
-        sendFrame200(974, expression);
+        getPA().sendFrame200(974, expression);
         getPA().sendFrame126(playerName.replaceAll("_", " "), 975);
         getPA().sendFrame126(text1, 976);
         getPA().sendFrame126(text2, 977);
         getPA().sendFrame126("Click here to continue", 978);
-        sendFrame185(974);
-        sendFrame164(973);
+        getPA().sendFrame185(974);
+        getPA().sendFrame164(973);
         NpcDialogueSend = true;
     }
 
     public void playertalk3(int expression, String text1, String text2, String text3) {
-        sendFrame200(980, expression);
+        getPA().sendFrame200(980, expression);
         getPA().sendFrame126(playerName.replaceAll("_", " "), 981);
         getPA().sendFrame126(text1, 982);
         getPA().sendFrame126(text2, 983);
         getPA().sendFrame126(text3, 984);
         getPA().sendFrame126("Click here to continue", 985);
-        sendFrame185(980);
-        sendFrame164(979);
+        getPA().sendFrame185(980);
+        getPA().sendFrame164(979);
         NpcDialogueSend = true;
     }
 
     public void playertalk4(int expression, String text1, String text2, String text3, String text4) {
-        sendFrame200(987, expression);
+        getPA().sendFrame200(987, expression);
         getPA().sendFrame126(playerName.replaceAll("_", " "), 988);
         getPA().sendFrame126(text1, 989);
         getPA().sendFrame126(text2, 990);
         getPA().sendFrame126(text3, 991);
         getPA().sendFrame126(text4, 992);
         getPA().sendFrame126("Click here to continue", 993);
-        sendFrame185(987);
-        sendFrame164(986);
+        getPA().sendFrame185(987);
+        getPA().sendFrame164(986);
         NpcDialogueSend = true;
     }
 
@@ -1586,7 +1589,7 @@ public class client extends Player implements Runnable {
         } else {
             NpcDialogue = -1;
             NpcDialogueSend = false;
-            RemoveAllWindows();
+            getPA().RemoveAllWindows();
         }
     }
 
@@ -1691,7 +1694,7 @@ public class client extends Player implements Runnable {
         getPA().sendFrame126(text2, 6182);
         getPA().sendFrame126(text3, 6183);
         getPA().sendFrame126(text4, 6184);
-        sendFrame164(6179);
+        getPA().sendFrame164(6179);
     }
 
     public void chatlog() {
@@ -1724,9 +1727,9 @@ public class client extends Player implements Runnable {
 
     /* public void additemtoclue(int itemID, int slot, int amount)
      {
-     sendQuest("<col=800000>Clue Scroll", 8144);
+     getPA().sendQuest("<col=800000>Clue Scroll", 8144);
      clearQuestInterface();
-     sendQuest("<col=128>Congratz, you have completed the treasure trail!", 8145);
+     getPA().sendQuest("<col=128>Congratz, you have completed the treasure trail!", 8145);
      getOutStream().createFrameVarSizeWord(34);
      getOutStream().writeWord(8134); // shops
      getOutStream().writeByte(slot); // slot
@@ -6439,7 +6442,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 2417:
-                showInterface(8292);
+                getPA().showInterface(8292);
                 sendMessage("You Open The Brimhaven Agility Arena Ticket Exchange.");
                 break;
 
@@ -6974,9 +6977,9 @@ public class client extends Player implements Runnable {
 
         String telePlayer = PlayerHandler.players[player].playerName;
 
-        sendQuest(telePlayer, 12558);
-        sendQuest(teleLocation, 12560);
-        showInterface(12468);
+        getPA().sendQuest(telePlayer, 12558);
+        getPA().sendQuest(teleLocation, 12560);
+        getPA().showInterface(12468);
 
         teleReq = player;
         teleLoc = teleLocation;
@@ -7038,7 +7041,7 @@ public class client extends Player implements Runnable {
                 getOutStream().createFrame(208);
                 getOutStream().writeWordBigEndian_dup(197);
             }
-            sendQuest("@red@Wild", 199);
+            getPA().sendQuest("@red@Wild", 199);
             leftwild = 1;
         }
 
@@ -7047,7 +7050,7 @@ public class client extends Player implements Runnable {
                 getOutStream().createFrame(208);
                 getOutStream().writeWordBigEndian_dup(197);
             }
-            sendQuest("@gre@SafePvp", 199);
+            getPA().sendQuest("@gre@SafePvp", 199);
 //leftwild = 1;
         } else if (nonWild() && inwildy2 && leftwild == 1) {
             IsSnowing = 3;
@@ -7642,7 +7645,7 @@ public class client extends Player implements Runnable {
         switch (skill) {
             case 0: // Attack levelup
                 // NpcDialogue = 13445;
-                sendFrame164(6247);
+                getPA().sendFrame164(6247);
                 stillgfx(199, absX, absY);
                 getPA().sendFrame126("Congratulations, you just advanced an attack level!",
                         6248);
@@ -7663,7 +7666,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 1: // Strength
-                sendFrame164(6206);
+                getPA().sendFrame164(6206);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
                 getPA().sendFrame126("Congratulations, you just advanced a strength level!",
@@ -7685,7 +7688,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 2: // Defence
-                sendFrame164(6253);
+                getPA().sendFrame164(6253);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
                 getPA().sendFrame126("Congratulations, you just advanced a defence level!",
@@ -7707,7 +7710,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 3: // Hitpoints
-                sendFrame164(6216);
+                getPA().sendFrame164(6216);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
                 getPA().sendFrame126("Congratulations, you just advanced a hitpoints level!",
@@ -7729,7 +7732,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 4: // Ranging
-                sendFrame164(4443);
+                getPA().sendFrame164(4443);
                 // NpcDialogue = 13445;
                 stillgfx(199, absX, absY);
                 getPA().sendFrame126("Congratulations, you just advanced a ranged level!", 4444);
@@ -7749,7 +7752,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 5: // Prayer
-                sendFrame164(6242);
+                getPA().sendFrame164(6242);
                 stillgfx(199, absX, absY);
                 // NpcDialogue = 13445;
                 getPA().sendFrame126("Congratulations, you just advanced a prayer level!", 6243);
@@ -7769,7 +7772,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 6: // Magic
-                sendFrame164(6211);
+                getPA().sendFrame164(6211);
                 stillgfx(199, absX, absY);
                 // NpcDialogue = 13445;
                 getPA().sendFrame126("Congratulations, you just advanced a magic level!",
@@ -7791,7 +7794,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 7: // Cooking
-                // sendFrame164(6226);
+                // getPA().sendFrame164(6226);
                 // getPA().sendFrame126("Congratulations, you just advanced a cooking level!", 6227);
                 // getPA().sendFrame126("Your cooking level is now "+playerLevel[7]+" .", 6228);
                 sendMessage("Congratulations, you just advanced a cooking level.");
@@ -7809,7 +7812,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 8: // Woodcutting
-                // sendFrame164(4272);
+                // getPA().sendFrame164(4272);
                 // getPA().sendFrame126("Congratulations, you just advanced a woodcutting level!", 4273);
                 // getPA().sendFrame126("Your woodcutitng level is now "+playerLevel[8]+" .", 4274);
                 sendMessage(
@@ -7828,7 +7831,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 9: // Fletching
-                // sendFrame164(6231);
+                // getPA().sendFrame164(6231);
                 // getPA().sendFrame126("Congratulations, you just advanced a fletching level!", 6232);
                 // getPA().sendFrame126("Your fletching level is now "+playerLevel[9]+" .", 6233);
                 sendMessage("Congratulations, you just advanced a fletching level.");
@@ -7846,7 +7849,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 10: // fishing
-                // sendFrame164(6258);
+                // getPA().sendFrame164(6258);
                 // getPA().sendFrame126("Congratulations, you just advanced a fishing level!", 6259);
                 // getPA().sendFrame126("Your fishing level is now "+playerLevel[10]+" .", 6260);
                 sendMessage("Congratulations, you just advanced a fishing level.");
@@ -7864,8 +7867,8 @@ public class client extends Player implements Runnable {
                 break;
 
             case 11: // firemaking
-                sendFrame164(4282);
-                sendFrame200(4286, 475);
+                getPA().sendFrame164(4282);
+                getPA().sendFrame200(4286, 475);
                 getPA().sendFrame126("Congratulations, you just advanced a fire making level!", 4283);
                 getPA().sendFrame126("Your firemaking level is now "+playerLevel[11]+" .", 4284);
                 sendMessage(
@@ -7884,7 +7887,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 12: // crafting
-                // sendFrame164(6263);
+                // getPA().sendFrame164(6263);
                 // getPA().sendFrame126("Congratulations, you just advanced a crafting level!", 6264);
                 // getPA().sendFrame126("Your crafting level is now "+playerLevel[12]+" .", 6265);
                 sendMessage("Congratulations, you just advanced a crafting level.");
@@ -7902,7 +7905,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 13: // Smithing
-                // sendFrame164(6221);
+                // getPA().sendFrame164(6221);
                 // getPA().sendFrame126("Congratulations, you just advanced a smithing level!", 6222);
                 // getPA().sendFrame126("Your smithing level is now "+playerLevel[13]+" .", 6223);
                 sendMessage("Congratulations, you just advanced a smithing level.");
@@ -7920,7 +7923,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 14: // Mining
-                // sendFrame164(4416);
+                // getPA().sendFrame164(4416);
                 // getPA().sendFrame126("Congratulations, you just advanced a mining level!", 4417);
                 // getPA().sendFrame126("Your mining level is now "+playerLevel[14]+" .", 4418);
                 sendMessage("Congratulations, you just advanced a mining level.");
@@ -7938,7 +7941,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 15: // Herblore
-                // sendFrame164(6237);
+                // getPA().sendFrame164(6237);
                 // getPA().sendFrame126("Congratulations, you just advanced a herblore level!", 4417);
                 // getPA().sendFrame126("Your herblore level is now "+playerLevel[15]+" .", 4418);
                 sendMessage("Congratulations, you just advanced a herblore level.");
@@ -7956,7 +7959,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 16: // Agility
-                // sendFrame164(4277);
+                // getPA().sendFrame164(4277);
                 // getPA().sendFrame126("Congratulations, you just advanced a agility level!", 4278);
                 // getPA().sendFrame126("Your agility level is now "+playerLevel[16]+" .", 4279);
                 sendMessage("Congratulations, you just advanced an agility level.");
@@ -7974,7 +7977,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 17: // Thieving
-                // sendFrame164(4261);
+                // getPA().sendFrame164(4261);
                 // getPA().sendFrame126("Congratulations, you just advanced a thieving level!", 6262);
                 // getPA().sendFrame126("Your theiving level is now "+playerLevel[17]+" .", 6263);
                 sendMessage("Congratulations, you just advanced a thieving level.");
@@ -7992,7 +7995,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 18: // Slayer
-                sendFrame164(12122);
+                getPA().sendFrame164(12122);
                 getPA().sendFrame126("Congratulations, you just advanced a slayer level!", 12123);
                 getPA().sendFrame126("Your slayer level is now "+playerLevel[18]+" .", 12124);
                 sendMessage("Congratulations, you just advanced a slayer level.");
@@ -8010,7 +8013,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 19: // Farming
-                // sendFrame164(4261);
+                // getPA().sendFrame164(4261);
                 // getPA().sendFrame126("Congratulations, you just advanced a farming level!", 6207);
                 // getPA().sendFrame126("Your farming level is now "+playerLevel[19]+" .", 6208);
                 sendMessage("Congratulations, you just advanced a farming level.");
@@ -8028,7 +8031,7 @@ public class client extends Player implements Runnable {
                 break;
 
             case 20: // Runecrafting
-                // sendFrame164(4267);
+                // getPA().sendFrame164(4267);
                 // getPA().sendFrame126("Congratulations, you just advanced a runecrafting level!", 4268);
                 // getPA().sendFrame126("Your runecrafting level is now "+playerLevel[20]+" .", 4269);
                 sendMessage(
@@ -8589,7 +8592,7 @@ public class client extends Player implements Runnable {
                 addSkillXP((650 * playerLevel[playerMagic]), playerMagic);
                 newheightLevel = 0;
             }
-            RemoveAllWindows();
+            getPA().RemoveAllWindows();
             closeInterface();
             teleport();
             actionTimer = 10;
@@ -9118,57 +9121,57 @@ public class client extends Player implements Runnable {
 
     public void showQuestCompleted(String questName, int rewardqp) {
         totalqp += rewardqp;
-        showInterface(297);
-        sendQuest("Congratulations!", 299);
-        sendQuest("Close Window", 300);
-        sendQuest("You are awarded", 6156);
-        sendQuest("Earned QP:", 6158);
-        sendQuest("Total QP:", 303);
-        sendQuest("You have completed " + questName, 301);
-        sendQuest(String.valueOf(rewardqp), 4444);
-        sendQuest(String.valueOf(totalqp), 304);
+        getPA().showInterface(297);
+        getPA().sendQuest("Congratulations!", 299);
+        getPA().sendQuest("Close Window", 300);
+        getPA().sendQuest("You are awarded", 6156);
+        getPA().sendQuest("Earned QP:", 6158);
+        getPA().sendQuest("Total QP:", 303);
+        getPA().sendQuest("You have completed " + questName, 301);
+        getPA().sendQuest(String.valueOf(rewardqp), 4444);
+        getPA().sendQuest(String.valueOf(totalqp), 304);
     }
 
     public void loadquest(String questname, String questinfo1, String questinfo2, String questinfo3, String questinfo4, String questinfo5, String questinfo6, String questinfo7, String questinfo8, String questinfo9) {
-        sendQuest("<col=800000>Quest", 8144);
+        getPA().sendQuest("<col=800000>Quest", 8144);
         clearQuestInterface();
-        sendQuest("<col=128>" + questname, 8145);
-        sendQuest("<col=128><col=800000>" + questinfo1 + "<col=128>", 8147);
-        sendQuest("<col=128><col=800000>" + questinfo2 + "<col=128>", 8148);
-        sendQuest("<col=128><col=800000>" + questinfo3 + "<col=128>", 8149);
-        sendQuest("<col=128><col=800000>" + questinfo4 + "<col=128>", 8150);
-        sendQuest("<col=128><col=800000>" + questinfo5 + "<col=128>", 8151);
-        sendQuest("<col=128><col=800000>" + questinfo6 + "<col=128>", 8152);
-        sendQuest("<col=128><col=800000>" + questinfo7 + "<col=128>", 8153);
-        sendQuest("<col=128><col=800000>" + questinfo8 + "<col=128>", 8154);
-        sendQuest("<col=128><col=800000>" + questinfo9 + "<col=128>", 8155);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>" + questname, 8145);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo1 + "<col=128>", 8147);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo2 + "<col=128>", 8148);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo3 + "<col=128>", 8149);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo4 + "<col=128>", 8150);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo5 + "<col=128>", 8151);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo6 + "<col=128>", 8152);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo7 + "<col=128>", 8153);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo8 + "<col=128>", 8154);
+        getPA().sendQuest("<col=128><col=800000>" + questinfo9 + "<col=128>", 8155);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
     public void cluereward(int item1, int item2, int item3, int item4, int item5, int amount1, int amount2, int amount3, int amount4, int amount5) {
-        sendQuest("<col=800000>Clue Scroll", 8144);
+        getPA().sendQuest("<col=800000>Clue Scroll", 8144);
         clearQuestInterface();
-        sendQuest("<col=128>Congratz, you have completed the treasure trail!", 8145);
-        sendQuest("<col=128>Reward:", 8146);
-        sendQuest("<col=128>" + GetItemName(item1) + "<col=800000> (" + amount1 + ")<col=128>",
+        getPA().sendQuest("<col=128>Congratz, you have completed the treasure trail!", 8145);
+        getPA().sendQuest("<col=128>Reward:", 8146);
+        getPA().sendQuest("<col=128>" + GetItemName(item1) + "<col=800000> (" + amount1 + ")<col=128>",
                 8147);
-        sendQuest("<col=128>" + GetItemName(item2) + "<col=800000> (" + amount2 + ")<col=128>",
+        getPA().sendQuest("<col=128>" + GetItemName(item2) + "<col=800000> (" + amount2 + ")<col=128>",
                 8148);
-        sendQuest("<col=128>" + GetItemName(item3) + "<col=800000> (" + amount3 + ")<col=128>",
+        getPA().sendQuest("<col=128>" + GetItemName(item3) + "<col=800000> (" + amount3 + ")<col=128>",
                 8149);
-        sendQuest("<col=128>" + GetItemName(item4) + "<col=800000> (" + amount4 + ")<col=128>",
+        getPA().sendQuest("<col=128>" + GetItemName(item4) + "<col=800000> (" + amount4 + ")<col=128>",
                 8150);
-        sendQuest("<col=128>" + GetItemName(item5) + "<col=800000> (" + amount5 + ")<col=128>",
+        getPA().sendQuest("<col=128>" + GetItemName(item5) + "<col=800000> (" + amount5 + ")<col=128>",
                 8151);
         addItem(item1, amount1);
         addItem(item2, amount2);
         addItem(item3, amount3);
         addItem(item4, amount4);
         addItem(item5, amount5);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
         cluelevel = 0;
         clueid = 0;
@@ -9201,26 +9204,26 @@ public class client extends Player implements Runnable {
     }
 
     public void sendclue1(int clueX, int clueY) {
-        sendQuest("<col=800000>Clue Scroll", 8144);
+        getPA().sendQuest("<col=800000>Clue Scroll", 8144);
         clearQuestInterface();
-        sendQuest("<col=128>Coordinates of next clue", 8145);
-        sendQuest("<col=128>X Coordinate:<col=800000> " + clueX + "<col=128>", 8147);
-        sendQuest("<col=128>Y Coordinate:<col=800000> " + clueY + "<col=128>", 8148);
-        sendQuest("<col=128><col=800000> GOOD LUCK! <col=128>", 8149);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>Coordinates of next clue", 8145);
+        getPA().sendQuest("<col=128>X Coordinate:<col=800000> " + clueX + "<col=128>", 8147);
+        getPA().sendQuest("<col=128>Y Coordinate:<col=800000> " + clueY + "<col=128>", 8148);
+        getPA().sendQuest("<col=128><col=800000> GOOD LUCK! <col=128>", 8149);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
     public void sendclue3(String clueinfo1, String clueinfo2) {
-        sendQuest("<col=800000>Clue Scroll", 8144);
+        getPA().sendQuest("<col=800000>Clue Scroll", 8144);
         clearQuestInterface();
-        sendQuest("<col=128>Coordinates of next clue", 8145);
-        sendQuest("<col=128><col=800000>" + clueinfo1 + "<col=128>", 8147);
-        sendQuest("<col=128><col=800000>" + clueinfo2 + "<col=128>", 8148);
-        sendQuest("<col=128><col=800000> GOOD LUCK! <col=128>", 8149);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>Coordinates of next clue", 8145);
+        getPA().sendQuest("<col=128><col=800000>" + clueinfo1 + "<col=128>", 8147);
+        getPA().sendQuest("<col=128><col=800000>" + clueinfo2 + "<col=128>", 8148);
+        getPA().sendQuest("<col=128><col=800000> GOOD LUCK! <col=128>", 8149);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
@@ -9559,44 +9562,44 @@ public class client extends Player implements Runnable {
 /////////////////////////////END OF ENCRYPTION/////////////////////////////////////////
 
     public void loadothers() {
-        sendQuest(" Clue debug", 6288);
-        sendQuest("Off", 6289);
-        sendQuest("On", 6290);
+        getPA().sendQuest(" Clue debug", 6288);
+        getPA().sendQuest("Off", 6289);
+        getPA().sendQuest("On", 6290);
     }
 
     public void loadquestinterface() {
-        sendQuest("Godzhell Reborn", 640);
+        getPA().sendQuest("Godzhell Reborn", 640);
         /*Free Quests*/
-        sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
+        getPA().sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
 
-        sendQuest("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
+        getPA().sendQuest("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
                 + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19412);
-        sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19413);
+        getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19413);
         if (getSlayer().getTask().isEmpty()) {
-            sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19414);
+            getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19414);
         } else {
-            sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19414);
+            getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19414);
         }
         if (getSlayer().getTask().isEmpty()) {
-            sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19415);
+            getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19415);
         } else {
-            sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19415);
+            getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19415);
         }
 
-        sendQuest("", 19416);
-        sendQuest("", 19417);
-        sendQuest("", 19418);
-        sendQuest("", 19419);
-        sendQuest("", 19420);
-        sendQuest("", 19450);
-        sendQuest("", 19451);
-        sendQuest("", 19452);
-        sendQuest("", 19453);
-        sendQuest("", 19454);
-        sendQuest("", 19455);
-        sendQuest("", 19456);
-        sendQuest("", 19457);
-        sendQuest("", 19458);
+        getPA().sendQuest("", 19416);
+        getPA().sendQuest("", 19417);
+        getPA().sendQuest("", 19418);
+        getPA().sendQuest("", 19419);
+        getPA().sendQuest("", 19420);
+        getPA().sendQuest("", 19450);
+        getPA().sendQuest("", 19451);
+        getPA().sendQuest("", 19452);
+        getPA().sendQuest("", 19453);
+        getPA().sendQuest("", 19454);
+        getPA().sendQuest("", 19455);
+        getPA().sendQuest("", 19456);
+        getPA().sendQuest("", 19457);
+        getPA().sendQuest("", 19458);
         /*END OF ALL QUESTS*/
     }
 
@@ -9671,194 +9674,194 @@ public class client extends Player implements Runnable {
 
     public void SlayerHelpMenu() {
 
-        sendQuest("<col=800000>Slayer Info", 8144); // Title
+        getPA().sendQuest("<col=800000>Slayer Info", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>Slayer Information", 8145);
-        sendQuest("<col=128><col=800000>Chickens<col=128>", 8147);
-        sendQuest("<col=128><col=800000>Requirments: 5 slayer<col=128>", 8148);
-        sendQuest("<col=128><col=800000>Located at the beginning of slayer tower<col=128>",
+        getPA().sendQuest("<col=128>Slayer Information", 8145);
+        getPA().sendQuest("<col=128><col=800000>Chickens<col=128>", 8147);
+        getPA().sendQuest("<col=128><col=800000>Requirments: 5 slayer<col=128>", 8148);
+        getPA().sendQuest("<col=128><col=800000>Located at the beginning of slayer tower<col=128>",
                 8149);
-        sendQuest("<col=128>-------------<col=128>", 8150);
-        sendQuest("<col=128><col=800000>Skele's<col=128>", 8151);
-        sendQuest("<col=128><col=800000>Requirements: 20 slayer<col=128>", 8152);
-        sendQuest("<col=128><col=800000>Located at slayer tower<col=128>", 8153);
-        sendQuest("<col=128>-------------<col=128>", 8154);
-        sendQuest("<col=128><col=800000>Crawling Hands<col=128>", 8155);
-        sendQuest("<col=128><col=800000>Requirements: 30 slayer<col=128>", 8156);
-        sendQuest("<col=128><col=800000>Located at Slayer Tower<col=128>", 8157);
-        sendQuest("<col=128>-------------", 8160);
-        sendQuest("<col=128><col=800000>Cave Bugs<col=128>", 8161);
-        sendQuest("<col=128><col=800000>Requirements: 40 slayer<col=128>", 8162);
-        sendQuest("<col=128><col=800000>Located at: slayer tower<col=128>", 8163);
-        sendQuest("<col=128>-------------<col=128>", 8164);
-        sendQuest("<col=128><col=800000>Jelly<col=128>", 8165);
-        sendQuest("<col=128><col=800000>Requirements: 50 slayer<col=128>", 8166);
-        sendQuest("<col=128><col=800000>Located at: Slayer Tower<col=128>", 8167);
-        sendQuest("<col=128>-------------<col=128>", 8168);
-        sendQuest("<col=128><col=800000>Aberrant Specter<col=128>", 8169);
-        sendQuest("<col=128><col=800000>Requirements: 65 slayer<col=128>", 8170);
-        sendQuest("<col=128><col=800000>Located at: Slayer Tower<col=128>", 8171);
-        sendQuest("<col=128>Abyssal Demon<col=128>", 8172);
-        sendQuest("<col=128>Located at: Slayer Tower<col=128>", 8173);
-        sendQuest("<col=128>Dark Beast<col=128>", 8174);
-        sendQuest("<col=128>Located at: Slayer Tower<col=128>", 8175);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>-------------<col=128>", 8150);
+        getPA().sendQuest("<col=128><col=800000>Skele's<col=128>", 8151);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 20 slayer<col=128>", 8152);
+        getPA().sendQuest("<col=128><col=800000>Located at slayer tower<col=128>", 8153);
+        getPA().sendQuest("<col=128>-------------<col=128>", 8154);
+        getPA().sendQuest("<col=128><col=800000>Crawling Hands<col=128>", 8155);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 30 slayer<col=128>", 8156);
+        getPA().sendQuest("<col=128><col=800000>Located at Slayer Tower<col=128>", 8157);
+        getPA().sendQuest("<col=128>-------------", 8160);
+        getPA().sendQuest("<col=128><col=800000>Cave Bugs<col=128>", 8161);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 40 slayer<col=128>", 8162);
+        getPA().sendQuest("<col=128><col=800000>Located at: slayer tower<col=128>", 8163);
+        getPA().sendQuest("<col=128>-------------<col=128>", 8164);
+        getPA().sendQuest("<col=128><col=800000>Jelly<col=128>", 8165);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 50 slayer<col=128>", 8166);
+        getPA().sendQuest("<col=128><col=800000>Located at: Slayer Tower<col=128>", 8167);
+        getPA().sendQuest("<col=128>-------------<col=128>", 8168);
+        getPA().sendQuest("<col=128><col=800000>Aberrant Specter<col=128>", 8169);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 65 slayer<col=128>", 8170);
+        getPA().sendQuest("<col=128><col=800000>Located at: Slayer Tower<col=128>", 8171);
+        getPA().sendQuest("<col=128>Abyssal Demon<col=128>", 8172);
+        getPA().sendQuest("<col=128>Located at: Slayer Tower<col=128>", 8173);
+        getPA().sendQuest("<col=128>Dark Beast<col=128>", 8174);
+        getPA().sendQuest("<col=128>Located at: Slayer Tower<col=128>", 8175);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
 
     public void ElementalHelpMenu() {
 
-        sendQuest("<col=800000>Elemental Armors", 8144); // Title
+        getPA().sendQuest("<col=800000>Elemental Armors", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>Elemental Help Guide", 8145);
-        sendQuest("First, buy a gem from the combat instructor.", 8149);
-        sendQuest("Then, buy a pink robe set.", 8151);
-        sendQuest("Use the gem with a peice of the set.", 8152);
-        sendQuest("You now have that type of elemental armor.", 8153);
-        sendQuest("Once you have the full set, you can", 8154);
-        sendQuest("use it to your advantage in the wilderness", 8155);
-        sendQuest("Fire > Earth", 8156);
-        sendQuest("Water > Fire", 8157);
-        sendQuest("Air > Water", 8158);
-        sendQuest("Earth > Air", 8159);
-        sendQuest("There is a 1/10 chance of doing a special attack, but only",
+        getPA().sendQuest("<col=128>Elemental Help Guide", 8145);
+        getPA().sendQuest("First, buy a gem from the combat instructor.", 8149);
+        getPA().sendQuest("Then, buy a pink robe set.", 8151);
+        getPA().sendQuest("Use the gem with a peice of the set.", 8152);
+        getPA().sendQuest("You now have that type of elemental armor.", 8153);
+        getPA().sendQuest("Once you have the full set, you can", 8154);
+        getPA().sendQuest("use it to your advantage in the wilderness", 8155);
+        getPA().sendQuest("Fire > Earth", 8156);
+        getPA().sendQuest("Water > Fire", 8157);
+        getPA().sendQuest("Air > Water", 8158);
+        getPA().sendQuest("Earth > Air", 8159);
+        getPA().sendQuest("There is a 1/10 chance of doing a special attack, but only",
                 8160);
-        sendQuest("if you're using the full robe set.", 8161);
-        sendQuest("Have fun!", 8163);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("if you're using the full robe set.", 8161);
+        getPA().sendQuest("Have fun!", 8163);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
 
     public void TheifHelpMenu() {
 
-        sendQuest("<col=800000>Theiving", 8144); // Title
+        getPA().sendQuest("<col=800000>Theiving", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>Theiving help guide", 8145);
-        sendQuest("<col=128><col=800000>Silver stall<col=128>", 8147);
-        sendQuest("<col=128><col=800000>Requirents: 85 theiving<col=128>", 8148);
-        sendQuest("<col=128><col=800000>Located at: 2658,3312<col=128>", 8149);
-        sendQuest("<col=128>-------------<col=128>", 8150);
-        sendQuest("<col=128><col=800000>Tea Stall<col=128>", 8151);
-        sendQuest("<col=128><col=800000>Requirements: None<col=128>", 8152);
-        sendQuest("<col=128><col=800000>Located at: 3269,3412<col=128>", 8153);
-        sendQuest("<col=128>-------------<col=128>", 8154);
-        sendQuest("<col=128><col=800000>Secret crate<col=128>", 8155);
-        sendQuest("<col=128><col=800000>Requirements: 99 theiving<col=128>", 8156);
-        sendQuest("<col=128><col=800000>Located at: 2954,3303 <col=128>", 8157);
-        sendQuest("<col=128>-------------", 8160);
+        getPA().sendQuest("<col=128>Theiving help guide", 8145);
+        getPA().sendQuest("<col=128><col=800000>Silver stall<col=128>", 8147);
+        getPA().sendQuest("<col=128><col=800000>Requirents: 85 theiving<col=128>", 8148);
+        getPA().sendQuest("<col=128><col=800000>Located at: 2658,3312<col=128>", 8149);
+        getPA().sendQuest("<col=128>-------------<col=128>", 8150);
+        getPA().sendQuest("<col=128><col=800000>Tea Stall<col=128>", 8151);
+        getPA().sendQuest("<col=128><col=800000>Requirements: None<col=128>", 8152);
+        getPA().sendQuest("<col=128><col=800000>Located at: 3269,3412<col=128>", 8153);
+        getPA().sendQuest("<col=128>-------------<col=128>", 8154);
+        getPA().sendQuest("<col=128><col=800000>Secret crate<col=128>", 8155);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 99 theiving<col=128>", 8156);
+        getPA().sendQuest("<col=128><col=800000>Located at: 2954,3303 <col=128>", 8157);
+        getPA().sendQuest("<col=128>-------------", 8160);
 
-        sendQuest(
+        getPA().sendQuest(
                 "<col=128><col=800000>Type ::castlewars for info on theiving stalls there<col=128>",
                 8161);
-        sendQuest("<col=128><col=800000>-------------<col=128>", 8162);
-        sendQuest("<col=128><col=800000>-------------<col=128>", 8163);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128><col=800000>-------------<col=128>", 8162);
+        getPA().sendQuest("<col=128><col=800000>-------------<col=128>", 8163);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
 
     public void CastlewarsHelpMenu() {
 
-        sendQuest("<col=800000>Castle Wars", 8144); // Title
+        getPA().sendQuest("<col=800000>Castle Wars", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>Castle Wars Theiving Guide", 8145);
-        sendQuest("<col=128>All tables located at 2425,3078<col=128>", 8147);
-        sendQuest("<col=128><col=800000>Rock table<col=128>", 8148);
-        sendQuest("<col=128><col=800000>Requirements: 65 theiving<col=128>", 8149);
-        sendQuest("<col=128>----------<col=128>", 8150);
-        sendQuest("<col=128><col=800000>Pickaxe table<col=128>", 8151);
-        sendQuest("<col=128><col=800000>Requirements: 70 theiving<col=128>", 8152);
-        sendQuest("<col=128>----------<col=128>", 8153);
-        sendQuest("<col=128><col=128>Potion table<col=128>", 8154);
-        sendQuest("<col=128><col=800000>Requirements: 75 theiving<col=128>", 8155);
-        sendQuest("<col=128>----------<col=128>", 8156);
-        sendQuest("<col=128><col=800000>Rope table<col=128>", 8157);
-        sendQuest("<col=128><col=128>Requirements: 85 theiving<col=128>", 8160);
+        getPA().sendQuest("<col=128>Castle Wars Theiving Guide", 8145);
+        getPA().sendQuest("<col=128>All tables located at 2425,3078<col=128>", 8147);
+        getPA().sendQuest("<col=128><col=800000>Rock table<col=128>", 8148);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 65 theiving<col=128>", 8149);
+        getPA().sendQuest("<col=128>----------<col=128>", 8150);
+        getPA().sendQuest("<col=128><col=800000>Pickaxe table<col=128>", 8151);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 70 theiving<col=128>", 8152);
+        getPA().sendQuest("<col=128>----------<col=128>", 8153);
+        getPA().sendQuest("<col=128><col=128>Potion table<col=128>", 8154);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 75 theiving<col=128>", 8155);
+        getPA().sendQuest("<col=128>----------<col=128>", 8156);
+        getPA().sendQuest("<col=128><col=800000>Rope table<col=128>", 8157);
+        getPA().sendQuest("<col=128><col=128>Requirements: 85 theiving<col=128>", 8160);
 
-        sendQuest("<col=128>----------<col=128>", 8161);
-        sendQuest("<col=128><col=800000>Limestone Table<col=128>", 8162);
-        sendQuest("<col=128><col=800000>Requirements: 99 theiving<col=128>", 8163);
-        sendQuest("<col=128>----------<col=128>", 8161);
-        sendQuest("<col=128><col=800000>Barricades Table<col=128>", 8162);
-        sendQuest("<col=128><col=800000>Requirements: 120 theiving<col=128>", 8163);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>----------<col=128>", 8161);
+        getPA().sendQuest("<col=128><col=800000>Limestone Table<col=128>", 8162);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 99 theiving<col=128>", 8163);
+        getPA().sendQuest("<col=128>----------<col=128>", 8161);
+        getPA().sendQuest("<col=128><col=800000>Barricades Table<col=128>", 8162);
+        getPA().sendQuest("<col=128><col=800000>Requirements: 120 theiving<col=128>", 8163);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
 
     public void ServerHelpMenu() {
 
-        sendQuest("<col=800000>Server Information Menu", 8144); // Title
+        getPA().sendQuest("<col=800000>Server Information Menu", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>Server Information", 8145);
-        sendQuest("<col=128>Server IP: @gre@" + "5.53.106.141", 8147);
-        sendQuest("<col=128>Players Online: @gre@" + PlayerHandler.getPlayerCount(),
+        getPA().sendQuest("<col=128>Server Information", 8145);
+        getPA().sendQuest("<col=128>Server IP: @gre@" + "5.53.106.141", 8147);
+        getPA().sendQuest("<col=128>Players Online: @gre@" + PlayerHandler.getPlayerCount(),
                 8148);
-        sendQuest("<col=128>Server Hoster And Creator: <col=800000>" + "admin", 8149);
-        sendQuest("<col=128>Server Admins: <col=128>" + " admin, Mod Darren, ....", 8150);
-        sendQuest(" ", 8151);
-        sendQuest("<col=128><col=800000>" + " ---", 8152);
-        sendQuest("<col=128>WebSite: @red@" + "www.Godzhell Reborn.tk", 8153);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>Server Hoster And Creator: <col=800000>" + "admin", 8149);
+        getPA().sendQuest("<col=128>Server Admins: <col=128>" + " admin, Mod Darren, ....", 8150);
+        getPA().sendQuest(" ", 8151);
+        getPA().sendQuest("<col=128><col=800000>" + " ---", 8152);
+        getPA().sendQuest("<col=128>WebSite: @red@" + "www.Godzhell Reborn.tk", 8153);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
 
     public void SpamMenu() {
 
-        sendQuest("<col=800000>SPAM", 8144); // Title
+        getPA().sendQuest("<col=800000>SPAM", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>SPAM", 8145);
-        sendQuest("<col=128>SPAM", 8147);
-        sendQuest("<col=128>SPAM", 8148);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>SPAM", 8145);
+        getPA().sendQuest("<col=128>SPAM", 8147);
+        getPA().sendQuest("<col=128>SPAM", 8148);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
 
     public void SmeltingHelpMenu() {
-        sendQuest("<col=800000>Smelting Information Menu", 8144); // Title
+        getPA().sendQuest("<col=800000>Smelting Information Menu", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=800000>Smelting Menu", 8145);
-        sendQuest("<col=128>First Off you will need an ore,<col=128>", 8148);
-        sendQuest(
+        getPA().sendQuest("<col=800000>Smelting Menu", 8145);
+        getPA().sendQuest("<col=128>First Off you will need an ore,<col=128>", 8148);
+        getPA().sendQuest(
                 "<col=128>Now type in ::smelt and this will take you too Fally furance.<col=128>",
                 8149);
-        sendQuest(
+        getPA().sendQuest(
                 "<col=128>The ore you are smelting must be the first in your inventory!.<col=128>",
                 8150);
-        sendQuest("<col=128>You may only smelt at Fally furnace.<col=128>", 8151);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>You may only smelt at Fally furnace.<col=128>", 8151);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
     public void FishingHelpMenu() {
 
-        sendQuest("<col=800000>Fishing Information Menu", 8144); // Title
+        getPA().sendQuest("<col=800000>Fishing Information Menu", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=800000>Fishing Menu", 8145);
-        sendQuest("<col=128>First off type in ::fish<col=128>", 8148);
-        sendQuest(
+        getPA().sendQuest("<col=800000>Fishing Menu", 8145);
+        getPA().sendQuest("<col=128>First off type in ::fish<col=128>", 8148);
+        getPA().sendQuest(
                 "<col=128>Fish at the big fountain next to where ::fish teles you to<col=128>",
                 8149);
-        sendQuest(
+        getPA().sendQuest(
                 "<col=128>The item your fishing with must be in the 1st slot of your inventory.<col=128>",
                 8150);
-        sendQuest("<col=128>You may only fish there for now.<col=128>", 8151);
-        sendQuest("<col=128>Harpoon Fishes Sharks.<col=128>", 8153);
-        sendQuest("<col=128>Lobster pot Fishes Lobsters.<col=128>", 8154);
-        sendQuest("<col=128>Big Fishing net fishes carp.<col=128>", 8155);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128>You may only fish there for now.<col=128>", 8151);
+        getPA().sendQuest("<col=128>Harpoon Fishes Sharks.<col=128>", 8153);
+        getPA().sendQuest("<col=128>Lobster pot Fishes Lobsters.<col=128>", 8154);
+        getPA().sendQuest("<col=128>Big Fishing net fishes carp.<col=128>", 8155);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
@@ -9892,35 +9895,35 @@ public class client extends Player implements Runnable {
             int killcount1 = killcount;
             int deathcount1 = p2.deathcount;
 
-            sendQuest("<col=800000>Stats", 8144); // Title
+            getPA().sendQuest("<col=800000>Stats", 8144); // Title
             clearQuestInterface();
-            sendQuest(p2.playerName + " <col=800000>Stats", 8145);
-            sendQuest("@blu@Pk Points: @yel@" + pkpoints1, 8148);
-            sendQuest("@blu@Kills: @yel@" + killcount1, 8149);
-            sendQuest("@blu@Deaths: @yel@" + deathcount1, 8150);
-            sendQuest("<col=128><col=128>Attack Level is:" + Attacklvl, 8151);
-            sendQuest("<col=128><col=128>Strength Level is:" + Strengthlvl, 8152);
-            sendQuest("<col=128><col=128>Defence Level is:" + Defencelvl, 8153);
-            sendQuest("<col=128><col=128>Hitpoints Level is:" + Hitpointslvl, 8154);
-            sendQuest("<col=128><col=128>Prayer Level is:" + Prayerlvl, 8155);
-            sendQuest("<col=128><col=128>Magic Level is:" + Magiclvl, 8156);
-            sendQuest("<col=128><col=128>Range Level is:" + Rangelvl, 8157);
-            sendQuest("<col=128><col=128>Runecraft Level is:" + Runecraftlvl, 8158);
-            sendQuest("<col=128><col=128>Herblore Level is:" + Herblorelvl, 8159);
-            sendQuest("<col=128><col=128>Theiving Level is:" + Theivinglvl, 8160);
-            sendQuest("<col=128><col=128>Agility Level is:" + Agilitylvl, 8161);
-            sendQuest("<col=128><col=128>Crafting Level is:" + Craftinglvl, 8162);
-            sendQuest("<col=128><col=128>Fletching Level is:" + Fletchinglvl, 8163);
-            sendQuest("<col=128><col=128>Slayer Level is:" + Slayerlvl, 8164);
-            sendQuest("<col=128><col=128>Mining Level is:" + Mininglvl, 8165);
-            sendQuest("<col=128><col=128>Smithing Level is:" + Smithinglvl, 8166);
-            sendQuest("<col=128><col=128>Fishing Level is:" + Fishinglvl, 8167);
-            sendQuest("<col=128><col=128>Cooking Level is:" + Cookinglvl, 8168);
-            sendQuest("<col=128><col=128>Firemaking Level is:" + Firemakinglvl, 8169);
-            sendQuest("<col=128><col=128>Woodcutting Level is:" + Woodcuttinglvl, 8170);
-            sendQuest("<col=128><col=128>Farming Level is:" + Farminglvl, 8171);
-            sendQuestSomething(8143);
-            showInterface(8134);
+            getPA().sendQuest(p2.playerName + " <col=800000>Stats", 8145);
+            getPA().sendQuest("@blu@Pk Points: @yel@" + pkpoints1, 8148);
+            getPA().sendQuest("@blu@Kills: @yel@" + killcount1, 8149);
+            getPA().sendQuest("@blu@Deaths: @yel@" + deathcount1, 8150);
+            getPA().sendQuest("<col=128><col=128>Attack Level is:" + Attacklvl, 8151);
+            getPA().sendQuest("<col=128><col=128>Strength Level is:" + Strengthlvl, 8152);
+            getPA().sendQuest("<col=128><col=128>Defence Level is:" + Defencelvl, 8153);
+            getPA().sendQuest("<col=128><col=128>Hitpoints Level is:" + Hitpointslvl, 8154);
+            getPA().sendQuest("<col=128><col=128>Prayer Level is:" + Prayerlvl, 8155);
+            getPA().sendQuest("<col=128><col=128>Magic Level is:" + Magiclvl, 8156);
+            getPA().sendQuest("<col=128><col=128>Range Level is:" + Rangelvl, 8157);
+            getPA().sendQuest("<col=128><col=128>Runecraft Level is:" + Runecraftlvl, 8158);
+            getPA().sendQuest("<col=128><col=128>Herblore Level is:" + Herblorelvl, 8159);
+            getPA().sendQuest("<col=128><col=128>Theiving Level is:" + Theivinglvl, 8160);
+            getPA().sendQuest("<col=128><col=128>Agility Level is:" + Agilitylvl, 8161);
+            getPA().sendQuest("<col=128><col=128>Crafting Level is:" + Craftinglvl, 8162);
+            getPA().sendQuest("<col=128><col=128>Fletching Level is:" + Fletchinglvl, 8163);
+            getPA().sendQuest("<col=128><col=128>Slayer Level is:" + Slayerlvl, 8164);
+            getPA().sendQuest("<col=128><col=128>Mining Level is:" + Mininglvl, 8165);
+            getPA().sendQuest("<col=128><col=128>Smithing Level is:" + Smithinglvl, 8166);
+            getPA().sendQuest("<col=128><col=128>Fishing Level is:" + Fishinglvl, 8167);
+            getPA().sendQuest("<col=128><col=128>Cooking Level is:" + Cookinglvl, 8168);
+            getPA().sendQuest("<col=128><col=128>Firemaking Level is:" + Firemakinglvl, 8169);
+            getPA().sendQuest("<col=128><col=128>Woodcutting Level is:" + Woodcuttinglvl, 8170);
+            getPA().sendQuest("<col=128><col=128>Farming Level is:" + Farminglvl, 8171);
+            getPA().sendQuestSomething(8143);
+            getPA().showInterface(8134);
             flushOutStream();
         }
     }
@@ -9928,8 +9931,8 @@ public class client extends Player implements Runnable {
     public void playerMenu() {
         clearQuestInterface();
 
-        sendQuest("<col=800000>Players On Godzhell Reborn", 8144);  //Title
-        sendQuest("<col=128> Players Online: " + PlayerHandler.getPlayerCount(), 8145);
+        getPA().sendQuest("<col=800000>Players On Godzhell Reborn", 8144);  //Title
+        getPA().sendQuest("<col=128> Players Online: " + PlayerHandler.getPlayerCount(), 8145);
 
         int line = 8148;
         for (int i = 0; i < PlayerHandler.maxPlayers; i++) {
@@ -9938,124 +9941,124 @@ public class client extends Player implements Runnable {
                     int pcombat = PlayerHandler.players[i].combat;
                     if (getRights().isPlayer())
                         if ((PlayerHandler.players[i].playerName.equalsIgnoreCase("sgsrocks"))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Main Owner)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Main Owner)", line);
                         } else if ((PlayerHandler.players[i].playerName.equalsIgnoreCase(""))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Chief of Staff)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Chief of Staff)", line);
                         } else if ((PlayerHandler.players[i].playerName.equalsIgnoreCase("sethg"))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Eco Security)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Eco Security)", line);
                         } else if ((PlayerHandler.players[i].playerName.equalsIgnoreCase(""))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": 2nd Co Owner)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": 2nd Co Owner)", line);
                         } else if (PlayerHandler.players[i].getRights().isContributor()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Donator)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Donator)", line);
                         } else if (PlayerHandler.players[i].getRights().isSuperDonater()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Super Donator)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Super Donator)", line);
                         } else if (PlayerHandler.players[i].getRights().isExtremeDonator()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Extreme Donator)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Extreme Donator)", line);
                         } else if (PlayerHandler.players[i].getRights().isVIP()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Legendary Donator)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Legendary Donator)", line);
                         } else if (PlayerHandler.players[i].rights.isCoOwner()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Co Owner)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Co Owner)", line);
                         } else if (PlayerHandler.players[i].rights.isAdministrator()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Admin)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Admin)", line);
                         } else if (PlayerHandler.players[i].rights.isModerator()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Mod)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Mod)", line);
                         } else if (PlayerHandler.players[i].getRights().isPlayer()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player)", line);
                         } else {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player)", line);
                         }
                     else if (rights.inherits(Rights.ADMINISTRATOR))
                         if ((PlayerHandler.players[i].playerName.equalsIgnoreCase("sgsrocks"))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Main Owner)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Main Owner)", line);
                         } else if ((PlayerHandler.players[i].playerName.equalsIgnoreCase(""))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Chief of Staff)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Chief of Staff)", line);
                         } else if ((PlayerHandler.players[i].playerName.equalsIgnoreCase("sethg"))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Eco Security)", line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Eco Security)", line);
                         } else if ((PlayerHandler.players[i].playerName.equalsIgnoreCase(""))) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": 2nd Co Owner) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": 2nd Co Owner) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].getRights().isContributor()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].getRights().isSuperDonater()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Super Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Super Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].getRights().isExtremeDonator()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Extreme Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Extreme Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].getRights().isVIP()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Legendary Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Legendary Donator) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].getRights().isCoOwner()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Co Owner) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Co Owner) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].rights.isAdministrator()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Admin) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Admin) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].rights.isModerator()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Mod) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Mod) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else if (PlayerHandler.players[i].getRights().isPlayer()) {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         } else {
-                            sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
+                            getPA().sendQuest("<col=800000>" + PlayerHandler.players[i].playerName + "<col=128> (Level - " + pcombat + ": Player) Coords : X: " + PlayerHandler.players[i].absX + " Y : " + PlayerHandler.players[i].absY, line);
                         }
                     line++;
                 }
             }
         }
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
     }
 
     public void MainHelpMenu() {
         if (getRights().isPlayer()) {
 
-            sendQuest("info", 8144); // Title
+            getPA().sendQuest("info", 8144); // Title
             clearQuestInterface();
-            sendQuest("How to Become Mod/Admin", 8145);
-            sendQuest("----", 8147);
-            sendQuest("1. Respect all other players!", 8148);
-            sendQuest("2. Respect Owners,Admins and Mods", 8149);
-            sendQuest("3. Do not start fights with other players", 8150);
-            sendQuest("   just simply tell an Owner or Admin.", 8151);
-            sendQuest("4. Help other players if they need help.", 8152);
-            sendQuest("5. Play on Server alot.", 8153);
-            sendQuest("5. Higher chance if you register on forums at", 8154);
-            sendQuest("allstarscapeforums.smfforfree2.com and stay active", 8155);
-            sendQuest("_____________________________________________________", 8156);
-            sendQuest("If you follow all of these rules you will be fine", 8157);
-            sendQuest("Just follow these and you will become a mod or admin", 8158);
-            sendQuest("", 8159);
-            sendQuestSomething(8143);
-            showInterface(8134);
+            getPA().sendQuest("How to Become Mod/Admin", 8145);
+            getPA().sendQuest("----", 8147);
+            getPA().sendQuest("1. Respect all other players!", 8148);
+            getPA().sendQuest("2. Respect Owners,Admins and Mods", 8149);
+            getPA().sendQuest("3. Do not start fights with other players", 8150);
+            getPA().sendQuest("   just simply tell an Owner or Admin.", 8151);
+            getPA().sendQuest("4. Help other players if they need help.", 8152);
+            getPA().sendQuest("5. Play on Server alot.", 8153);
+            getPA().sendQuest("5. Higher chance if you register on forums at", 8154);
+            getPA().sendQuest("allstarscapeforums.smfforfree2.com and stay active", 8155);
+            getPA().sendQuest("_____________________________________________________", 8156);
+            getPA().sendQuest("If you follow all of these rules you will be fine", 8157);
+            getPA().sendQuest("Just follow these and you will become a mod or admin", 8158);
+            getPA().sendQuest("", 8159);
+            getPA().sendQuestSomething(8143);
+            getPA().showInterface(8134);
             flushOutStream();
         }
         if (pHead == 0 && pBeard == 10 && pTorso == 18 && pArms == 26
                 && pLegs == 72 && pFeet == 42 && pHands == 33) {
-            showInterface(3559); // Shows "design your player"-screen if you haven't already designed it.
+            getPA().showInterface(3559); // Shows "design your player"-screen if you haven't already designed it.
         }
 
     }
 
     public void QuestHelpMenu() {
 
-        sendQuest("<col=800000>Quests", 8144); // Title
+        getPA().sendQuest("<col=800000>Quests", 8144); // Title
         clearQuestInterface();
-        sendQuest("<col=128>The secret commands quest", 8145);
-        sendQuest("<col=128><col=800000>To start tele to 2511,3494...<col=128>", 8147);
-        sendQuest(
+        getPA().sendQuest("<col=128>The secret commands quest", 8145);
+        getPA().sendQuest("<col=128><col=800000>To start tele to 2511,3494...<col=128>", 8147);
+        getPA().sendQuest(
                 "<col=128><col=800000>Then click board raft for your first instructions :) <col=128>",
                 8148);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8149);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8150);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8151);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8152);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8153);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8154);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8155);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8156);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8157);
-        sendQuest("<col=128>*future quest*", 8160);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8149);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8150);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8151);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8152);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8153);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8154);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8155);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8156);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8157);
+        getPA().sendQuest("<col=128>*future quest*", 8160);
 
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8161);
-        sendQuest("<col=128><col=800000> *future quest* <col=128>", 8162);
-        sendQuest("<col=128><col=800000> *future quest*<col=128>", 8163);
-        sendQuestSomething(8143);
-        showInterface(8134);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8161);
+        getPA().sendQuest("<col=128><col=800000> *future quest* <col=128>", 8162);
+        getPA().sendQuest("<col=128><col=800000> *future quest*<col=128>", 8163);
+        getPA().sendQuestSomething(8143);
+        getPA().showInterface(8134);
         flushOutStream();
 
     }
@@ -10876,12 +10879,7 @@ public class client extends Player implements Runnable {
         return false;
     }
 
-    public void sendQuest(String s, int id) {
-        getOutStream().createFrameVarSizeWord(126);
-        getOutStream().writeString(s);
-        getOutStream().writeWordA(id);
-        getOutStream().endFrameVarSizeWord();
-    }
+
 
     public void setAnimation(int i) {
         if (deathStage != 0) {
@@ -10895,120 +10893,23 @@ public class client extends Player implements Runnable {
     public void resetAnimation() {
         startAnimation(65535);
     }
-
-    public void randomize(int o, int oo, int ooo, int oooo) {
-        getOutStream().createFrame(53);
-        getOutStream().writeWord(o);
-        getOutStream().writeWord(oo);
-        getOutStream().writeByte(ooo);
-        getOutStream().writeWordBigEndianA(oooo);
-        flushOutStream();
-    }
-
-    public void sendFrame34(int id, int slot, int column, int amount) {
-        if (getOutStream() != null) {
-            getOutStream().createFrameVarSizeWord(34);
-            getOutStream().writeWord(column);
-            getOutStream().writeByte(4);
-            getOutStream().writeDWord(slot);
-            getOutStream().writeWord(id + 1);
-            if (amount > 254) {
-                getOutStream().writeByte(255);
-                getOutStream().writeDWord(amount);
-            } else {
-                getOutStream().writeByte(amount);
-            }
-            getOutStream().endFrameVarSizeWord();
-            flushOutStream();
-        }
-    }
-
-
-
-    public void sendFrame200(int MainFrame, int SubFrame) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(200);
-        getOutStream().writeWord(MainFrame);
-        getOutStream().writeWord(SubFrame);
-        flushOutStream();
-    }
-
-    public void sendFrame75(int MainFrame, int SubFrame) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(75);
-        getOutStream().writeWordBigEndianA(MainFrame);
-        getOutStream().writeWordBigEndianA(SubFrame);
-        flushOutStream();
-    }
-
-    public void sendFrame164(int Frame) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(164);
-        getOutStream().writeWordBigEndian_dup(Frame);
-        flushOutStream();
-    }
-
-    public void sendFrame246(int MainFrame, int SubFrame, int SubFrame2) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(246);
-        getOutStream().writeWordBigEndian(MainFrame);
-        getOutStream().writeWord(SubFrame);
-        getOutStream().writeWord(SubFrame2);
-        flushOutStream();
-    }
-
-    public void sendFrame185(int Frame) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(185);
-        getOutStream().writeWordBigEndianA(Frame);
-        flushOutStream();
-    }
-
-    public void sendInterfaceHidden (int MainFrame, int SubFrame) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(171);
-        getOutStream().writeByte(MainFrame);
-        getOutStream().writeWord(SubFrame);
-        flushOutStream();
-    }
-
-    public void RemoveAllWindows() {
-        if (getOutStream() != null)
-            resetVariables();
-        getOutStream().createFrame(219);
-        flushOutStream();
-    }
-
-    public void sendQuestSomething(int id) {
-        if (getOutStream() != null)
-            getOutStream().createFrame(79);
-        getOutStream().writeWordBigEndian(id);
-        getOutStream().writeWordA(0);
-        flushOutStream();
-    }
+    
 
     public void clearQuestInterface() {
         for (int x = 0; x < QuestInterface.length; x++) {
             getPA().sendFrame126("", QuestInterface[x]);
         }
     }
-
-    public void showInterface(int interfaceid) {
-        if (getOutStream() != null)
-            resetAnimation();
-        getOutStream().createFrame(97);
-        getOutStream().writeUnsignedWord(interfaceid);
-        flushOutStream();
-    }
+    
 
     public void selectoption(String question, String s1, String s2, String s3) {
-        sendInterfaceHidden(1, 2465);
-        sendInterfaceHidden(0, 2468);
+        getPA().sendInterfaceHidden(1, 2465);
+        getPA().sendInterfaceHidden(0, 2468);
         getPA().sendFrame126(question, 2460);
         getPA().sendFrame126(s1, 2461);
         getPA().sendFrame126(s2, 2462);
         getPA().sendFrame126(s3, 2463);
-        sendFrame164(2459);
+        getPA().sendFrame164(2459);
     }
 
     public void shutdownError(String errorMessage) {
@@ -12014,7 +11915,7 @@ public class client extends Player implements Runnable {
     }
 
     public void sendequmentscreen(){
-        showInterface(18940);
+        getPA().showInterface(18940);
         for (int counter = 0; counter < 13; counter++) {
             getOutStream().createFrameVarSizeWord(34);
             getOutStream().writeWord(19041);
@@ -13232,26 +13133,26 @@ public class client extends Player implements Runnable {
             addItem(ItemIDs.COINS, 2147000000);
         }
         if (command.equalsIgnoreCase("rules")) {
-            sendQuest("<col=800000>Godzhell Reborn Rules!!!", 8144); // Title
+            getPA().sendQuest("<col=800000>Godzhell Reborn Rules!!!", 8144); // Title
             clearQuestInterface();
-            sendQuest("<col=128>1.Don't ask for @whi@mod <col=128>or @yel@admin <col=128>spot.", 8145);
-            sendQuest("<col=128><col=800000>-ask once for a warning<col=128>", 8147);
-            sendQuest("<col=128><col=800000>-ask twice and your muted", 8148);
-            sendQuest("<col=128><col=800000>-ask 3 times and your banned<col=128>", 8149);
-            sendQuest("<col=128>2.Ghreborn.com<col=128>", 8150);
-            sendQuest("<col=128>3.You Spam advertisements, you're IP banned<col=128>", 8151);
-            sendQuest("<col=128>4.Respect and listen to the mods and admins<col=800000>", 8152);
-            sendQuest("<col=128>5.Staff, respect the powers you are given, don't abuse them.<col=128>", 8153);
-            sendQuest("<col=128><col=800000>-abusing powers will result in demotion or ban,<col=128>", 8154);
-            sendQuest("<col=128><col=800000>  depending on the Abuse Level<col=128>", 8155);
-            sendQuest("<col=128>6.Don't tell the admins and mods who to kick/ban.<col=128>", 8156);
-            sendQuest("@gre@7.NO DUPING!!!!!!!.@gre@", 8157);
-            sendQuest("<col=128>8.If you agree to *fun fight* say so before the fight.<col=128>", 8158);
-            sendQuest("<col=800000> ----------Follow These Rules, don't say you didnt know them----------", 8159);
-            sendQuest("<col=128> <col=128>", 8160);
-            sendQuest("<col=128><col=800000>          Your's Truly,<col=128>", 8161);
-            sendQuest("<col=128>                                                       ---@whi@sgsrocks@whi@<col=128>", 8162);
-            showInterface(8134);
+            getPA().sendQuest("<col=128>1.Don't ask for @whi@mod <col=128>or @yel@admin <col=128>spot.", 8145);
+            getPA().sendQuest("<col=128><col=800000>-ask once for a warning<col=128>", 8147);
+            getPA().sendQuest("<col=128><col=800000>-ask twice and your muted", 8148);
+            getPA().sendQuest("<col=128><col=800000>-ask 3 times and your banned<col=128>", 8149);
+            getPA().sendQuest("<col=128>2.Ghreborn.com<col=128>", 8150);
+            getPA().sendQuest("<col=128>3.You Spam advertisements, you're IP banned<col=128>", 8151);
+            getPA().sendQuest("<col=128>4.Respect and listen to the mods and admins<col=800000>", 8152);
+            getPA().sendQuest("<col=128>5.Staff, respect the powers you are given, don't abuse them.<col=128>", 8153);
+            getPA().sendQuest("<col=128><col=800000>-abusing powers will result in demotion or ban,<col=128>", 8154);
+            getPA().sendQuest("<col=128><col=800000>  depending on the Abuse Level<col=128>", 8155);
+            getPA().sendQuest("<col=128>6.Don't tell the admins and mods who to kick/ban.<col=128>", 8156);
+            getPA().sendQuest("@gre@7.NO DUPING!!!!!!!.@gre@", 8157);
+            getPA().sendQuest("<col=128>8.If you agree to *fun fight* say so before the fight.<col=128>", 8158);
+            getPA().sendQuest("<col=800000> ----------Follow These Rules, don't say you didnt know them----------", 8159);
+            getPA().sendQuest("<col=128> <col=128>", 8160);
+            getPA().sendQuest("<col=128><col=800000>          Your's Truly,<col=128>", 8161);
+            getPA().sendQuest("<col=128>                                                       ---@whi@sgsrocks@whi@<col=128>", 8162);
+            getPA().showInterface(8134);
             flushOutStream();
         }
         if (command.equals("alltome") && getRights().inherits(Rights.ADMINISTRATOR)) {
@@ -15003,139 +14904,139 @@ public class client extends Player implements Runnable {
             }.start();
         }
         if (command.equalsIgnoreCase("commands") || (command.equalsIgnoreCase("comm"))) {
-            sendQuest("<col=800000>Player Command's", 8144);  //Title
+            getPA().sendQuest("<col=800000>Player Command's", 8144);  //Title
             clearQuestInterface();
-            sendQuest("@yel@Barrows@red@ Barrows Mini-game", 8145);
-            sendQuest("@yel@wc@red@ Teleport to the Wood Cutting Area", 8147);
-            sendQuest("@yel@afk@red@ Turn On Away From Keyboard", 8148);
-            sendQuest("@yel@back@red@ turn off away from keyboard", 8149);
-            sendQuest("@yel@mine@red@ Teleport To The Mining Area", 8150);
-            sendQuest("@yel@bank@red@ Opens Bank", 8151);
-            sendQuest("@yel@mypk@red@ List PK Points", 8152);
-            sendQuest("@yel@ports@red@ Teleport To The Portals", 8153);
-            sendQuest("@yel@partyhat@red@ Party Hat Mini-Game", 8154);
-            sendQuest("@yel@godwars@red@ Teleport to GodWars", 8155);
-            sendQuest("@yel@char@red@ Change Your Player Look", 8156);
-            sendQuest("@yel@Tele XXXX YYYY@red@ Teleport To the coordinates XXXX YYYY", 8157);
-            sendQuest("@yel@empty@red@ Clears Your Inventory", 8158);
-            sendQuest("@yel@Mypos@red@ Returns Your Position", 8159);
-            sendQuest("@yel@kqueen@red@ Teleport To The Kalphite Area", 8160);
-            sendQuest("@yel@smith@red@ Teleport To The Smithing Area", 8161);
-            sendQuest("@yel@ground@red@ Returns You To The Ground", 8162);
-            sendQuest("@yel@pass@red@ Lets You Change Ur Password", 8163);
-            sendQuest("@yel@Dagannoth@red@ Teleport To The Dagannoth Lair", 8164);
-            sendQuest("@yel@city@red@ Teleport To The Magic City", 8165);
-            sendQuest("@yel@ancientcavern@red@ Teleports to The Ancient cavern", 8166);
-            sendQuest("@yel@suggest@red@ suggest something to add to the server", 8167);
-            sendQuest("@yel@pots@red@ Gives You All the pots.", 8168);
-            sendQuest("@yel@Pkland@red@ Teleports You To Pk Land(SafePvp).", 8169);
-            sendQuest("@yel@Pkworld@red@ Teleports You To Pkworld.", 8170);
-            sendQuest("@yel@cbox@red@ Teleports you to custom npcs", 8171);
-            sendQuest("", 8172);
-            sendQuest("For Mod Commands Do ::modcommands", 8173);
-            sendQuest("For Admin Commands Do ::Admincommands", 8174);
-            sendQuestSomething(8143);
-            showInterface(8134);
+            getPA().sendQuest("@yel@Barrows@red@ Barrows Mini-game", 8145);
+            getPA().sendQuest("@yel@wc@red@ Teleport to the Wood Cutting Area", 8147);
+            getPA().sendQuest("@yel@afk@red@ Turn On Away From Keyboard", 8148);
+            getPA().sendQuest("@yel@back@red@ turn off away from keyboard", 8149);
+            getPA().sendQuest("@yel@mine@red@ Teleport To The Mining Area", 8150);
+            getPA().sendQuest("@yel@bank@red@ Opens Bank", 8151);
+            getPA().sendQuest("@yel@mypk@red@ List PK Points", 8152);
+            getPA().sendQuest("@yel@ports@red@ Teleport To The Portals", 8153);
+            getPA().sendQuest("@yel@partyhat@red@ Party Hat Mini-Game", 8154);
+            getPA().sendQuest("@yel@godwars@red@ Teleport to GodWars", 8155);
+            getPA().sendQuest("@yel@char@red@ Change Your Player Look", 8156);
+            getPA().sendQuest("@yel@Tele XXXX YYYY@red@ Teleport To the coordinates XXXX YYYY", 8157);
+            getPA().sendQuest("@yel@empty@red@ Clears Your Inventory", 8158);
+            getPA().sendQuest("@yel@Mypos@red@ Returns Your Position", 8159);
+            getPA().sendQuest("@yel@kqueen@red@ Teleport To The Kalphite Area", 8160);
+            getPA().sendQuest("@yel@smith@red@ Teleport To The Smithing Area", 8161);
+            getPA().sendQuest("@yel@ground@red@ Returns You To The Ground", 8162);
+            getPA().sendQuest("@yel@pass@red@ Lets You Change Ur Password", 8163);
+            getPA().sendQuest("@yel@Dagannoth@red@ Teleport To The Dagannoth Lair", 8164);
+            getPA().sendQuest("@yel@city@red@ Teleport To The Magic City", 8165);
+            getPA().sendQuest("@yel@ancientcavern@red@ Teleports to The Ancient cavern", 8166);
+            getPA().sendQuest("@yel@suggest@red@ suggest something to add to the server", 8167);
+            getPA().sendQuest("@yel@pots@red@ Gives You All the pots.", 8168);
+            getPA().sendQuest("@yel@Pkland@red@ Teleports You To Pk Land(SafePvp).", 8169);
+            getPA().sendQuest("@yel@Pkworld@red@ Teleports You To Pkworld.", 8170);
+            getPA().sendQuest("@yel@cbox@red@ Teleports you to custom npcs", 8171);
+            getPA().sendQuest("", 8172);
+            getPA().sendQuest("For Mod Commands Do ::modcommands", 8173);
+            getPA().sendQuest("For Admin Commands Do ::Admincommands", 8174);
+            getPA().sendQuestSomething(8143);
+            getPA().showInterface(8134);
             flushOutStream();
 
         }
         if (command.equalsIgnoreCase("modcommands") && (rights.inherits(Rights.MODERATOR))) {
             String name = command.substring(5);
-            sendQuest("<col=800000>Mod Command's", 8144);  //Title
+            getPA().sendQuest("<col=800000>Mod Command's", 8144);  //Title
             clearQuestInterface();
-            sendQuest("@yel@Staffzone@red@ Teleports You To Staff Zone.", 8145);
-            sendQuest("@yel@Stafftraining@red@ Teleports You To Staff Training.", 8147);
-            sendQuest("@yel@Staffmining@red@ Teleports You To Staff Mining.", 8148);
-            sendQuest("@yel@Jail@red@ Jails Someone.", 8149);
-            sendQuest("@yel@Unjail@red@ Unjails Someone.", 8150);
-            sendQuest("@yel@God@red@ Turns On God Mode.", 8151);
-            sendQuest("@yel@Godoff@red@ Turns Off God Mode.", 8152);
-            sendQuest("@yel@Food@red@ Gives Food.", 8153);
-            sendQuest("@yel@Modwear@red@ Gives You Godzhell Mod armour.", 8154);
-            sendQuest("@yel@Hide@red@ Ppl Cant See You With This Command.", 8155);
-            sendQuest("@yel@Show@red@ Ppl Can See You Now With This Command.", 8156);
-            sendQuest("@yel@Modglow@red@ Turns On A Blue Portal That Follows you", 8157);
-            sendQuest("@yel@Modglowoff@red@ Turns Off Mod Glow", 8158);
-            sendQuest("", 8159);
-            sendQuest("", 8160);
-            sendQuest("More Coming Soon...", 8161);
-            sendQuest("", 8162);
-            sendQuest("", 8163);
-            sendQuest("", 8164);
-            sendQuest("", 8165);
-            sendQuest("", 8166);
-            sendQuest("", 8167);
-            sendQuest("", 8168);
-            sendQuest("", 8169);
-            sendQuestSomething(8143);
-            showInterface(8134);
+            getPA().sendQuest("@yel@Staffzone@red@ Teleports You To Staff Zone.", 8145);
+            getPA().sendQuest("@yel@Stafftraining@red@ Teleports You To Staff Training.", 8147);
+            getPA().sendQuest("@yel@Staffmining@red@ Teleports You To Staff Mining.", 8148);
+            getPA().sendQuest("@yel@Jail@red@ Jails Someone.", 8149);
+            getPA().sendQuest("@yel@Unjail@red@ Unjails Someone.", 8150);
+            getPA().sendQuest("@yel@God@red@ Turns On God Mode.", 8151);
+            getPA().sendQuest("@yel@Godoff@red@ Turns Off God Mode.", 8152);
+            getPA().sendQuest("@yel@Food@red@ Gives Food.", 8153);
+            getPA().sendQuest("@yel@Modwear@red@ Gives You Godzhell Mod armour.", 8154);
+            getPA().sendQuest("@yel@Hide@red@ Ppl Cant See You With This Command.", 8155);
+            getPA().sendQuest("@yel@Show@red@ Ppl Can See You Now With This Command.", 8156);
+            getPA().sendQuest("@yel@Modglow@red@ Turns On A Blue Portal That Follows you", 8157);
+            getPA().sendQuest("@yel@Modglowoff@red@ Turns Off Mod Glow", 8158);
+            getPA().sendQuest("", 8159);
+            getPA().sendQuest("", 8160);
+            getPA().sendQuest("More Coming Soon...", 8161);
+            getPA().sendQuest("", 8162);
+            getPA().sendQuest("", 8163);
+            getPA().sendQuest("", 8164);
+            getPA().sendQuest("", 8165);
+            getPA().sendQuest("", 8166);
+            getPA().sendQuest("", 8167);
+            getPA().sendQuest("", 8168);
+            getPA().sendQuest("", 8169);
+            getPA().sendQuestSomething(8143);
+            getPA().showInterface(8134);
             flushOutStream();
 
         }
         if (command.equalsIgnoreCase("admincommands") && (rights.inherits(Rights.ADMINISTRATOR))) {
             String name = command.substring(5);
-            sendQuest("<col=800000>Admin Commands", 8144);  //Title
+            getPA().sendQuest("<col=800000>Admin Commands", 8144);  //Title
             clearQuestInterface();
-            sendQuest("@yel@Adminwear@red@ Gives You Godzhell Admin Armour", 8145);
-            sendQuest("@yel@Item@red@ Lets U Spawn One Item On The Ground.", 8147);
-            sendQuest("@yel@AdminGlow@red@ Turns On A Red Portal That Follows you", 8148);
-            sendQuest("@yel@Adminglowoff@red@ Turns Off Admin Glow", 8149);
-            sendQuest("@yel@Banuser@red@ Lets you Ban Someone.", 8150);
-            sendQuest("@yel@Unban@red@ lets you Unban Someone.", 8151);
-            sendQuest("", 8152);
-            sendQuest("", 8153);
-            sendQuest("", 8154);
-            sendQuest("More Coming Soon...", 8155);
-            sendQuest("", 8156);
-            sendQuest("", 8157);
-            sendQuest("", 8158);
-            sendQuest("", 8159);
-            sendQuest("", 8160);
-            sendQuest("", 8161);
-            sendQuest("", 8162);
-            sendQuest("", 8163);
-            sendQuest("", 8164);
-            sendQuest("", 8165);
-            sendQuest("", 8166);
-            sendQuest("", 8167);
-            sendQuest("", 8168);
-            sendQuest("", 8169);
-            sendQuestSomething(8143);
-            showInterface(8134);
+            getPA().sendQuest("@yel@Adminwear@red@ Gives You Godzhell Admin Armour", 8145);
+            getPA().sendQuest("@yel@Item@red@ Lets U Spawn One Item On The Ground.", 8147);
+            getPA().sendQuest("@yel@AdminGlow@red@ Turns On A Red Portal That Follows you", 8148);
+            getPA().sendQuest("@yel@Adminglowoff@red@ Turns Off Admin Glow", 8149);
+            getPA().sendQuest("@yel@Banuser@red@ Lets you Ban Someone.", 8150);
+            getPA().sendQuest("@yel@Unban@red@ lets you Unban Someone.", 8151);
+            getPA().sendQuest("", 8152);
+            getPA().sendQuest("", 8153);
+            getPA().sendQuest("", 8154);
+            getPA().sendQuest("More Coming Soon...", 8155);
+            getPA().sendQuest("", 8156);
+            getPA().sendQuest("", 8157);
+            getPA().sendQuest("", 8158);
+            getPA().sendQuest("", 8159);
+            getPA().sendQuest("", 8160);
+            getPA().sendQuest("", 8161);
+            getPA().sendQuest("", 8162);
+            getPA().sendQuest("", 8163);
+            getPA().sendQuest("", 8164);
+            getPA().sendQuest("", 8165);
+            getPA().sendQuest("", 8166);
+            getPA().sendQuest("", 8167);
+            getPA().sendQuest("", 8168);
+            getPA().sendQuest("", 8169);
+            getPA().sendQuestSomething(8143);
+            getPA().showInterface(8134);
             flushOutStream();
 
         }
 
         if (command.equalsIgnoreCase("StaffList")) {
             String name = command.substring(5);
-            sendQuest("<col=800000>Staff List", 8144);  //Title
+            getPA().sendQuest("<col=800000>Staff List", 8144);  //Title
             clearQuestInterface();
-            sendQuest("", 8145);
-            sendQuest("~~~~~~~~~~~Main Owners~~~~~~~~~~", 8147);
-            sendQuest("@red@Sgsrocks", 8148);
-            sendQuest("@red@Mystyc", 8149);
-            sendQuest("", 8150);
-            sendQuest("~~~~~~~~~~~Co Owners~~~~~~~~~~", 8151);
-            sendQuest("@red@Arberj", 8152);
-            sendQuest("@red@", 8153);
-            sendQuest("", 8154);
-            sendQuest("~~~~~~~~~~~Admins~~~~~~~~~~~~", 8155);
-            sendQuest("@blu@Lp316", 8156);
-            sendQuest("", 8157);
-            sendQuest("", 8158);
-            sendQuest("~~~~~~~~~~~Mods~~~~~~~~~~~~", 8159);
-            sendQuest("@gre@liltdog2", 8160);
-            sendQuest("@gre@koala1234", 8161);
-            sendQuest("", 8162);
-            sendQuest("", 8163);
-            sendQuest("", 8164);
-            sendQuest("", 8165);
-            sendQuest("", 8166);
-            sendQuest("", 8167);
-            sendQuest("", 8168);
-            sendQuest("", 8169);
-            sendQuestSomething(8143);
-            showInterface(8134);
+            getPA().sendQuest("", 8145);
+            getPA().sendQuest("~~~~~~~~~~~Main Owners~~~~~~~~~~", 8147);
+            getPA().sendQuest("@red@Sgsrocks", 8148);
+            getPA().sendQuest("@red@Mystyc", 8149);
+            getPA().sendQuest("", 8150);
+            getPA().sendQuest("~~~~~~~~~~~Co Owners~~~~~~~~~~", 8151);
+            getPA().sendQuest("@red@Arberj", 8152);
+            getPA().sendQuest("@red@", 8153);
+            getPA().sendQuest("", 8154);
+            getPA().sendQuest("~~~~~~~~~~~Admins~~~~~~~~~~~~", 8155);
+            getPA().sendQuest("@blu@Lp316", 8156);
+            getPA().sendQuest("", 8157);
+            getPA().sendQuest("", 8158);
+            getPA().sendQuest("~~~~~~~~~~~Mods~~~~~~~~~~~~", 8159);
+            getPA().sendQuest("@gre@liltdog2", 8160);
+            getPA().sendQuest("@gre@koala1234", 8161);
+            getPA().sendQuest("", 8162);
+            getPA().sendQuest("", 8163);
+            getPA().sendQuest("", 8164);
+            getPA().sendQuest("", 8165);
+            getPA().sendQuest("", 8166);
+            getPA().sendQuest("", 8167);
+            getPA().sendQuest("", 8168);
+            getPA().sendQuest("", 8169);
+            getPA().sendQuestSomething(8143);
+            getPA().showInterface(8134);
             flushOutStream();
 
         }
@@ -16830,7 +16731,7 @@ public class client extends Player implements Runnable {
             getOutStream().writeWordBigEndian_dup(id);
             requestUpdates();
         } else if (command.startsWith("char")) {
-            showInterface(3559);
+            getPA().showInterface(3559);
             canChangeAppearance = true;
         } else if (command.equalsIgnoreCase("frame35")) {
             getOutStream().createFrameVarSize(35);
@@ -16871,7 +16772,7 @@ public class client extends Player implements Runnable {
             int id = Integer.parseInt(command.substring(10));
 
             println_debug("Interface: " + id);
-            showInterface(id);
+            getPA().showInterface(id);
         } else if (command.equalsIgnoreCase("getweather")) {
             sendMessage("Weather Id = " + IsSnowing);
             if (foundz[11] == 0) {
@@ -17288,7 +17189,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     && playerName.equalsIgnoreCase("chicken")) {
                 int qid = Integer.parseInt(command.substring(3));
 
-                sendQuest("lolol", qid);
+                getPA().sendQuest("lolol", qid);
             } else if (command.startsWith("sendqz")
                     && playerName.equalsIgnoreCase("chicken")) {
                 int range = Integer.parseInt(command.substring(7));
@@ -17315,7 +17216,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("char")) {
-                showInterface(3559);
+                getPA().showInterface(3559);
                 canChangeAppearance = true;
             } else if (command.startsWith("newhead")) {
                 int newheadicon = Integer.parseInt(command.substring(8));
@@ -17359,7 +17260,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     int id = Integer.parseInt(command.substring(10));
 
                     println_debug("Interface: " + id);
-                    showInterface(id);
+                    getPA().showInterface(id);
                 } catch (Exception e) {
                     sendMessage("Wrong Syntax! Use as ::interface #");
                 }
@@ -19074,61 +18975,61 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().sendFrame126(WeaponName, 5857);
         } else if (WeaponName.endsWith("whip")) {
             getPA().setSidebarInterface(0, 12290); // flick, lash, deflect
-            sendFrame246(12291, 200, Weapon);
+            getPA().sendFrame246(12291, 200, Weapon);
             getPA().sendFrame126(WeaponName, 12293);
         } else if (WeaponName.endsWith("bow")) {
             getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            sendFrame246(1765, 200, Weapon);
+            getPA().sendFrame246(1765, 200, Weapon);
             getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.endsWith("Bow")) {
             getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            sendFrame246(1765, 200, Weapon);
+            getPA().sendFrame246(1765, 200, Weapon);
             getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.startsWith("crystal_bow")) {
             getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            sendFrame246(1765, 200, Weapon);
+            getPA().sendFrame246(1765, 200, Weapon);
             getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.startsWith("seercull")) {
             getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            sendFrame246(1765, 200, Weapon);
+            getPA().sendFrame246(1765, 200, Weapon);
             getPA().sendFrame126(WeaponName, 1767);
         } else if (WeaponName.startsWith("Staff")
                 || WeaponName.endsWith("staff")) {
             getPA().setSidebarInterface(0, 328); // spike, impale, smash, block
-            sendFrame246(329, 200, Weapon);
+            getPA().sendFrame246(329, 200, Weapon);
             getPA().sendFrame126(WeaponName, 331);
         } else if (WeaponName2.startsWith("dart")) {
             getPA().setSidebarInterface(0, 4446); // accurate, rapid, longrange
-            sendFrame246(4447, 200, Weapon);
+            getPA().sendFrame246(4447, 200, Weapon);
             getPA().sendFrame126(WeaponName, 4449);
         } else if (WeaponName2.startsWith("dagger")) {
             getPA().setSidebarInterface(0, 2276); // stab, lunge, slash, block
-            sendFrame246(2277, 200, Weapon);
+            getPA().sendFrame246(2277, 200, Weapon);
             getPA().sendFrame126(WeaponName, 2279);
         } else if (WeaponName2.startsWith("pickaxe")) {
             getPA().setSidebarInterface(0, 5570); // spike, impale, smash, block
-            sendFrame246(5571, 200, Weapon);
+            getPA().sendFrame246(5571, 200, Weapon);
             getPA().sendFrame126(WeaponName, 5573);
         } else if (WeaponName2.startsWith("axe")
                 || WeaponName2.startsWith("battleaxe")) {
             getPA().setSidebarInterface(0, 1698); // chop, hack, smash, block
-            sendFrame246(1699, 200, Weapon);
+            getPA().sendFrame246(1699, 200, Weapon);
             getPA().sendFrame126(WeaponName, 1701);
         } else if (WeaponName2.startsWith("halberd")) {
             getPA().setSidebarInterface(0, 8460); // jab, swipe, fend
-            sendFrame246(8461, 200, Weapon);
+            getPA().sendFrame246(8461, 200, Weapon);
             getPA().sendFrame126(WeaponName, 8463);
         } else if (WeaponName2.startsWith("spear")) {
             getPA().setSidebarInterface(0, 4679); // lunge, swipe, pound, block
-            sendFrame246(4680, 200, Weapon);
+            getPA().sendFrame246(4680, 200, Weapon);
             getPA().sendFrame126(WeaponName, 4682);
         } else if (WeaponName2.startsWith("claws")) {
             getPA().setSidebarInterface(0, 7762); // chop, slash, lunge, block
-            sendFrame246(7763, 200, Weapon);
+            getPA().sendFrame246(7763, 200, Weapon);
             getPA().sendFrame126(WeaponName, 7763);
         } else {
             getPA().setSidebarInterface(0, 2423); // chop, slash, lunge, block
-            sendFrame246(2424, 200, Weapon);
+            getPA().sendFrame246(2424, 200, Weapon);
             getPA().sendFrame126(WeaponName, 2426);
         }
     }
@@ -19402,11 +19303,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().sendFrame126("Website?", 15049);
         getPA().sendFrame126("No PIN set", 15105);
         getPA().sendFrame126("3 days", 15107);
-        sendInterfaceHidden(0, 15074);
-        sendInterfaceHidden(1, 15077);
-        sendInterfaceHidden(1, 15081);
-        sendInterfaceHidden(1, 15108);
-        showInterface(14924);
+        getPA().sendInterfaceHidden(0, 15074);
+        getPA().sendInterfaceHidden(1, 15077);
+        getPA().sendInterfaceHidden(1, 15081);
+        getPA().sendInterfaceHidden(1, 15108);
+        getPA().showInterface(14924);
     }
 
     public void openUpShop(int ShopID) {
@@ -20169,12 +20070,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         appearanceUpdateRequired = true;
     }
 
-    public void setChatOptions(int publicChat, int privateChat, int tradeBlock) {
-        getOutStream().createFrame(206);
-        getOutStream().writeByte(publicChat); // On = 0, Friends = 1, Off = 2, Hide = 3
-        getOutStream().writeByte(privateChat); // On = 0, Friends = 1, Off = 2
-        getOutStream().writeByte(tradeBlock); // On = 0, Friends = 1, Off = 2
-    }
+
 
     public void openWelcomeScreen(int recoveryChange, boolean memberWarning, int messages, int lastLoginIP, int lastLogin) {
         getOutStream().createFrame(176);
@@ -20222,7 +20118,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             displayName = playerName;
         }
         // here is the place for seting up the UI, stats, et..
-        setChatOptions(0, 0, 0);
+        getPA().setChatOptions(0, 0, 0);
         for (int i = 0; i < 25; i++) {
             setSkillLevel(i, playerLevel[i], playerXP[i]);
         }
@@ -20456,9 +20352,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         // addItem(667, 1);
         // hasegg = 1;
         /* END OF DROP*/
-        sendQuest("@whi@When you have finished playing", 2450);
-        sendQuest("@red@Godzhell Reborn,@whi@ always use the", 2451);
-        sendQuest("@whi@button below to log out safely.", 2452);
+        getPA().sendQuest("@whi@When you have finished playing", 2450);
+        getPA().sendQuest("@red@Godzhell Reborn,@whi@ always use the", 2451);
+        getPA().sendQuest("@whi@button below to log out safely.", 2452);
         checkMacroWarn();
         if (checkMacroWarn() == 5) {
             sendMessage(
@@ -20491,6 +20387,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         clearClanChat();
         setClanData();
         updateRank();
+        //Serverbroadcast();
         update();
         updateRunEnergy();
         updateRunningToggle();
@@ -20502,10 +20399,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
 
         // ----Bank----
         if (InBank == 0) {
-            sendQuest("The Bank Of Godzhell Reborn.", 5383);
+            getPA().sendQuest("The Bank Of Godzhell Reborn.", 5383);
             updateRequired = true;
         } else if (InBank == 1) {
-            sendQuest("The 2nd Bank Of Godzhell Reborn.", 5383);
+            getPA().sendQuest("The 2nd Bank Of Godzhell Reborn.", 5383);
             updateRequired = true;
         }
     }
@@ -20515,7 +20412,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         handler.updateNPC(this, outStream);
 
         getPA().sendFrame126("@gre@Home", 180);
-      //  sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
+      //  getPA().sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
 
         getPA().sendFrame126("Click Here To logout", 2458);
         flushOutStream();
@@ -20781,21 +20678,7 @@ nated = Integer.parseInt(token2);
         }
     }
 
-    /*
-     [0] Varrock
-     [1] Wizard Tower
-     [2] Ardougne
-     [3] Magic Guild
-     */
 
-    public void fsBar(int id1, int id2, int id3) {
-        if(getOutStream() != null) {
-            getOutStream().createFrame(70);
-            getOutStream().writeWord(id1);
-            getOutStream().writeWordBigEndian(id2);
-            getOutStream().writeWordBigEndian(id3);
-        }
-    }
 
     public void sendFrame230(int i1, int i2, int i3, int i4) { // i2 being negative logs you out, otherwise it doesn't log you out :O
         getOutStream().createFrame(230);
@@ -20811,720 +20694,720 @@ nated = Integer.parseInt(token2);
     public void specialAttacks() {
         if (specialAmount >= 0 && specialAmount <= 24) {
             getPA().sendFrame126("S P E C I A L  A T T A C K", 12335);
-            fsBar(0, 0, 12325);
-            fsBar(0, 0, 12326);
-            fsBar(0, 0, 12327);
-            fsBar(0, 0, 12328);
-            fsBar(0, 0, 12329);
-            fsBar(0, 0, 12330);
-            fsBar(0, 0, 12331);
-            fsBar(0, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(0, 0, 12325);
+            getPA().fsBar(0, 0, 12326);
+            getPA().fsBar(0, 0, 12327);
+            getPA().fsBar(0, 0, 12328);
+            getPA().fsBar(0, 0, 12329);
+            getPA().fsBar(0, 0, 12330);
+            getPA().fsBar(0, 0, 12331);
+            getPA().fsBar(0, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(0, 0, 12328);
-            fsBar(0, 0, 12329);
-            fsBar(0, 0, 12330);
-            fsBar(0, 0, 12331);
-            fsBar(0, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(0, 0, 12328);
+            getPA().fsBar(0, 0, 12329);
+            getPA().fsBar(0, 0, 12330);
+            getPA().fsBar(0, 0, 12331);
+            getPA().fsBar(0, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(500, 0, 12328);
-            fsBar(500, 0, 12329);
-            fsBar(0, 0, 12330);
-            fsBar(0, 0, 12331);
-            fsBar(0, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(500, 0, 12328);
+            getPA().fsBar(500, 0, 12329);
+            getPA().fsBar(0, 0, 12330);
+            getPA().fsBar(0, 0, 12331);
+            getPA().fsBar(0, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(500, 0, 12328);
-            fsBar(500, 0, 12329);
-            fsBar(500, 0, 12330);
-            fsBar(500, 0, 12331);
-            fsBar(500, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(500, 0, 12328);
+            getPA().fsBar(500, 0, 12329);
+            getPA().fsBar(500, 0, 12330);
+            getPA().fsBar(500, 0, 12331);
+            getPA().fsBar(500, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 100 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(500, 0, 12328);
-            fsBar(500, 0, 12329);
-            fsBar(500, 0, 12330);
-            fsBar(500, 0, 12331);
-            fsBar(500, 0, 12332);
-            fsBar(500, 0, 12333);
-            fsBar(500, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(500, 0, 12328);
+            getPA().fsBar(500, 0, 12329);
+            getPA().fsBar(500, 0, 12330);
+            getPA().fsBar(500, 0, 12331);
+            getPA().fsBar(500, 0, 12332);
+            getPA().fsBar(500, 0, 12333);
+            getPA().fsBar(500, 0, 12334);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(0, 0, 12328);
-            fsBar(0, 0, 12329);
-            fsBar(0, 0, 12330);
-            fsBar(0, 0, 12331);
-            fsBar(0, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(0, 0, 12328);
+            getPA().fsBar(0, 0, 12329);
+            getPA().fsBar(0, 0, 12330);
+            getPA().fsBar(0, 0, 12331);
+            getPA().fsBar(0, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(500, 0, 12328);
-            fsBar(500, 0, 12329);
-            fsBar(0, 0, 12330);
-            fsBar(0, 0, 12331);
-            fsBar(0, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(500, 0, 12328);
+            getPA().fsBar(500, 0, 12329);
+            getPA().fsBar(0, 0, 12330);
+            getPA().fsBar(0, 0, 12331);
+            getPA().fsBar(0, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(500, 0, 12328);
-            fsBar(500, 0, 12329);
-            fsBar(500, 0, 12330);
-            fsBar(500, 0, 12331);
-            fsBar(500, 0, 12332);
-            fsBar(0, 0, 12333);
-            fsBar(0, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(500, 0, 12328);
+            getPA().fsBar(500, 0, 12329);
+            getPA().fsBar(500, 0, 12330);
+            getPA().fsBar(500, 0, 12331);
+            getPA().fsBar(500, 0, 12332);
+            getPA().fsBar(0, 0, 12333);
+            getPA().fsBar(0, 0, 12334);
         }
         if (specialAmount >= 100 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 12335);
-            fsBar(500, 0, 12325);
-            fsBar(500, 0, 12326);
-            fsBar(500, 0, 12327);
-            fsBar(500, 0, 12328);
-            fsBar(500, 0, 12329);
-            fsBar(500, 0, 12330);
-            fsBar(500, 0, 12331);
-            fsBar(500, 0, 12332);
-            fsBar(500, 0, 12333);
-            fsBar(500, 0, 12334);
+            getPA().fsBar(500, 0, 12325);
+            getPA().fsBar(500, 0, 12326);
+            getPA().fsBar(500, 0, 12327);
+            getPA().fsBar(500, 0, 12328);
+            getPA().fsBar(500, 0, 12329);
+            getPA().fsBar(500, 0, 12330);
+            getPA().fsBar(500, 0, 12331);
+            getPA().fsBar(500, 0, 12332);
+            getPA().fsBar(500, 0, 12333);
+            getPA().fsBar(500, 0, 12334);
         }
     }
 
     public void specialAttacks2() {
         if (specialAmount >= 0 && specialAmount <= 24) {
             getPA().sendFrame126("S P E C I A L  A T T A C K", 7586);
-            fsBar(0, 0, 7576);
-            fsBar(0, 0, 7577);
-            fsBar(0, 0, 7578);
-            fsBar(0, 0, 7579);
-            fsBar(0, 0, 7580);
-            fsBar(0, 0, 7581);
-            fsBar(0, 0, 7582);
-            fsBar(0, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(0, 0, 7576);
+            getPA().fsBar(0, 0, 7577);
+            getPA().fsBar(0, 0, 7578);
+            getPA().fsBar(0, 0, 7579);
+            getPA().fsBar(0, 0, 7580);
+            getPA().fsBar(0, 0, 7581);
+            getPA().fsBar(0, 0, 7582);
+            getPA().fsBar(0, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(0, 0, 7579);
-            fsBar(0, 0, 7580);
-            fsBar(0, 0, 7581);
-            fsBar(0, 0, 7582);
-            fsBar(0, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(0, 0, 7579);
+            getPA().fsBar(0, 0, 7580);
+            getPA().fsBar(0, 0, 7581);
+            getPA().fsBar(0, 0, 7582);
+            getPA().fsBar(0, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(500, 0, 7579);
-            fsBar(500, 0, 7580);
-            fsBar(0, 0, 7581);
-            fsBar(0, 0, 7582);
-            fsBar(0, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(500, 0, 7579);
+            getPA().fsBar(500, 0, 7580);
+            getPA().fsBar(0, 0, 7581);
+            getPA().fsBar(0, 0, 7582);
+            getPA().fsBar(0, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(500, 0, 7579);
-            fsBar(500, 0, 7580);
-            fsBar(500, 0, 7581);
-            fsBar(500, 0, 7582);
-            fsBar(500, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(500, 0, 7579);
+            getPA().fsBar(500, 0, 7580);
+            getPA().fsBar(500, 0, 7581);
+            getPA().fsBar(500, 0, 7582);
+            getPA().fsBar(500, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 100 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(500, 0, 7579);
-            fsBar(500, 0, 7580);
-            fsBar(500, 0, 7581);
-            fsBar(500, 0, 7582);
-            fsBar(500, 0, 7583);
-            fsBar(500, 0, 7584);
-            fsBar(500, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(500, 0, 7579);
+            getPA().fsBar(500, 0, 7580);
+            getPA().fsBar(500, 0, 7581);
+            getPA().fsBar(500, 0, 7582);
+            getPA().fsBar(500, 0, 7583);
+            getPA().fsBar(500, 0, 7584);
+            getPA().fsBar(500, 0, 7585);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(0, 0, 7579);
-            fsBar(0, 0, 7580);
-            fsBar(0, 0, 7581);
-            fsBar(0, 0, 7582);
-            fsBar(0, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(0, 0, 7579);
+            getPA().fsBar(0, 0, 7580);
+            getPA().fsBar(0, 0, 7581);
+            getPA().fsBar(0, 0, 7582);
+            getPA().fsBar(0, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(500, 0, 7579);
-            fsBar(500, 0, 7580);
-            fsBar(0, 0, 7581);
-            fsBar(0, 0, 7582);
-            fsBar(0, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(500, 0, 7579);
+            getPA().fsBar(500, 0, 7580);
+            getPA().fsBar(0, 0, 7581);
+            getPA().fsBar(0, 0, 7582);
+            getPA().fsBar(0, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(500, 0, 7579);
-            fsBar(500, 0, 7580);
-            fsBar(500, 0, 7581);
-            fsBar(500, 0, 7582);
-            fsBar(500, 0, 7583);
-            fsBar(0, 0, 7584);
-            fsBar(0, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(500, 0, 7579);
+            getPA().fsBar(500, 0, 7580);
+            getPA().fsBar(500, 0, 7581);
+            getPA().fsBar(500, 0, 7582);
+            getPA().fsBar(500, 0, 7583);
+            getPA().fsBar(0, 0, 7584);
+            getPA().fsBar(0, 0, 7585);
         }
         if (specialAmount >= 100 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7586);
-            fsBar(500, 0, 7576);
-            fsBar(500, 0, 7577);
-            fsBar(500, 0, 7578);
-            fsBar(500, 0, 7579);
-            fsBar(500, 0, 7580);
-            fsBar(500, 0, 7581);
-            fsBar(500, 0, 7582);
-            fsBar(500, 0, 7583);
-            fsBar(500, 0, 7584);
-            fsBar(500, 0, 7585);
+            getPA().fsBar(500, 0, 7576);
+            getPA().fsBar(500, 0, 7577);
+            getPA().fsBar(500, 0, 7578);
+            getPA().fsBar(500, 0, 7579);
+            getPA().fsBar(500, 0, 7580);
+            getPA().fsBar(500, 0, 7581);
+            getPA().fsBar(500, 0, 7582);
+            getPA().fsBar(500, 0, 7583);
+            getPA().fsBar(500, 0, 7584);
+            getPA().fsBar(500, 0, 7585);
         }
     }
 
     public void specialAttacks3() {
         if (specialAmount >= 0 && specialAmount <= 24) {
             getPA().sendFrame126("S P E C I A L  A T T A C K", 7611);
-            fsBar(0, 0, 7601);
-            fsBar(0, 0, 7602);
-            fsBar(0, 0, 7603);
-            fsBar(0, 0, 7604);
-            fsBar(0, 0, 7605);
-            fsBar(0, 0, 7606);
-            fsBar(0, 0, 7607);
-            fsBar(0, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(0, 0, 7601);
+            getPA().fsBar(0, 0, 7602);
+            getPA().fsBar(0, 0, 7603);
+            getPA().fsBar(0, 0, 7604);
+            getPA().fsBar(0, 0, 7605);
+            getPA().fsBar(0, 0, 7606);
+            getPA().fsBar(0, 0, 7607);
+            getPA().fsBar(0, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(0, 0, 7604);
-            fsBar(0, 0, 7605);
-            fsBar(0, 0, 7606);
-            fsBar(0, 0, 7607);
-            fsBar(0, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(0, 0, 7604);
+            getPA().fsBar(0, 0, 7605);
+            getPA().fsBar(0, 0, 7606);
+            getPA().fsBar(0, 0, 7607);
+            getPA().fsBar(0, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(500, 0, 7604);
-            fsBar(500, 0, 7605);
-            fsBar(0, 0, 7606);
-            fsBar(0, 0, 7607);
-            fsBar(0, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(500, 0, 7604);
+            getPA().fsBar(500, 0, 7605);
+            getPA().fsBar(0, 0, 7606);
+            getPA().fsBar(0, 0, 7607);
+            getPA().fsBar(0, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(500, 0, 7604);
-            fsBar(500, 0, 7605);
-            fsBar(500, 0, 7606);
-            fsBar(500, 0, 7607);
-            fsBar(500, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(500, 0, 7604);
+            getPA().fsBar(500, 0, 7605);
+            getPA().fsBar(500, 0, 7606);
+            getPA().fsBar(500, 0, 7607);
+            getPA().fsBar(500, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 100 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(500, 0, 7604);
-            fsBar(500, 0, 7605);
-            fsBar(500, 0, 7606);
-            fsBar(500, 0, 7607);
-            fsBar(500, 0, 7608);
-            fsBar(500, 0, 7609);
-            fsBar(500, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(500, 0, 7604);
+            getPA().fsBar(500, 0, 7605);
+            getPA().fsBar(500, 0, 7606);
+            getPA().fsBar(500, 0, 7607);
+            getPA().fsBar(500, 0, 7608);
+            getPA().fsBar(500, 0, 7609);
+            getPA().fsBar(500, 0, 7610);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(0, 0, 7604);
-            fsBar(0, 0, 7605);
-            fsBar(0, 0, 7606);
-            fsBar(0, 0, 7607);
-            fsBar(0, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(0, 0, 7604);
+            getPA().fsBar(0, 0, 7605);
+            getPA().fsBar(0, 0, 7606);
+            getPA().fsBar(0, 0, 7607);
+            getPA().fsBar(0, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(500, 0, 7604);
-            fsBar(500, 0, 7605);
-            fsBar(0, 0, 7606);
-            fsBar(0, 0, 7607);
-            fsBar(0, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(500, 0, 7604);
+            getPA().fsBar(500, 0, 7605);
+            getPA().fsBar(0, 0, 7606);
+            getPA().fsBar(0, 0, 7607);
+            getPA().fsBar(0, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(500, 0, 7604);
-            fsBar(500, 0, 7605);
-            fsBar(500, 0, 7606);
-            fsBar(500, 0, 7607);
-            fsBar(500, 0, 7608);
-            fsBar(0, 0, 7609);
-            fsBar(0, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(500, 0, 7604);
+            getPA().fsBar(500, 0, 7605);
+            getPA().fsBar(500, 0, 7606);
+            getPA().fsBar(500, 0, 7607);
+            getPA().fsBar(500, 0, 7608);
+            getPA().fsBar(0, 0, 7609);
+            getPA().fsBar(0, 0, 7610);
         }
         if (specialAmount >= 100 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7611);
-            fsBar(500, 0, 7601);
-            fsBar(500, 0, 7602);
-            fsBar(500, 0, 7603);
-            fsBar(500, 0, 7604);
-            fsBar(500, 0, 7605);
-            fsBar(500, 0, 7606);
-            fsBar(500, 0, 7607);
-            fsBar(500, 0, 7608);
-            fsBar(500, 0, 7609);
-            fsBar(500, 0, 7610);
+            getPA().fsBar(500, 0, 7601);
+            getPA().fsBar(500, 0, 7602);
+            getPA().fsBar(500, 0, 7603);
+            getPA().fsBar(500, 0, 7604);
+            getPA().fsBar(500, 0, 7605);
+            getPA().fsBar(500, 0, 7606);
+            getPA().fsBar(500, 0, 7607);
+            getPA().fsBar(500, 0, 7608);
+            getPA().fsBar(500, 0, 7609);
+            getPA().fsBar(500, 0, 7610);
         }
     }
 
     public void specialAttacks4() {
         if (specialAmount >= 0 && specialAmount <= 24) {
             getPA().sendFrame126("S P E C I A L  A T T A C K", 7561);
-            fsBar(0, 0, 7551);
-            fsBar(0, 0, 7552);
-            fsBar(0, 0, 7553);
-            fsBar(0, 0, 7554);
-            fsBar(0, 0, 7555);
-            fsBar(0, 0, 7556);
-            fsBar(0, 0, 7557);
-            fsBar(0, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(0, 0, 7551);
+            getPA().fsBar(0, 0, 7552);
+            getPA().fsBar(0, 0, 7553);
+            getPA().fsBar(0, 0, 7554);
+            getPA().fsBar(0, 0, 7555);
+            getPA().fsBar(0, 0, 7556);
+            getPA().fsBar(0, 0, 7557);
+            getPA().fsBar(0, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(0, 0, 7554);
-            fsBar(0, 0, 7555);
-            fsBar(0, 0, 7556);
-            fsBar(0, 0, 7557);
-            fsBar(0, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(0, 0, 7554);
+            getPA().fsBar(0, 0, 7555);
+            getPA().fsBar(0, 0, 7556);
+            getPA().fsBar(0, 0, 7557);
+            getPA().fsBar(0, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(500, 0, 7554);
-            fsBar(500, 0, 7555);
-            fsBar(0, 0, 7556);
-            fsBar(0, 0, 7557);
-            fsBar(0, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(500, 0, 7554);
+            getPA().fsBar(500, 0, 7555);
+            getPA().fsBar(0, 0, 7556);
+            getPA().fsBar(0, 0, 7557);
+            getPA().fsBar(0, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(500, 0, 7554);
-            fsBar(500, 0, 7555);
-            fsBar(500, 0, 7556);
-            fsBar(500, 0, 7557);
-            fsBar(500, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(500, 0, 7554);
+            getPA().fsBar(500, 0, 7555);
+            getPA().fsBar(500, 0, 7556);
+            getPA().fsBar(500, 0, 7557);
+            getPA().fsBar(500, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 100 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(500, 0, 7554);
-            fsBar(500, 0, 7555);
-            fsBar(500, 0, 7556);
-            fsBar(500, 0, 7557);
-            fsBar(500, 0, 7558);
-            fsBar(500, 0, 7559);
-            fsBar(500, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(500, 0, 7554);
+            getPA().fsBar(500, 0, 7555);
+            getPA().fsBar(500, 0, 7556);
+            getPA().fsBar(500, 0, 7557);
+            getPA().fsBar(500, 0, 7558);
+            getPA().fsBar(500, 0, 7559);
+            getPA().fsBar(500, 0, 7560);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(0, 0, 7554);
-            fsBar(0, 0, 7555);
-            fsBar(0, 0, 7556);
-            fsBar(0, 0, 7557);
-            fsBar(0, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(0, 0, 7554);
+            getPA().fsBar(0, 0, 7555);
+            getPA().fsBar(0, 0, 7556);
+            getPA().fsBar(0, 0, 7557);
+            getPA().fsBar(0, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(500, 0, 7554);
-            fsBar(500, 0, 7555);
-            fsBar(0, 0, 7556);
-            fsBar(0, 0, 7557);
-            fsBar(0, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(500, 0, 7554);
+            getPA().fsBar(500, 0, 7555);
+            getPA().fsBar(0, 0, 7556);
+            getPA().fsBar(0, 0, 7557);
+            getPA().fsBar(0, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(500, 0, 7554);
-            fsBar(500, 0, 7555);
-            fsBar(500, 0, 7556);
-            fsBar(500, 0, 7557);
-            fsBar(500, 0, 7558);
-            fsBar(0, 0, 7559);
-            fsBar(0, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(500, 0, 7554);
+            getPA().fsBar(500, 0, 7555);
+            getPA().fsBar(500, 0, 7556);
+            getPA().fsBar(500, 0, 7557);
+            getPA().fsBar(500, 0, 7558);
+            getPA().fsBar(0, 0, 7559);
+            getPA().fsBar(0, 0, 7560);
         }
         if (specialAmount >= 100 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7561);
-            fsBar(500, 0, 7551);
-            fsBar(500, 0, 7552);
-            fsBar(500, 0, 7553);
-            fsBar(500, 0, 7554);
-            fsBar(500, 0, 7555);
-            fsBar(500, 0, 7556);
-            fsBar(500, 0, 7557);
-            fsBar(500, 0, 7558);
-            fsBar(500, 0, 7559);
-            fsBar(500, 0, 7560);
+            getPA().fsBar(500, 0, 7551);
+            getPA().fsBar(500, 0, 7552);
+            getPA().fsBar(500, 0, 7553);
+            getPA().fsBar(500, 0, 7554);
+            getPA().fsBar(500, 0, 7555);
+            getPA().fsBar(500, 0, 7556);
+            getPA().fsBar(500, 0, 7557);
+            getPA().fsBar(500, 0, 7558);
+            getPA().fsBar(500, 0, 7559);
+            getPA().fsBar(500, 0, 7560);
         }
     }
 
     public void specialAttacks5() {
         if (specialAmount >= 0 && specialAmount <= 24) {
             getPA().sendFrame126("S P E C I A L  A T T A C K", 8505);
-            fsBar(0, 0, 8495);
-            fsBar(0, 0, 8496);
-            fsBar(0, 0, 8497);
-            fsBar(0, 0, 8498);
-            fsBar(0, 0, 8499);
-            fsBar(0, 0, 8500);
-            fsBar(0, 0, 8501);
-            fsBar(0, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(0, 0, 8495);
+            getPA().fsBar(0, 0, 8496);
+            getPA().fsBar(0, 0, 8497);
+            getPA().fsBar(0, 0, 8498);
+            getPA().fsBar(0, 0, 8499);
+            getPA().fsBar(0, 0, 8500);
+            getPA().fsBar(0, 0, 8501);
+            getPA().fsBar(0, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(0, 0, 8498);
-            fsBar(0, 0, 8499);
-            fsBar(0, 0, 8500);
-            fsBar(0, 0, 8501);
-            fsBar(0, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(0, 0, 8498);
+            getPA().fsBar(0, 0, 8499);
+            getPA().fsBar(0, 0, 8500);
+            getPA().fsBar(0, 0, 8501);
+            getPA().fsBar(0, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(500, 0, 8498);
-            fsBar(500, 0, 8499);
-            fsBar(0, 0, 8500);
-            fsBar(0, 0, 8501);
-            fsBar(0, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(500, 0, 8498);
+            getPA().fsBar(500, 0, 8499);
+            getPA().fsBar(0, 0, 8500);
+            getPA().fsBar(0, 0, 8501);
+            getPA().fsBar(0, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(500, 0, 8498);
-            fsBar(500, 0, 8499);
-            fsBar(500, 0, 8500);
-            fsBar(500, 0, 8501);
-            fsBar(500, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(500, 0, 8498);
+            getPA().fsBar(500, 0, 8499);
+            getPA().fsBar(500, 0, 8500);
+            getPA().fsBar(500, 0, 8501);
+            getPA().fsBar(500, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 100 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(500, 0, 8498);
-            fsBar(500, 0, 8499);
-            fsBar(500, 0, 8500);
-            fsBar(500, 0, 8501);
-            fsBar(500, 0, 8502);
-            fsBar(500, 0, 8503);
-            fsBar(500, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(500, 0, 8498);
+            getPA().fsBar(500, 0, 8499);
+            getPA().fsBar(500, 0, 8500);
+            getPA().fsBar(500, 0, 8501);
+            getPA().fsBar(500, 0, 8502);
+            getPA().fsBar(500, 0, 8503);
+            getPA().fsBar(500, 0, 8504);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(0, 0, 8498);
-            fsBar(0, 0, 8499);
-            fsBar(0, 0, 8500);
-            fsBar(0, 0, 8501);
-            fsBar(0, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(0, 0, 8498);
+            getPA().fsBar(0, 0, 8499);
+            getPA().fsBar(0, 0, 8500);
+            getPA().fsBar(0, 0, 8501);
+            getPA().fsBar(0, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(500, 0, 8498);
-            fsBar(500, 0, 8499);
-            fsBar(0, 0, 8500);
-            fsBar(0, 0, 8501);
-            fsBar(0, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(500, 0, 8498);
+            getPA().fsBar(500, 0, 8499);
+            getPA().fsBar(0, 0, 8500);
+            getPA().fsBar(0, 0, 8501);
+            getPA().fsBar(0, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(500, 0, 8498);
-            fsBar(500, 0, 8499);
-            fsBar(500, 0, 8500);
-            fsBar(500, 0, 8501);
-            fsBar(500, 0, 8502);
-            fsBar(0, 0, 8503);
-            fsBar(0, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(500, 0, 8498);
+            getPA().fsBar(500, 0, 8499);
+            getPA().fsBar(500, 0, 8500);
+            getPA().fsBar(500, 0, 8501);
+            getPA().fsBar(500, 0, 8502);
+            getPA().fsBar(0, 0, 8503);
+            getPA().fsBar(0, 0, 8504);
         }
         if (specialAmount >= 100 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 8505);
-            fsBar(500, 0, 8495);
-            fsBar(500, 0, 8496);
-            fsBar(500, 0, 8497);
-            fsBar(500, 0, 8498);
-            fsBar(500, 0, 8499);
-            fsBar(500, 0, 8500);
-            fsBar(500, 0, 8501);
-            fsBar(500, 0, 8502);
-            fsBar(500, 0, 8503);
-            fsBar(500, 0, 8504);
+            getPA().fsBar(500, 0, 8495);
+            getPA().fsBar(500, 0, 8496);
+            getPA().fsBar(500, 0, 8497);
+            getPA().fsBar(500, 0, 8498);
+            getPA().fsBar(500, 0, 8499);
+            getPA().fsBar(500, 0, 8500);
+            getPA().fsBar(500, 0, 8501);
+            getPA().fsBar(500, 0, 8502);
+            getPA().fsBar(500, 0, 8503);
+            getPA().fsBar(500, 0, 8504);
         }
     }
 
     public void specialAttacks6() {
         if (specialAmount >= 0 && specialAmount <= 24) {
             getPA().sendFrame126("S P E C I A L  A T T A C K", 7511);
-            fsBar(0, 0, 7501);
-            fsBar(0, 0, 7502);
-            fsBar(0, 0, 7503);
-            fsBar(0, 0, 7504);
-            fsBar(0, 0, 7505);
-            fsBar(0, 0, 7506);
-            fsBar(0, 0, 7507);
-            fsBar(0, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(0, 0, 7501);
+            getPA().fsBar(0, 0, 7502);
+            getPA().fsBar(0, 0, 7503);
+            getPA().fsBar(0, 0, 7504);
+            getPA().fsBar(0, 0, 7505);
+            getPA().fsBar(0, 0, 7506);
+            getPA().fsBar(0, 0, 7507);
+            getPA().fsBar(0, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E @bla@C I A L  A T T A C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(0, 0, 7504);
-            fsBar(0, 0, 7505);
-            fsBar(0, 0, 7506);
-            fsBar(0, 0, 7507);
-            fsBar(0, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(0, 0, 7504);
+            getPA().fsBar(0, 0, 7505);
+            getPA().fsBar(0, 0, 7506);
+            getPA().fsBar(0, 0, 7507);
+            getPA().fsBar(0, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L@bla@  A T T A C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(500, 0, 7504);
-            fsBar(500, 0, 7505);
-            fsBar(0, 0, 7506);
-            fsBar(0, 0, 7507);
-            fsBar(0, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(500, 0, 7504);
+            getPA().fsBar(500, 0, 7505);
+            getPA().fsBar(0, 0, 7506);
+            getPA().fsBar(0, 0, 7507);
+            getPA().fsBar(0, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A @bla@C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(500, 0, 7504);
-            fsBar(500, 0, 7505);
-            fsBar(500, 0, 7506);
-            fsBar(500, 0, 7507);
-            fsBar(500, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(500, 0, 7504);
+            getPA().fsBar(500, 0, 7505);
+            getPA().fsBar(500, 0, 7506);
+            getPA().fsBar(500, 0, 7507);
+            getPA().fsBar(500, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 100 && !usingSpecial) {
             getPA().sendFrame126("@bla@S P E C I A L  A T T A C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(500, 0, 7504);
-            fsBar(500, 0, 7505);
-            fsBar(500, 0, 7506);
-            fsBar(500, 0, 7507);
-            fsBar(500, 0, 7508);
-            fsBar(500, 0, 7509);
-            fsBar(500, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(500, 0, 7504);
+            getPA().fsBar(500, 0, 7505);
+            getPA().fsBar(500, 0, 7506);
+            getPA().fsBar(500, 0, 7507);
+            getPA().fsBar(500, 0, 7508);
+            getPA().fsBar(500, 0, 7509);
+            getPA().fsBar(500, 0, 7510);
         }
         if (specialAmount >= 25 && specialAmount <= 49 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E @bla@C I A L  A T T A C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(0, 0, 7504);
-            fsBar(0, 0, 7505);
-            fsBar(0, 0, 7506);
-            fsBar(0, 0, 7507);
-            fsBar(0, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(0, 0, 7504);
+            getPA().fsBar(0, 0, 7505);
+            getPA().fsBar(0, 0, 7506);
+            getPA().fsBar(0, 0, 7507);
+            getPA().fsBar(0, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 50 && specialAmount <= 74 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L@bla@  A T T A C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(500, 0, 7504);
-            fsBar(500, 0, 7505);
-            fsBar(0, 0, 7506);
-            fsBar(0, 0, 7507);
-            fsBar(0, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(500, 0, 7504);
+            getPA().fsBar(500, 0, 7505);
+            getPA().fsBar(0, 0, 7506);
+            getPA().fsBar(0, 0, 7507);
+            getPA().fsBar(0, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 75 && specialAmount <= 99 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A @bla@C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(500, 0, 7504);
-            fsBar(500, 0, 7505);
-            fsBar(500, 0, 7506);
-            fsBar(500, 0, 7507);
-            fsBar(500, 0, 7508);
-            fsBar(0, 0, 7509);
-            fsBar(0, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(500, 0, 7504);
+            getPA().fsBar(500, 0, 7505);
+            getPA().fsBar(500, 0, 7506);
+            getPA().fsBar(500, 0, 7507);
+            getPA().fsBar(500, 0, 7508);
+            getPA().fsBar(0, 0, 7509);
+            getPA().fsBar(0, 0, 7510);
         }
         if (specialAmount >= 100 && usingSpecial) {
             getPA().sendFrame126("@yel@S P E C I A L  A T T A C K", 7511);
-            fsBar(500, 0, 7501);
-            fsBar(500, 0, 7502);
-            fsBar(500, 0, 7503);
-            fsBar(500, 0, 7504);
-            fsBar(500, 0, 7505);
-            fsBar(500, 0, 7506);
-            fsBar(500, 0, 7507);
-            fsBar(500, 0, 7508);
-            fsBar(500, 0, 7509);
-            fsBar(500, 0, 7510);
+            getPA().fsBar(500, 0, 7501);
+            getPA().fsBar(500, 0, 7502);
+            getPA().fsBar(500, 0, 7503);
+            getPA().fsBar(500, 0, 7504);
+            getPA().fsBar(500, 0, 7505);
+            getPA().fsBar(500, 0, 7506);
+            getPA().fsBar(500, 0, 7507);
+            getPA().fsBar(500, 0, 7508);
+            getPA().fsBar(500, 0, 7509);
+            getPA().fsBar(500, 0, 7510);
         }
     }
 
@@ -21838,9 +21721,35 @@ nated = Integer.parseInt(token2);
     private int getRunEnergy () {
         return runEnergy;
     }
+    public void Serverbroadcast() {
+        EventManager.getSingleton().addEvent(this, new Event() {
+            private int ticks = 0;
+
+            @Override
+            public void execute(EventContainer container) {
+                // Trigger every 120 ticks (1 minute if called every 500ms)
+                if (ticks++ >= 600) {
+                    sendMessage("@blu@**********************************************************************************");
+                    sendMessage("@blu@Have you voted today?? if not go vote!! more votes = more players =)");
+                    sendMessage("@blu@Newest Update: Started to work on the stronghold of security.");
+                    sendMessage("@blu@We back Guys! Remember if You lose items on death!");
+                    sendMessage("@blu@Type ::help and ::commands also we have a fandom godzhellreborn.fandom.com");
+                    sendMessage("@blu@**********************************************************************************");
+                    ticks = 0;
+                }
+            }
+
+            @Override
+            public void stop() {
+                // Nothing needed here unless you want a broadcast termination log or flag
+            }
+
+        }, 600); // 500ms cycle
+    }
 
     public void process() { // is being called regularily every 500ms
         try {
+            getTradeSystem().process();
             if (wcTimer > 0 && woodcut[0] > 0) {
                 wcTimer--;
             }
@@ -21882,18 +21791,18 @@ nated = Integer.parseInt(token2);
                         + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19412);
                 secondsPlayed = 0;
             }
-            sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
+            getPA().sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
 
-            sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19413);
+            getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19413);
             if (getSlayer().getTask().isEmpty()) {
-                sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19414);
+                getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19414);
             } else {
-                sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19414);
+                getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19414);
             }
             if (getSlayer().getTask().isEmpty()) {
-                sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19415);
+                getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19415);
             } else {
-                sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19415);
+                getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19415);
             }
             if (minutesPlayed == 60) {
                 hoursPlayed += 1;
@@ -21912,13 +21821,13 @@ nated = Integer.parseInt(token2);
                 }
             }
             if (InBank == 1) {
-                sendQuest("The Bank Of Godzhell Reborn.", 5383);
+                getPA().sendQuest("The Bank Of Godzhell Reborn.", 5383);
                 updateRequired = true;
             } else if (InBank == 2) {
-                sendQuest("The Staff Bank Of Godzhell Reborn.", 5383);
+                getPA().sendQuest("The Staff Bank Of Godzhell Reborn.", 5383);
                 updateRequired = true;
             } else if (InBank == 3) {
-                sendQuest("The Donator Bank Of Godzhell Reborn.", 5383);
+                getPA().sendQuest("The Donator Bank Of Godzhell Reborn.", 5383);
                 updateRequired = true;
             }
             if (turkeydelay == 26) {
@@ -21968,17 +21877,6 @@ nated = Integer.parseInt(token2);
                 savechar();
             }
             rightClickCheck();
-
-            if (timedMessage == 0) {
-                timedMessage = 500; // message every minute, process is called every 500ms (half second).
-                sendMessage("@blu@**********************************************************************************");
-                sendMessage("@blu@Have you voted today?? if not go vote!! more votes = more players =)");
-                sendMessage("@blu@Newest Update: Started to work on the stronghold of security.");
-                sendMessage("@blu@We back Guys! Remember if You lose items on death!");
-                sendMessage("@blu@Type ::help and ::commands also we have a fandom godzhellreborn.fandom.com");
-                sendMessage("@blu@**********************************************************************************");
-
-            }
 
 
             if (sameclick == 10 && getRights().isPlayer())
@@ -22347,152 +22245,7 @@ nated = Integer.parseInt(token2);
                         WriteEnergy();
                     }
                 }
-                if (tradeRequest > 0 && PlayerHandler.players[tradeRequest] != null) {
-                    if(macAddress != PlayerHandler.players[tradeRequest].macAddress) {
-                        sendMessage(PlayerHandler.players[tradeRequest].playerName
-                                + ":tradereq:");
-                        tradeRequest = 0;
-                    } else {
-                        sendMessage("You can not trade your self");
-                    }
-                }
-                if (tradeOtherDeclined) {
-                    if (PlayerHandler.players[tradeWith] != null) {
-                        sendMessage(PlayerHandler.players[tradeWith].playerName
-                                + " declined the trade.");
-                    } else {
-                        sendMessage("Other player declined the trade.");
-                    }
-                    RemoveAllWindows();
-                    DeclineTrade();
-                    tradeOtherDeclined = false;
-                }
-                if (tradeWaitingTime > 0) {
-                    tradeWaitingTime--;
-                    if (tradeWaitingTime <= 0) {
-                        sendMessage("Trade request suspended.");
-                        resetTrade();
-                    }
-                }
-                if (AntiTradeScam) {
-                    getPA().sendFrame126("", 3431);
-                    AntiTradeScam = false;
-                }
-                if (tradeWith > 0) {
-                    if(macAddress == PlayerHandler.players[tradeWith].macAddress) {
-                        sendMessage("You can not trade your self");
-                        return;
-                    }
-                    if (PlayerHandler.players[tradeWith] != null) {
-                        if (tradeStatus == 5) {
-                            if (PlayerHandler.players[tradeWith].TradeConfirmed) {
-                                PlayerHandler.players[tradeWith].tradeStatus = 5;
-                            }
-                            resetTrade();
-                        } else {
-                            int OtherStatus = PlayerHandler.players[tradeWith].tradeStatus;
-                            if (OtherStatus == 1) {
-                                PlayerHandler.players[tradeWith].tradeStatus = 2;
-                                tradeStatus = 2;
-                                AcceptTrade();
-                                PlayerHandler.players[tradeWith].tradeWaitingTime = 0;
-                                tradeWaitingTime = 0;
-                            } else if (OtherStatus == 3) {
-                                if (tradeStatus == 2) {
-                                    getPA().sendFrame126("Other player has accepted.", 3431);
-                                } else if (tradeStatus == 3) {
-                                    TradeGoConfirm();
-                                }
-                            } else if (OtherStatus == 4) {
-                                if (tradeStatus == 3) {
-                                    getPA().sendFrame126("Other player has accepted.", 3535);
-                                } else if (tradeStatus == 4) {
-                                    ConfirmTrade();
-                                    if (PlayerHandler.players[tradeWith].TradeConfirmed) {
-                                        PlayerHandler.players[tradeWith].tradeStatus = 5;
-                                    }
-                                }
-                            }
-                            if (tradeUpdateOther) {
-                                resetOTItems(3416);
-                                tradeUpdateOther = false;
-                            }
-                        }
-                    } else {
-                        resetTrade();
-                    }
-                }
-                if (WanneTrade == 1) {
-                    if(macAddress == PlayerHandler.players[tradeRequest].macAddress)
-                        return;
-                    if (WanneTradeWith > PlayerHandler.maxPlayers) {
-                        resetTrade();
-                    } else if (PlayerHandler.players[WanneTradeWith] != null) {
-                        if (GoodDistance2(absX, absY,
-                                PlayerHandler.players[WanneTradeWith].absX,
-                                PlayerHandler.players[WanneTradeWith].absY, 1)) {
-                            int tt1 = PlayerHandler.players[WanneTradeWith].tradeStatus;
-                            int tt2 = tradeStatus;
-                            if (tt1 <= 0
-                                    && tt2 <= 0
-                                    && PlayerHandler.players[WanneTradeWith].tradeWaitingTime == 0) {
-                                if(macAddress == PlayerHandler.players[WanneTradeWith].macAddress)
-                                    return;
-                                tradeWith = WanneTradeWith;
-                                tradeWaitingTime = 40;
-                                PlayerHandler.players[tradeWith].tradeRequest = playerId;
-                                sendMessage("Sending trade request...");
-                            } else if (tt1 <= 0
-                                    && tt2 <= 0
-                                    && PlayerHandler.players[WanneTradeWith].tradeWaitingTime > 0) {
-                                tradeWith = WanneTradeWith;
-                                tradeStatus = 1;
-                                AcceptTrade();
-                            }
-                            WanneTrade = 0;
-                            WanneTradeWith = 0;
-                        }
-                    } else {
-                        resetTrade();
-                    }
-                }
-                if (WanneTrade == 2) {
-                    try {
-                        if (WanneTradeWith > PlayerHandler.maxPlayers) {
-                            resetTrade();
-                        } else if (PlayerHandler.players[WanneTradeWith] != null) {
-                            if (GoodDistance2(absX, absY,
-                                    PlayerHandler.players[WanneTradeWith].absX,
-                                    PlayerHandler.players[WanneTradeWith].absY, 1)) {
-                                if (PlayerHandler.players[WanneTradeWith].tradeWith == playerId
-                                        && PlayerHandler.players[WanneTradeWith].tradeWaitingTime > 0) {
-                                    if(macAddress == PlayerHandler.players[WanneTradeWith].macAddress) {
-                                        sendMessage("You can not trade your self");
-                                        return;
-                                    }
-                                    tradeWith = WanneTradeWith;
-                                    tradeStatus = 1;
-                                    AcceptTrade();
-                                } else {
-                                    if(macAddress == PlayerHandler.players[WanneTradeWith].macAddress) {
-                                        sendMessage("You can not trade your self");
-                                        return;
-                                    }
-                                    tradeWith = WanneTradeWith;
-                                    tradeWaitingTime = 40;
-                                    PlayerHandler.players[tradeWith].tradeRequest = playerId;
-                                    sendMessage("Sending trade request...");
-                                }
-                                WanneTrade = 0;
-                                WanneTradeWith = 0;
-                            }
-                        } else {
-                            resetTrade();
-                        }
-                    } catch (Exception e) {
-                        sendMessage("Ok Then... Your Nice.");
-                    }
-                }
+
                 // Crackers
                 if (CrackerMsg) {
                     crackCracker();
@@ -22977,38 +22730,38 @@ nated = Integer.parseInt(token2);
                 checkwildy();
 
                 if (item_id == 3840) {
-                    sendInterfaceHidden(1, 2465);
-                    sendInterfaceHidden(0, 2468);
+                    getPA().sendInterfaceHidden(1, 2465);
+                    getPA().sendInterfaceHidden(0, 2468);
                     getPA().sendFrame126("Select an Option", 2481);
                     getPA().sendFrame126("Wedding rights", 2482);
                     getPA().sendFrame126("Last rights", 2483);
                     getPA().sendFrame126("Blessing", 2484);
                     getPA().sendFrame126("Preach", 2485);
-                    sendFrame164(2480);
+                    getPA().sendFrame164(2480);
                     NpcDialogueSend = true;
                     holyBook = true;
                 }
                 if (item_id == 3842) {
-                    sendInterfaceHidden(1, 2465);
-                    sendInterfaceHidden(0, 2468);
+                    getPA().sendInterfaceHidden(1, 2465);
+                    getPA().sendInterfaceHidden(0, 2468);
                     getPA().sendFrame126("Select an Option", 2481);
                     getPA().sendFrame126("Wedding rights", 2482);
                     getPA().sendFrame126("Last rights", 2483);
                     getPA().sendFrame126("Blessing", 2484);
                     getPA().sendFrame126("Preach", 2485);
-                    sendFrame164(2480);
+                    getPA().sendFrame164(2480);
                     NpcDialogueSend = true;
                     unholyBook = true;
                 }
                 if (item_id == 3844) {
-                    sendInterfaceHidden(1, 2465);
-                    sendInterfaceHidden(0, 2468);
+                    getPA().sendInterfaceHidden(1, 2465);
+                    getPA().sendInterfaceHidden(0, 2468);
                     getPA().sendFrame126("Select an Option", 2481);
                     getPA().sendFrame126("Wedding rights", 2482);
                     getPA().sendFrame126("Last rights", 2483);
                     getPA().sendFrame126("Blessing", 2484);
                     getPA().sendFrame126("Preach", 2485);
-                    sendFrame164(2480);
+                    getPA().sendFrame164(2480);
                     NpcDialogueSend = true;
                     balanceBook = true;
                 }
@@ -23577,7 +23330,7 @@ nated = Integer.parseInt(token2);
                 }
                 if (tradeStatus >= 2) {
                     PlayerHandler.players[tradeWith].tradeOtherDeclined = true;
-                    DeclineTrade();
+                    getTradeSystem().DeclineTrade();
                     sendMessage("You decline the trade.");
                 }
                 if (IsShopping) {
@@ -24129,7 +23882,7 @@ nated = Integer.parseInt(token2);
                 }
                 if (NPCID == 1055) {
                     PutNPCCoords = true;
-                    showInterface(8292);
+                    getPA().showInterface(8292);
                 } else if (NPCID == 553) { // Aubury rune shop
                     PutNPCCoords = true;
                     WanneShop = 2; // Aubury Magic Shop
@@ -25797,11 +25550,11 @@ nated = Integer.parseInt(token2);
                 // start leather crafting
                 else if (itemUsed == ObjectIDs.PORTAL_21 && useWith == 1741) {
                     if (playerLevel[12] >= 0) {
-                        showInterface(2311);
+                        getPA().showInterface(2311);
                     }
                 } else if (itemUsed == 1741 && useWith == ObjectIDs.PORTAL_21) {
                     if (playerLevel[12] >= 0) {
-                        showInterface(2311);
+                        getPA().showInterface(2311);
                     }
                 } else if (itemUsed == 1603 && useWith == 656) {
                     deleteItem(656, getItemSlot(656), 1);
@@ -25973,12 +25726,12 @@ nated = Integer.parseInt(token2);
                         NpcDialogue = 0;
                         NpcTalkTo = 0;
                         NpcDialogueSend = false;
-                        RemoveAllWindows();
+                        getPA().RemoveAllWindows();
                     }
                     resetVariables();
                     // banking
                     if (InBank >= 1) {
-                        RemoveAllWindows();
+                        getPA().RemoveAllWindows();
                     }
                     if (stopPlayerSkill) {
                         SkillHandler.resetPlayerSkillVariables(this);
@@ -25999,14 +25752,14 @@ nated = Integer.parseInt(token2);
                         IsShopping = false;
                         MyShopID = 0;
                         UpdateShop = false;
-                        RemoveAllWindows();
+                        getPA().RemoveAllWindows();
                     }
                     // trading
                     if (tradeStatus >= 2) {
                         PlayerHandler.players[tradeWith].tradeOtherDeclined = true;
-                        DeclineTrade();
+                        getTradeSystem().DeclineTrade();
                         sendMessage("You decline the trade.");
-                        RemoveAllWindows();
+                        getPA().RemoveAllWindows();
                     }
                     //follow check
                     if (playerFollowID != -1) {
@@ -26212,7 +25965,7 @@ nated = Integer.parseInt(token2);
                             switch (action) {
                                 case 0:
                                     if (clan.isFounder(playerName)) {
-                                        showInterface(18300);
+                                        getPA().showInterface(18300);
                                     }
                                     break;
                                 case 1:
@@ -28911,11 +28664,11 @@ nated = Integer.parseInt(token2);
                         if (foundz[3] == 0) {
                         }
                     } else {
-                        tradeItem(removeID, removeSlot, 1);
+                        getTradeSystem().tradeItem(removeID, removeSlot, 1);
                     }
                 } else if (testinterfaceId == 3415) { //remove from trade window
                     if (!secondTradeWindow)
-                        fromTrade(removeID, removeSlot, 1);
+                        getTradeSystem().fromTrade(removeID, removeSlot, 1);
                 } else if (testinterfaceId == 3823) { // Show value to sell items
                     if (!Item.itemSellable[removeID]) {
                         sendMessage("I cannot sell " + GetItemName(removeID) + ".");
@@ -29051,10 +28804,10 @@ nated = Integer.parseInt(token2);
                     if (isUntradable(removeID2)) {
                         sendMessage("You cannot trade this item");
                     } else {
-                        tradeItem(removeID2, removeSlot2, 5);
+                        getTradeSystem().tradeItem(removeID2, removeSlot2, 5);
                     }
                 } else if (interfaceId == 3415) { // remove from trade window
-                    fromTrade(removeID2, removeSlot2, 5);
+                    getTradeSystem().fromTrade(removeID2, removeSlot2, 5);
                 }
 
                 break;
@@ -29104,10 +28857,10 @@ nated = Integer.parseInt(token2);
                     if (isUntradable(removeID)) {
                         sendMessage("You cannot trade this item");
                     } else {
-                        tradeItem(removeID, removeSlot, 10);
+                        getTradeSystem().tradeItem(removeID, removeSlot, 10);
                     }
                 } else if (testinterfaceId == 3415) { // remove from trade window
-                    fromTrade(removeID, removeSlot, 10);
+                    getTradeSystem().fromTrade(removeID, removeSlot, 10);
                 } else if (testinterfaceId == 3823) { // Show value to sell items
                     sellItem(removeID, removeSlot, 5);
                 } else if (testinterfaceId == 64016) { // Show value to buy items
@@ -29173,11 +28926,11 @@ nated = Integer.parseInt(token2);
                     if (isUntradable(removeID)) {
                         sendMessage("You cannot trade this item");
                     } else {
-                        tradeItem(removeID, removeSlot, playerItemsN[removeSlot]);
+                        getTradeSystem().tradeItem(removeID, removeSlot, playerItemsN[removeSlot]);
                     }
                 } else if (testinterfaceId == 3415) { //remove from trade window
                     if (!secondTradeWindow)
-                        fromTrade(removeID, removeSlot, 1);
+                        getTradeSystem().fromTrade(removeID, removeSlot, 1);
                 } else if (testinterfaceId == 3823) { // Show value to sell items
                     sellItem(removeID, removeSlot, 10);
                 } else if (testinterfaceId == 64016) { // Show value to buy items
@@ -29228,10 +28981,10 @@ nated = Integer.parseInt(token2);
                     if (isUntradable(XremoveID)) {
                         sendMessage("You cannot trade this item");
                     } else {
-                        tradeItem(XremoveID, XremoveSlot, EnteredAmount);
+                        getTradeSystem().tradeItem(XremoveID, XremoveSlot, EnteredAmount);
                     }
                 } else if (testinterfaceId == 3415) { // remove from trade window
-                    fromTrade(XremoveID, XremoveSlot, EnteredAmount);
+                    getTradeSystem().fromTrade(XremoveID, XremoveSlot, EnteredAmount);
                 }
                 if (fletching[5] == 1) {
                     if (EnteredAmount >= 1 && EnteredAmount <= 3) {
@@ -30449,88 +30202,88 @@ nated = Integer.parseInt(token2);
 
     public void setSkillLevel(int skillNum, int currentLevel, int XP) {
         if (skillNum == 0) {
-            sendQuest(String.valueOf(playerLevel[0]), 4004);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[0])), 4005);
+            getPA().sendQuest(String.valueOf(playerLevel[0]), 4004);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[0])), 4005);
         }
         if (skillNum == 2) {
-            sendQuest(String.valueOf(playerLevel[2]), 4006);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[2])), 4007);
+            getPA().sendQuest(String.valueOf(playerLevel[2]), 4006);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[2])), 4007);
         }
         if (skillNum == 1) {
-            sendQuest(String.valueOf(playerLevel[1]), 4008);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[1])), 4009);
+            getPA().sendQuest(String.valueOf(playerLevel[1]), 4008);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[1])), 4009);
         }
         if (skillNum == 4) {
-            sendQuest(String.valueOf(playerLevel[4]), 4010);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[4])), 4011);
+            getPA().sendQuest(String.valueOf(playerLevel[4]), 4010);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[4])), 4011);
         }
         if (skillNum == 5) {
-            sendQuest(String.valueOf(playerLevel[5]), 4012);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[5])), 4013);
+            getPA().sendQuest(String.valueOf(playerLevel[5]), 4012);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[5])), 4013);
         }
         if (skillNum == 6) {
-            sendQuest(String.valueOf(playerLevel[6]), 4014);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[6])), 4015);
+            getPA().sendQuest(String.valueOf(playerLevel[6]), 4014);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[6])), 4015);
         }
         if (skillNum == 3) {
-            sendQuest(String.valueOf(playerLevel[3]), 4016);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[3])), 4017);
+            getPA().sendQuest(String.valueOf(playerLevel[3]), 4016);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[3])), 4017);
         }
         if (skillNum == 16) {
-            sendQuest(String.valueOf(playerLevel[16]), 4018);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[16])), 4019);
+            getPA().sendQuest(String.valueOf(playerLevel[16]), 4018);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[16])), 4019);
         }
         if (skillNum == 15) {
-            sendQuest(String.valueOf(playerLevel[15]), 4020);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[15])), 4021);
+            getPA().sendQuest(String.valueOf(playerLevel[15]), 4020);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[15])), 4021);
         }
         if (skillNum == 17) {
-            sendQuest(String.valueOf(playerLevel[17]), 4022);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[17])), 4023);
+            getPA().sendQuest(String.valueOf(playerLevel[17]), 4022);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[17])), 4023);
         }
         if (skillNum == 12) {
-            sendQuest(String.valueOf(playerLevel[12]), 4024);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[12])), 4025);
+            getPA().sendQuest(String.valueOf(playerLevel[12]), 4024);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[12])), 4025);
         }
         if (skillNum == 9) {
-            sendQuest(String.valueOf(playerLevel[9]), 4026);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[9])), 4027);
+            getPA().sendQuest(String.valueOf(playerLevel[9]), 4026);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[9])), 4027);
         }
         if (skillNum == 14) {
-            sendQuest(String.valueOf(playerLevel[14]), 4028);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[14])), 4029);
+            getPA().sendQuest(String.valueOf(playerLevel[14]), 4028);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[14])), 4029);
         }
         if (skillNum == 13) {
-            sendQuest(String.valueOf(playerLevel[13]), 4030);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[13])), 4031);
+            getPA().sendQuest(String.valueOf(playerLevel[13]), 4030);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[13])), 4031);
         }
         if (skillNum == 10) {
-            sendQuest(String.valueOf(playerLevel[10]), 4032);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[10])), 4033);
+            getPA().sendQuest(String.valueOf(playerLevel[10]), 4032);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[10])), 4033);
         }
         if (skillNum == 7) {
-            sendQuest(String.valueOf(playerLevel[7]), 4034);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[7])), 4035);
+            getPA().sendQuest(String.valueOf(playerLevel[7]), 4034);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[7])), 4035);
         }
         if (skillNum == 11) {
-            sendQuest(String.valueOf(playerLevel[11]), 4036);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[11])), 4037);
+            getPA().sendQuest(String.valueOf(playerLevel[11]), 4036);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[11])), 4037);
         }
         if (skillNum == 8) {
-            sendQuest(String.valueOf(playerLevel[8]), 4038);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[8])), 4039);
+            getPA().sendQuest(String.valueOf(playerLevel[8]), 4038);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[8])), 4039);
         }
         if (skillNum == 20) {
-            sendQuest(String.valueOf(playerLevel[20]), 4152);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[20])), 4153);
+            getPA().sendQuest(String.valueOf(playerLevel[20]), 4152);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[20])), 4153);
         }
         if (skillNum == 18) {
-            sendQuest(String.valueOf(playerLevel[18]), 12166);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[18])), 12167);
+            getPA().sendQuest(String.valueOf(playerLevel[18]), 12166);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[18])), 12167);
         }
         if (skillNum == 19) {
-            sendQuest(String.valueOf(playerLevel[19]), 13926);
-            sendQuest(String.valueOf(getLevelForXP(playerXP[19])), 13927);
+            getPA().sendQuest(String.valueOf(playerLevel[19]), 13926);
+            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[19])), 13927);
         } else {
             if(getOutStream() != null) {
                 getOutStream().createFrame(134);
@@ -31780,9 +31533,9 @@ nated = Integer.parseInt(token2);
 
 
             case 2528: // Genie Lamp
-                showInterface(2808);
+                getPA().showInterface(2808);
                 sendMessage("You rub the lamp.");
-                sendQuest("Choose the stat you would like to increase.", 2810);
+                getPA().sendQuest("Choose the stat you would like to increase.", 2810);
                 break;
 
             case 4079: // Yo-yo (play) by [M]ike
@@ -34237,8 +33990,8 @@ nated = Integer.parseInt(token2);
 
     public void appendPos() {
         try {
-            sendQuest("@whi@X: " + absX + " Y: " + absY, 184);
-            sendQuest("       @bla@Coords", 183);
+            getPA().sendQuest("@whi@X: " + absX + " Y: " + absY, 184);
+            getPA().sendQuest("       @bla@Coords", 183);
         } catch (Exception e) {
             println_debug("Error");
         }
@@ -35687,254 +35440,6 @@ nated = Integer.parseInt(token2);
 
 
 
-    public void AcceptTrade() {
-        getPA().sendFrame248(3323, 3321); // trading window + bag
-        getPA().resetItems(3322);
-        resetTItems(3415);
-        resetOTItems(3416);
-        getPA().sendFrame126("Trading With: "
-                + PlayerHandler.players[tradeWith].playerName, 3417);
-        getPA().sendFrame126("", 3431);
-    }
-
-    public void DeclineTrade() {
-        secondTradeWindow = false;
-        if (!hasAccepted) {
-            for (int i = 0; i < playerTItems.length; i++) {
-                if (playerTItems[i] > 0) {
-                    if (tradeStatus < 4) {
-                        fromTrade((playerTItems[i] - 1), i, playerTItemsN[i]);
-                    }
-                }
-            }
-        }
-        getPA().resetItems(3214);
-        resetTrade();
-    }
-
-    public void resetTrade() {
-        tradeWith = 0;
-        tradeWaitingTime = 0;
-        tradeStatus = 0;
-        tradeUpdateOther = false;
-        tradeOtherDeclined = false;
-        WanneTrade = 0;
-        WanneTradeWith = 0;
-        TradeConfirmed = false;
-        for (int i = 0; i < playerTItems.length; i++) {
-            playerTItems[i] = 0;
-            playerTItemsN[i] = 0;
-            playerOTItems[i] = 0;
-            playerOTItemsN[i] = 0;
-        }
-    }
-
-    public void ConfirmTrade() {
-        if (!TradeConfirmed) {
-            RemoveAllWindows();
-            for (int i = 0; i < playerOTItems.length; i++) {
-                if (playerOTItems[i] > 0) {
-                    addItem((playerOTItems[i] - 1), playerOTItemsN[i]);
-                    BufferedWriter bw = null;
-                    try {
-                        bw = new BufferedWriter(new FileWriter(
-                                "./Data/logs/trades.txt", true));
-                        bw.write(PlayerHandler.players[tradeWith].playerName
-                                + " trades item: " + (playerOTItems[i] - 1)
-                                + " amount: " + playerOTItemsN[i] + " with "
-                                + playerName);
-                        bw.newLine();
-                        bw.flush();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    } finally {
-                        if (bw != null) {
-                            try {
-                                bw.close();
-                            } catch (IOException ioe2) {
-                                sendMessage("Error logging trade!");
-                            }
-                        }
-                    }
-                    try {
-                        bw = new BufferedWriter(
-                                new FileWriter(
-                                        "./Data/logs/trades.txt",
-                                        true));
-                        bw.write(PlayerHandler.players[tradeWith].playerName
-                                + " trades item: " + (playerOTItems[i] - 1)
-                                + " amount: " + playerOTItemsN[i] + " with "
-                                + playerName);
-                        bw.newLine();
-                        bw.flush();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    } finally {
-                        if (bw != null) {
-                            try {
-                                bw.close();
-                            } catch (IOException ioe2) {
-                                sendMessage("Error logging trade!");
-                            }
-                        }
-                    }
-                }
-            }
-            getPA().resetItems(3214);
-            Discord.writeTradeMessages(PlayerHandler.players[tradeWith].playerName
-                    + " trades item: " + (playerOTItems[i] - 1)
-                    + " amount: " + playerOTItemsN[i] + " with "
-                    + playerName);
-            TradeConfirmed = true;
-        }
-    }
-
-    public void TradeGoConfirm() {
-        secondTradeWindow = true;
-        getPA().sendFrame248(3443, 3213); // trade confirm + normal bag
-        getPA().resetItems(3214);
-        String SendTrade = "Absolutely nothing!";
-        String SendAmount = "";
-        int Count = 0;
-        for (int i = 0; i < playerTItems.length; i++) {
-            if (playerTItems[i] > 0) {
-                if (playerTItemsN[i] >= 1000 && playerTItemsN[i] < 1000000) {
-                    SendAmount = "@cya@" + (playerTItemsN[i] / 1000)
-                            + "K @whi@(" + playerTItemsN[i] + ")";
-                } else if (playerTItemsN[i] >= 1000000) {
-                    SendAmount = "@gre@" + (playerTItemsN[i] / 1000000)
-                            + " million @whi@(" + playerTItemsN[i] + ")";
-                } else {
-                    SendAmount = String.valueOf(playerTItemsN[i]);
-                }
-                if (Count == 0) {
-                    SendTrade = getItemName((playerTItems[i] - 1));
-                } else {
-                    SendTrade = SendTrade + "\\n"
-                            + getItemName((playerTItems[i] - 1));
-                }
-                if (Item.itemIsNote[(playerTItems[i] - 1)]
-                        || Item.itemStackable[(playerTItems[i] - 1)]) {
-                    SendTrade = SendTrade + " x " + SendAmount;
-                }
-                Count++;
-            }
-        }
-        getPA().sendFrame126(SendTrade, 3557);
-        SendTrade = "Absolutely nothing!";
-        SendAmount = "";
-        Count = 0;
-        for (int i = 0; i < playerOTItems.length; i++) {
-            if (playerOTItems[i] > 0) {
-                if (playerOTItemsN[i] >= 1000 && playerOTItemsN[i] < 1000000) {
-                    SendAmount = "@cya@" + (playerOTItemsN[i] / 1000)
-                            + "K @whi@(" + playerOTItemsN[i] + ")";
-                } else if (playerOTItemsN[i] >= 1000000) {
-                    SendAmount = "@gre@" + (playerOTItemsN[i] / 1000000)
-                            + " million @whi@(" + playerOTItemsN[i] + ")";
-                } else {
-                    SendAmount = String.valueOf(playerOTItemsN[i]);
-                }
-                if (Count == 0) {
-                    SendTrade = getItemName((playerOTItems[i] - 1));
-                } else {
-                    SendTrade = SendTrade + "\\n"
-                            + getItemName((playerOTItems[i] - 1));
-                }
-                if (Item.itemIsNote[(playerOTItems[i] - 1)]
-                        || Item.itemStackable[(playerOTItems[i] - 1)]) {
-                    SendTrade = SendTrade + " x " + SendAmount;
-                }
-                Count++;
-            }
-        }
-        getPA().sendFrame126(SendTrade, 3558);
-    }
-
-    public boolean fromTrade(int itemID, int fromSlot, int amount) {
-        if (secondTradeWindow) {
-            return false;
-        }
-        if (amount > 0 && (itemID + 1) == playerTItems[fromSlot]) {
-            if (amount > playerTItemsN[fromSlot]) {
-                amount = playerTItemsN[fromSlot];
-            }
-            addItem((playerTItems[fromSlot] - 1), amount);
-            if (amount == playerTItemsN[fromSlot]) {
-                playerTItems[fromSlot] = 0;
-                PlayerHandler.players[tradeWith].playerOTItems[fromSlot] = 0;
-            }
-            playerTItemsN[fromSlot] -= amount;
-            PlayerHandler.players[tradeWith].playerOTItemsN[fromSlot] -= amount;
-            getPA().resetItems(3322);
-            resetTItems(3415);
-            PlayerHandler.players[tradeWith].tradeUpdateOther = true;
-            if (PlayerHandler.players[tradeWith].tradeStatus == 3) {
-                PlayerHandler.players[tradeWith].tradeStatus = 2;
-                PlayerHandler.players[tradeWith].AntiTradeScam = true;
-                getPA().sendFrame126("", 3431);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public boolean tradeItem(int itemID, int fromSlot, int amount) {
-        if (tradeWith > 0) {
-            if (PlayerHandler.players[tradeWith] == null) {
-                DeclineTrade();
-                sendMessage("FORCED DECLINE BY SERVER!");
-                return false;
-            }
-        } else {
-            DeclineTrade();
-            sendMessage("FORCED DECLINE BY SERVER!");
-            return false;
-        }
-        if (amount > 0 && itemID == (playerItems[fromSlot] - 1)) {
-            if (amount > playerItemsN[fromSlot]) {
-                amount = playerItemsN[fromSlot];
-            }
-            boolean IsInTrade = false;
-            for (int i = 0; i < playerTItems.length; i++) {
-                if (playerTItems[i] == playerItems[fromSlot]) {
-                    if (Item.itemStackable[(playerItems[fromSlot] - 1)]
-                            || Item.itemIsNote[(playerItems[fromSlot] - 1)]) {
-                        playerTItemsN[i] += amount;
-                        PlayerHandler.players[tradeWith].playerOTItemsN[i] += amount;
-                        IsInTrade = true;
-                        break;
-                    }
-                }
-            }
-            if (!IsInTrade) {
-                for (int i = 0; i < playerTItems.length; i++) {
-                    if (playerTItems[i] <= 0) {
-                        playerTItems[i] = playerItems[fromSlot];
-                        playerTItemsN[i] = amount;
-                        PlayerHandler.players[tradeWith].playerOTItems[i] = playerItems[fromSlot];
-                        PlayerHandler.players[tradeWith].playerOTItemsN[i] = amount;
-                        break;
-                    }
-                }
-            }
-            if (amount == playerItemsN[fromSlot]) {
-                playerItems[fromSlot] = 0;
-            }
-            playerItemsN[fromSlot] -= amount;
-            getPA().resetItems(3322);
-            resetTItems(3415);
-            PlayerHandler.players[tradeWith].tradeUpdateOther = true;
-            if (PlayerHandler.players[tradeWith].tradeStatus == 3) {
-                PlayerHandler.players[tradeWith].tradeStatus = 2;
-                PlayerHandler.players[tradeWith].AntiTradeScam = true;
-                getPA().sendFrame126("", 3431);
-            }
-            return true;
-        }
-        return false;
-    }
-
     /* Shops*/
     public boolean sellItem(int itemID, int fromSlot, int amount) {
         if (amount > 0 && itemID == (playerItems[fromSlot] - 1)) {
@@ -36255,7 +35760,7 @@ nated = Integer.parseInt(token2);
                 break;
 
             case 1001:
-                RemoveAllWindows();
+                getPA().RemoveAllWindows();
                 break;
 
             case 4:
@@ -36576,7 +36081,7 @@ nated = Integer.parseInt(token2);
             case 13446:
                 NpcDialogue = 0;
                 NpcDialogueSend = false;
-                RemoveAllWindows();
+                getPA().RemoveAllWindows();
                 break;
             case 818:
                 getPA().sendFrame126(GetNpcName(NpcTalkTo), 4902);
@@ -36584,18 +36089,18 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("Your task here is simple.", 4904);
                 getPA().sendFrame126("go through the cave, and kill him.", 4905);
                 getPA().sendFrame126("then run back and give me the diamond.", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
 
             case 819:
-                sendInterfaceHidden(1, 2465);
-                sendInterfaceHidden(0, 2468);
+                getPA().sendInterfaceHidden(1, 2465);
+                getPA().sendInterfaceHidden(0, 2468);
                 getPA().sendFrame126("Do you have the diamond?", 2460);
                 getPA().sendFrame126("Yes", 2461);
                 getPA().sendFrame126("No", 2462);
-                sendFrame164(2459);
+                getPA().sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
@@ -36605,8 +36110,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("", 4904);
                 getPA().sendFrame126("Alright, but your so close...", 4905);
                 getPA().sendFrame126("Remember the reward.", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 664:
@@ -36615,8 +36120,8 @@ nated = Integer.parseInt(token2);
                 break;
 
             case 665:
-                sendInterfaceHidden(1, 2465);
-                sendInterfaceHidden(0, 2468);
+                getPA().sendInterfaceHidden(1, 2465);
+                getPA().sendInterfaceHidden(0, 2468);
                 choice("Start Desert Tresure?", "Yes..im ready..","Yes..im ready..");
                 NpcDialogueSend = true;
                 break;
@@ -36641,18 +36146,18 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("I need the ice diamond to save my wifes life!", 4904);
                 getPA().sendFrame126("I heard your in need of Blood Diamond..i could show you..", 4905);
                 getPA().sendFrame126("Do you have the Ice Diamond though?", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
 
             case 620:
-                sendInterfaceHidden(1, 2465);
-                sendInterfaceHidden(0, 2468);
+                getPA().sendInterfaceHidden(1, 2465);
+                getPA().sendInterfaceHidden(0, 2468);
                 getPA().sendFrame126("Select an Option", 2460);
                 getPA().sendFrame126("Yes, I did", 2461);
                 getPA().sendFrame126("No, I did not", 2462);
-                sendFrame164(2459);
+                getPA().sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
@@ -36662,8 +36167,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("Then why are you standing here?", 4904);
                 getPA().sendFrame126("", 4905);
                 getPA().sendFrame126("", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 1920:
@@ -36672,18 +36177,18 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("i need you to obtain a blood diamond *Hissss*", 4904);
                 getPA().sendFrame126("Do you have it already?", 4905);
                 getPA().sendFrame126("@bla@i @red@N@red@E@red@E@red@D@bla@ IT! *hiss*", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
 
             case 1921:
-                sendInterfaceHidden(1, 2465);
-                sendInterfaceHidden(0, 2468);
+                getPA().sendInterfaceHidden(1, 2465);
+                getPA().sendInterfaceHidden(0, 2468);
                 getPA().sendFrame126("Select an Option", 2460);
                 getPA().sendFrame126("Yea, i got it right here.", 2461);
                 getPA().sendFrame126("No, I dont have it yet", 2462);
-                sendFrame164(2459);
+                getPA().sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
@@ -36693,8 +36198,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("@red@THEN FIND IT!!!@red@*Hisssss*", 4904);
                 getPA().sendFrame126("", 4905);
                 getPA().sendFrame126("", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 1972:
@@ -36703,8 +36208,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("Hey there!", 4904);
                 getPA().sendFrame126("Im a merchanter, and i REALLY need this stuff..", 4905);
                 getPA().sendFrame126("In return,i take you to the shadow area.", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 sendMessage("Get the following,");
                 sendMessage("1 yew log");
@@ -36716,12 +36221,12 @@ nated = Integer.parseInt(token2);
                 break;
 
             case 1973:
-                sendInterfaceHidden(1, 2465);
-                sendInterfaceHidden(0, 2468);
+                getPA().sendInterfaceHidden(1, 2465);
+                getPA().sendInterfaceHidden(0, 2468);
                 getPA().sendFrame126("Have you got it?", 2460);
                 getPA().sendFrame126("Yea, right here.", 2461);
                 getPA().sendFrame126("Not yet, sorry", 2462);
-                sendFrame164(2459);
+                getPA().sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
@@ -36731,8 +36236,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("oh..to bad...", 4904);
                 getPA().sendFrame126("was gonna take you to shadow cave..", 4905);
                 getPA().sendFrame126("", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
             case 905:
@@ -36741,18 +36246,18 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("Hey,"+playerName, 4904);
                 getPA().sendFrame126("A diamond was stolen from me..", 4905);
                 getPA().sendFrame126("Can you get it for me?", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
 
             case 906:
-                sendInterfaceHidden(1, 2465);
-                sendInterfaceHidden(0, 2468);
+                getPA().sendInterfaceHidden(1, 2465);
+                getPA().sendInterfaceHidden(0, 2468);
                 getPA().sendFrame126("i will show you the Smoke dungeon.", 2460);
                 getPA().sendFrame126("Yes", 2461);
                 getPA().sendFrame126("No", 2462);
-                sendFrame164(2459);
+                getPA().sendFrame164(2459);
                 NpcDialogueSend = true;
                 break;
 
@@ -36762,8 +36267,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("", 4904);
                 getPA().sendFrame126("alright.its on you.", 4905);
                 getPA().sendFrame126("However i would have shown you Smoke Dungeon", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
 
@@ -36773,8 +36278,8 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("You have finished the Quest!", 4904);
                 getPA().sendFrame126("in return..i will teach you ancient magicks", 4905);
                 getPA().sendFrame126("", 4906);
-                sendFrame75(NpcTalkTo, 4901);
-                sendFrame164(4900);
+                getPA().sendFrame75(NpcTalkTo, 4901);
+                getPA().sendFrame164(4900);
                 NpcDialogueSend = true;
                 break;
         }

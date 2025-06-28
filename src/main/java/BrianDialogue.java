@@ -25,7 +25,7 @@ public class BrianDialogue extends Dialogue {
                 break;
             case 5:
                 end();
-                getPlayer().RemoveAllWindows();
+                getPlayer().getPA().RemoveAllWindows();
                 break;
         }
     }
