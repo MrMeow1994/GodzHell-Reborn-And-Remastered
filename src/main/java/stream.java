@@ -222,8 +222,11 @@ public class stream {
         else writeFrameSizeWord(currentOffset - frameStack[frameStackPtr--]);
     }
 
-    public void writeByte(int i) {
-        buffer[currentOffset++] = (byte) i;
+    public void writeByte(int value) {
+        if (currentOffset >= buffer.length) {
+            throw new IndexOutOfBoundsException("Stream write overflow: attempted to write beyond buffer length of " + buffer.length);
+        }
+        buffer[currentOffset++] = (byte) value;
     }
 
     public void writeWord(int i) {
@@ -298,6 +301,9 @@ public class stream {
     }
 
     public int readUnsignedByte() {
+        if (currentOffset >= buffer.length) {
+            throw new IndexOutOfBoundsException("Stream read overflow");
+        }
         return buffer[currentOffset++] & 0xff;
     }
 

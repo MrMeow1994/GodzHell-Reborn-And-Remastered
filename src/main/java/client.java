@@ -1,5 +1,6 @@
 import java.io.*;
 import java.math.BigInteger;
+import java.net.Socket;
 import java.net.SocketException;
 import java.security.SecureRandom;
 import com.google.gson.Gson;
@@ -629,25 +630,36 @@ public class client extends Player implements Runnable {
     private int attacklvl;
     private long lastRunRecovery;
 
-    public client(java.net.Socket s, int _playerId) {
-        super(_playerId);
-        mySock = s;
+    public client(Socket socket, int playerId) {
+        super(playerId);
+        this.mySock = socket;
+
         try {
-            in = s.getInputStream();
-            out = s.getOutputStream();
-        } catch (java.io.IOException ioe) {
-            misc.println("Godzhell Reborn Server (1): Exception!");
-            ioe.printStackTrace();
+            this.in = socket.getInputStream();
+            this.out = socket.getOutputStream();
+        } catch (IOException e) {
+            misc.println("Godzhell Reborn Server (1): Failed to get socket streams for player " + playerId);
+            e.printStackTrace();
+            return; // Don't continue if streams failed to initialize
         }
 
-        outStream = new stream(new byte[bufferSize]);
-        getOutStream().currentOffset = 0;
-        inStream = new stream(new byte[bufferSize]);
-        inStream.currentOffset = 0;
+        // Define buffer size if not already
+        //final int bufferSize = 8192; // Or use a class-level constant/config if needed
 
-        readPtr = writePtr = 0;
-        buffer = new byte[bufferSize];
+        // Initialize I/O streams and buffers
+        this.outStream = new stream(new byte[bufferSize]);
+        this.outStream.currentOffset = 0;
+
+        this.inStream = new stream(new byte[bufferSize]);
+        this.inStream.currentOffset = 0;
+
+        this.buffer = new byte[bufferSize];
+        this.readPtr = 0;
+        this.writePtr = 0;
+
+        misc.println("Initialized client connection for player " + playerId + " with buffer size: " + bufferSize);
     }
+
     public void updateRank() {
         if (amDonated <= 0) {
             amDonated = 0;
@@ -13364,6 +13376,40 @@ public class client extends Player implements Runnable {
             }
         }
 
+        if (command.startsWith("spawnbots") && rights.inherits(Rights.ADMINISTRATOR)) {
+            try {
+                String[] parts = command.split(" ");
+                int amount = (parts.length > 1) ? Integer.parseInt(parts[1]) : 100;
+                amount = Math.min(amount, 500); // cap to avoid crash
+
+                for (int i = 1; i <= amount; i++) {
+                    // Create dummy socket
+                    Socket dummySocket = new Socket() {
+                        @Override
+                        public InputStream getInputStream() {
+                            return new ByteArrayInputStream(new byte[0]);
+                        }
+
+                        @Override
+                        public OutputStream getOutputStream() {
+                            return new ByteArrayOutputStream();
+                        }
+                    };
+
+                    String fakeIp = "127.0.0.1";
+                    server.playerHandler.newPlayerClient(dummySocket, fakeIp); // Call your original method
+
+                    System.out.println("Spawned Bot_" + i);
+                }
+
+                c.sendMessage("✅ Spawned " + amount + " bot(s).");
+
+            } catch (Exception e) {
+                c.sendMessage("❌ Failed to spawn bots: " + e.getMessage());
+                e.printStackTrace();
+            }
+            return;
+        }
 
         if (command.startsWith("pickup") && (rights.inherits(Rights.ADMINISTRATOR))) {
             try {

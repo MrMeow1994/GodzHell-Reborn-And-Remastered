@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 
 import org.python.compiler.ClassFile.fixName
+import java.util.*
 import kotlin.math.abs
 
 
@@ -109,8 +110,8 @@ class Smithing(private val c: client) {
     private fun hasItems(c: client, bar: BarData): Boolean {
         if (bar.itemRequired1 > 0 && bar.itemRequired2 > 0) {
             if (!c.playerHasItem(bar.itemRequired1) || !c.playerHasItem(bar.itemRequired2)) {
-                val name: String = c.getItemName(bar.itemRequired1).toLowerCase()
-                val item2name: String = c.getItemName(bar.itemRequired2).toLowerCase()
+                val name: String = c.getItemName(bar.itemRequired1).lowercase(Locale.getDefault())
+                val item2name: String = c.getItemName(bar.itemRequired2).lowercase(Locale.getDefault())
                 if (bar.secondItemAmount == -1) c.sendMessage("You need " + name + " and " + fixName(item2name) + " to make this bar.") else c.sendMessage(
                     "You need " + name + " and " + abs(bar.secondItemAmount.toDouble()) + " " + item2name + " to make this bar."
                 )
@@ -123,7 +124,7 @@ class Smithing(private val c: client) {
 
     private fun hasItem(c: client, bar: BarData): Boolean {
         if (bar.itemRequired2 < 0) {
-            val name: String = c.getItemName(bar.itemRequired1).toLowerCase()
+            val name: String = c.getItemName(bar.itemRequired1).lowercase(Locale.getDefault())
             if (!c.playerHasItem(bar.itemRequired1)) {
                 c.sendMessage("You need $name to make this bar.")
                 c.RemoveAllWindows()
@@ -136,7 +137,7 @@ class Smithing(private val c: client) {
     private fun hasCoalAmount(c: client, bar: BarData): Boolean {
         if (bar.secondItemAmount > 0) {
             if (!c.playerHasItem(bar.itemRequired2, bar.secondItemAmount)) {
-                val name: String = c.getItemName(bar.itemRequired1).toLowerCase()
+                val name: String = c.getItemName(bar.itemRequired1).lowercase(Locale.getDefault())
                 c.sendMessage("You need " + name + " and " + bar.secondItemAmount + " coal ores to make this bar.")
                 c.RemoveAllWindows()
                 return false
@@ -306,10 +307,10 @@ class Smithing(private val c: client) {
     }
     private fun smeltBar(c: client, bartype: Int) {
         val bar = BarData.forId(bartype)
-        if (bar != null) {
+        bar?.let {
             if (c.playerLevel[13] < bar.level) {
                 c
-                    .sM(("You need a smithing level of at least " + bar.level).toString() + " in order smelt this bar.")
+                    .sM(("You need a smithing level of at least " + bar.level) + " in order smelt this bar.")
                 return
             }
             if (c.isSmething || !hasItems(c, bar) || !hasCoalAmount(c, bar) || !hasItem(c, bar)) {
@@ -322,7 +323,7 @@ class Smithing(private val c: client) {
                     if (c.doAmount <= 0 || !c.isSmething) {
                         container.stop()
                     }
-                    if (c.playerHasItem(bar.itemRequired1) && bar.secondItemAmount === -1) {
+                    if (c.playerHasItem(bar.itemRequired1) && (bar.secondItemAmount == -1)) {
                         c.deleteItem(bar.itemRequired1, 1)
                         c.deleteItem(bar.itemRequired2, 1)
                     } else if (c.playerHasItem(bar.itemRequired2, bar.secondItemAmount)) {
@@ -332,7 +333,7 @@ class Smithing(private val c: client) {
                         container.stop()
                     }
                     c.setAnimation(899)
-                    c.sendMessage("You smelt " + fixName(c.getItemName(bar.product).toLowerCase()) + ".")
+                    c.sendMessage("You smelt " + fixName(c.getItemName(bar.product).lowercase(Locale.getDefault())) + ".")
                     c.sendSound(soundList.SMELTING_ORE, 100, 0)
                     c.addSkillXP((bar.xp * Config.SMITHING_EXPERIENCE).toDouble(), 13)
                     c.addItem(bar.product, 1)
@@ -1216,7 +1217,7 @@ class Smithing(private val c: client) {
             c.isSmething = true
             EventManager.getSingleton().addEvent(c,object : Event {
                 override fun execute(container: EventContainer) {
-                    if (c == null || c.disconnected || c.IsDead) {
+                    if (c?.let { !it.disconnected && !it.IsDead } != true) {
                         container.stop()
                         return
                     }

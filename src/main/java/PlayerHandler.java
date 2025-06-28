@@ -2,6 +2,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.gson.Gson;
@@ -82,11 +84,14 @@ public class PlayerHandler {
     public static Stream<Player> nonNullStream() {
         return Arrays.stream(players).filter(Objects::nonNull);
     }
-    // a new client connected
+    // Place this somewhere at the top of your class or as a static field if needed
+    private static final ExecutorService playerThreadPool = Executors.newCachedThreadPool();
+
+    // A new client connected
     public void newPlayerClient(Socket socket, String connectedFrom) {
         int slot = -1;
 
-        // Search for a free player slot, skipping index 0
+        // Search from playerSlotSearchStart to maxPlayers
         for (int i = playerSlotSearchStart; i < maxPlayers; i++) {
             if (players[i] == null) {
                 slot = i;
@@ -94,7 +99,7 @@ public class PlayerHandler {
             }
         }
 
-        // If no free slot found in remaining array, wrap around to search earlier slots
+        // Wrap around to search lower indices
         if (slot == -1) {
             for (int i = 1; i < playerSlotSearchStart; i++) {
                 if (players[i] == null) {
@@ -104,25 +109,45 @@ public class PlayerHandler {
             }
         }
 
-        // Still no slot? Server is full
+        // No available slot
         if (slot == -1) {
             System.err.println("No free player slots available. Connection rejected from: " + connectedFrom);
             return;
         }
 
-        // Initialize client
-        client newClient = new client(socket, slot);
-        newClient.handler = this;
-        players[slot] = newClient;
-        players[slot].connectedFrom = connectedFrom;
+        try {
+            // Optional: timeout to prevent login hang
+            socket.setSoTimeout(10000); // 10 seconds
 
-        // Start player thread
-        new Thread(newClient, "Player-" + slot).start();
+            // Create and assign the new client
+            client newClient = new client(socket, slot);
+            newClient.handler = this;
+            newClient.connectedFrom = connectedFrom;
 
-        // Update state
-        updatePlayerNames();
-        playerSlotSearchStart = (slot + 1) % maxPlayers;
-        if (playerSlotSearchStart == 0) playerSlotSearchStart = 1; // Skip index 0
+            // Register in player array
+            players[slot] = newClient;
+
+            // Submit to thread pool
+            playerThreadPool.execute(newClient);
+
+            // Update player name list
+            updatePlayerNames();
+
+            // Increment slot search index
+            playerSlotSearchStart = (slot + 1) % maxPlayers;
+            if (playerSlotSearchStart == 0) {
+                playerSlotSearchStart = 1; // skip index 0
+            }
+
+            System.out.println("✅ Accepted connection from " + connectedFrom + " in slot " + slot);
+
+        } catch (IOException e) {
+            System.err.println("❌ Failed to initialize socket from: " + connectedFrom);
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error during player connection:");
+            e.printStackTrace();
+        }
     }
 
     public void destruct() {
