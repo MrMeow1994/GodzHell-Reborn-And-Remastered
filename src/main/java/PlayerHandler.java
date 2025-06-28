@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.Socket;
 import java.util.*;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -82,33 +83,46 @@ public class PlayerHandler {
         return Arrays.stream(players).filter(Objects::nonNull);
     }
     // a new client connected
-    public void newPlayerClient(java.net.Socket s, String connectedFrom) {
-        // first, search for a free slot
-        //int slot = -1, i = playerSlotSearchStart;
-        int slot = -1, i = 1;
-        do {
+    public void newPlayerClient(Socket socket, String connectedFrom) {
+        int slot = -1;
+
+        // Search for a free player slot, skipping index 0
+        for (int i = playerSlotSearchStart; i < maxPlayers; i++) {
             if (players[i] == null) {
                 slot = i;
                 break;
             }
-            i++;
-            if (i >= maxPlayers) i = 0;        // wrap around
-//		} while(i != playerSlotSearchStart);
-        } while (i <= maxPlayers);
+        }
 
-        client newClient = new client(s, slot);
+        // If no free slot found in remaining array, wrap around to search earlier slots
+        if (slot == -1) {
+            for (int i = 1; i < playerSlotSearchStart; i++) {
+                if (players[i] == null) {
+                    slot = i;
+                    break;
+                }
+            }
+        }
+
+        // Still no slot? Server is full
+        if (slot == -1) {
+            System.err.println("No free player slots available. Connection rejected from: " + connectedFrom);
+            return;
+        }
+
+        // Initialize client
+        client newClient = new client(socket, slot);
         newClient.handler = this;
-        (new Thread(newClient)).start();
-        if (slot == -1) return;        // no free slot found - world is full
         players[slot] = newClient;
         players[slot].connectedFrom = connectedFrom;
-        updatePlayerNames();
 
-        // start at next slot when issuing the next search to speed it up
-        playerSlotSearchStart = slot + 1;
-        if (playerSlotSearchStart > maxPlayers) playerSlotSearchStart = 1;
-        // Note that we don't use slot 0 because playerId zero does not function
-        // properly with the client.
+        // Start player thread
+        new Thread(newClient, "Player-" + slot).start();
+
+        // Update state
+        updatePlayerNames();
+        playerSlotSearchStart = (slot + 1) % maxPlayers;
+        if (playerSlotSearchStart == 0) playerSlotSearchStart = 1; // Skip index 0
     }
 
     public void destruct() {
@@ -162,7 +176,7 @@ public class PlayerHandler {
 
     public void process() {
         try {
-            if (messageToAll.length() > 0) {
+            if (!messageToAll.isEmpty()) {
                 int msgTo = 1;
                 do {
                     if (players[msgTo] != null) {
@@ -207,11 +221,11 @@ public class PlayerHandler {
                 if (players[randomOrder[i]].disconnected) {
                     for (int i2 = 0; i2 < NPCHandler.maxNPCs; i2++) {
                         if (NPCHandler.npcs[i2] != null && players[randomOrder[i]] != null) {
-                            if (NPCHandler.npcs[i2].followPlayer == players[randomOrder[i]].playerId && NPCHandler.npcs[i2] != null)
+                            if (NPCHandler.npcs[i2].followPlayer == players[randomOrder[i]].playerId)
                                 NPCHandler.npcs[i2].IsDead = true;
                         }
                     }
-                    if (players[randomOrder[i]].savefile == true) {
+                    if (players[randomOrder[i]].savefile) {
                         if (saveGame(players[randomOrder[i]])) {
                             playerCount--;
                             savechar(players[randomOrder[i]]);
@@ -245,7 +259,7 @@ public class PlayerHandler {
                                 NPCHandler.npcs[i3].IsDead = true;
                         }
                     }
-                    if (players[randomOrder[i]].savefile == true) {
+                    if (players[randomOrder[i]].savefile) {
                         if (saveGame(players[randomOrder[i]])) {
                             playerCount--;
                             savechar(players[randomOrder[i]]);
@@ -258,13 +272,11 @@ public class PlayerHandler {
                     }
                     removePlayer(players[randomOrder[i]]);
                     players[randomOrder[i]] = null;
+                } else if (!players[randomOrder[i]].initialized) {
+                    players[randomOrder[i]].initialize();
+                    players[randomOrder[i]].initialized = true;
                 } else {
-                    if (!players[randomOrder[i]].initialized) {
-                        players[randomOrder[i]].initialize();
-                        players[randomOrder[i]].initialized = true;
-                    } else {
-                        players[randomOrder[i]].update();
-                    }
+                    players[randomOrder[i]].update();
                 }
             }
 
@@ -300,7 +312,7 @@ public class PlayerHandler {
         int size = plr.npcListSize;
         plr.npcListSize = 0;
         for(int i = 0; i < size; i++) {
-            if(plr.RebuildNPCList == false && plr.withinDistance(plr.npcList[i]) == true) {
+            if(!plr.RebuildNPCList && plr.withinDistance(plr.npcList[i])) {
                 plr.npcList[i].updateNPCMovement(str);
                 plr.npcList[i].appendNPCUpdateBlock(updateBlock);
                 plr.npcList[plr.npcListSize++] = plr.npcList[i];
@@ -318,11 +330,11 @@ public class PlayerHandler {
         int newNpcs = 0;
         // iterate through all npcs to check whether there's new npcs to add
         for(int i = 0; i < NPCHandler.maxNPCs; i++) {
-            if(server.npcHandler.npcs[i] != null) {
-                int id = server.npcHandler.npcs[i].npcId;
-                if (plr.RebuildNPCList == false && (plr.npcInListBitmap[id>>3]&(1 << (id&7))) != 0) {
+            if(NPCHandler.npcs[i] != null) {
+                int id = NPCHandler.npcs[i].npcId;
+                if (!plr.RebuildNPCList && (plr.npcInListBitmap[id>>3]&(1 << (id&7))) != 0) {
                     // npc already in npcList
-                } else if (plr.withinDistance(server.npcHandler.npcs[i]) == false) {
+                } else if (!plr.withinDistance(server.npcHandler.npcs[i])) {
                     // out of sight
                 } else {
                     plr.addNewNPC(server.npcHandler.npcs[i], str, updateBlock);

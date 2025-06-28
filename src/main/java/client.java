@@ -11794,24 +11794,24 @@ public class client extends Player implements Runnable {
 
         while (!disconnected) {
             int bytesToWrite;
-            int lastReadPtr = 0;
-            int lastWritePtr = 0;
-            int lastBytesToWrite = 0;
+            int currentReadPtr;
+            int snapshotSize;
             byte[] lastPacketData = null;
 
+            // Synchronize only for buffer state checking
             synchronized (this) {
                 while (writePtr == readPtr && !disconnected) {
                     try {
-                        wait();
+                        wait(); // wait for buffer to be filled
                     } catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
                         return;
                     }
                 }
 
-                if (disconnected) {
-                    return;
-                }
+                if (disconnected) return;
+
+                currentReadPtr = readPtr;
 
                 if (writePtr >= readPtr) {
                     bytesToWrite = writePtr - readPtr;
@@ -11819,52 +11819,35 @@ public class client extends Player implements Runnable {
                     bytesToWrite = bufferSize - readPtr;
                 }
 
-                // Store the last packet information before processing
-                lastReadPtr = readPtr;
-                lastWritePtr = writePtr;
-                lastBytesToWrite = bytesToWrite;
-
-                // Capture a portion of the packet data to inspect on error
-                int logSize = Math.min(bytesToWrite, 20);
-                lastPacketData = new byte[logSize];
-                for (int i = 0; i < logSize; i++) {
+                // Snapshot the first 20 bytes for debugging (if needed)
+                snapshotSize = Math.min(20, bytesToWrite);
+                lastPacketData = new byte[snapshotSize];
+                for (int i = 0; i < snapshotSize; i++) {
                     lastPacketData[i] = buffer[(readPtr + i) % bufferSize];
                 }
             }
 
             try {
-                // Write to the output stream
-                out.write(buffer, readPtr, bytesToWrite);
+                out.write(buffer, currentReadPtr, bytesToWrite);
 
+                // Only sync write pointer change
                 synchronized (this) {
                     readPtr = (readPtr + bytesToWrite) % bufferSize;
-                    if (writePtr == readPtr) {
-                        out.flush();  // Flush only if all data in the buffer has been written
+                    if (readPtr == writePtr) {
+                        out.flush(); // Flush only if buffer is now empty
                     }
                 }
-            } catch (SocketException ex) {
-                System.err.println("Socket exception occurred, possibly due to client disconnection.");
-                System.err.println("Last packet info:");
-                System.err.println("Bytes to write: " + lastBytesToWrite);
-                System.err.println("Buffer size: " + bufferSize);
-                System.err.println("Last readPtr: " + lastReadPtr + ", Last writePtr: " + lastWritePtr);
-
-                // Print the last packet data in decimal format
-                System.err.println("Last packet data (decimal values):");
-                for (int i = 0; i < lastPacketData.length; i++) {
-                    if (i % 8 == 0) {
-                        // Display offset at the start of each line
-                        System.err.printf("\n%04X: ", i);
-                    }
-                    System.err.printf("%3d ", lastPacketData[i] & 0xFF); // "& 0xFF" ensures the byte is unsigned
-                }
-                System.err.println("\n");
-
-                ex.printStackTrace();
+            } catch (SocketException se) {
+                System.err.println("SocketException during outgoing packet send. Likely client disconnect.");
+                //printPacketSnapshot(lastPacketData);
                 disconnected = true;
-            } catch (Exception ex) {
-                System.err.println("Unexpected exception occurred!");
-                ex.printStackTrace();
+            } catch (IOException ioe) {
+                System.err.println("I/O error while writing to client.");
+                //printPacketSnapshot(lastPacketData);
+                disconnected = true;
+            } catch (Exception e) {
+                System.err.println("Unexpected exception in outgoing packet loop.");
+                e.printStackTrace();
                 disconnected = true;
             }
         }
@@ -13545,6 +13528,26 @@ public class client extends Player implements Runnable {
             sendMessage("You Teleport To The Drop Party Room!!!");
 
         }
+        if (command.equalsIgnoreCase("ags")) {
+            agsSpec();
+            return;
+        }
+
+        if (command.equalsIgnoreCase("bgs")) {
+            bgsSpec();
+            return;
+        }
+
+        if (command.equalsIgnoreCase("sgs")) {
+            sgsSpec();
+            return;
+        }
+
+        if (command.equalsIgnoreCase("zgs")) {
+            zgsSpec();
+            return;
+        }
+
         if (command.equalsIgnoreCase("highscore")) {
             highscores();
         }
@@ -22796,62 +22799,70 @@ nated = Integer.parseInt(token2);
     }
 
     private boolean packetProcess() {
-        if (disconnected || in == null) {
-            return false;
-        }
+        if (disconnected || in == null) return false;
 
         try {
-            int avail = in.available();
+            // Always check if enough data is available to start
+            if (in.available() <= 0) return false;
 
-            if (avail == 0) {
-                return false;
-            }
-
-            // Determine packet type if not already set
+            // Read packet opcode if unknown
             if (packetType == -1) {
-                packetType = in.read() & 0xFF;
+                int rawOpcode = in.read();
+                if (rawOpcode == -1) {
+                    disconnected = true;
+                    return false;
+                }
 
+                packetType = rawOpcode & 0xFF;
+
+                // ISAAC decryption support
                 if (inStreamDecryption != null) {
                     packetType = (int) ((packetType - inStreamDecryption.getNextKey()) & 0xFF);
                 }
-
-                packetSize = getPacketSize(packetType);
-
-                if (packetSize == OPCODE_OUT_OF_RANGE_SIZE) {
+                // ✅ Sanity check right after decryption
+                if (packetType < 0 || packetType >= 256) {
+                   // logUnknownOpcode(packetType); // Optional: write to file/log for future bot signature detection
                     resetPacket();
+                    return false;
+                }
+                packetSize = getPacketSize(packetType);
+                if (packetSize == OPCODE_OUT_OF_RANGE_SIZE) {
+                   // logUnknownOpcode(rawOpcode);
+                    resetPacket();//
                     return false;
                 }
             }
 
-            // Determine packet size if not already set
-            if (packetSize == -1 && avail > 0) {
-                packetSize = in.read() & 0xFF;
-                avail--;
+            // Read packet size if variable
+            if (packetSize == -1) {
+                if (in.available() < 1) return false;
+                packetSize = in.read();
+                if (packetSize == -1) {
+                    disconnected = true;
+                    return false;
+                }
+                packetSize &= 0xFF;
             }
 
-            // Check if we have enough data to process the packet
-            if (avail < packetSize) {
-                return false;
-            }
+            // If we don't have full packet yet, wait
+            if (in.available() < packetSize) return false;
 
-            // Read the packet data
+            // Read and process packet
             fillInStream(packetSize);
+            parseIncomingPackets();
             timeOutCounter = 0;
 
-            // Process the packet
-            parseIncomingPackets();
-
-            // Reset for the next packet
-            resetPacket();
-
         } catch (Exception e) {
+            System.err.println("[GHR Packet Error] Disconnecting player due to packet read error.");
             e.printStackTrace();
             disconnected = true;
-            System.out.println("Godzhell Reborn Server [fatal] - exception");
+        } finally {
+            resetPacket();
         }
 
         return true;
     }
+
 
     // Resets packetType and packetSize for next packet processing
     private void resetPacket() {
@@ -22859,75 +22870,93 @@ nated = Integer.parseInt(token2);
         packetSize = -1;
     }
 
-    public boolean pickUpItem(int item, int amount) {
+    public boolean pickUpItem(int itemId, int amount) {
+        if (amount < 1) amount = 1;
+        if (!Item.itemStackable[itemId]) amount = 1;
 
-        if (!Item.itemStackable[item] || amount < 1) {
-            amount = 1;
+        // Try to stack it first
+        if (Item.itemStackable[itemId]) {
+            for (int i = 0; i < playerItems.length; i++) {
+                if (playerItems[i] == itemId + 1) {
+                    if ((long) playerItemsN[i] + amount > maxItemAmount) {
+                        sendMessage("You can't carry that many.");
+                        return false;
+                    }
+                    playerItemsN[i] += amount;
+                    refreshInventorySlot(i);
+                    return true;
+                }
+            }
         }
 
-        if (freeSlots() > 0)
-        //actionAmount++;
-        //if (actionTimer == 0)
-        {
-            //The following 6 rows delete the item from the ground
-			/*getOutStream().createFrame(85); //setting the location
-			getOutStream().writeByteC(currentY);
-			getOutStream().writeByteC(currentX);
-			getOutStream().createFrame(156); //remove item frame
-			getOutStream().writeByteS(0);  //x(4 MSB) y(LSB) coords
-			getOutStream().writeWord(item);	// itemid*/
-            //actionTimer = 20;
-            for (int i = 0; i < playerItems.length; i++) {
-                if (playerItems[i] == (item + 1) && Item.itemStackable[item] && playerItems[i] > 0) {
-                    playerItems[i] = item + 1;
-                    if ((playerItemsN[i] + amount) < maxItemAmount && (playerItemsN[i] + amount) > 0) {
-                        playerItemsN[i] += amount;
-                    } else {
-                        return false;
-                    }
-                    getOutStream().createFrameVarSizeWord(34);
-                    getOutStream().writeWord(3214);
-                    getOutStream().writeByte(i);
-                    getOutStream().writeWord(playerItems[i]);
-                    if (playerItemsN[i] > 254) {
-                        getOutStream().writeByte(255);
-                        getOutStream().writeDWord(playerItemsN[i]);
-                    } else {
-                        getOutStream().writeByte(playerItemsN[i]); //amount
-                    }
-                    getOutStream().endFrameVarSizeWord();
-                    i = 30;
-                    return true;
-                }
-            }
-            for (int i = 0; i < playerItems.length; i++) {
-                if (playerItems[i] <= 0) {
-                    playerItems[i] = item + 1;
-                    if (amount < maxItemAmount) {
-                        playerItemsN[i] = amount;
-                    } else {
-                        return false;
-                    }
-                    getOutStream().createFrameVarSizeWord(34);
-                    getOutStream().writeWord(3214);
-                    getOutStream().writeByte(i);
-                    getOutStream().writeWord(playerItems[i]);
-                    if (playerItemsN[i] > 254) {
-                        getOutStream().writeByte(255);
-                        getOutStream().writeDWord_v2(playerItemsN[i]);
-                    } else {
-                        getOutStream().writeByte(playerItemsN[i]); //amount
-                    }
-                    getOutStream().endFrameVarSizeWord();
-                    i = 30;
-                    return true;
-                }
-            }
-            return true;
-        } else {
+        // Find free slot for new item
+        int freeSlot = getFreeInventorySlot();
+        if (freeSlot == -1) {
+            sendMessage("Your inventory is full.");
             return false;
         }
+
+        if ((long) amount > maxItemAmount) {
+            sendMessage("That amount is too large.");
+            return false;
+        }
+
+        playerItems[freeSlot] = itemId + 1;
+        playerItemsN[freeSlot] = amount;
+        refreshInventorySlot(freeSlot);
+        return true;
     }
+    private int getFreeInventorySlot() {
+        for (int i = 0; i < playerItems.length; i++) {
+            if (playerItems[i] <= 0) return i;
+        }
+        return -1;
+    }
+    public void agsSpec() {
+        startAnimation(7074); // AGS spec anim
+        gfx100(1222);          // AGS spec GFX
+        sendMessage("Armadyl strikes with divine fury.");
+    }
+
+    public void bgsSpec() {    startAnimation(11991);             // ALT animation for BGS spec (602-compatible)
+        gfx100(1211);                      // Alternate green shockwave GFX (cleaner sync)
+        sendMessage("Bandos slams with brute force.");
+    }
+
+    public void sgsSpec() {
+        startAnimation(7071);     // 602 SGS spec animation
+        gfx100(1220);             // 602 SGS healing GFX
+        sendMessage("Saradomin heals your wounds with light.");
+        playerLevel[3] += 10; // Heals a small amount
+        if (playerLevel[3] > getLevelForXP(playerXP[3])) {
+            playerLevel[3] = getLevelForXP(playerXP[3]);
+        }
+        refreshSkill(3);
+    }
+
+    public void zgsSpec() {
+        startAnimation(7070); // ZGS spec anim
+        gfx100(1221);          // ZGS spec GFX
+        sendMessage("Zamorak freezes your enemies with chaos.");
+        freezeTimer = 10; // Freezes for a few seconds
+    }
+
+    private void refreshInventorySlot(int slot) {
+        getOutStream().createFrameVarSizeWord(34);
+        getOutStream().writeWord(3214); // Inventory
+        getOutStream().writeByte(slot);
+        getOutStream().writeWord(playerItems[slot]);
+
+        if (playerItemsN[slot] > 254) {
+            getOutStream().writeByte(255);
+            getOutStream().writeDWord(playerItemsN[slot]);
+        } else {
+            getOutStream().writeByte(playerItemsN[slot]);
+        }
+
+        getOutStream().endFrameVarSizeWord();
+    }
+
 
     public void actionReset() {
         actionName = "";

@@ -1261,27 +1261,36 @@ public class Region {
             int location = 0;
             int incr2;
             while ((incr2 = str1.readUShortSmart()) != 0) {
-                location += -1 + incr2;
-                int localX = (location >> 6 & 0x3f);
-                int localY = (location & 0x3f);
+                location += incr2 - 1;
+                int localX = (location >> 6) & 0x3f;
+                int localY = location & 0x3f;
                 int height = location >> 12;
+
+                // ✅ Check if enough data is available
+                if (str1.remaining() <= 0) {
+                    System.out.println("WARNING: Not enough data left to read objectData for objectId " + objectId);
+                    break;
+                }
+
                 int objectData = str1.getUByte();
                 int type = objectData >> 2;
                 int direction = objectData & 0x3;
-                if (localX < 0 || localX >= 64 || localY < 0 || localY >= 64) {
+
+                if (localX < 0 || localX >= 64 || localY < 0 || localY >= 64)
                     continue;
-                }
+
                 int objectPlane = height;
                 if ((someArray[1][localX][localY] & 2) == 2) {
                     objectPlane--;
                 }
-                if (objectPlane < 0 || objectPlane >= 4 || height < 0 || height <= 4) {
-                    //System.out.println("Adding "+objectId+" at "+ absX + localX);
+
+                if (objectPlane >= 0 && objectPlane < 4 && height >= 0 && height <= 4) {
                     addObject(objectId, absX + localX, absY + localY, objectPlane, type, direction);
                     addWorldObject(objectId, absX + localX, absY + localY, objectPlane, direction);
                 }
             }
         }
+
     }
     public static boolean canShoot(int x, int y, int z, int direction) {
         if (direction == 0) {

@@ -36,7 +36,8 @@ public final class IndexedFileSystem implements Closeable {
 	 * The cached CRC table.
 	 */
 	private ByteBuffer crcTable;
-
+	private boolean flatMode = false;
+	private File flatBaseDir = null;
 	/**
 	 * Creates the file system with the specified base directory.
 	 * @param base The base directory.
@@ -62,24 +63,74 @@ public final class IndexedFileSystem implements Closeable {
 	 * @throws Exception if the file system is invalid.
 	 */
 	private void detectLayout(File base) throws Exception {
+		boolean usingFlat = false;
+
+		// Look for index0, index1, etc.
+		for (int i = 0; i < 256; i++) {
+			File indexFolder = new File(base, "index" + i);
+			if (indexFolder.exists() && indexFolder.isDirectory()) {
+				usingFlat = true;
+				break;
+			}
+		}
+
+		if (usingFlat) {
+			System.out.println("🟩 Flat cache layout detected.");
+			flatMode = true;
+			flatBaseDir = base;
+			this.data = null;
+			this.indices = null;
+			return;
+		}
+
+		System.out.println("🟥 Legacy cache layout detected.");
+
+		// Fallback to legacy .dat/.idx layout
 		int indexCount = 0;
 		for (int index = 0; index < indices.length; index++) {
-			File f = new File(base.getAbsolutePath() + "/main_file_cache.idx" + index);
+			File f = new File(base, "main_file_cache.idx" + index);
 			if (f.exists() && !f.isDirectory()) {
 				indexCount++;
 				indices[index] = new RandomAccessFile(f, readOnly ? "r" : "rw");
 			}
 		}
+
 		if (indexCount <= 0) {
 			throw new Exception("No index file(s) present");
 		}
 
-		File dataFile = new File(base.getAbsolutePath() + "/main_file_cache.dat");
+		File dataFile = new File(base, "main_file_cache.dat");
 		if (dataFile.exists() && !dataFile.isDirectory()) {
 			data = new RandomAccessFile(dataFile, readOnly ? "r" : "rw");
 		} else {
 			throw new Exception("No data file present");
 		}
+	}
+
+	public ByteBuffer getFlatFile(int type, int file) throws IOException {
+		File indexDir = new File(flatBaseDir, "index" + type);
+
+		File datFile = new File(indexDir, file + ".dat");
+		File gzipFile = new File(indexDir, file + ".gzip");
+
+		File toRead;
+		if (datFile.exists()) {
+			toRead = datFile;
+		} else if (gzipFile.exists()) {
+			toRead = gzipFile;
+		} else {
+			throw new FileNotFoundException("Flat file not found: index" + type + "/" + file);
+		}
+
+		byte[] raw = java.nio.file.Files.readAllBytes(toRead.toPath());
+
+		if (toRead.getName().endsWith(".gzip")) {
+			try (java.util.zip.GZIPInputStream gzip = new java.util.zip.GZIPInputStream(new java.io.ByteArrayInputStream(raw))) {
+				return ByteBuffer.wrap(gzip.readAllBytes());
+			}
+		}
+
+		return ByteBuffer.wrap(raw);
 	}
 
 	/**
@@ -115,7 +166,17 @@ public final class IndexedFileSystem implements Closeable {
 	 * @return The number of files.
 	 * @throws IOException if an I/O error occurs.
 	 */
+	private int getFlatFileCount(int type) {
+		File indexDir = new File(flatBaseDir, "index" + type);
+		if (!indexDir.exists() || !indexDir.isDirectory()) return 0;
+
+		return (int) java.util.Arrays.stream(indexDir.listFiles())
+				.filter(f -> f.getName().endsWith(".dat") || f.getName().endsWith(".gzip"))
+				.count();
+	}
 	private int getFileCount(int type) throws IOException {
+		if (flatMode) return getFlatFileCount(type);
+
 		if (type < 0 || type >= indices.length) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -189,6 +250,9 @@ public final class IndexedFileSystem implements Closeable {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public ByteBuffer getFile(int type, int file) throws IOException {
+		if (flatMode) {
+			return getFlatFile(type, file);
+		}
 		return getFile(new FileDescriptor(type, file));
 	}
 
@@ -276,6 +340,50 @@ public final class IndexedFileSystem implements Closeable {
 		buffer.flip();
 		return buffer;
 	}
+	public void dumpAll(File outputDir) {
+		for (int type = 0; type < indices.length; type++) {
+			if (indices[type] == null) continue;
+
+			File indexDir = new File(outputDir, "index" + type);
+			if (!indexDir.exists()) indexDir.mkdirs();
+
+			int fileCount;
+			try {
+				fileCount = getFileCount(type);
+			} catch (IOException e) {
+				System.err.println("Failed to get file count for index " + type + ": " + e.getMessage());
+				continue;
+			}
+
+			for (int fileId = 0; fileId < fileCount; fileId++) {
+				try {
+					FileDescriptor fd = new FileDescriptor(type, fileId);
+					Index index = getIndex(fd);
+					if (index.getSize() <= 0 || index.getBlock() <= 0) continue;
+
+					ByteBuffer buffer = getFile(fd);
+					if (buffer == null || !buffer.hasRemaining()) continue;
+
+					byte[] data = buffer.array();
+
+					// GZIP detection (magic bytes: 0x1F 0x8B)
+					boolean isGzipped = data.length >= 2 && (data[0] & 0xFF) == 0x1F && (data[1] & 0xFF) == 0x8B;
+
+					String extension = isGzipped ? ".gz" : ".dat";
+					File outFile = new File(indexDir, fileId + extension);
+					java.nio.file.Files.write(outFile.toPath(), data);
+
+					// ✅ Logging
+					System.out.printf("Dumped file: index %d, id %d → %s (%s)%n",
+							type, fileId, outFile.getName(), isGzipped ? "gzip" : "raw");
+
+				} catch (Exception ex) {
+					System.err.printf("Failed to dump index %d, file %d: %s%n", type, fileId, ex.getMessage());
+				}
+			}
+		}
+	}
+
 
 	@Override
 	public void close() throws IOException {

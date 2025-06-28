@@ -67,7 +67,70 @@ public class PlayerData {
     private long[] ignores;
     private int consecutiveTasks; // Field for consecutive tasks
     private int loyaltyRank; // Field for loyalty rank
+    public static PlayerData from(Player plr) {
+        PlayerData data = new PlayerData();
 
+        data.username = plr.playerName;
+        data.password = plr.playerPass;
+        data.displayName = plr.displayName;
+        data.heightLevel = plr.heightLevel;
+        data.absX = plr.absX;
+        data.absY = plr.absY;
+        data.rights = plr.getRights().getValue();
+        data.runEnergy = plr.runEnergy;
+        data.runningToggled = plr.runningToggled;
+        data.daysPlayed = plr.daysPlayed;
+        data.hoursPlayed = plr.hoursPlayed;
+        data.minutesPlayed = plr.minutesPlayed;
+        data.secondsPlayed = plr.secondsPlayed;
+        data.amDonated = plr.amDonated;
+        data.hasFirstFloorDone = plr.hasfirstfloorDone;
+        data.hasSecondFloorDone = plr.hassecoundfloorDone;
+        data.hasThirdFloorDone = plr.hasthirdfloorDone;
+        data.hasFourthFloorDone = plr.hasfourthfloorDone;
+        data.skullTimer = plr.skullTimer;
+
+        client target = (client) plr;
+        data.slayerTask = target.getSlayer().getTask();
+        data.slayerTaskAmount = target.getSlayer().getTaskAmount();
+        data.slayerMaster = target.getSlayer().getMaster();
+        data.consecutiveTasks = target.getSlayer().getConsecutiveTasks();
+
+        data.playerIsMember = plr.playerIsMember;
+        data.playerHasDonated = plr.playerHasDonated;
+        data.jailed = plr.jailed;
+        data.playerMessages = plr.playerMessages;
+        data.playerLastConnect = plr.playerLastConnect;
+        data.playerUID = plr.playerUID;
+        data.macAddress = plr.macAddress;
+        data.uuid = plr.uuid;
+        data.countryCode = plr.countryCode;
+        data.playerLastLogin = plr.playerLastLogin;
+        data.playerEnergy = plr.playerEnergy;
+        data.playerGameTime = plr.playerGameTime;
+        data.playerGameCount = plr.playerGameCount;
+        data.loyaltyRank = plr.loyaltyRank;
+        data.prestigeLevel = plr.prestigeLevel;
+
+        data.playerEquipment = plr.playerEquipment;
+        data.playerEquipmentN = plr.playerEquipmentN;
+        data.playerAppearance = plr.playerAppearance;
+        data.playerColor = plr.playerColor;
+        data.playerLevel = plr.playerLevel;
+        data.playerXP = plr.playerXP;
+        data.playerItems = plr.playerItems;
+        data.playerItemsN = plr.playerItemsN;
+        data.bankItems = plr.bankItems;
+        data.bankItemsN = plr.bankItemsN;
+        data.bankItems2 = plr.bankItems2;
+        data.bankItemsN2 = plr.bankItemsN2;
+        data.bankItems3 = plr.bankItems3;
+        data.bankItemsN3 = plr.bankItemsN3;
+        data.friends = plr.friends;
+        data.ignores = plr.ignores;
+
+        return data;
+    }
     // Add these methods to the class:
     public int getLoyaltyRank() {
         return loyaltyRank;

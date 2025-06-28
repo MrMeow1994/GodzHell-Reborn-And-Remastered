@@ -1172,7 +1172,7 @@ public class NPCHandler {
                     if(npcGetsAnnoyed(npcId) && (npcs[npcId] != null) && (npcs[npcId].StartKilling == 0)) {
                         npcs[npcId].StartKilling = player.playerId;
                         npcs[npcId].RandomWalk = false;
-                        AttackPlayer(npcId);
+                        attackPlayer(npcId);
                     }
                 }
             }
@@ -1508,7 +1508,7 @@ public class NPCHandler {
                                     || npcs[i].npcType == 54 || npcs[i].npcType == 8133) {
                                 AttackPlayerMage(i);
                             } else  {
-                                AttackPlayer(i);
+                                attackPlayer(i);
                             }
                         } else if (npcs[i].followingPlayer
                                 && npcs[i].followPlayer > 0
@@ -1544,7 +1544,7 @@ public class NPCHandler {
                                             || npcs[i].npcType == 54 || npcs[i].npcType == 8133) {
                                         AttackPlayerMage(i);
                                     } else {
-                                        AttackPlayer(i);
+                                        attackPlayer(i);
                                     }
                                 }
 
@@ -3578,109 +3578,171 @@ public class NPCHandler {
     }
 
 
-    public boolean AttackPlayer(int NPCID) {
-        int Player = npcs[NPCID].StartKilling;
+    public boolean attackPlayer(int npcId) {
+        NPC npc = npcs[npcId];
+        int playerIndex = npc.StartKilling;
 
-        if (server.playerHandler.players[Player] == null) {
-            ResetAttackPlayer(NPCID);
-            return false;
-        } else if (server.playerHandler.players[Player].DirectionCount < 2) {
-            handleClipping(NPCID);
+        if (!isPlayerValid(playerIndex)) {
+            resetAttackPlayer(npcId);
             return false;
         }
-        client plr = (client) server.playerHandler.players[Player];
-        int EnemyX = server.playerHandler.players[Player].absX;
-        int EnemyY = server.playerHandler.players[Player].absY;
-        npcs[NPCID].faceplayer(plr.playerId);
-        npcs[NPCID].enemyX = EnemyX;
-        npcs[NPCID].enemyY = EnemyY;
 
-        int EnemyHP = server.playerHandler.players[Player].playerLevel[server.playerHandler.players[Player].playerHitpoints];
-        int EnemyMaxHP = getLevelForXP(
-                server.playerHandler.players[Player].playerXP[server.playerHandler.players[Player].playerHitpoints]);
-        boolean RingOfLife = server.playerHandler.players[Player].playerEquipment[server.playerHandler.players[Player].playerRing]
-                == 2570;
-
-        if(EnemyX != npcs[NPCID].absX && EnemyY != npcs[NPCID].absY) // Xerozcheez: stops client crashing
-            plr.viewTo(npcs[NPCID].absX, npcs[NPCID].absY); // Xerozcheez: Player turns to npc
-
-        if (server.playerHandler.players[Player].attacknpc == NPCID) {
-            server.playerHandler.players[Player].face = NPCID; // Xerozcheez: sets npc index for player to view
-            server.playerHandler.players[Player].faceUpdateRequired = true; // Xerozcheez: updates face npc index so player faces npcs
-            server.playerHandler.players[Player].attacknpc = NPCID; // Xerozcheez: makes it so if player runs away the player attacks back when npc follows
-            server.playerHandler.players[Player].IsAttackingNPC = true; // Xerozcheez: makes it so if player runs away the player attacks back when npc follows
+        client player = (client) server.playerHandler.players[playerIndex];
+        if (!playerHasDirection(player)) {
+            handleClipping(npcId);
+            return false;
         }
-        int hitDiff = 0;
 
-        hitDiff = misc.random(npcs[NPCID].MaxHit);
-        if (npcs[NPCID].npcType != 3200 && npcs[NPCID].npcType != 1645) {
-            FollowPlayerCB(NPCID, Player);
-            handleClipping(NPCID);
+        handleFacing(npc, player);
+
+        if (!isInRange(npc, player) && npc.npcType != 3200) {
+            return false;
         }
-        if (GoodDistance(npcs[NPCID].absX, npcs[NPCID].absY, EnemyX, EnemyY, 1)
-                || npcs[NPCID].npcType == 3200) {
-            if (npcs[NPCID].actionTimer == 0) {
-                if (RingOfLife
-                        && EnemyHP
-                        <= (int) (((double) EnemyMaxHP / 10.0)
-                        + 0.5)) {
-                    server.playerHandler.players[Player].SafeMyLife = true;
-                } else {
-                    if (server.playerHandler.players[Player].IsDead) {
-                        ResetAttackPlayer(NPCID);
-                    } else {
-                        if (npcs[NPCID].npcType == 8349) {
-                            if (npcs[NPCID].HP >= 1000 && npcs[NPCID].HP <= 1500) {
-                                NPCHandler.npcs[NPCID].requestTransform(8351);
-                                //NPCHandler.npcs[i].gfx100(1885);
-                            }
-                        } else if (npcs[NPCID].npcType == 8351) {
-                            if (npcs[NPCID].HP >= 500 && npcs[NPCID].HP <= 1000) {
-                                NPCHandler.npcs[NPCID].requestTransform(8350);
-                                //NPCHandler.npcs[i].gfx100(1885);
-                            }
-                        } else if (npcs[NPCID].npcType == 8350) {
-                            if (npcs[NPCID].HP <= 500) {
-                                NPCHandler.npcs[NPCID].requestTransform(8349);
-                                //NPCHandler.npcs[i].gfx100(1885);
-                            }
 
+        if (npc.actionTimer > 0) return false;
 
-                        }
-                        plr.sendSound(getNpcAttackSound(npcs[NPCID].npcType), 100, 0);
-                        npcs[NPCID].animNumber = getNpcAttackAnimation(npcs[NPCID].npcType);
-                        if (npcs[NPCID].projectileId > 0) {
-                            int nX = npcs[NPCID].getX() + offset(npcs[NPCID].npcType);
-                            int nY = npcs[NPCID].getY() + offset(npcs[NPCID].npcType);
-                            int pX = plr.getX();
-                            int pY = plr.getY();
-                            int offX = (nX - pX) * -1;
-                            int offY = (nY - pY) * -1;
-                            int centerX = nX + npcs[NPCID].getNPCSize() / 2;
-                            int centerY = nY + npcs[NPCID].getNPCSize() / 2;
-                            plr.createPlayersProjectile(centerX, centerY, offX, offY, 50, getProjectileSpeed(npcs[NPCID].npcType), npcs[NPCID].projectileId, getProjectileStartHeight(npcs[NPCID].npcId, npcs[NPCID].projectileId), getProjectileEndHeight(npcs[NPCID].npcId, npcs[NPCID].projectileId), -plr.playerId - 1, 65);
-                        }
-                        plr.sendSound(soundConfig.getPlayerBlockSounds(plr), 100, 0);
-                        plr.startAnimation(
-                                plr.GetBlockAnim(
-                                        plr.playerEquipment[plr.playerWeapon]));
-                        npcs[NPCID].faceNPC(plr.playerId);
-                        npcs[NPCID].animUpdateRequired = true;
-                        npcs[NPCID].updateRequired = true;
-                        if ((EnemyHP - hitDiff) < 0) {
-                            hitDiff = EnemyHP;
-                        }
-                        server.playerHandler.players[Player].hitDiff = hitDiff;
-                        server.playerHandler.players[Player].updateRequired = true;
-                        server.playerHandler.players[Player].hitUpdateRequired = true;
-                        server.playerHandler.players[Player].appearanceUpdateRequired = true;
-                        npcs[NPCID].actionTimer = 4;
-                    }
-                }
-                return true;
+        if (shouldTriggerRingOfLife(player)) {
+            player.SafeMyLife = true;
+            return true;
+        }
+
+        if (player.IsDead) {
+            resetAttackPlayer(npcId);
+            return false;
+        }
+
+        handleNpcTransform(npc);
+
+        int damage = calculateHit(npc, player);
+        if (damage > player.NewHP) {
+            damage = player.NewHP;
+        }
+
+        playAttackEffects(npc, player);
+        applyDamage(player, damage);
+        npc.actionTimer = 4;
+
+        return true;
+    }
+    public void resetAttackPlayer(int npcId) {
+        if (npcId < 0 || npcId >= npcs.length || npcs[npcId] == null) return;
+
+        NPC npc = npcs[npcId];
+        int playerIndex = npc.StartKilling;
+
+        if (playerIndex >= 0 && playerIndex < server.playerHandler.players.length) {
+            client player = (client) server.playerHandler.players[playerIndex];
+            if (player != null && player.IsAttackingNPC && player.attacknpc == npcId) {
+                player.IsAttackingNPC = false;
+                player.attacknpc = -1;
             }
         }
-        return false;
+
+        npc.StartKilling = 0;
+        npc.RandomWalk = true;
+        npc.face = 0;
+        npc.faceUpdateRequired = true;
+        npc.followPlayer = -1;
+        npc.killedBy = 0;
+    }
+
+    private static final int RING_OF_LIFE_ID = 2570;
+
+    private boolean isPlayerValid(int index) {
+        return index >= 0 && index < server.playerHandler.players.length && server.playerHandler.players[index] != null;
+    }
+
+    private boolean playerHasDirection(client player) {
+        return player.DirectionCount >= 2;
+    }
+
+    private void handleFacing(NPC npc, client player) {
+        npc.faceplayer(player.playerId);
+        npc.enemyX = player.absX;
+        npc.enemyY = player.absY;
+
+        if (npc.absX != player.absX || npc.absY != player.absY) {
+            player.viewTo(npc.absX, npc.absY);
+        }
+
+        player.face = npc.npcId;
+        player.faceUpdateRequired = true;
+        player.attacknpc = npc.npcId;
+        player.IsAttackingNPC = true;
+
+        FollowPlayerCB(npc.npcId, player.playerId);
+        handleClipping(npc.npcId);
+    }
+
+    private boolean isInRange(NPC npc, client player) {
+        return GoodDistance(npc.absX, npc.absY, player.absX, player.absY, npc.getNPCSize());
+    }
+
+    private boolean shouldTriggerRingOfLife(client player) {
+        int currentHP = player.playerLevel[player.playerHitpoints];
+        int maxHP = getLevelForXP(player.playerXP[player.playerHitpoints]);
+        return player.playerEquipment[player.playerRing] == RING_OF_LIFE_ID && currentHP <= maxHP / 10;
+    }
+
+    private void handleNpcTransform(NPC npc) {
+        int hp = npc.HP;
+
+        switch (npc.npcType) {
+            case 8349:
+                if (hp >= 1000 && hp <= 1500) npc.requestTransform(8351);
+                break;
+            case 8351:
+                if (hp >= 500 && hp <= 1000) npc.requestTransform(8350);
+                break;
+            case 8350:
+                if (hp <= 500) npc.requestTransform(8349);
+                break;
+        }
+    }
+
+    private int calculateHit(NPC npc, client player) {
+        return misc.random(npc.MaxHit);
+    }
+
+    private void playAttackEffects(NPC npc, client player) {
+        player.sendSound(getNpcAttackSound(npc.npcType), 100, 0);
+        npc.animNumber = getNpcAttackAnimation(npc.npcType);
+        npc.animUpdateRequired = true;
+        npc.updateRequired = true;
+
+        if (npc.projectileId > 0) {
+            sendProjectile(npc, player);
+        }
+
+        player.sendSound(soundConfig.getPlayerBlockSounds(player), 100, 0);
+        player.startAnimation(player.GetBlockAnim(player.playerEquipment[player.playerWeapon]));
+    }
+
+    private void sendProjectile(NPC npc, client player) {
+        int startX = npc.getX() + offset(npc.npcType);
+        int startY = npc.getY() + offset(npc.npcType);
+        int targetX = player.getX();
+        int targetY = player.getY();
+        int offX = (startX - targetX) * -1;
+        int offY = (startY - targetY) * -1;
+        int centerX = startX + npc.getNPCSize() / 2;
+        int centerY = startY + npc.getNPCSize() / 2;
+
+        player.createPlayersProjectile(
+                centerX, centerY, offX, offY, 50,
+                getProjectileSpeed(npc.npcType),
+                npc.projectileId,
+                getProjectileStartHeight(npc.npcId, npc.projectileId),
+                getProjectileEndHeight(npc.npcId, npc.projectileId),
+                -player.playerId - 1, 65
+        );
+    }
+
+    private void applyDamage(client player, int damage) {
+        player.hitDiff = damage;
+        player.updateRequired = true;
+        player.hitUpdateRequired = true;
+        player.appearanceUpdateRequired = true;
     }
 
     private int getProjectileStartHeight (int npcId, int projectileId) {

@@ -1,5 +1,6 @@
 package com.Ghreborn.jagcached;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
@@ -9,6 +10,7 @@ import java.util.logging.Logger;
 
 
 import com.Ghreborn.jagcached.dispatch.RequestWorkerPool;
+import com.Ghreborn.jagcached.fs.IndexedFileSystem;
 import com.Ghreborn.jagcached.net.FileServerHandler;
 import com.Ghreborn.jagcached.net.HttpPipelineFactory;
 import com.Ghreborn.jagcached.net.JagGrabPipelineFactory;
@@ -70,7 +72,7 @@ public final class FileServer {
 	public void start() throws Exception {
 		logger.info("Starting workers...");
 		pool.start();
-		
+
 		logger.info("Starting services...");
 		try {
 			start("HTTP", new HttpPipelineFactory(handler, timer), NetworkConstants.HTTP_PORT);

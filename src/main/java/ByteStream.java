@@ -115,14 +115,20 @@ public class ByteStream {
         System.arraycopy(buffer, i, abyte0, i - i, offset - 1 - i);
         return abyte0;
     }
-	
-	public byte[] read(int length)
-	{
-		byte[] b = new byte[length+45000];
-		for (int i = 0; i < length; i++)
-			b[i] = buffer[offset++];
+
+	public byte[] read(int length) {
+		if (offset + length > buffer.length) {
+			throw new IndexOutOfBoundsException("Trying to read beyond end of buffer");
+		}
+
+		byte[] b = new byte[length];
+		System.arraycopy(buffer, offset, b, 0, length);
+		offset += length;
 		return b;
 	}
 
+	public int remaining() {
+		return buffer.length - offset;
+	}
 }
 	
