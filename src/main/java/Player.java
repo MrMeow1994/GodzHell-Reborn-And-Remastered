@@ -34,6 +34,7 @@ public abstract class Player {
 	public Clan clan;
 	public long buySlayerTimer;
 	public boolean isMoving;
+	public final stream updateBlock = new stream(new byte[20000]);
 	private boolean hitUpdateRequired2;
 	boolean stopPlayerSkill = false;
 	int runEnergy = 100,  talkingNpc = -1;
@@ -1616,13 +1617,13 @@ public abstract class Player {
 		try {
 			str.writeByte(hitDiff); // What the perseon got 'hit' for
 			if (hitDiff > 0 && !newhptype && !poisondmg) {
-				str.writeByteA(1); // 0: red hitting - 1: blue hitting
+				str.writeByteS(1); // 0: red hitting - 1: blue hitting
 			} else if (hitDiff > 0 && poisondmg) {
-				str.writeByteA(0); // 0: red hitting - 1: blue hitting 2: poison 3: orange
+				str.writeByteS(0); // 0: red hitting - 1: blue hitting 2: poison 3: orange
 			} else if (hitDiff > 0 && newhptype) {
-				str.writeByteA(hptype); // 0: red hitting - 1: blue hitting
+				str.writeByteS(hptype); // 0: red hitting - 1: blue hitting
 			} else {
-				str.writeByteA(0); // 0: red hitting - 1: blue hitting
+				str.writeByteS(0); // 0: red hitting - 1: blue hitting
 			}
 			NewHP = (playerLevel[playerHitpoints] - hitDiff);
 			if (NewHP <= 0) {
@@ -1640,13 +1641,13 @@ public abstract class Player {
 		try {
 			str.writeByte(hitDiff); // What the perseon got 'hit' for
 			if (hitDiff > 0 && !newhptype && !poisondmg) {
-				str.writeByteS(1); // 0: red hitting - 1: blue hitting
+				str.writeByteA(1); // 0: red hitting - 1: blue hitting
 			} else if (hitDiff > 0 && poisondmg) {
-				str.writeByteS(2); // 0: red hitting - 1: blue hitting 2: poison 3: orange
+				str.writeByteA(2); // 0: red hitting - 1: blue hitting 2: poison 3: orange
 			} else if (hitDiff > 0 && newhptype) {
-				str.writeByteS(hptype); // 0: red hitting - 1: blue hitting
+				str.writeByteA(hptype); // 0: red hitting - 1: blue hitting
 			} else {
-				str.writeByteS(0); // 0: red hitting - 1: blue hitting
+				str.writeByteA(0); // 0: red hitting - 1: blue hitting
 			}
 			NewHP = (playerLevel[playerHitpoints] - hitDiff);
 			if (NewHP <= 0) {
@@ -1829,8 +1830,11 @@ public abstract class Player {
 	public int playerGameCount;
 	public boolean ChangeDoor[] = new boolean[ObjectHandler.MaxObjects];
 	public int respawnTimer;
-	public int underAttackBy2;
-	public int underAttackBy;
+	// --- Combat State ---
+	public int lastAttackedByNpc = -1;
+	public int lastCombatTime = 0;
+	public int underAttackBy = -1;
+	public int underAttackBy2 = -1;
 	public int lastNpcAttacked = 0;
 	public int totalDamageDealt = 0;
 	public boolean fishing = false;

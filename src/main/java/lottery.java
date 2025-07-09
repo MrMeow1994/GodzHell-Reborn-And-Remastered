@@ -49,8 +49,8 @@ public class lottery {
 				lotteryPlayerNames.add(c.playerName);
 				lotteryFund += ((entryPrice * 1000000)*.75);
 				c.deleteItem(995, entryPrice * 1000000);
-				c.sendMessage("You have been entered into the lottery, when the lottery fund reaches 150m a winner");
-				c.sendMessage("will be drawn");
+				c.sendMessage("<shad=A9a9a9><col=7851a9>You have been entered into the lottery, when the lottery fund reaches 150m a winner");
+				c.sendMessage("<shad=A9a9a9><col=7851a9>will be drawn");
 			} else {
 				c.sendMessage("You dont have enough cash!");
 			}
@@ -89,7 +89,7 @@ public class lottery {
 			for (int j = 0; j < PlayerHandler.players.length; j++) {
 				if (PlayerHandler.players[j] != null) {
 					client all = (client)PlayerHandler.players[j];
-					all.sendMessage("@red@[Lottery]The Lottery has been won by " + lotteryPlayerNames.get(winner));
+					all.sendMessage("<shad=A9a9a9><col=7851a9>[Lottery]The Lottery has been won by " + lotteryPlayerNames.get(winner));
 				}
 			}
 		} catch (Exception e) {
@@ -102,13 +102,13 @@ public class lottery {
 	public void
 	announceFund() {
 		int fund = lotteryFund / 1000000;
-		PlayerHandler.messageToAll = "@red@[Lottery]The Lottery Fund is currently at " + fund + "m. Enter by talking to lottie at Skillz";
+		PlayerHandler.messageToAll = "<shad=A9a9a9><col=7851a9>[Lottery]The Lottery Fund is currently at " + fund + "m. Enter by talking to lottie at Skillz";
 
 	}
 	public void checkUnclaimedWinners(client c) {
 		if (unclaimedWinners.contains(c.playerName)) {
 			if (c.freeSlots() > 0) {
-				c.sendMessage("It's your lucky day! you have won the lottery");
+				c.sendMessage("<shad=A9a9a9><col=7851a9>It's your lucky day! you have won the lottery");
 				c.addItem(995,prizeAmount * 1000000);
 				unclaimedWinners.remove(unclaimedWinners.indexOf(c.playerName));
 			} else {

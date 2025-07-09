@@ -1,6 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 public class TradeSystem {
     public client c;
@@ -10,12 +11,14 @@ public class TradeSystem {
     }
     public void process() {
         if (c.tradeRequest > 0 && PlayerHandler.players[c.tradeRequest] != null) {
-            if(c.macAddress != PlayerHandler.players[c.tradeRequest].macAddress) {
+            if (Objects.equals(c.macAddress, PlayerHandler.players[c.tradeRequest].macAddress)) {
+                //c.sendMessage("You can not trade yourself");
+                resetTrade();
+                return;
+            } else {
                 c.sendMessage(PlayerHandler.players[c.tradeRequest].playerName
                         + ":tradereq:");
                 c.tradeRequest = 0;
-            } else {
-                c.sendMessage("You can not trade your self");
             }
         }
         if (c.tradeOtherDeclined) {
@@ -41,8 +44,10 @@ public class TradeSystem {
             c.AntiTradeScam = false;
         }
         if (c.tradeWith > 0) {
-            if(c.macAddress == PlayerHandler.players[c.tradeWith].macAddress) {
-                c.sendMessage("You can not trade your self");
+            if (Objects.equals(c.macAddress, PlayerHandler.players[c.tradeWith].macAddress)) {
+               // c.getPA().RemoveAllWindows();
+               // c.sendMessage("You can not trade yourself");
+                resetTrade();
                 return;
             }
             if (PlayerHandler.players[c.tradeWith] != null) {
@@ -90,6 +95,11 @@ public class TradeSystem {
             if (c.WanneTradeWith > PlayerHandler.maxPlayers) {
                 resetTrade();
             } else if (PlayerHandler.players[c.WanneTradeWith] != null) {
+                if (Objects.equals(c.macAddress, PlayerHandler.players[c.WanneTradeWith].macAddress)) {
+                   // c.sendMessage("You can not trade yourself");
+                    resetTrade();
+                    return;
+                }
                 if (c.GoodDistance2(c.absX, c.absY,
                         PlayerHandler.players[c.WanneTradeWith].absX,
                         PlayerHandler.players[c.WanneTradeWith].absY, 1)) {

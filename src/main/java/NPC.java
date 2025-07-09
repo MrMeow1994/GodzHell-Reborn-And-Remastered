@@ -290,7 +290,7 @@ public class NPC {
         // crucial
         if (animUpdateRequired)
             appendAnimUpdate(str);
-        if (hitUpdateRequired2)
+        if (hitUpdateRequired2 && !IsDead)
             appendHitUpdate2(str);
         if (gfxUpdateRequired)
             appendMask80Update(str);
@@ -299,7 +299,7 @@ public class NPC {
         if (textUpdateRequired) {
             str.writeString(textUpdate);
         }
-        if (hitUpdateRequired)
+        if (hitUpdateRequired && !IsDead)
             appendHitUpdate(str);
         if (transformUpdateRequired)
             appendTransformUpdate(str);
@@ -382,47 +382,51 @@ public class NPC {
     }
     protected void appendHitUpdate(stream str) {
         try {
-            HP -= hitDiff;
-            if (HP <= 0) {
-                IsDead = true;
-            }
-            str.writeByteC(hitDiff); // What the perseon got 'hit' for
-            if (hitDiff > 0 && !poisondmg) {
-                str.writeByteS(1); // 0: red hitting - 1: blue hitting
-            } else if (hitDiff > 0 && poisondmg) {
-                str.writeByteS(2); // 0: red hitting - 1: blue hitting
-            } else {
-                str.writeByteS(0); // 0: red hitting - 1: blue hitting
-            }
-            str.writeWord(HP); // Their current hp, for HP bar
-            str.writeWord(MaxHP); // Their max hp, for HP bar
-            poisondmg = false;
+            int damage = Math.max(0, hitDiff);
+            int type = poisondmg ? 2 : (damage > 0 ? 1 : 0);
+
+            str.writeByteC(damage);     // Main damage
+            str.writeByteS(type);       // Hit type
+            str.writeWord(HP - damage); // Future HP
+            str.writeWord(MaxHP);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            HP -= hitDiff;
+            if (HP <= 0 && !IsDead) {
+                IsDead = true;
+                DeadApply = false; // This flags the death animation next tick
+            }
+
+            poisondmg = false;
+            hitUpdateRequired = false;
         }
     }
 
+
     protected void appendHitUpdate2(stream str) {
         try {
-            HP -= hitDiff;
-            if (HP <= 0) {
-                IsDead = true;
-            }
-            str.writeByteA(hitDiff); // What the perseon got 'hit' for
-            if (hitDiff > 0 && !poisondmg) {
-                str.writeByteC(1); // 0: red hitting - 1: blue hitting
-            } else if (hitDiff > 0 && poisondmg) {
-                str.writeByteC(2); // 0: red hitting - 1: blue hitting
-            } else {
-                str.writeByteC(0); // 0: red hitting - 1: blue hitting
-            }
-            str.writeWord(HP); // Their current hp, for HP bar
-            str.writeWord(MaxHP); // Their max hp, for HP bar
-            poisondmg = false;
+            int damage = Math.max(0, hitDiff2);
+            int type = poisondmg ? 2 : (damage > 0 ? 1 : 0);
+
+            str.writeByteA(damage);     // Secondary damage
+            str.writeByteC(type);       // Hit type
+            str.writeWord(HP - damage); // Future HP
+            str.writeWord(MaxHP);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            HP -= hitDiff2;
+            if (HP <= 0 && !IsDead) {
+                IsDead = true;
+                DeadApply = false;
+            }
+
+            poisondmg = false;
+            hitUpdateRequired2 = false;
         }
     }
+
 
     public void TurnNpcTo(int i, int j) {
         FocusPointX = 2 * i + 1;

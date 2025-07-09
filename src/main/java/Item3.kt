@@ -1,6 +1,5 @@
-public class Item3 {
-
-    public static int slayeritems85[] = {
+object Item3 {
+    var slayeritems85: IntArray = intArrayOf(
         4087, 4087, 4087, 4151, 1149, 1149, 1149, 1149, 1165, 1165, 1165, 1165,
         1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165,
         1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165, 1165,
@@ -137,50 +136,60 @@ public class Item3 {
         4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834,
         4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834,
         4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834, 4834,
-        2683, 4834};
+        2683, 4834
+    )
 
-    public static int randomSlayeritem85() {
-        return slayeritems85[(int) (Math.random() * slayeritems85.length)];
+    fun randomSlayeritem85(): Int {
+        return slayeritems85[(Math.random() * slayeritems85.size).toInt()]
     }
 
-    public static int guardz[] = {
+    var guardz: IntArray = intArrayOf(
         995, 1071, 995, 995, 995, 995, 1085, 995, 995, 995, 995, 2623, 995, 995,
         1109, 995, 995, 995, 995, 995, 995, 1121, 995, 995, 995, 995, 1143, 995,
-        995, 995, 1198, 995, 1995, 995, 1159, 1333};
+        995, 995, 1198, 995, 1995, 995, 1159, 1333
+    )
 
-    public static int randomguardz() {
-        return guardz[(int) (Math.random() * guardz.length)];
+    @JvmStatic
+    fun randomguardz(): Int {
+        return guardz[(Math.random() * guardz.size).toInt()]
     }
-    public static int hero[] = {
+
+    var hero: IntArray = intArrayOf(
         6585, 995, 1071, 995, 995, 995, 995, 2621, 995, 995, 1085, 995, 995, 995,
         995, 995, 995, 995, 995, 2623, 995, 995, 1109, 995, 995, 995, 995, 2615,
         995, 995, 995, 1121, 995, 995, 995, 995, 1143, 995, 995, 2617, 995, 995,
         1198, 995, 1159, 995, 1159, 1333, 995, 995, 2619, 995, 1201, 1163, 995,
-        1127, 995, 1093, 4151, 995, 4151};
+        1127, 995, 1093, 4151, 995, 4151
+    )
 
-    public static int randomhero() {
-        return hero[(int) (Math.random() * hero.length)];
+    @JvmStatic
+    fun randomhero(): Int {
+        return hero[(Math.random() * hero.size).toInt()]
     }
-    public static int chaos[] = {
+
+    var chaos: IntArray = intArrayOf(
         592, 592, 2446, 179, 179, 179, 179, 2446, 2446, 2446, 2446, 7158, 6735,
         6735, 6737, 6737, 592, 592, 592, 592, 6733, 6733, 592, 592, 592, 592,
         6731, 6731, 6585, 6585, 6575, 6575, 6575, 4087, 4087, 4087, 1319, 1319,
-        1319, 1319, 1319, 1319, 1712, 1712, 1712, 592, 592, 592, 592, 592, 1712};
+        1319, 1319, 1319, 1319, 1712, 1712, 1712, 592, 592, 592, 592, 592, 1712
+    )
 
-    public static int randomchaos() {
-        return chaos[(int) (Math.random() * chaos.length)];
+    fun randomchaos(): Int {
+        return chaos[(Math.random() * chaos.size).toInt()]
     }
 
-    public static int guard[] = {
+    var guard: IntArray = intArrayOf(
         995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995,
         995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995, 995,
-        995, 995, 4151};
+        995, 995, 4151
+    )
 
-    public static int randomguard() {
-        return guard[(int) (Math.random() * guard.length)];
+    @JvmStatic
+    fun randomguard(): Int {
+        return guard[(Math.random() * guard.size).toInt()]
     }
 
-    public static int WolfDrop[] = {
+    var WolfDrop: IntArray = intArrayOf(
         526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526,
         526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 1729, 1729, 1729, 1729,
         1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729, 1333, 1333, 1333, 1333,
@@ -189,11 +198,11 @@ public class Item3 {
         1201, 1201, 1201, 1201, 1201, 1201, 1359, 1359, 1359, 1359, 1359, 4153,
         4153, 4153, 4153, 4153, 5698, 5698, 5698, 526, 526, 526, 526, 526, 526,
         526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526,
-        526, 526, 526, 526};
+        526, 526, 526, 526
+    )
 
-    public static int WolfDrop() {
-        return WolfDrop[(int) (Math.random() * WolfDrop.length)];
+    fun WolfDrop(): Int {
+        return WolfDrop[(Math.random() * WolfDrop.size).toInt()]
     }
-
 }
 

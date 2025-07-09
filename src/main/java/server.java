@@ -3,12 +3,12 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 //import org.Vote.*;
 
 
@@ -16,6 +16,7 @@ public class server implements Runnable {
 
     public static final int cycleTime = 600;
     static long tickCount = 0;
+    public static int tick = 0;
     public static final String ObjectManager = null;
     public static lottery lottery = new lottery();
     public static GlobalObjects globalObjects = new GlobalObjects();
@@ -78,7 +79,16 @@ public class server implements Runnable {
     BufferedReader reader;
     BufferedWriter bw = null;
     String connectingIP = null;
+    private static ExecutorService executor = createExecutor();
 
+    private static ExecutorService createExecutor() {
+        return Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r);
+            t.setName("ClientHandlerThread");
+            t.setDaemon(false);
+            return t;
+        });
+    }
     /**
      * The task scheduler.
      */
@@ -98,6 +108,10 @@ public class server implements Runnable {
        // js.start();
 
     }
+    public static void resetExecutor() {
+        executor = createExecutor();
+    }
+
     public static void ServerbroadcastGlobal() {
         EventManager.getSingleton().addEvent(null, new Event() {
             private int ticks = 0;
@@ -108,12 +122,12 @@ public class server implements Runnable {
                     for (Player p : PlayerHandler.players) { // loop so it effects all players
                         if (p != null) {
                             client castOn = (client) p; // specific player's client
-                            castOn.sendMessage("@blu@**********************************************************************************");
-                            castOn.sendMessage("@blu@Have you voted today?? if not go vote!! more votes = more players =)");
-                            castOn.sendMessage("@blu@Newest Update: Started to work on the stronghold of security.");
-                            castOn.sendMessage("@blu@We back Guys! Remember if You lose items on death!");
-                            castOn.sendMessage("@blu@Type ::help and ::commands also we have a fandom godzhellreborn.fandom.com");
-                            castOn.sendMessage("@blu@**********************************************************************************");
+                            castOn.sendMessage("<shad=A9a9a9><col=7851a9>**********************************************************************************</shad></col>");
+                            castOn.sendMessage("<shad=A9a9a9><col=7851a9>Have you voted today?? if not go vote!! more votes = more players =)</shad></col>");
+                            castOn.sendMessage("<shad=A9a9a9><col=7851a9>Newest Update: Started to work on the stronghold of security.</shad></col>");
+                            castOn.sendMessage("<shad=A9a9a9><col=7851a9>We back Guys! Remember if You lose items on death!</shad></col>");
+                            castOn.sendMessage("<shad=A9a9a9><col=7851a9>Type ::help and ::commands. </shad></col>");
+                            castOn.sendMessage("<shad=A9a9a9><col=7851a9>**********************************************************************************</shad></col>");
                         }
                     }
                     ticks = 0;
@@ -137,6 +151,7 @@ public class server implements Runnable {
     public static void main(String[] args) {
 
         startServer();
+        new Thread(new MemoryLogger(), "MemoryLogger").start();
     }
 
     public static void startServer() {
@@ -187,7 +202,8 @@ public class server implements Runnable {
         npcDrops = new NPCDrops();
 
         clientHandler = new server();
-        (new Thread(clientHandler)).start();
+        resetExecutor(); // Make sure we have a fresh executor
+        executor.submit(new ClientHandlerService(clientHandler));
         playerHandler = new PlayerHandler();
         ConnectionList.getInstance();
 
@@ -201,6 +217,7 @@ public class server implements Runnable {
             // This way we avoid all the sync'in issues
             // The rough outline could look like:
                 tickCount++;
+                tick++;
             playerHandler.process();            // updates all player related stuff
             npcHandler.process();
             itemHandler.process();
@@ -214,7 +231,7 @@ public class server implements Runnable {
             itemspawnpoints.process();
             objectHandler.process();
             objectHandler.firemaking_process();
-            System.gc();
+            //System.gc();// might of fiuxed the issue noty need this anymore
             // doNpcs()		// all npc related stuff
             // doObjects()
             // doWhatever()
@@ -222,74 +239,6 @@ public class server implements Runnable {
             }
         });
     }
-
-    public static void calcTime() {
-        long curTime = System.currentTimeMillis();
-        updateSeconds = 180 - ((int) (curTime - startTime) / 1000);
-        if (updateSeconds == 0) {
-            shutdownServer = true;
-        }
-    }
-
-    public static boolean playerInWorld(String name) {
-        File file;
-        file = new File("./Data/world/" + name + ".world");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException ioe) {
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public static void resetWorlds() {
-        if (checkStatus(29433)) {
-            File loc = new File("./Data/world/");
-            if (loc.exists()) {
-                try {
-                    File[] files = loc.listFiles();
-                    for (int i = 0; i < files.length; i++) {
-                        File load = files[i];
-                        if (load.getName().endsWith(".world1")) {
-                            load.delete();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (checkStatus(29434)) {
-            File loc = new File("./data/world/");
-            if (loc.exists()) {
-                try {
-                    File[] files = loc.listFiles();
-                    for (int i = 0; i < files.length; i++) {
-                        File load = files[i];
-                        if (load.getName().endsWith(".world2")) {
-                            load.delete();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static void deleteFromWorld(String name) {
-
-        File file = new File("./Data/world/" + name + ".world");
-        if (!file.exists()) return;
-
-        boolean delete = file.delete();
-
-        if (!delete)
-            System.out.println("Failed to delete .world file: " + name);
-    }
-
     public static boolean checkStatus(int world) {
         ServerSocket socket = null;
         try {
@@ -341,52 +290,73 @@ public class server implements Runnable {
     public static boolean isPublic() {
         return true;
     }
+    // Whether we're in flood testing mode (ignore bans, count all connections)
+    public static boolean floodTestMode = false;
+    public static int floodTestConnectionCount = 0;
 
     public Socket acceptSocketSafe(ServerSocket serverSocket) {
-        while (true) { // Loop until a valid socket is accepted
-            Socket socket = null; // Initialize socket
+        try {
+            serverSocket.setSoTimeout(5000); // 5-second timeout
+        } catch (SocketException e) {
+            System.err.println("Failed to set socket timeout: " + e.getMessage());
+        }
+
+        while (!shutdownClientHandler && !shutdownServer) {
+            Socket socket = null;
 
             try {
-                socket = serverSocket.accept(); // Blocking call; waits for a connection
+                if (serverSocket.isClosed()) {
+                    System.out.println("ServerSocket is closed. Stopping accept loop.");
+                    break;
+                }
+
+                socket = serverSocket.accept(); // Wait for connection
+
                 String connectingIP = socket.getInetAddress().getHostAddress();
-                int readByte = socket.getInputStream().read(); // Read input
+                int readByte = socket.getInputStream().read(); // Read handshake
+
+                if (floodTestMode) {
+                    floodTestConnectionCount++;
+                    System.out.println("[FLOOD TEST] Connection #" + floodTestConnectionCount + " from " + connectingIP + " (byte=" + readByte + ")");
+                    return socket;
+                }
 
                 System.out.println("Received connection attempt from IP: " + connectingIP + " with byte: " + readByte);
 
-                // Validate the incoming socket
                 if ((readByte & 0xFF) == 14 &&
                         !isIpBanned(connectingIP) &&
-                        !isVpnIp(connectingIP)) { // Check for VPN IP
+                        !isVpnIp(connectingIP)) {
+
                     System.out.println("Accepted connection from IP: " + connectingIP);
-                    return socket; // Return the valid socket
+                    return socket;
+
                 } else {
                     System.out.println("Connection rejected from IP: " + connectingIP +
                             " (Banned: " + isIpBanned(connectingIP) +
                             ", VPN: " + isVpnIp(connectingIP) + ")");
-                    if (socket != null) {
-                        socket.close(); // Close the socket if it's invalid
-                    }
+                    if (socket != null) socket.close();
                 }
+
+            } catch (SocketTimeoutException ste) {
+                // No incoming connection, retry after timeout
             } catch (SocketException se) {
-                if (shutdownClientHandler) {
-                    System.out.println("Server is shutting down, stopping acceptance of new connections.");
-                    break; // Exit if the server is shutting down
-                }
-                se.printStackTrace(); // Log other socket exceptions
+                System.out.println("SocketException: Likely shutdown. " + se.getMessage());
+                break;
             } catch (IOException e) {
-                e.printStackTrace(); // General IOException handling
+                e.printStackTrace();
                 if (socket != null && !socket.isClosed()) {
                     try {
-                        socket.close(); // Ensure the socket is closed on error
-                    } catch (IOException closeException) {
-                        closeException.printStackTrace();
+                        socket.close();
+                    } catch (IOException closeEx) {
+                        closeEx.printStackTrace();
                     }
                 }
             }
         }
 
-        return null; // Return null if no valid socket was accepted
+        return null;
     }
+
 
 
     // HashSet to store VPN IPs for quick lookup
@@ -483,31 +453,36 @@ public class server implements Runnable {
             clientListener = new ServerSocket(serverlistenerPort, 1, null);
             System.out.println("- Godzhell Reborn and Remastered is Online at port " + clientListener.getLocalPort());
 
-            // Continue accepting connections until shutdownClientHandler is true
             while (!shutdownClientHandler) {
-                Socket s = acceptSocketSafe(clientListener); // Attempt to accept a new socket
-                if (s != null) { // Check if the socket is valid
-                    s.setTcpNoDelay(true); // Configure the accepted socket
+                try {
+                    Socket s = acceptSocketSafe(clientListener);
+                    if (s != null) {
+                        s.setTcpNoDelay(true);
+                        String connectingHost = s.getInetAddress().getHostName();
+                        System.out.println("Connection established with: " + connectingHost);
 
-                    String connectingHost = s.getInetAddress().getHostName();
-                    System.out.println("Connection established with: " + connectingHost);
-
-                    // Connection filtering logic
-                    if (ConnectionList.getInstance().filter(s.getInetAddress())) {
-                        playerHandler.newPlayerClient(s, connectingHost);
-                        ConnectionList.getInstance().addConnection(s.getInetAddress());
-                    } else {
-                        System.out.println("Connection blocked for: " + connectingHost);
-                        s.close(); // Close the socket if not allowed
+                        if (ConnectionList.getInstance().filter(s.getInetAddress())) {
+                            playerHandler.newPlayerClient(s, connectingHost);
+                            ConnectionList.getInstance().addConnection(s.getInetAddress());
+                        } else {
+                            System.out.println("Connection blocked for: " + connectingHost);
+                            s.close();
+                        }
                     }
-                } else {
-                    System.out.println("Failed to accept a valid socket.");
+                } catch (SocketException se) {
+                    if (shutdownClientHandler || shutdownServer) {
+                        System.out.println("Accept loop ending due to shutdown.");
+                        break; // Stop loop if we're shutting down
+                    } else {
+                        System.err.println("SocketException during accept: " + se.getMessage());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-                // Check if the reboot flag is set, then initiate shutdown.
                 if (shutdownServer) {
-                    killServer();  // Trigger server shutdown or reboot
-                    break;         // Exit the loop to stop accepting new connections
+                    killServer();
+                    break;
                 }
             }
 
@@ -546,39 +521,42 @@ public class server implements Runnable {
         return playerHandler.getPlayerCount() > 0;  // Assuming playerHandler tracks connected players
     }
     public static boolean hasRunningThreads() {
-        int activeThreads = Thread.activeCount();
-        System.out.println("Active threads: " + activeThreads);
-        return activeThreads > 1; // Assuming 1 thread is the main thread
+        return false; // Skip JVM thread check — assume it's fine to reboot
     }
 
     public void killServer() {
         try {
-            shuttingDown = true; // Mark that the server is shutting down
+            shuttingDown = true;
+            shutdownClientHandler = true;
 
-            if (!hasActiveConnections() && !hasRunningThreads()) {
-                shutdownClientHandler = true; // Signal to stop accepting new connections
-
-                // Close the main listener socket if it's not null
-                if (clientListener != null && !clientListener.isClosed()) {
-                    clientListener.close();
-                    clientListener = null;
-                    scheduler.terminate(); // Terminate any scheduled tasks
-                    System.out.println("Server listener socket closed.");
-                }
-
-                EventManager.getSingleton().shutdown(); // Shutdown any event handling
-                System.out.println("Server events shutdown.");
-
-                // Don't interrupt the thread until shutdown is fully done
-            } else {
-                System.out.println("Waiting for all connections and threads to finish...");
+            if (clientListener != null && !clientListener.isClosed()) {
+                clientListener.close();
+                clientListener = null;
+                System.out.println("Server listener socket closed.");
             }
-        } catch (IOException e) {
+
+            if (executor != null && !executor.isShutdown()) {
+                executor.shutdownNow();
+                executor.awaitTermination(5, TimeUnit.SECONDS);
+            }
+
+            EventManager.getSingleton().shutdown();
+
+            if (playerHandler != null) {
+                playerHandler.destruct();
+                playerHandler.fullyWipePlayerPresence(); // <- Wipe the ghosts
+            }
+
+            System.out.println("Server shutdown complete.");
+
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             shuttingDown = false;
         }
     }
+
+
 
     public void restartServer() {
         try {
@@ -607,7 +585,6 @@ public class server implements Runnable {
             e.printStackTrace();
         }
     }
-
 
 
 

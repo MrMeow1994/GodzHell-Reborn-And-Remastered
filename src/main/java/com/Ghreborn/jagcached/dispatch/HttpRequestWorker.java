@@ -3,8 +3,10 @@ package com.Ghreborn.jagcached.dispatch;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import com.Ghreborn.jagcached.fs.IndexedFileSystem;
@@ -20,33 +22,14 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
 
-/**
- * A worker which services HTTP requests, including handling ZIP file requests.
- * Automatically generates an index.html file on server startup if it does not exist.
- * @author Graham
- */
 public final class HttpRequestWorker extends RequestWorker<HttpRequest, ResourceProvider> {
 
-	/**
-	 * The value of the server header.
-	 */
 	private static final String SERVER_IDENTIFIER = "JAGeX/3.1";
-
-	/**
-	 * The directory with web files.
-	 */
 	private static final File WWW_DIRECTORY = new File("./data/www/");
+	private static final Charset CHARACTER_SET = StandardCharsets.UTF_8;
 
-	/**
-	 * The default character set.
-	 */
-	private static final Charset CHARACTER_SET = Charset.forName("ISO-8859-1");
-
-	/**
-	 * Creates the HTTP request worker.
-	 * @param fs The file system.
-	 */
 	public HttpRequestWorker(IndexedFileSystem fs) {
 		super(new CombinedResourceProvider(new VirtualResourceProvider(fs), new HypertextResourceProvider(WWW_DIRECTORY)));
 		ensureIndexFile();
@@ -59,24 +42,28 @@ public final class HttpRequestWorker extends RequestWorker<HttpRequest, Resource
 
 	@Override
 	protected void service(ResourceProvider provider, Channel channel, HttpRequest request) throws IOException {
-		String path = request.getUri();
-		ByteBuffer buf = provider.get(path);
-
+		String path = sanitizeUri(request.getUri());
+		ByteBuffer buf;
 		ChannelBuffer wrappedBuf;
 		HttpResponseStatus status = HttpResponseStatus.OK;
-
 		String mimeType = getMimeType(path);
 
-		if (buf == null) {
-			status = HttpResponseStatus.NOT_FOUND;
-			wrappedBuf = createErrorPage(status, "The requested resource could not be found, or ZIP entry is missing.");
+		try {
+			buf = provider.get(path);
+			if (buf == null) {
+				status = HttpResponseStatus.NOT_FOUND;
+				wrappedBuf = createErrorPage(status, "The requested resource could not be found, or ZIP entry is missing.");
+				mimeType = "text/html";
+			} else {
+				wrappedBuf = ChannelBuffers.wrappedBuffer(buf);
+			}
+		} catch (Exception e) {
+			status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+			wrappedBuf = createErrorPage(status, "Server failed to process the request.");
 			mimeType = "text/html";
-		} else {
-			wrappedBuf = ChannelBuffers.wrappedBuffer(buf);
 		}
 
-		HttpResponse resp = new DefaultHttpResponse(request.getProtocolVersion(), status);
-
+		HttpResponse resp = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status);
 		resp.setHeader("Date", new Date());
 		resp.setHeader("Server", SERVER_IDENTIFIER);
 		resp.setHeader("Content-Type", mimeType + "; charset=" + CHARACTER_SET.name());
@@ -90,20 +77,15 @@ public final class HttpRequestWorker extends RequestWorker<HttpRequest, Resource
 
 		channel.write(resp).addListener(ChannelFutureListener.CLOSE);
 
-		logRequest(path, status);
+		String ip = ((InetSocketAddress) channel.getRemoteAddress()).getAddress().getHostAddress();
+		System.out.println("[" + ip + "] Request: " + path + " -> " + status);
 	}
 
-	/**
-	 * Ensures that the index.html file exists in the WWW_DIRECTORY.
-	 * If it does not exist, it will be created with a default message.
-	 */
 	private void ensureIndexFile() {
 		File indexFile = new File(WWW_DIRECTORY, "index.html");
 		if (!indexFile.exists()) {
 			try {
-				if (!WWW_DIRECTORY.exists()) {
-					WWW_DIRECTORY.mkdirs();
-				}
+				if (!WWW_DIRECTORY.exists()) WWW_DIRECTORY.mkdirs();
 				try (FileWriter writer = new FileWriter(indexFile)) {
 					writer.write("<!DOCTYPE html><html><head><title>Welcome</title></head><body><h1>Welcome to the server!</h1><p>This is the default index page.</p></body></html>");
 				}
@@ -114,43 +96,13 @@ public final class HttpRequestWorker extends RequestWorker<HttpRequest, Resource
 		}
 	}
 
-	/**
-	 * Gets the MIME type of a file by its name.
-	 * @param name The file name.
-	 * @return The MIME type.
-	 */
-	private String getMimeType(String name) {
-		if (name.endsWith(".htm") || name.endsWith(".html")) {
-			return "text/html";
-		} else if (name.endsWith(".css")) {
-			return "text/css";
-		} else if (name.endsWith(".js")) {
-			return "text/javascript";
-		} else if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
-			return "image/jpeg";
-		} else if (name.endsWith(".gif")) {
-			return "image/gif";
-		} else if (name.endsWith(".png")) {
-			return "image/png";
-		} else if (name.endsWith(".zip")) {
-			return "application/zip";
-		} else if (name.endsWith(".txt")) {
-			return "text/plain";
-		}
-		return "application/octet-stream";
+	private String sanitizeUri(String uri) {
+		return uri.replace("..", "").replace("\\", "/");
 	}
 
-	/**
-	 * Creates an error page.
-	 * @param status The HTTP status.
-	 * @param description The error description.
-	 * @return The error page as a buffer.
-	 */
 	private ChannelBuffer createErrorPage(HttpResponseStatus status, String description) {
 		String title = status.getCode() + " " + status.getReasonPhrase();
-
 		StringBuilder bldr = new StringBuilder();
-
 		bldr.append("<!DOCTYPE html><html><head><title>");
 		bldr.append(title);
 		bldr.append("</title></head><body><h1>");
@@ -160,16 +112,18 @@ public final class HttpRequestWorker extends RequestWorker<HttpRequest, Resource
 		bldr.append("</p><hr /><address>");
 		bldr.append(SERVER_IDENTIFIER);
 		bldr.append(" Server</address></body></html>");
-
-		return ChannelBuffers.copiedBuffer(bldr.toString(), Charset.defaultCharset());
+		return ChannelBuffers.copiedBuffer(bldr.toString(), CHARACTER_SET);
 	}
 
-	/**
-	 * Logs the details of an HTTP request.
-	 * @param path The requested path.
-	 * @param status The HTTP response status.
-	 */
-	private void logRequest(String path, HttpResponseStatus status) {
-		System.out.println("Request Path: " + path + " | Status: " + status);
+	private String getMimeType(String name) {
+		if (name.endsWith(".htm") || name.endsWith(".html")) return "text/html";
+		if (name.endsWith(".css")) return "text/css";
+		if (name.endsWith(".js")) return "application/javascript";
+		if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
+		if (name.endsWith(".gif")) return "image/gif";
+		if (name.endsWith(".png")) return "image/png";
+		if (name.endsWith(".zip")) return "application/zip";
+		if (name.endsWith(".txt")) return "text/plain";
+		return "application/octet-stream";
 	}
 }

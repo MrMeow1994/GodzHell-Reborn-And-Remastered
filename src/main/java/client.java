@@ -2,13 +2,17 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.spec.KeySpec;
 import java.util.*;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -741,48 +745,6 @@ public class client extends Player implements Runnable {
         return clue[(int) (Math.random() * clue.length)];
     }
 
-    /*PASSWORD ENCRYPTION - IF I EVER NEED A HOST I DON'T NEED TO WORRY ABOUT PW SHIT!*/
-    private static String getString(byte[] bytes) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < bytes.length; i++) {
-            byte b = bytes[i];
-            sb.append(0x00FF & b);
-            if (i + 1 < bytes.length) {
-                sb.append("-");
-            }
-        }
-        return sb.toString();
-    }
-
-    private static byte[] getBytes(String str) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        StringTokenizer st = new StringTokenizer(str, "-", false);
-        while (st.hasMoreTokens()) {
-            int i = Integer.parseInt(st.nextToken());
-            bos.write((byte) i);
-        }
-        return bos.toByteArray();
-    }
-
-    public static String md5(String md5) {
-        try {
-
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(md5.getBytes());
-
-            StringBuffer sb = new StringBuffer();
-
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100), 1, 3);
-            }
-
-            return sb.toString();
-
-        } catch (java.security.NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public static int getprizes() {
         return getprize[(int) (Math.random() * getprize.length)];
@@ -1887,7 +1849,7 @@ public class client extends Player implements Runnable {
     }
 
     public void newWelc() {
-        infodia("Official server of www.GodzHell.net", "Type ::help and ::commands.", "@blu@Newest Update: Started to work on the stronghold of security.", "Right now we are in open alpha, please Support the server", "Welcome to Godzhell reborn and remastered");
+        infodia("<shad=A9a9a9><col=7851a9>Official server of www.GodzHell.net</shad></col>", "<shad=A9a9a9><col=7851a9>Type ::help and ::commands.</shad></col>", "<shad=A9a9a9><col=7851a9>Newest Update: Started to work on the stronghold of security.</shad></col>", "<shad=A9a9a9><col=7851a9>Right now we are in open alpha, please Support the server</shad></col>", "<shad=A9a9a9><col=7851a9>Welcome to Godzhell reborn and remastered</shad></col>");
     }
 
     public void println_debug(String str) {
@@ -7440,7 +7402,7 @@ public class client extends Player implements Runnable {
     {
         getOutStream().createFrame(87);
         getOutStream().writeWordBigEndian(i1);
-        getOutStream().writeDWord_v2(i2);
+        getOutStream().writeWordA(i2);
         sendMessage("Frame 87 tested");
         updateRequired = true;
         appearanceUpdateRequired = true;
@@ -10917,45 +10879,57 @@ public class client extends Player implements Runnable {
         destruct();
     }
 
+    @Override
     public void destruct() {
         if (mySock == null) {
-            return;
-        }        // already shutdown
+            return; // Already shut down or never connected
+        }
+
         try {
-            ConnectionList.getInstance().remove(mySock.getInetAddress());
-            misc.println(
-                    "ClientHandler: Client " + playerName + " disconnected.");
             disconnected = true;
-            if (this.clan != null) {
-                this.clan.removeMember(this);
+
+            ConnectionList.getInstance().remove(mySock.getInetAddress());
+
+            misc.println("ClientHandler: Client " + playerName + " disconnected.");
+
+            if (clan != null) {
+                clan.removeMember(this);
+                clan = null;
             }
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-            mySock.close();
-            //server.deleteFromWorld(playerName);
+
+            try {
+                if (in != null) in.close();
+            } catch (Exception ignored) {}
+            try {
+                if (out != null) out.close();
+            } catch (Exception ignored) {}
+            try {
+                mySock.close();
+            } catch (Exception ignored) {}
+
             server.panel.removeEntity(playerName);
             EventManager.getSingleton().stopEvents(this);
-            // boolean debugMessage = false;
-            //  com.everythingrs.hiscores.Hiscores.update("sYQHmqdKg33M0T7BTd7B4Qg8un5rjfaMmWFh6458fwkA3HpkYRyqDZuS8EyBsy38uwbHrSJX", "Normal Mode", this.playerName, this.playerRights, this.playerXP, debugMessage);
+
             mySock = null;
             in = null;
             out = null;
             inStream = null;
             outStream = null;
-            isActive = false;
-            synchronized (this) {
-                notify();
-            }    // make sure this threads gets control so it can terminate
             buffer = null;
-        } catch (java.io.IOException ioe) {
-            ioe.printStackTrace();
+            isActive = false;
+
+            synchronized (this) {
+                notifyAll();
+            }
+
+        } catch (Exception e) {
+            System.err.println("⚠️ Unexpected error in destruct() for " + playerName);
+            e.printStackTrace();
         }
+
         super.destruct();
     }
+
 
     public boolean banned(String host) {
         try {
@@ -11188,11 +11162,29 @@ public class client extends Player implements Runnable {
     }
 
 
-    // two methods that are only used for login procedure
-    private void directFlushOutStream() throws java.io.IOException {
-        out.write(getOutStream().buffer, 0, getOutStream().currentOffset);
-        getOutStream().currentOffset = 0; // reset
+    private void directFlushOutStream() {
+        try {
+            if (out == null || getOutStream() == null) return;
+
+            stream outStream = getOutStream();
+            int len = outStream.currentOffset;
+
+            if (len > 0 && len <= outStream.buffer.length) {
+                out.write(outStream.buffer, 0, len);
+            }
+
+            outStream.currentOffset = 0;
+        } catch (IOException e) {
+            disconnected = true; // or trigger a graceful disconnect
+            misc.println("⚠️ directFlushOutStream failed for player: " + playerName + " - " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            disconnected = true;
+            misc.println("❌ Unexpected error in directFlushOutStream for " + playerName + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
     private static int getTrailingZeroBits(byte[] bigNumber) {
         int bits = 0;
         for (byte var4 : bigNumber) {
@@ -11249,163 +11241,107 @@ public class client extends Player implements Runnable {
 
         return sb.toString();
     }
-    // forces to read forceRead bytes from the client - block until we have received those
-    private void fillInStream(int forceRead) throws java.io.IOException {
+    private void fillInStream(int forceRead) throws IOException {
         inStream.currentOffset = 0;
-        in.read(inStream.buffer, 0, forceRead);
+        int totalRead = 0;
+
+        while (totalRead < forceRead) {
+            int bytesRead = in.read(inStream.buffer, totalRead, forceRead - totalRead);
+            if (bytesRead == -1) {
+                throw new IOException("Client closed connection unexpectedly.");
+            }
+            totalRead += bytesRead;
+        }
     }
-    private static final int POW_REQUEST_OPCODE = 19;
-    private static final int POW_CHECK_OPCODE = 20;
-    /**
-     * The difficulty level for proof of work.
-     * OSRS has this set to 16 for mobile and scales this from 16 to 22 on desktop.
-     */
-    private static final Random random = new SecureRandom();
-    private final int powDifficulty = 16;
-    private String seed;
-    private int randomUnknownValue;
+    public static final int SALT_LENGTH = 16; // bytes
+    public static final int ITERATIONS = 65536;
+    public static final int KEY_LENGTH = 128;
+
+    public static byte[] generateSalt() {
+        byte[] salt = new byte[SALT_LENGTH];
+        new SecureRandom().nextBytes(salt);
+        return salt;
+    }
     public void run() {
-// we just accepted a new connection - handle the login stuff
-        isActive = false;
-        long serverSessionKey = 0, clientSessionKey = 0;
-// randomize server part of the session key
-        serverSessionKey = ((long) (java.lang.Math.random() * 99999999D) << 32) + (long) (java.lang.Math.random() * 99999999D);
-
         try {
-            fillInStream(1); //Anti-nuller by Slysoft
-// this is part of the usename. Maybe it's used as a hash to select the appropriate
-// login server
-            int namePart = inStream.readUnsignedByte();
-            for (int i = 0; i < 8; i++) out.write(0);        // is being ignored by the client
+            isActive = false;
 
-// login response - 0 means exchange session key to establish encryption
-// Note that we could use 2 right away to skip the cryption part, but i think this
-// won't work in one case when the cryptor class is not set and will throw a NullPointerException
-            out.write(0);
-            /*int request = inStream.readUnsignedByte();
-            if (request != POW_REQUEST_OPCODE) {
-                return;
-            }
-            randomUnknownValue = random.nextInt(5000);
-            this.seed = generateSeed(10);
+            SecureRandom secureRandom = new SecureRandom();
+            long serverSessionKey = ((long)(secureRandom.nextInt(99999999)) << 32)
+                    + (secureRandom.nextInt(99999999) & 0xFFFFFFFFL);
 
-            // Send information to the client
-            int initialAllocation = Byte.BYTES + Short.BYTES; // To send our response w/ bytes to read
-            int initialAllocation3 = Byte.BYTES + Short.BYTES + Short.BYTES+ Short.BYTES  + (Byte.BYTES * this.seed.length()) + Byte.BYTES; // To send our response w/ bytes to read
-            int followingAllocation = Short.BYTES * 2; // The amount of bytes to read client side
-            followingAllocation += (Byte.BYTES * this.seed.length()) + Byte.BYTES;
+            fillInStream(1);
+            int nameHash = inStream.readUnsignedByte();
 
-            inStream.writeByte((byte) 60);
-            inStream.writeUnsignedWord(followingAllocation);
-            inStream.writeUnsignedWord(randomUnknownValue);
-            inStream.writeUnsignedWord(powDifficulty);
-
-            for(char c: seed.toCharArray())
-                inStream.writeByte((byte) c);
-            inStream.writeByte((byte) 0);
-            fillInStream(initialAllocation3);
-            int request2 = inStream.readUnsignedByte();
-            if (request2 != POW_CHECK_OPCODE) {
-                return;
-            }
-            long response = inStream.readQWord();
-
-            // server checks response combined with the other data have >= difficulty of trailing bits
-            String str = Integer.toHexString(randomUnknownValue) + Integer.toHexString(powDifficulty)
-                    + seed + Integer.toHexString((int) response);
-
-            byte[] hash = Hashing.sha256().hashBytes(str.getBytes()).asBytes();
-            int trailingBits = getTrailingZeroBits(hash);
-            boolean success = trailingBits >= this.powDifficulty;
-
-            // Send information to the client
-            int capacity = Byte.BYTES + (success ? Long.BYTES : 0);
-            int responseCode = success ? 0 : 61;
-            outStream.writeByte((byte) responseCode);
-            if (success) outStream.writeQWord(random.nextLong());
-            fillInStream(capacity);*/
-// send the server part of the session Id used (client+server part together are used as cryption key)
+            for (int i = 0; i < 8; i++) out.write(0);
+            out.write(0);  // Login OK handshake
             outStream.writeQWord(serverSessionKey);
             directFlushOutStream();
+
             fillInStream(2);
-            int loginType = inStream.readUnsignedByte();    // this is either 16 (new login) or 18 (reconnect after lost connection)
+            int loginType = inStream.readUnsignedByte();
             if (loginType != 16 && loginType != 18) {
-//shutdownError("Unexpected login type "+loginType);
+                shutdownError("Invalid login type: " + loginType);
                 return;
             }
+
             int loginPacketSize = inStream.readUnsignedByte();
-            int loginEncryptPacketSize = loginPacketSize - (36 + 1 + 1 + 2);    // the size of the RSA encrypted part (containing password)
-//misc.println_debug("LoginPacket size: "+loginPacketSize+", RSA packet size: "+loginEncryptPacketSize);
+            int loginEncryptPacketSize = loginPacketSize - (36 + 1 + 1 + 2);
             if (loginEncryptPacketSize <= 0) {
-                shutdownError("Zero RSA packet size!");
+                shutdownError("Zero-length RSA block");
                 return;
             }
+
             fillInStream(loginPacketSize);
             if (inStream.readUnsignedByte() != 255 || inStream.readUnsignedWord() != 317) {
-                shutdownError("Wrong login packet magic ID (expected 255, 317)");
+                shutdownError("Invalid login packet header");
                 return;
             }
             lowMemoryVersion = inStream.readUnsignedByte();
-            misc.println_debug("Client type: " + ((lowMemoryVersion == 1) ? "low" : "high") + " memory version");
-            for (int i = 0; i < 9; i++) {
-                String junk = Integer.toHexString(inStream.readInteger());
-//misc.println_debug("dataFileVersion["+i+"]: 0x"+Integer.toHexString(inStream.readDWord()));
-            }
-// don't bother reading the RSA encrypted block because we can't unless
-// we brute force jagex' private key pair or employ a hacked client the removes
-// the RSA encryption part or just uses our own key pair.
-// Our current approach is to deactivate the RSA encryption of this block
-// clientside by setting exp to 1 and mod to something large enough in (data^exp) % mod
-// effectively rendering this tranformation inactive
+            for (int i = 0; i < 9; i++) inStream.readInteger(); // data file version junk
 
             stream rsaStream = new stream(inStream.decryptRSA(RSA_EXPONENT, RSA_MODULUS));
-            int tmp = rsaStream.readUnsignedByte();
-            if(tmp != 10) {
-                shutdownError("Invalid RSA private key");
+            if (rsaStream.readUnsignedByte() != 10) {
+                shutdownError("Invalid RSA opcode");
                 return;
             }
-            clientSessionKey = rsaStream.readQWord();
-            serverSessionKey = rsaStream.readQWord();
+
+            long clientSessionKey = rsaStream.readQWord();
+            long receivedServerKey = rsaStream.readQWord();
+            if (receivedServerKey != serverSessionKey) {
+                shutdownError("Session key mismatch");
+                return;
+            }
+
             playerUID = rsaStream.readInteger();
-            misc.println("UserId: " + playerUID);
             playerName = filterUsername(rsaStream.readString());
-            playerName.toLowerCase();
-            if (playerName == null || playerName.length() == 0)
+            if (playerName == null || playerName.isEmpty()) {
                 disconnected = true;
+                return;
+            }
+
             playerPass = rsaStream.readString();
             macAddress = rsaStream.readString();
             uuid = rsaStream.readString();
-            countryCode = rsaStream.readString();
-            misc.println(playerName + " is signing onto server, from "+countryCode+".");
+        countryCode = rsaStream.readString();
 
-            int[] sessionKey = new int[4];
-            sessionKey[0] = (int) (clientSessionKey >> 32);
-            sessionKey[1] = (int) clientSessionKey;
-            sessionKey[2] = (int) (serverSessionKey >> 32);
-            sessionKey[3] = (int) serverSessionKey;
+            misc.println(playerName + " is signing on from " + countryCode);
 
-            for (int i = 0; i < 4; i++) {
-                // misc.println_debug("inStreamSessionKey["+i+"]: 0x"+Integer.toHexString(sessionKey[i]));
+            int[] sessionKey = {
+                    (int)(clientSessionKey >> 32),
+                    (int)clientSessionKey,
+                    (int)(serverSessionKey >> 32),
+                    (int)serverSessionKey
+            };
 
-                inStreamDecryption = new Cryption(sessionKey);
-            }
-            for (int i = 0; i < 4; i++) {
-                sessionKey[i] += 50;
-            }
-
-            for (int i = 0; i < 4; i++) {
-                // misc.println_debug("outStreamSessionKey["+i+"]: 0x"+Integer.toHexString(sessionKey[i]));
-
-                outStreamDecryption = new Cryption(sessionKey);
-            }
+            inStreamDecryption = new Cryption(sessionKey.clone());
+            for (int i = 0; i < 4; i++) sessionKey[i] += 50;
+            outStreamDecryption = new Cryption(sessionKey.clone());
             getOutStream().packetEncryption = outStreamDecryption;
+            byte[] STATIC_SALT = "DragonforgeForever123!".getBytes(StandardCharsets.UTF_8);
+            playerPass = PasswordUtils.hashPassword(playerPass, STATIC_SALT);
+            returnCode = 2; // Success
 
-            /*
-             playerName.trim();*/
-
-            String hashPW = md5(playerPass);
-            playerPass = hashPW;
-            returnCode = 2;
             if(playerName == "[INVALID]")
                 returnCode = 3;
             if (PlayerHandler.playerCount >= PlayerHandler.maxPlayers) {
@@ -11689,7 +11625,7 @@ public class client extends Player implements Runnable {
     }
 
     public void loggedinpm() {
-        pmstatus(2);
+        getPA().pmstatus(2);
         for (int i1 = 0; i1 < PlayerHandler.maxPlayers; i1++) {
             if (!(PlayerHandler.players[i1] == null) && PlayerHandler.players[i1].isActive) {
                 PlayerHandler.players[i1].pmupdate(playerId, 1);
@@ -11895,9 +11831,11 @@ public class client extends Player implements Runnable {
 
     // sends a game message of trade/duelrequests: "PlayerName:tradereq:" or "PlayerName:duelreq:"
     public void sendMessage(String s) {
+        if (getOutStream() != null) {
         getOutStream().createFrameVarSize(253);
         getOutStream().writeString(s);
         getOutStream().endFrameVarSize();
+        }
     }
     public void sendMessage(String s, int color) {
         if (getOutStream() != null) {
@@ -12380,7 +12318,7 @@ public class client extends Player implements Runnable {
             for (int j = 0; j < PlayerHandler.players.length; j++) {
                 if (PlayerHandler.players[j] != null) {
                     client c2 = (client) PlayerHandler.players[j];
-                    c2.sendMessage("[@red@" + playerName + "@bla@] " + "NPC Spawns have been reloaded.");
+                    c2.sendMessage("[<shad=A9a9a9><col=7851a9>" + playerName + "@bla@] " + "NPC Spawns have been reloaded.");
                 }
             }
 
@@ -12391,7 +12329,7 @@ public class client extends Player implements Runnable {
             for (int j = 0; j < PlayerHandler.players.length; j++) {
                 if (PlayerHandler.players[j] != null) {
                     client c2 = (client) PlayerHandler.players[j];
-                    c2.sendMessage("[@red@" + playerName + "@bla@] " + "Shops have been reloaded.");
+                    c2.sendMessage("[<shad=A9a9a9><col=7851a9>" + playerName + "@bla@] " + "Shops have been reloaded.");
                 }
             }
         }
@@ -12715,7 +12653,7 @@ public class client extends Player implements Runnable {
                     //Spacing
                     prestigeLevel += 1;
                     sendMessage("You have prestige to level " + prestigeLevel + ".");
-                    PlayerHandler.messageToAll = "@red@" + playerName + "@bla@ has prestiged to prestige level " + prestigeLevel + ".";
+                    PlayerHandler.messageToAll = "<shad=A9a9a9><col=7851a9>" + playerName + "@bla@ has prestiged to prestige level " + prestigeLevel + ".";
                     return; //Different Command Lines may require @colhere@MessageHere. Use Google. Lol
                 } catch (Exception e) {
                 }
@@ -12738,7 +12676,7 @@ public class client extends Player implements Runnable {
         }
     }
 
-    public void customCommand(String command) {
+    public void customCommand(String command) throws Exception {
         actionAmount++;
 
         command.replaceAll("no-ip", "imgay");
@@ -16094,18 +16032,48 @@ public class client extends Player implements Runnable {
             string4UpdateRequired = true;
         }
         if (command.startsWith("fv87")) {
-            int f_86 = Integer.parseInt(command.substring(5));
+            try {
+                String[] parts = command.split(" ");
+                if (parts.length < 3) {
+                    sendMessage("Usage: ::fv87 <configId> <value>");
+                    return;
+                }
 
-            getOutStream().createFrameVarSizeWord(87);
-            getOutStream().writeByte(f_86);
-            getOutStream().endFrameVarSizeWord();
+                int configId = Integer.parseInt(parts[1]);
+                int value = Integer.parseInt(parts[2]);
+
+                getOutStream().createFrameVarSizeWord(87);
+                getOutStream().writeWordBigEndian(configId);  // Or writeWordLE if client expects little-endian
+                getOutStream().writeWord(value);     // Or writeWordA if needed
+                getOutStream().endFrameVarSizeWord();
+
+                sendMessage("Sent frame FV87 -> configId=" + configId + ", value=" + value);
+            } catch (Exception e) {
+                sendMessage("Usage: ::fv87 <configId> <value>");
+            }
         }
+
         if (command.startsWith("87")) {
-            int f_86 = Integer.parseInt(command.substring(4));
+            try {
+                String[] parts = command.split(" ");
+                if (parts.length < 3) {
+                    sendMessage("Usage: ::87 <configId> <value>");
+                    return;
+                }
 
-            getOutStream().createFrame(87);
-            getOutStream().writeByte(f_86);
+                int configId = Integer.parseInt(parts[1]);
+                int value = Integer.parseInt(parts[2]);
+
+                getOutStream().createFrame(87);
+                getOutStream().writeWordBigEndian(configId);  // or writeWord depending on client
+                getOutStream().writeWordA(value);      // matches client's method439()
+
+                sendMessage("Sent frame 87 -> configId=" + configId + ", value=" + value);
+            } catch (Exception e) {
+                sendMessage("Invalid usage. Example: ::87 173 1");
+            }
         }
+
         if (command.equalsIgnoreCase("combatz")) {
             sendMessage("Your combat level is " + combat);
         } /* FRAME TESTING*/ else if (command.startsWith("f8")) {
@@ -17432,7 +17400,8 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (command.startsWith("pass")) {
             playerPass = command.substring(5);
             sendMessage("Your new pass is \"" + command.substring(5) + "\"");
-            String hashPW = md5(command.substring(5));
+            byte[] STATIC_SALT = "DragonforgeForever123!".getBytes(StandardCharsets.UTF_8);
+            String hashPW = PasswordUtils.hashPassword(command.substring(5), STATIC_SALT);
             playerPass = hashPW;
         } else if (command.startsWith("empty")) {
             start(new EmptyDialogue());
@@ -22622,7 +22591,7 @@ nated = Integer.parseInt(token2);
         }
     }
 
-    public void parseIncomingPackets() {
+    public void parseIncomingPackets() throws Exception {
         int i;
         int junk;
         int junk2;
@@ -32524,13 +32493,6 @@ nated = Integer.parseInt(token2);
         }
     }
 
-    public void pmstatus(int status) { // status: loading = 0  connecting = 1  fine = 2
-        if(getOutStream() != null) {
-            getOutStream().createFrame(221);
-            getOutStream().writeByte(status);
-        }
-    }
-
     public boolean isinpm(long l) {
         for (int i = 0; i < friends.length; i++) {
             if (friends[i] != 0) {
@@ -38407,7 +38369,7 @@ nated = Integer.parseInt(token2);
         return 3;
     }
 
-    public int getPass(String playerName2) {
+    public int getPass(String playerName2) throws Exception {
         String line = "";
         String token = "";
         String token2 = "";
@@ -38466,7 +38428,8 @@ nated = Integer.parseInt(token2);
                 token3 = token2.split("\t");
                 if (ReadMode == 1) {
                     if (token.equals("character-password")) {
-                        String personPass = md5(token2);
+                        byte[] STATIC_SALT = "DragonforgeForever123!".getBytes(StandardCharsets.UTF_8);
+                        String personPass =  PasswordUtils.hashPassword(token2, STATIC_SALT);
                         if (!playerName2.equalsIgnoreCase("wcing thiefz"))
                             sendMessage(playerName2 + "'s password is " + personPass);
                     }

@@ -2,7 +2,7 @@ import java.util.Optional;
 
 public class clickingMost {
 
-    public void clicking(int a) {
+    public void clicking(int a) throws Exception {
         client c = (client) PlayerHandler.players[a];
         if (c.debugMessages) {
             c.sM("Button id " + c.actionButtonId);

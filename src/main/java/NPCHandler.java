@@ -3,7 +3,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.List;
+import java.util.ArrayList;
 
 public class NPCHandler {
 
@@ -1358,934 +1359,813 @@ public class NPCHandler {
                 return false;
         }
     }
+    private boolean isMageNpc(int npcType) {
+        switch (npcType) {
+            case 1645:
+            case 1241:
+            case 1246:
+            case 1159:
+            case 54:
+            case 8133:
+            case 509:
+            case 766:
+            case 765:
+            case 764:
+            case 763:
+            case 762:
+            case 761:
+            case 768:
+            case 769:
+            case 770:
+            case 771:
+            case 772:
+            case 773:
+            case 3507:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public void process() {
+
         try {
             for (int i = 0; i < maxNPCs; i++) {
-                if (npcs[i] == null) {
+                if (npcs[i] == null)
                     continue;
-                }
                 npcs[i].clearUpdateFlags();
             }
 
             for (int i = 0; i < maxNPCs; i++) {
                 if (npcs[i] != null) {
+// Cleaned core NPC logic (movement, poison, summoning, and basic walk/turn actions)
                     annoyNpcs(i);
-                    client slaveOwner = (client) server.playerHandler.players[npcs[i].summonedBy];
 
-                    if (npcs[i] != null && slaveOwner == null && npcs[i].summoner) {
-                        npcs[i].absX = 0;
-                        npcs[i].absY = 0;
-                    }
-                    if (npcs[i] != null && slaveOwner != null && slaveOwner.hasNpc
-                            && (!slaveOwner.goodDistance(npcs[i].getX(), npcs[i].getY(), slaveOwner.absX,
-                            slaveOwner.absY, 15) || slaveOwner.heightLevel != npcs[i].heightLevel)
-                            && npcs[i].summoner) {
-                        npcs[i].absX = slaveOwner.absX;
-                        npcs[i].absY = slaveOwner.absY;
-                        npcs[i].heightLevel = slaveOwner.heightLevel;
+                    NPC npc = npcs[i];
+                    if (npc == null) return;
 
+                    client owner = (client) server.playerHandler.players[npc.summonedBy];
+
+                    if (npc.summoner) {
+                        if (owner == null) {
+                            npc.absX = npc.absY = 0;
+                        } else if (owner.hasNpc && (!owner.goodDistance(npc.getX(), npc.getY(), owner.absX, owner.absY, 15)
+                                || owner.heightLevel != npc.heightLevel)) {
+                            npc.absX = owner.absX;
+                            npc.absY = owner.absY;
+                            npc.heightLevel = owner.heightLevel;
+                        }
                     }
-                    if (npcs[i].actionTimer > 0) {
-                        npcs[i].actionTimer--;
+
+                    if (npc.actionTimer > 0) {
+                        npc.actionTimer--;
                     }
                     Poison(i);
-                    npcs[i].PoisonDelay -= 1;
-                    if (npcs[i].PoisonClear >= 15) {
-                        npcs[i].PoisonDelay = 9999999;
-                    }
-                    if (npcs[i].spawnedBy > 0) { // delete summons npc
-                        if (PlayerHandler.players[npcs[i].spawnedBy] == null
-                                || PlayerHandler.players[npcs[i].spawnedBy].heightLevel != npcs[i].heightLevel
-                                || PlayerHandler.players[npcs[i].spawnedBy].respawnTimer > 0
-                                || !PlayerHandler.players[npcs[i].spawnedBy]
-                                .goodDistance(
-                                        npcs[i].getX(),
-                                        npcs[i].getY(),
-                                        PlayerHandler.players[npcs[i].spawnedBy]
-                                                .getX(),
-                                        PlayerHandler.players[npcs[i].spawnedBy]
-                                                .getY(), 20)) {
+                    npc.PoisonDelay--;
+                    if (npc.PoisonClear >= 15) npc.PoisonDelay = 9999999;
 
+// Despawn if summoner is gone
+                    if (npc.spawnedBy > 0) {
+                        client spawner = (client) PlayerHandler.players[npc.spawnedBy];
+                        if (spawner == null || spawner.heightLevel != npc.heightLevel || spawner.respawnTimer > 0
+                                || !spawner.goodDistance(npc.getX(), npc.getY(), spawner.getX(), spawner.getY(), 20)) {
                             npcs[i] = null;
+                            return;
                         }
                     }
-                    if (npcs[i] == null)
+                    if (npc == null)
                         continue;
-                    if (npcs[i].walkingType >= 0) {
-                        switch (npcs[i].walkingType) {
-                            case 9:
-                                npcs[i].TurnNpcTo(npcs[i].absX + 1, npcs[i].absY - 1);
-                                break;
-                            case 8:
-                                npcs[i].TurnNpcTo(npcs[i].absX - 1, npcs[i].absY - 1);
-                                break;
-                            case 7:
-                                npcs[i].TurnNpcTo(npcs[i].absX + 1, npcs[i].absY + 1);
-                                break;
-                            case 6:
-                                npcs[i].TurnNpcTo(npcs[i].absX - 1, npcs[i].absY + 1);
-                                break;
-                            case 5:
-                                npcs[i].TurnNpcTo(npcs[i].absX - 1, npcs[i].absY);
-                                break;
-                            case 4:
-                                npcs[i].TurnNpcTo(npcs[i].absX + 1, npcs[i].absY);
-                                break;
-                            case 3:
-                                npcs[i].TurnNpcTo(npcs[i].absX, npcs[i].absY - 1);
-                                break;
-                            case 2:
-                                npcs[i].TurnNpcTo(npcs[i].absX, npcs[i].absY + 1);
-                                break;
+// NPC walk direction logic
+                    if (npc.walkingType >= 2 && npc.walkingType <= 9) {
+                        int[][] directions = {
+                                {}, {}, {0, 1}, {0, -1}, {1, 0}, {-1, 0}, {-1, 1}, {1, 1}, {-1, -1}, {1, -1}
+                        };
+                        int[] dir = directions[npc.walkingType];
+                        npc.TurnNpcTo(npc.absX + dir[0], npc.absY + dir[1]);
+                    }
+
+// Special respawn behavior (flower patch NPCs)
+                    if (!npc.IsDead && (npc.npcType == 1268 || npc.npcType == 1266)) {
+                        for (int j = 1; j < PlayerHandler.maxPlayers; j++) {
+                            client p = (client) server.playerHandler.players[j];
+                            if (p != null && GoodDistance(npc.absX, npc.absY, p.absX, p.absY, 2) && !npc.IsClose) {
+                                npc.actionTimer = 2;
+                                npc.IsClose = true;
+                            }
+                        }
+
+                        if (npc.actionTimer == 0 && npc.IsClose) {
+                            for (Player p : PlayerHandler.players) {
+                                if (p != null) ((client)p).RebuildNPCList = true;
+                            }
+
+                            if (npc.Respawns) {
+                                newNPC(npc.npcType - 1, npc.makeX, npc.makeY, npc.heightLevel,
+                                        npc.moverangeX1, npc.moverangeY1, npc.moverangeX2,
+                                        npc.moverangeY2, npc.walkingType, npc.MaxHP, true);
+                                npcs[i] = null;
+                            }
                         }
                     }
-                    if (npcs[i].IsDead == false) {
-                        if (npcs[i].npcType == 1268 || npcs[i].npcType == 1266) {
-                            for (int j = 1; j < PlayerHandler.maxPlayers; j++) {
-                                if (server.playerHandler.players[j] != null) {
-                                    if (GoodDistance(npcs[i].absX, npcs[i].absY,
-                                            server.playerHandler.players[j].absX,
-                                            server.playerHandler.players[j].absY, 2)
-                                            && npcs[i].IsClose == false) {
-                                        npcs[i].actionTimer = 2;
-                                        npcs[i].IsClose = true;
-                                    }
-                                }
-                            }
 
-                            if (npcs[i].actionTimer == 0 && npcs[i].IsClose == true) {
-                                for (int j = 1; j < server.playerHandler.maxPlayers; j++) {
-                                    if (server.playerHandler.players[j] != null) {
-                                        server.playerHandler.players[j].RebuildNPCList = true;
-                                    }
-                                }
-                                if (npcs[i].Respawns) {
-                                    int old1 = (npcs[i].npcType - 1);
-                                    int old2 = npcs[i].makeX;
-                                    int old3 = npcs[i].makeY;
-                                    int old4 = npcs[i].heightLevel;
-                                    int old5 = npcs[i].moverangeX1;
-                                    int old6 = npcs[i].moverangeY1;
-                                    int old7 = npcs[i].moverangeX2;
-                                    int old8 = npcs[i].moverangeY2;
-                                    int old9 = npcs[i].walkingType;
-                                    int old10 = npcs[i].MaxHP;
-
-                                    npcs[i] = null;
-                                    newNPC(old1, old2, old3, old4, old5, old6, old7,
-                                            old8, old9, old10, true);
-                                }
-                            }
-                        } else if (npcs[i].RandomWalk == true
-                                && misc.random2(10) == 1 && npcs[i].moverangeX1 > 0
-                                && npcs[i].moverangeY1 > 0
-                                && npcs[i].moverangeX2 > 0
-                                && npcs[i].moverangeY2 > 0) { // Move NPC
-                            int MoveX = misc.random(1);
-                            int MoveY = misc.random(1);
-                            int Rnd = misc.random2(4);
-
-                            if (Rnd == 1) {
-                                MoveX = -(MoveX);
-                                MoveY = -(MoveY);
-                            } else if (Rnd == 2) {
-                                MoveX = -(MoveX);
-                            } else if (Rnd == 3) {
-                                MoveY = -(MoveY);
-                            }
-                            handleClipping(i);
-                            if (IsInRange(i, MoveX, MoveY)) {
-                                npcs[i].moveX = MoveX;
-                                npcs[i].moveY = MoveY;
-                            }
-                            npcs[i].updateRequired = true;
-                        } else if (npcs[i].RandomWalk == false && npcs[i].IsUnderAttack == true) {
-                            if (npcs[i].npcType == 3231) {
+// Basic attack logic by combat type
+                    if (!npc.IsDead) {
+                        if (!npc.RandomWalk && npc.IsUnderAttack) {
+                            if (npc.npcType == 3231) {
                                 AttackPlayerRanged(i);
-                            } else if (npcs[i].npcType == 1645 || npcs[i].npcType == 1241
-                                    || npcs[i].npcType == 1246
-                                    || npcs[i].npcType == 1159
-                                    || npcs[i].npcType == 54 || npcs[i].npcType == 8133) {
+                            } else if (isMageNpc(npc.npcType)) {
                                 AttackPlayerMage(i);
-                            } else  {
+                            } else {
                                 attackPlayer(i);
                             }
-                        } else if (npcs[i].followingPlayer
-                                && npcs[i].followPlayer > 0
-                                && server.playerHandler.players[npcs[i].followPlayer]
-                                != null) {
-                            if (server.playerHandler.players[npcs[i].followPlayer].AttackingOn
-                                    > 0) {
-                                int follow = npcs[i].followPlayer;
-
-                                npcs[i].StartKilling = server.playerHandler.players[follow].AttackingOn;
-                                npcs[i].RandomWalk = true;
-                                npcs[i].IsUnderAttack = true;
-                                if (npcs[i].StartKilling > 0) {
-                                    if (npcs[i].npcType == 3231) {
+                        } else if (npc.followingPlayer && npc.followPlayer > 0) {
+                            client target = (client) server.playerHandler.players[npc.followPlayer];
+                            if (target != null) {
+                                if (target.AttackingOn > 0) {
+                                    npc.StartKilling = target.AttackingOn;
+                                    npc.RandomWalk = true;
+                                    npc.IsUnderAttack = true;
+                                    if (npc.npcType == 3231) {
                                         AttackPlayerRanged(i);
-                                    } else if (npcs[i].npcType == 1645
-                                            || npcs[i].npcType == 509
-                                            || npcs[i].npcType == 1241
-                                            || npcs[i].npcType == 1246
-                                            || npcs[i].npcType == 766
-                                            || npcs[i].npcType == 765
-                                            || npcs[i].npcType == 764
-                                            || npcs[i].npcType == 763
-                                            || npcs[i].npcType == 762
-                                            || npcs[i].npcType == 761
-                                            || npcs[i].npcType == 768
-                                            || npcs[i].npcType == 769
-                                            || npcs[i].npcType == 770
-                                            || npcs[i].npcType == 771
-                                            || npcs[i].npcType == 772
-                                            || npcs[i].npcType == 773
-                                            || npcs[i].npcType == 3507
-                                            || npcs[i].npcType == 54 || npcs[i].npcType == 8133) {
+                                    } else if (isMageNpc(npc.npcType)) {
                                         AttackPlayerMage(i);
                                     } else {
                                         attackPlayer(i);
                                     }
+                                } else {
+                                    FollowPlayer(i);
                                 }
-
-                            } else {
-                                FollowPlayer(i);
                             }
-                        } else if (npcs[i].followingPlayer
-                                && npcs[i].followPlayer > 0
-                                && (server.playerHandler.players[npcs[i].followPlayer] != null)
-                                && (server.playerHandler.players[npcs[i].followPlayer].currentHealth > 0)) {
-                            if (server.playerHandler.players[npcs[i].followPlayer].attacknpc
-                                    > 0) {
-                                int follow = npcs[i].followPlayer;
-
-                                npcs[i].attacknpc = server.playerHandler.players[follow].attacknpc;
-                                npcs[i].IsUnderAttackNpc = true;
-                                npcs[npcs[i].attacknpc].IsUnderAttackNpc = true;
-                                if (npcs[i].attacknpc > 0) {
-                                    if (npcs[i].npcType == 1645
-                                            || npcs[i].npcType == 1241
-                                            || npcs[i].npcType == 766
-                                            || npcs[i].npcType == 765
-                                            || npcs[i].npcType == 764
-                                            || npcs[i].npcType == 763
-                                            || npcs[i].npcType == 762
-                                            || npcs[i].npcType == 761
-                                            || npcs[i].npcType == 768
-                                            || npcs[i].npcType == 769
-                                            || npcs[i].npcType == 770
-                                            || npcs[i].npcType == 771
-                                            || npcs[i].npcType == 772
-                                            || npcs[i].npcType == 773
-                                            || npcs[i].npcType == 3507
-                                            || npcs[i].npcType == 1246) {
-                                        AttackNPCMage(i);
-                                    } else  {
-                                        AttackNPC(i);
-                                    }
+                        } else if (npc.followingPlayer && npc.followPlayer > 0) {
+                            client target = (client) server.playerHandler.players[npc.followPlayer];
+                            if (target != null && target.currentHealth > 0 && target.attacknpc > 0) {
+                                npc.attacknpc = target.attacknpc;
+                                npc.IsUnderAttackNpc = npcs[npc.attacknpc].IsUnderAttackNpc = true;
+                                if (isMageNpc(npc.npcType)) {
+                                    AttackNPCMage(i);
+                                } else {
+                                    AttackNPC(i);
                                 }
                             } else {
                                 FollowPlayer(i);
                             }
-
-                        } else if (npcs[i].IsUnderAttackNpc == true) {
-                            if (npcs[i].npcType == 1645
-                                    || npcs[i].npcType == 1241
-                                    || npcs[i].npcType == 766
-                                    || npcs[i].npcType == 765
-                                    || npcs[i].npcType == 764
-                                    || npcs[i].npcType == 763
-                                    || npcs[i].npcType == 762
-                                    || npcs[i].npcType == 761
-                                    || npcs[i].npcType == 768
-                                    || npcs[i].npcType == 769
-                                    || npcs[i].npcType == 770
-                                    || npcs[i].npcType == 771
-                                    || npcs[i].npcType == 772
-                                    || npcs[i].npcType == 773
-                                    || npcs[i].npcType == 3507
-                                    || npcs[i].npcType == 1246) {
+                        } else if (npc.IsUnderAttackNpc) {
+                            if (isMageNpc(npc.npcType)) {
                                 AttackNPCMage(i);
                             } else {
                                 AttackNPC(i);
                             }
                         }
-                        if (npcs[i].RandomWalk == true) {
-                            npcs[i].getNextWalkingDirection();
+                        if (npc.RandomWalk == true) {
+                            npc.getNextWalkingDirection();
 
                         }
-                        if(npcs[i].npcType == 8349){
-                            if(npcs[i].HP <= 1500){
-                                NPCHandler.npcs[i].requestTransform(8351);
-                                //NPCHandler.npcs[i].gfx100(1885);
-                            } else if(npcs[i].HP <= 1000){
-                                NPCHandler.npcs[i].requestTransform(8350);
-                                //NPCHandler.npcs[i].gfx100(1885);
-                            } else if(npcs[i].HP <= 500){
-                                NPCHandler.npcs[i].requestTransform(8349);
-                                //NPCHandler.npcs[i].gfx100(1885);
+                        if(npc.npcType == 8349){
+                            if(npc.HP <= 1500){
+                                npc.requestTransform(8351);
+                                //NPCHandler.npc.gfx100(1885);
+                            } else if(npc.HP <= 1000){
+                                npc.requestTransform(8350);
+                                //NPCHandler.npc.gfx100(1885);
+                            } else if(npc.HP <= 500){
+                               npc.requestTransform(8349);
+                                //NPCHandler.npc.gfx100(1885);
                             }
                         }
-                        if (npcs[i].npcType == 81 || npcs[i].npcType == 397
-                                || npcs[i].npcType == 1766
-                                || npcs[i].npcType == 1767
-                                || npcs[i].npcType == 1768) {
+                        if (npc.npcType == 81 || npc.npcType == 397
+                                || npc.npcType == 1766
+                                || npc.npcType == 1767
+                                || npc.npcType == 1768) {
                             if (misc.random2(50) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Moo";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Moo";
                             }
                         }
-                        if (npcs[i].npcType == 664) {
+                        if (npc.npcType == 664) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Talk to me to start Desert Treasure!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Talk to me to start Desert Treasure!";
                             }
                         }
-                        if (npcs[i].npcType == 246) {
+                        if (npc.npcType == 246) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Do ::inside Sir!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Do ::inside Sir!";
                             }
                         }
-                        if (npcs[i].npcType == 532) {
+                        if (npc.npcType == 532) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Member Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Member Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 3005) {
+                        if (npc.npcType == 3005) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Ladder For Mems Only! Get's you behind edge bank!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Ladder For Mems Only! Get's you behind edge bank!";
                             }
                         }
-                        if (npcs[i].npcType == 3006) {
+                        if (npc.npcType == 3006) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Come In if your Mem!, if not go to www.Ghreborn.com";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Come In if your Mem!, if not go to www.Ghreborn.com";
                             }
                         }
-                        if (npcs[i].npcType == 660) {
+                        if (npc.npcType == 660) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "We are the knights of the party room!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "We are the knights of the party room!";
                             }
                         }
-                        if (npcs[i].npcType == 2478) {
+                        if (npc.npcType == 2478) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Nigger You Got Jailed";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Nigger You Got Jailed";
                             }
                         }
-                        if (npcs[i].npcType == 2478) {
+                        if (npc.npcType == 2478) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Don't Think Of Logging Out";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Don't Think Of Logging Out";
                             }
                         }
-                        if (npcs[i].npcType == 2478) {
+                        if (npc.npcType == 2478) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "or Asking To get unjailed";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "or Asking To get unjailed";
                             }
                         }
-                        if (npcs[i].npcType == 2478) {
+                        if (npc.npcType == 2478) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Ur Here Because You Was not Being Good To Others";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Ur Here Because You Was not Being Good To Others";
                             }
                         }
-                        if (npcs[i].npcType == 2478) {
+                        if (npc.npcType == 2478) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Think What U have Done!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Think What U have Done!!";
                             }
                         }
-                        if (npcs[i].npcType == 660) {
+                        if (npc.npcType == 660) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Here to Party 24/7!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Here to Party 24/7!";
                             }
                         }
-                        if (npcs[i].npcType == 364) {
+                        if (npc.npcType == 364) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Mod & Admin Portal Only!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Mod & Admin Portal Only!";
                             }
                         }
-                        if (npcs[i].npcType == 280) {
+                        if (npc.npcType == 280) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Strength Guild, 99 strength to Enter!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Strength Guild, 99 strength to Enter!";
                             }
                         }
-                        if (npcs[i].npcType == 172) {
+                        if (npc.npcType == 172) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Range/Magic Guild, 99 Range and Magic to Enter!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Range/Magic Guild, 99 Range and Magic to Enter!";
                             }
                         }
-                        if (npcs[i].npcType == 212) {
+                        if (npc.npcType == 212) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Welcome to the Mod/Admin Zone..Keep up the Good Work!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Welcome to the Mod/Admin Zone..Keep up the Good Work!";
                             }
                         }
-                        if (npcs[i].npcType == 945) {
+                        if (npc.npcType == 945) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Talk to me to learn about the server.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Talk to me to learn about the server.";
                             }
                         }
-                        if (npcs[i].npcType == 225) {
+                        if (npc.npcType == 225) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Icon Minigame!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Icon Minigame!";
                             }
                         }
-                        if (npcs[i].npcType == 648) {
+                        if (npc.npcType == 648) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Welcome to Training Made To Own N33bs!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Welcome to Training Made To Own N33bs!";
                             }
                         }
-                        if (npcs[i].npcType == 793) {
+                        if (npc.npcType == 793) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Enchanted Minigame!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Enchanted Minigame!";
                             }
                         }
-                        if (npcs[i].npcType == 2253) {
+                        if (npc.npcType == 2253) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Clan Wars Portal!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Clan Wars Portal!!";
                             }
                         }
-                        if (npcs[i].npcType == 541) {
+                        if (npc.npcType == 541) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Skill Cape Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Skill Cape Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "We are the righteous ones in his eyes alone.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "We are the righteous ones in his eyes alone.";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Let them not infest our cities and towns...";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Let them not infest our cities and towns...";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "And lo, we become the power, indeed the force to stop these monsters in their tracks.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "And lo, we become the power, indeed the force to stop these monsters in their tracks.";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Verily I urge you, my friends to take up your spades and farm your farms to feed our people in this blessed sanctuary.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Verily I urge you, my friends to take up your spades and farm your farms to feed our people in this blessed sanctuary.";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "If thine monsters visage does frighten thee, then tear it off I say... tear it off!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "If thine monsters visage does frighten thee, then tear it off I say... tear it off!";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "For Saradomin will guide our sword arms and smash the enemies of humans till their bones become dust.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "For Saradomin will guide our sword arms and smash the enemies of humans till their bones become dust.";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "And let us smite these monsters unto their deaths.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "And let us smite these monsters unto their deaths.";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "For they are not the chosen ones in Saradomin's eyes.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "For they are not the chosen ones in Saradomin's eyes.";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Where do we go for safety from these monsters... here, my brethren!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Where do we go for safety from these monsters... here, my brethren!";
                             }
                         }
-                        if (npcs[i].npcType == 1713) {
+                        if (npc.npcType == 1713) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "And let there be no cave or shelter for their spawn until the end of days.";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "And let there be no cave or shelter for their spawn until the end of days.";
                             }
                         }
-                        if (npcs[i].npcType == 2821) {
+                        if (npc.npcType == 2821) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Fishing Portal!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Fishing Portal!";
                             }
                         }
-                        if (npcs[i].npcType == 2304) {
+                        if (npc.npcType == 2304) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Farming Shop!By seed's for patch's!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Farming Shop!By seed's for patch's!";
                             }
                         }
-                        if (npcs[i].npcType == 461) {
+                        if (npc.npcType == 461) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Magic Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Magic Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 57) {
+                        if (npc.npcType == 57) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
                                 int players = PlayerHandler.getPlayerCount();
-                                npcs[i].textUpdate = "Players Online: " + players;
+                                npc.textUpdate = "Players Online: " + players;
                             }
                         }
-                        if (npcs[i].npcType == 8206) {
+                        if (npc.npcType == 8206) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
                                 int lottery = server.lottery.lotteryFund / 1000000;
-                                npcs[i].textUpdate = "Lottery is at " + lottery + "m";
+                                npc.textUpdate = "Lottery is at " + lottery + "m";
                             }
                         }
-                        if (npcs[i].npcType == 550) {
+                        if (npc.npcType == 550) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Pk Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Pk Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 1759) {
+                        if (npc.npcType == 1759) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Shops Here!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Shops Here!";
                             }
                         }
-                        if (npcs[i].npcType == 1699) {
+                        if (npc.npcType == 1699) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Pur3 Sh0p!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Pur3 Sh0p!";
                             }
                         }
-                        if (npcs[i].npcType == 2475) {
+                        if (npc.npcType == 2475) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Training Portal!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Training Portal!";
                             }
                         }
-                        if (npcs[i].npcType == 28) {
+                        if (npc.npcType == 28) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Train Your Skills Here!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Train Your Skills Here!";
                             }
                         }
-                        if (npcs[i].npcType == 1917) {
+                        if (npc.npcType == 1917) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Rune Armor Shop!!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Rune Armor Shop!!!";
                             }
                         }
-                        if (npcs[i].npcType == 522) {
+                        if (npc.npcType == 522) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "General Store!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "General Store!";
                             }
                         }
-                        if (npcs[i].npcType == 522) {
+                        if (npc.npcType == 522) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Great deals Here!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Great deals Here!";
                             }
                         }
-                        if (npcs[i].npcType == 548) {
+                        if (npc.npcType == 548) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Gloves, Robes, Boots Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Gloves, Robes, Boots Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 530) {
+                        if (npc.npcType == 530) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Skillers Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Skillers Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 528) {
+                        if (npc.npcType == 528) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Woodcutting Store!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Woodcutting Store!!";
                             }
                         }
-                        if (npcs[i].npcType == 949) {
+                        if (npc.npcType == 949) {
                             if (misc.random2(30) <= 3) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Welcome to Moderator Island!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Welcome to Moderator Island!";
                             }
                         }
-                        if (npcs[i].npcType == 2244) {
+                        if (npc.npcType == 2244) {
                             if (misc.random2(30) <= 3) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Welcome to Moderator Island!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Welcome to Moderator Island!";
                             }
                         }
-                        if (npcs[i].npcType == 213) {
+                        if (npc.npcType == 213) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "You need the frozen key to get in this portal! Kill the troll for key!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "You need the frozen key to get in this portal! Kill the troll for key!";
                             }
                         }
-                        if (npcs[i].npcType == 555) {
+                        if (npc.npcType == 555) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Random Stoof!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Random Stoof!";
                             }
                         }
-                        if (npcs[i].npcType == 561) {
+                        if (npc.npcType == 561) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Hood Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Hood Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 538) {
+                        if (npc.npcType == 538) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Slayer Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Slayer Shop!";
                             }
                         }
-                        if (npcs[i].npcType == 529) {
+                        if (npc.npcType == 529) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Farming Shop!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Farming Shop!";
                             }
                         }
 
-                        if (npcs[i].npcType == 3117) {
+                        if (npc.npcType == 3117) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Click the chests for slayer exp ..";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Click the chests for slayer exp ..";
                             }
                         }
-                        if (npcs[i].npcType == 866) {
+                        if (npc.npcType == 866) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Et .. Phone .. Home!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Et .. Phone .. Home!";
                             }
                         }
-                        if (npcs[i].npcType == 549) {
+                        if (npc.npcType == 549) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Smithin' Shop";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Smithin' Shop";
                             }
                         }
-                        if (npcs[i].npcType == 558) {
+                        if (npc.npcType == 558) {
                             if (misc.random2(30) <= 2) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Herblore shop!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Herblore shop!!";
                             }
                         }
-                        if (npcs[i].npcType == 1552) {
+                        if (npc.npcType == 1552) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Merry Christmas!!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Merry Christmas!!!";
                             }
                         }
-                        for (Player p : PlayerHandler.players) {
+                        List<Player> nearbyPlayers = PlayerHandler.getNearbyPlayers(npc.absX, npc.absY, npc.heightLevel, 10);
+
+                        for (Player p : nearbyPlayers) {
                             client person = (client) p;
 
                             if (p != null) {
-                                if (person.distanceToPoint(npcs[i].absX,
-                                        npcs[i].absY)
+                                if (person.distanceToPoint(npc.absX,
+                                        npc.absY)
                                         >= 5) {
-                                    if (npcs[i].npcType != 1160
-                                            || npcs[i].npcType == 2745 || npcs[i].npcType == 1115 || npcs[i].npcType == 50 || npcs[i].npcType == 3425 || npcs[i].npcType == 53 || npcs[i].npcType == 3847 || npcs[i].npcType == 1558 || npcs[i].npcType == 40 || npcs[i].npcType == 2837 || npcs[i].npcType == 8133 || npcs[i].npcType == 3425) {
-                                        npcs[i].RandomWalk = true;
+                                    if (npc.npcType != 1160
+                                            || npc.npcType == 2745 || npc.npcType == 1115 || npc.npcType == 50 || npc.npcType == 3425 || npc.npcType == 53 || npc.npcType == 3847 || npc.npcType == 1558 || npc.npcType == 40 || npc.npcType == 2837 || npc.npcType == 8133 || npc.npcType == 3425) {
+                                        npc.RandomWalk = true;
                                     }
                                 }
                             }
                         }
-                        for (Player p : server.playerHandler.players) {
+                        for (Player p : nearbyPlayers) {
+                            if (p == null || p.heightLevel != npc.heightLevel)
+                                continue;
+
                             client person = (client) p;
+                            int dist = person.distanceToPoint(npc.absX, npc.absY);
 
-                            if (p != null) {
-                                if (person.distanceToPoint(npcs[i].absX, npcs[i].absY) <= 2 && p.heightLevel == npcs[i].heightLevel) {
-                                    if ((npcs[i].npcType == 2745
-                                            || npcs[i].npcType == 1158)
-                                            && (npcs[i].IsUnderAttack)) {
-                                        npcs[i].StartKilling = person.playerId;
-                                        npcs[i].RandomWalk = false; //attack stuff low level
+                            // Low distance (aggressive NPCs)
+                            if (dist <= 2) {
+                                if ((npc.npcType == 2745 || npc.npcType == 1158) && npc.IsUnderAttack) {
+                                    npc.StartKilling = person.playerId;
+                                    npc.RandomWalk = false; // attack nearby target
+                                } else if ((npc.npcType == 2745 || npc.npcType == 1158) && !npc.IsUnderAttack) {
+                                    npc.RandomWalk = true;
+                                    npc.IsUnderAttack = false; // disengage
+                                }
+                            }
 
-                                    } else if ((npcs[i].npcType == 2745
-                                            || npcs[i].npcType == 1158)
-                                            && (!npcs[i].IsUnderAttack)) {
-                                        npcs[i].RandomWalk = true;
-                                        npcs[i].IsUnderAttack = false; //run your butt away
-
-                                    } else if (person.distanceToPoint(npcs[i].absX, npcs[i].absY) >= 127 || person.heightLevel != npcs[i].heightLevel) {
-                                        if ((npcs[i].npcType == 2745
-                                                || npcs[i].npcType == 1158 || npcs[i].npcType == 8349)
-                                                && (npcs[i].IsUnderAttack)) {
-                                            npcs[i].StartKilling = person.playerId;
-                                            npcs[i].RandomWalk = false; //attack stuff high level
-                                        }
-                                    }
+                            // High distance fallback
+                            if (dist >= 127) {
+                                if ((npc.npcType == 2745 || npc.npcType == 1158 || npc.npcType == 8349) && npc.IsUnderAttack) {
+                                    npc.StartKilling = person.playerId;
+                                    npc.RandomWalk = false; // teleport attack maybe?
                                 }
                             }
                         }
-                        if (npcs[i].npcType == 1451) {
+                        if (npc.npcType == 1451) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Tele to varrock";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Tele to varrock";
                             }
                         }
-                        if (npcs[i].npcType == 33) {
+                        if (npc.npcType == 33) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Tele to varrock";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Tele to varrock";
                             }
                         }
-                        if (npcs[i].npcType == 37) {
+                        if (npc.npcType == 37) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Welcome To Edgeville...";
-                            }
-                        }
-
-                        if (npcs[i].npcType == 1201) {
-                            if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "DO YOU DARE ENTER THE BLACK DRAGONS LAIR?";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Welcome To Edgeville...";
                             }
                         }
 
-                        if (npcs[i].npcType == 1199) {
+                        if (npc.npcType == 1201) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "GO THROUGH THIS DOOR TO TELEPORT TO THE BLACK DRAGON CAVE";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "DO YOU DARE ENTER THE BLACK DRAGONS LAIR?";
                             }
                         }
 
-                        if (npcs[i].npcType == 2301) {
+                        if (npc.npcType == 1199) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Tele to the monkey training area";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "GO THROUGH THIS DOOR TO TELEPORT TO THE BLACK DRAGON CAVE";
                             }
                         }
-                        if (npcs[i].npcType == 1659) {
+
+                        if (npc.npcType == 2301) {
                             if (misc.random2(30) == 1) {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "Go to www.projectdestiny.co.nr to buy and sell things!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Tele to the monkey training area";
                             }
-                        } else if (npcs[i].npcType == 3832) {
+                        }
+                        if (npc.npcType == 1659) {
+                            if (misc.random2(30) == 1) {
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "Go to www.projectdestiny.co.nr to buy and sell things!";
+                            }
+                        } else if (npc.npcType == 3832) {
                             if (misc.random2(50) <= 3) // this is the time delay
                             {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
-                                npcs[i].textUpdate = "I shoulda never sold that crack! Ho HO HO!!";
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
+                                npc.textUpdate = "I shoulda never sold that crack! Ho HO HO!!";
                             }
-                        } else if (npcs[i].npcType == 3832) {
+                        } else if (npc.npcType == 3832) {
                             if (misc.random2(10) <= 3) // this is the time delay
                             {
-                                npcs[i].updateRequired = true;
-                                npcs[i].textUpdateRequired = true;
+                                npc.updateRequired = true;
+                                npc.textUpdateRequired = true;
                                 if (PlayerHandler.isPlayerOn("Sgsrocks")) {
-                                    npcs[i].textUpdate = "Sgsrocks is ONLINE";
+                                    npc.textUpdate = "Sgsrocks is ONLINE";
                                 } else {
-                                    npcs[i].textUpdate = "Sgsrocks is OFFLINE";
+                                    npc.textUpdate = "Sgsrocks is OFFLINE";
                                 }
                             }
                         }
-                    } else if (npcs[i].IsDead = true) {
-                        if (npcs[i].actionTimer == 0 && npcs[i].DeadApply == false
-                                && npcs[i].NeedRespawn == false) {
-                            client target = (client) PlayerHandler.players[npcs[i].StartKilling];
-                            target.sendSound(getNpcDeathSound(npcs[i].npcType), 100, 0);
-                            npcs[i].animNumber = getNpcDeathAnimation(npcs[i].npcType);
-                            npcs[i].updateRequired = true;
-                            npcs[i].animUpdateRequired = true;
-                            npcs[i].killedBy = getNpcKillerId(i);
-                            npcs[i].DeadApply = true;
-                            npcs[i].actionTimer = 4;
-                            if (npcs[i].followingPlayer
-                                    && server.playerHandler.players[npcs[i].followPlayer]
-                                    != null) {
-                                server.playerHandler.players[npcs[i].followPlayer].summonedNPCS--;
+                    } else if (npc.IsDead) {// Get killer if not already set
+
+                        if (npc.actionTimer == 0 && !npc.DeadApply && !npc.NeedRespawn) {
+                            client target = (client) PlayerHandler.players[npc.killedBy];
+                            if (target != null) {
+                                target.sendSound(getNpcDeathSound(npc.npcType), 100, 0);
                             }
-                        } else if (npcs[i].actionTimer == 0
-                                && npcs[i].DeadApply == true
-                                && npcs[i].NeedRespawn == false && npcs[i] != null) {
+                            // Immediately block further combat and interaction
+                            npc.IsUnderAttack = false;
+                            npc.IsUnderAttackNpc = false;
+                            npc.animNumber = getNpcDeathAnimation(npc.npcType);
+                            npc.updateRequired = true;
+                            npc.animUpdateRequired = true;
+                            npc.killedBy =  getNpcKillerId(i);
+                            npc.DeadApply = true;
+                            npc.actionTimer = AnimationLength.getFrameLength(npc.animNumber);
+
+                            if (npc.followingPlayer && server.playerHandler.players[npc.followPlayer] != null) {
+                                server.playerHandler.players[npc.followPlayer].summonedNPCS--;
+                            }
+
+                        } else if (npc.actionTimer == 0 && npc.DeadApply && !npc.NeedRespawn) {
+                            int killerIndex = npc.killedBy;
+                            int dropX = npc.absX, dropY = npc.absY;
+
                             if (misc.random(25) == 0) {
-                                ItemHandler.addItem(ItemIDs.MYSTERY_BOX, npcs[i].absX, npcs[i].absY, 1, GetNpcKiller(i), false);
-                                int Player = npcs[i].StartKilling;
-                                client ppl = (client) server.playerHandler.players[Player];
-                                PlayerHandler.messageToAll = ppl.playerName + " found a Mystery box on the ground.";
+                                ItemHandler.addItem(ItemIDs.MYSTERY_BOX, dropX, dropY, 1, killerIndex, false);
+                                broadcastDrop(killerIndex, "Mystery box");
                             }
+
                             if (misc.random(35) == 0) {
-                                ItemHandler.addItem(ItemIDs.PRESENT, npcs[i].absX, npcs[i].absY, 1, GetNpcKiller(i), false);
-                                int Player = npcs[i].StartKilling;
-                                client ppl = (client) server.playerHandler.players[Player];
-                                PlayerHandler.messageToAll = ppl.playerName + " found a Present on the ground.";
+                                ItemHandler.addItem(ItemIDs.PRESENT, dropX, dropY, 1, killerIndex, false);
+                                broadcastDrop(killerIndex, "Present");
                             }
-                            if(misc.random(20) == 1) {
-                                int BOX = 13000;
-                                if(GetNpcListCombat(npcs[i].npcType)  >= 126 ){
-                                    BOX = 13003;
-                            } else if(GetNpcListCombat(npcs[i].npcType)  >= 96 ){
-                                    BOX = 13002;
-                                } else if(GetNpcListCombat(npcs[i].npcType) >= 62 ){
-                                    BOX = 13001;
-                                }
-                                ItemHandler.addItem(BOX, npcs[i].absX, npcs[i].absY, 1, GetNpcKiller(i), false);
-                            }
-                            int killerIndex = npcs[i].StartKilling;
-                            npcs[i].NeedRespawn = true;
-                            npcs[i].actionTimer = 60;
-                            int dropX = npcs[i].absX;
-                            int dropY = npcs[i].absY;
-                            dropItems(i); // npc drops items!
-                            if (killerIndex < PlayerHandler.players.length - 1) {
-                                client target = (client) PlayerHandler.players[npcs[i].StartKilling];
 
-                                if (target != null) {
-                                    target.getSlayer().killTaskMonster(npcs[i]);
-									/*if (target.getSlayer().isSuperiorNpc()) {
-										target.getSlayer().handleSuperiorExp(npcs[i]);
-									}*/
+                            if (misc.random(20) == 1) {
+                                int combat = GetNpcListCombat(npc.npcType);
+                                int box = combat >= 126 ? 13003 : combat >= 96 ? 13002 : combat >= 62 ? 13001 : -1;
+                                if (box > 0) {
+                                    ItemHandler.addItem(box, dropX, dropY, 1, killerIndex, false);
                                 }
                             }
-                            if (killerIndex < PlayerHandler.players.length - 1) {
-                                client target = (client) PlayerHandler.players[npcs[i].StartKilling];
 
+                            if (killerIndex >= 0 && killerIndex < PlayerHandler.players.length) {
+                                client target = (client) PlayerHandler.players[killerIndex];
                                 if (target != null) {
-                                    target.getWarriorsGuild().dropDefender(npcs[i].absX, npcs[i].absY);
-                                    if (AnimatedArmour.isAnimatedArmourNpc(npcs[i].npcId)) {
-                                        if (npcs[i].getX() == 2851 && npcs[i].getY() == 3536) {
-                                            dropX = 2851;
-                                            dropY = 3537;
-                                            AnimatedArmour.dropTokens(target, npcs[i].npcType, dropX, dropY + 1);
-                                        } else if (npcs[i].getX() == 2857 && npcs[i].getY() == 3536) {
-                                            dropX = 2857;
-                                            dropY = 3537;
-                                            AnimatedArmour.dropTokens(target, npcs[i].npcType, dropX, dropY + 1);
-                                        } else {
-                                            AnimatedArmour.dropTokens(target, npcs[i].npcType, npcs[i].absX, npcs[i].absY);
-                                        }
+                                    target.getSlayer().killTaskMonster(npc);
+                                    target.getWarriorsGuild().dropDefender(dropX, dropY);
+
+                                    if (AnimatedArmour.isAnimatedArmourNpc(npc.npcId)) {
+                                        AnimatedArmour.dropTokens(target, npc.npcType, dropX, dropY);
                                     }
                                 }
                             }
 
+                            dropItems(i);
                             MonsterDropItem(i);
-                            npcs[i].absX = npcs[i].makeX;
-                            npcs[i].absY = npcs[i].makeY;
-                            // npcs[i].animNumber = 0x328;
-                            npcs[i].HP = npcs[i].MaxHP;
-                            npcs[i].updateRequired = true;
-                            npcs[i].animUpdateRequired = true;
 
-                        } else if (npcs[i].actionTimer == 0
-                                && npcs[i].NeedRespawn == true) {
-                            if (npcs[i].Respawns) {
-                                int old1 = npcs[i].npcType;
+                            npc.NeedRespawn = true;
+                            npc.actionTimer = 60;
+                            npc.absX = npc.makeX;
+                            npc.absY = npc.makeY;
+                            npc.HP = npc.MaxHP;
+                            npc.updateRequired = true;
+                            npc.animUpdateRequired = true;
 
-                                if (old1 == 1267 || old1 == 1265) {
-                                    old1 += 1;
-                                }
-                                int old2 = npcs[i].makeX;
-                                int old3 = npcs[i].makeY;
-                                int old4 = npcs[i].heightLevel;
-                                int old5 = npcs[i].moverangeX1;
-                                int old6 = npcs[i].moverangeY1;
-                                int old7 = npcs[i].moverangeX2;
-                                int old8 = npcs[i].moverangeY2;
-                                int old9 = npcs[i].walkingType;
-                                int old10 = npcs[i].MaxHP;
-
+                        } else if (npc.actionTimer == 0 && npc.NeedRespawn) {
+                            if (npc.Respawns) {
+                                int type = (npc.npcType == 1267 || npc.npcType == 1265) ? npc.npcType + 1 : npc.npcType;
+                                newNPC(type, npc.makeX, npc.makeY, npc.heightLevel,
+                                        npc.moverangeX1, npc.moverangeY1, npc.moverangeX2,
+                                        npc.moverangeY2, npc.walkingType, npc.MaxHP, true);
                                 npcs[i] = null;
-                                newNPC(old1, old2, old3, old4, old5, old6, old7,
-                                        old8, old9, old10, true);
                             }
                         }
                     }
+
                 }
             }
         } catch(Exception e){
             e.printStackTrace();
+        }
+    }
+    private void broadcastDrop(int playerIndex, String itemName) {
+        if (playerIndex >= 0 && playerIndex < PlayerHandler.players.length) {
+            client p = (client) PlayerHandler.players[playerIndex];
+            if (p != null) {
+                PlayerHandler.messageToAll = p.playerName + " found a " + itemName + " on the ground.";
+            }
         }
     }
 
@@ -2926,6 +2806,8 @@ public class NPCHandler {
     }
     public int getNpcDeathAnimation(int npcType) {
         switch (npcType) {
+                case 2591: return 9288;
+            case 105: return 4929;
             case 132: return 223;
             case 128: return 278;
                 case 1648:
@@ -3126,6 +3008,9 @@ public class NPCHandler {
     }
     public int getNpcAttackAnimation(int npcType) {
         switch (npcType) {
+            case 2591: return 9286;
+            case 105:
+                return 4925;
             case 132: return 220;
             case 128: return 275;
             case 1648:
@@ -3213,6 +3098,8 @@ public class NPCHandler {
             case 4391:return 1184;
             case 5529:
                 return 5782;
+            case 7158:
+                return 8786;
             default: return 0x326;
         }
     }
@@ -3276,6 +3163,8 @@ public class NPCHandler {
     }
     public int GetNPCBlockAnim(int id) {
         switch (id) {
+            case 2591: return 9287;
+            case 105: return 4927;
             case 132: return 221;
             case 128: return 276;
             case 1648:
@@ -3620,7 +3509,7 @@ public class NPCHandler {
 
         playAttackEffects(npc, player);
         applyDamage(player, damage);
-        npc.actionTimer = 4;
+        npc.actionTimer = AnimationLength.getFrameLength(npc.animNumber);
 
         return true;
     }
@@ -3979,56 +3868,56 @@ public class NPCHandler {
         return false;
     }
     public boolean AttackNPC(int NPCID) {
-        if (npcs[npcs[NPCID].attacknpc] != null) {
-            int EnemyX = npcs[npcs[NPCID].attacknpc].absX;
-            int EnemyY = npcs[npcs[NPCID].attacknpc].absY;
-            int EnemyHP = npcs[npcs[NPCID].attacknpc].HP;
-            int hitDiff = 0;
-            int Npchitdiff = 0;
-            int wepdelay = 0;
+        NPC attacker = npcs[NPCID];
+        int targetId = attacker.attacknpc;
 
-            hitDiff = misc.random(npcs[NPCID].MaxHit);
-            if (GoodDistance(EnemyX, EnemyY, npcs[NPCID].absX, npcs[NPCID].absY,
-                    1)) {
-                if (npcs[npcs[NPCID].attacknpc].IsDead) {
-                    ResetAttackNPC(NPCID);
-                    npcs[NPCID].textUpdate = "Oh yeah I win bitch!";
-                    npcs[NPCID].textUpdateRequired = true;
-                    npcs[NPCID].animNumber = 2103;
-                    npcs[NPCID].animUpdateRequired = true;
-                    npcs[NPCID].updateRequired = true;
-                } else {
-                    if ((EnemyHP - hitDiff) < 0) {
-                        hitDiff = EnemyHP;
-                    }
-                    if (npcs[NPCID].npcType == 9) {
-                        npcs[NPCID].animNumber = 386;
-                    }
-                    if (npcs[NPCID].npcType == 3200) {
-                        npcs[NPCID].animNumber = 0x326;
-                    } // drags: chaos ele emote ( YESSS )
-                    if (npcs[NPCID].npcType == 1605) {
-                        npcs[NPCID].animNumber = 386; // drags: abberant spector death ( YAY )
-                    }
-                    npcs[NPCID].animUpdateRequired = true;
-                    npcs[NPCID].updateRequired = true;
-                    for (Player p : server.playerHandler.players) {
-                        if (p != null) {
-                            client person = (client) p;
-                            npcs[NPCID].StartKilling = person.playerId;
-                            npcs[NPCID].RandomWalk = false;
-                            npcs[npcs[NPCID].attacknpc].hitDiff = hitDiff;
-                            npcs[npcs[NPCID].attacknpc].attacknpc = NPCID;
-                            npcs[npcs[NPCID].attacknpc].updateRequired = true;
-                            npcs[npcs[NPCID].attacknpc].hitUpdateRequired = true;
-                            npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animNumber);
-                            return true;
-                        }
-                    }
-                }
-            }
+        if (targetId < 0 || targetId >= npcs.length || npcs[targetId] == null) {
+            return false;
         }
-        return false;
+
+        NPC target = npcs[targetId];
+
+        if (!GoodDistance(target.absX, target.absY, attacker.absX, attacker.absY, 1)) {
+            return false;
+        }
+
+        if (target.IsDead || target.HP <= 0) {
+            ResetAttackNPC(NPCID);
+            attacker.textUpdate = "Oh yeah I win bitch!";
+            attacker.textUpdateRequired = true;
+            attacker.animNumber = 2103;
+            attacker.animUpdateRequired = true;
+            attacker.updateRequired = true;
+            return true;
+        }
+
+        int hitDiff = misc.random(attacker.MaxHit);
+        if (hitDiff > target.HP) hitDiff = target.HP;
+
+        // Animations per NPC type
+        switch (attacker.npcType) {
+            case 9:
+            case 1605:
+                attacker.animNumber = 386;
+                break;
+            case 3200:
+                attacker.animNumber = 0x326;
+                break;
+        }
+
+        attacker.animUpdateRequired = true;
+        attacker.updateRequired = true;
+        attacker.actionTimer = AnimationLength.getFrameLength(attacker.animNumber);
+        attacker.IsAttackingNPC = true;
+        attacker.RandomWalk = false;
+
+        target.hitDiff = hitDiff;
+        target.hitUpdateRequired = true;
+        target.updateRequired = true;
+        target.attacknpc = NPCID;
+        target.IsUnderAttackNpc = true;
+
+        return true;
     }
 
     public boolean ResetAttackNPC(int NPCID) {

@@ -247,6 +247,11 @@ public class PlayerAssistant {
         c.updateRequired = true;
         c.appearanceUpdateRequired = true;
     }
-
+    public void pmstatus(int status) { // status: loading = 0  connecting = 1  fine = 2
+        if(c.getOutStream() != null) {
+            c.getOutStream().createFrame(221);
+            c.getOutStream().writeByte(status);
+        }
+    }
 
 }

@@ -38,7 +38,9 @@ public class ControlPanel extends JFrame {
         PANEL_ACTIVE = visible;
         // Initialize series and chart components before the Timer
         heapSeries = new TimeSeries("Heap Memory Usage");
+        heapSeries.setMaximumItemAge(300); // keep only last 5 minutes (300 seconds)
         nonHeapSeries = new TimeSeries("Non-Heap Memory Usage");
+        nonHeapSeries.setMaximumItemAge(300); // keep only last 5 minutes (300 seconds)
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(heapSeries);
         dataset.addSeries(nonHeapSeries);
@@ -113,6 +115,7 @@ public class ControlPanel extends JFrame {
 
         // Refresh the chart to ensure it updates dynamically
         ramChart.fireChartChanged();
+        System.gc(); // Light suggestion to GC (won't force it)
     }
     @SuppressWarnings("serial")
     public void initComponents() {
