@@ -8,6 +8,7 @@ public class clickingMost {
             c.sM("Button id " + c.actionButtonId);
         }
         LeatherMaking.craftLeather(c, c.actionButtonId);
+        QuestAssistant.questButtons(c, c.actionButtonId);
         c.getGlassBlowing().handleActionButtin(c.actionButtonId);
         c.getSmithing().getBar(c, c.actionButtonId);
         if (c.playerIsfFetching) {

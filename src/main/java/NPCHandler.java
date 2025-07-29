@@ -2,8 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.ArrayList;
 
 public class NPCHandler {
@@ -387,6 +386,11 @@ public class NPCHandler {
     public NPCList[] NpcList = new NPCList[maxListedNPCs];
     public NPCDrops[] NpcDrops = new NPCDrops[maxNPCDrops];
     public int remove = 2; // 1 = removes equipment, 2 = doesn't remove - xerozcheez
+    public static final int MAX_MAP_X = 104;
+    public static final int MAX_MAP_Y = 104;
+    public static final int MAX_HEIGHT = 4;
+
+    public static boolean[][][] npcOccupied = new boolean[MAX_HEIGHT][MAX_MAP_X][MAX_MAP_Y];
 
     NPCHandler() {
         for (int i = 0; i < maxNPCs; i++) {
@@ -406,6 +410,49 @@ public class NPCHandler {
 
     public static int randomremoveschaos() {
         return removeschaos[(int) (Math.random() * removeschaos.length)];
+    }
+
+    public static void removeNPC(NPC npc) {
+        if (npc == null) return;
+
+        for (int i = 0; i < maxNPCs; i++) {
+            if (npcs[i] == npc) {
+                npc.IsDead = true;
+                npc.NeedRespawn = false;
+                npc.npcType = -1;
+                npcs[i] = null;
+                break;
+            }
+        }
+    }
+
+
+
+    public static NPC spawnNpc(int npcType, int x, int y, int height, int walkType, int maxHP, int maxHit, int attack, int defence, boolean aggressive, boolean respawn) {
+        for (int i = 1; i < maxNPCs; i++) {
+            if (npcs[i] == null) {
+                NPC newNpc = new NPC(i, npcType);
+                newNpc.absX = x;
+                newNpc.absY = y;
+                newNpc.makeX = x;
+                newNpc.makeY = y;
+                newNpc.heightLevel = height;
+                newNpc.walkingType = walkType;
+                newNpc.HP = maxHP;
+                newNpc.MaxHP = maxHP;
+                newNpc.MaxHit = maxHit;
+                newNpc.attack = attack;
+                newNpc.NeedRespawn = respawn;
+                newNpc.spawnedBy = -1;
+                newNpc.facePlayer(0);
+                newNpc.updateRequired = true;
+                newNpc.IsDead = false;
+                newNpc.randomWalk = (walkType == 1);
+                npcs[i] = newNpc;
+                return newNpc;
+            }
+        }
+        return null; // No available slots
     }
 
     public void newPetNPC(int npcType, int x, int y, int heightLevel, int rangex1, int rangey1, int rangex2, int rangey2, int WalkingType, int HP, boolean Respawns, int summonedBy) {
@@ -443,21 +490,25 @@ public class NPCHandler {
         newNPC.followingPlayer = true;
         npcs[slot] = newNPC;
     }
-
     public int getNpcKillerId(int npcId) {
-        int oldDamage = 0;
+        Player[] players = server.playerHandler.players;
         int killerId = 0;
-        for (int p = 1; p < PlayerHandler.maxPlayers; p++) {
-            if (server.playerHandler.players[p] != null) {
-                if (server.playerHandler.players[p].lastNpcAttacked == npcId) {
-                    if (server.playerHandler.players[p].totalDamageDealt > oldDamage) {
-                        oldDamage = server.playerHandler.players[p].totalDamageDealt;
-                        killerId = p;
-                    }
-                    server.playerHandler.players[p].totalDamageDealt = 0;
+        int highestDamage = 0;
+
+        for (int i = 1; i < PlayerHandler.maxPlayers; i++) {
+            Player player = players[i];
+            if (player == null) continue;
+
+            if (player.lastNpcAttacked == npcId) {
+                if (player.totalDamageDealt > highestDamage) {
+                    highestDamage = player.totalDamageDealt;
+                    killerId = i;
                 }
+                // Reset damage *after* evaluation — not during comparison
+                player.totalDamageDealt = 0;
             }
         }
+
         return killerId;
     }
 
@@ -732,7 +783,7 @@ public class NPCHandler {
             return;
         }        // no free slot found
         if (HP <= 0) { // This will cause client crashes if we don't use this :) - xero
-            HP = 3000;
+            HP = 30;
         }
         NPC newNPC = new NPC(slot, npcType);
 
@@ -747,7 +798,7 @@ public class NPCHandler {
         newNPC.walkingType = WalkingType;
         newNPC.HP = HP;
         newNPC.MaxHP = HP;
-        newNPC.MaxHit = (int) Math.floor((HP / 100));
+        newNPC.MaxHit =  NpcMaxHitCalculator.calculate(npcType, HP);
         if (newNPC.MaxHit < 1) {
             newNPC.MaxHit = 1;
         }
@@ -826,7 +877,7 @@ public class NPCHandler {
 
     public void dropItems(int i) {
         // long start = System.currentTimeMillis();
-        client c = (client) server.playerHandler.players[GetNpcKiller(i)];
+        client c = (client) PlayerHandler.players[GetNpcKiller(i)];
         if (c != null) {
             if (NPCDrops.constantDrops.get(npcs[i].npcType) != null) {
                 for (int item : NPCDrops.constantDrops.get(npcs[i].npcType)) {
@@ -1166,19 +1217,46 @@ public class NPCHandler {
         // return npcs[i].definition().isAggressive();
     }
     public void annoyNpcs(int npcId) {
-        for(Player p : server.playerHandler.players) {
-            if(p != null) {
-                client player = (client)p;
-                if (player.distanceToPoint(npcs[npcId].absX, npcs[npcId].absY) <= getDistanceForNpc(npcId) && p.heightLevel == npcs[npcId].heightLevel) {
-                    if(npcGetsAnnoyed(npcId) && (npcs[npcId] != null) && (npcs[npcId].StartKilling == 0)) {
-                        npcs[npcId].StartKilling = player.playerId;
-                        npcs[npcId].RandomWalk = false;
+        NPC npc = npcs[npcId];
+        if (npc == null || !npc.isAlive() || npc.StartKilling > 0 || npc.targetNpcIndex >= 0) return;
+
+        boolean foundPlayer = false;
+
+        // Player aggro (your original logic)
+        for (Player p : server.playerHandler.players) {
+            if (p != null && p.heightLevel == npc.heightLevel) {
+                client player = (client) p;
+                if (player.distanceToPoint(npc.absX, npc.absY) <= getDistanceForNpc(npcId)) {
+                    if (npcGetsAnnoyed(npcId)) {
+                        npc.StartKilling = player.playerId;
+                        npc.RandomWalk = false;
                         attackPlayer(npcId);
+                        foundPlayer = true;
+                        break;
                     }
                 }
             }
         }
+
+        // If no players to attack, scan for hostile NPCs
+        if (!foundPlayer) {
+            for (int i = 0; i < maxNPCs; i++) {
+                NPC other = npcs[i];
+                if (other == null || other == npc || !other.isAlive()) continue;
+
+                // Example rule: only attack if different combat type or faction
+                if (npc.heightLevel == other.heightLevel &&
+                        misc.goodDistance(npc.getX(), npc.getY(), other.getX(), other.getY(), 1)) {
+
+                    // 👇 you could also check faction, behavior, etc
+                    npc.targetNpcIndex = i;
+                    npc.RandomWalk = false;
+                    break;
+                }
+            }
+        }
     }
+
     public int getDistanceForNpc(int Npc) {
         switch(npcs[Npc].npcType) {
             case 2705:
@@ -1386,6 +1464,143 @@ public class NPCHandler {
                 return false;
         }
     }
+    public static boolean isEnemy(NPC npc, NPC target) {
+        return npc.isGodwarsNpc && target.isGodwarsNpc
+                && npc.godwarsFaction != -1
+                && npc.godwarsFaction != target.godwarsFaction;
+    }
+    public void processGodwarsTargeting(int npcId) {
+        NPC attacker = npcs[npcId];
+        if (attacker == null || attacker.IsDead || !attacker.isGodwarsNpc || attacker.targetNpcIndex != -1)
+            return;
+
+        for (int i = 0; i < maxNPCs; i++) {
+            NPC target = npcs[i];
+            if (target == null || target == attacker || target.IsDead)
+                continue;
+
+            if (attacker.heightLevel == target.heightLevel &&
+                    misc.goodDistance(attacker.absX, attacker.absY, target.absX, target.absY, 10) &&
+                    isEnemy(attacker, target)) {
+
+                attacker.targetNpcIndex = i;
+                attacker.RandomWalk = false;
+                break;
+            }
+        }
+    }
+
+    public void getRealRandomWalk(NPC npc) {
+        if (!npc.RandomWalk || npc.freezeTimer > 0) return;
+
+        // Only try to walk every few ticks (optional)
+        if (server.tick % 5 != 0) return;
+
+        int[][] directions = {
+                { 1, 0 }, {-1, 0}, { 0, 1 }, { 0, -1 },
+                { 1, 1 }, {-1, -1}, { 1, -1 }, {-1, 1 }
+        };
+
+        Collections.shuffle(Arrays.asList(directions)); // Randomize directions
+
+        for (int[] dir : directions) {
+            int newX = npc.absX + dir[0];
+            int newY = npc.absY + dir[1];
+
+            if (!isTileWalkable(newX, newY, npc.heightLevel)) continue;
+            if (isTileOccupied(newX, newY,  npc.heightLevel)) continue; // Optional
+
+            npc.moveX = dir[0];
+            npc.moveY = dir[1];
+            return;
+        }
+
+        // No valid direction found — don't move this tick
+        npc.moveX = 0;
+        npc.moveY = 0;
+    }
+    public void walkTowardsTarget(NPC attacker, NPC target) {
+        int dx = target.absX - attacker.absX;
+        int dy = target.absY - attacker.absY;
+
+        // Prevent overlap
+        if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) return;
+
+        int moveX = Integer.signum(dx);
+        int moveY = Integer.signum(dy);
+
+        int nextX = attacker.absX + moveX;
+        int nextY = attacker.absY + moveY;
+
+        if (!isTileOccupied(nextX, nextY, attacker.heightLevel)) {
+            attacker.moveX = moveX;
+            attacker.moveY = moveY;
+            attacker.getNextWalkingDirection(); // Applies the move
+            attacker.faceNPC(attacker.targetNpcIndex);
+            attacker.randomWalk = false;
+        } else {
+            // Optional: try to sidestep or fallback logic
+            attacker.randomWalk = false;
+        }
+    }
+
+    public static boolean isTileOccupied(int x, int y, int z) {
+        if (z < 0 || z >= MAX_HEIGHT || x < 0 || x >= MAX_MAP_X || y < 0 || y >= MAX_MAP_Y) return false;
+        int localX = x % 104;
+        int localY = y % 104;
+        return npcOccupied[z][localX][localY];
+    }
+    private static final int[][] hansPath = {
+            {3226, 3218}, {3225, 3218}, {3224, 3218}, {3223, 3218}, {3222, 3218}, {3221, 3218},
+            {3220, 3218}, {3219, 3218}, {3218, 3218}, {3217, 3218}, {3216, 3219}, {3215, 3220},
+            {3215, 3221}, {3215, 3222}, {3215, 3223}, {3215, 3224}, {3215, 3225}, {3215, 3226},
+            {3215, 3227}, {3216, 3228}, {3217, 3229}, {3218, 3230}, {3219, 3231}, {3220, 3231},
+            {3221, 3231}, {3222, 3231}, {3223, 3231}, {3224, 3230}, {3225, 3229}, {3226, 3228},
+            {3227, 3227}, {3227, 3226}, {3227, 3225}, {3227, 3224}, {3227, 3223}, {3226, 3222},
+            {3225, 3221}, {3224, 3220}, {3223, 3219}, {3222, 3218}
+    };
+
+    public static void processHansWalking(NPC npc) {
+        if (npc.hansWalkTimer > 0) {
+            npc.hansWalkTimer--;
+            return;
+        }
+
+        if (npc.walkingQueue == null || npc.walkingQueue.isEmpty()) {
+            int[] target = hansPath[npc.hansWaypointIndex];
+
+            if (npc.absX == target[0] && npc.absY == target[1]) {
+                npc.hansWaypointIndex = (npc.hansWaypointIndex + 1) % hansPath.length;
+                npc.hansWalkTimer = 1;
+                return;
+            }
+
+            LinkedList<int[]> path = NpcPathFinder.findPathForNpc(npc, target[0], target[1]);
+            if (path.isEmpty()) {
+                npc.forceChat("Can't get through...");
+                npc.hansWalkTimer = 3;
+                return;
+            }
+
+            npc.walkingQueue = new LinkedList<>();
+            npc.walkingQueue.addAll(path);
+        }
+
+        if (!npc.walkingQueue.isEmpty()) {
+            int[] nextStep = npc.walkingQueue.poll();
+            int dx = Integer.compare(nextStep[0], npc.absX);
+            int dy = Integer.compare(nextStep[1], npc.absY);
+
+            npc.moveX = dx;
+            npc.moveY = dy;
+            npc.walkingType = 1;
+            npc.updateRequired = true;
+            npc.direction = npc.getNextWalkingDirection();
+        }
+
+        npc.hansWalkTimer = 1;
+    }
+
 
     public void process() {
 
@@ -1394,7 +1609,73 @@ public class NPCHandler {
                 if (npcs[i] == null)
                     continue;
                 npcs[i].clearUpdateFlags();
+
             }
+
+            for (int i = 0; i < maxNPCs; i++) {
+                NPC attacker = npcs[i];
+                if (attacker == null || attacker.IsDead || !attacker.isGodwarsNpc)
+                    continue;
+
+                // Step 1: Acquire target if none and cooldown allows
+                if (attacker.targetNpcIndex == -1 && attacker.targetScanCooldown-- <= 0) {
+                    attacker.targetScanCooldown = misc.random(4) + 3; // 3–6 tick cooldown
+                    int closestDist = Integer.MAX_VALUE;
+                    int closestIndex = -1;
+
+                    for (int j = 0; j < maxNPCs; j++) {
+                        NPC candidate = npcs[j];
+                        if (candidate == null || candidate == attacker || candidate.IsDead || !candidate.isGodwarsNpc)
+                            continue;
+
+                        if (candidate.godwarsFaction == attacker.godwarsFaction)
+                            continue;
+
+                        if (candidate.absX == attacker.absX && candidate.absY == attacker.absY)
+                            continue;
+
+                        int dist = (int) misc.distance(attacker.absX, attacker.absY, candidate.absX, candidate.absY);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closestIndex = j;
+                        }
+                    }
+
+                    if (closestIndex != -1) {
+                        attacker.targetNpcIndex = closestIndex;
+                    } else {
+                        attacker.randomWalk = true;
+                    }
+                }
+                if (attacker.targetNpcIndex < 0 || attacker.targetNpcIndex >= maxNPCs) {
+                    attacker.targetNpcIndex = -1;
+                    attacker.randomWalk = true;
+                    continue;
+                }
+                // Step 2: Attack logic
+                NPC target = npcs[attacker.targetNpcIndex];
+                if (target == null || target.IsDead || target.godwarsFaction == attacker.godwarsFaction) {
+                    attacker.targetNpcIndex = -1;
+                    attacker.randomWalk = true;
+                    continue;
+                }
+
+                // Step 3: Attack or move
+                int dx = target.absX - attacker.absX;
+                int dy = target.absY - attacker.absY;
+
+                if (attacker.attackTimer-- <= 0) {
+                    if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) {
+                        NpcVsNpc.attack(attacker, target);
+                        attacker.attackTimer = misc.random(3) + 2; // Wait 2–5 ticks before next attack
+                        attacker.faceNPC(attacker.targetNpcIndex);
+                        attacker.randomWalk = false;
+                    } else {
+                        walkTowardsTarget(attacker, target);
+                    }
+                }
+            }
+
 
             for (int i = 0; i < maxNPCs; i++) {
                 if (npcs[i] != null) {
@@ -1403,7 +1684,10 @@ public class NPCHandler {
 
                     NPC npc = npcs[i];
                     if (npc == null) return;
-
+                    // HANS PATHING LOGIC
+                    if (npc.npcType == 0) { // Hans ID (adjust if different)
+                        processHansWalking(npc);
+                    }
                     client owner = (client) server.playerHandler.players[npc.summonedBy];
 
                     if (npc.summoner) {
@@ -1416,10 +1700,11 @@ public class NPCHandler {
                             npc.heightLevel = owner.heightLevel;
                         }
                     }
-
                     if (npc.actionTimer > 0) {
                         npc.actionTimer--;
                     }
+                    if (npc.npcCombatDelay > 0)
+                        npc.npcCombatDelay--;
                     Poison(i);
                     npc.PoisonDelay--;
                     if (npc.PoisonClear >= 15) npc.PoisonDelay = 9999999;
@@ -1435,6 +1720,9 @@ public class NPCHandler {
                     }
                     if (npc == null)
                         continue;
+                    if (npc.moveX != 0 || npc.moveY != 0) {
+                        npc.move();
+                    }
 // NPC walk direction logic
                     if (npc.walkingType >= 2 && npc.walkingType <= 9) {
                         int[][] directions = {
@@ -1443,7 +1731,9 @@ public class NPCHandler {
                         int[] dir = directions[npc.walkingType];
                         npc.TurnNpcTo(npc.absX + dir[0], npc.absY + dir[1]);
                     }
-
+                    if (npc.RandomWalk) {
+                        getRealRandomWalk(npc);
+                    }
 // Special respawn behavior (flower patch NPCs)
                     if (!npc.IsDead && (npc.npcType == 1268 || npc.npcType == 1266)) {
                         for (int j = 1; j < PlayerHandler.maxPlayers; j++) {
@@ -1471,13 +1761,7 @@ public class NPCHandler {
 // Basic attack logic by combat type
                     if (!npc.IsDead) {
                         if (!npc.RandomWalk && npc.IsUnderAttack) {
-                            if (npc.npcType == 3231) {
-                                AttackPlayerRanged(i);
-                            } else if (isMageNpc(npc.npcType)) {
-                                AttackPlayerMage(i);
-                            } else {
                                 attackPlayer(i);
-                            }
                         } else if (npc.followingPlayer && npc.followPlayer > 0) {
                             client target = (client) server.playerHandler.players[npc.followPlayer];
                             if (target != null) {
@@ -1485,13 +1769,8 @@ public class NPCHandler {
                                     npc.StartKilling = target.AttackingOn;
                                     npc.RandomWalk = true;
                                     npc.IsUnderAttack = true;
-                                    if (npc.npcType == 3231) {
-                                        AttackPlayerRanged(i);
-                                    } else if (isMageNpc(npc.npcType)) {
-                                        AttackPlayerMage(i);
-                                    } else {
+
                                         attackPlayer(i);
-                                    }
                                 } else {
                                     FollowPlayer(i);
                                 }
@@ -1516,10 +1795,7 @@ public class NPCHandler {
                                 AttackNPC(i);
                             }
                         }
-                        if (npc.RandomWalk == true) {
-                            npc.getNextWalkingDirection();
 
-                        }
                         if(npc.npcType == 8349){
                             if(npc.HP <= 1500){
                                 npc.requestTransform(8351);
@@ -1531,6 +1807,22 @@ public class NPCHandler {
                                npc.requestTransform(8349);
                                 //NPCHandler.npc.gfx100(1885);
                             }
+                        }
+                        if(npc.npcType == 6268 || npc.npcType == 6269 || npc.npcType == 6270 || npc.npcType == 6271 || npc.npcType == 6272 || npc.npcType == 6273 || npc.npcType == 6274 || npc.npcType == 6275 || npc.npcType == 6276 || npc.npcType == 6277 || npc.npcType == 6278 || npc.npcType == 6279 || npc.npcType == 6280 || npc.npcType == 6281 || npc.npcType == 6282 || npc.npcType == 6283){
+                            npc.isGodwarsNpc = true;
+                            npc.godwarsFaction = 3; // bandos, for example
+                        }
+                        if(npc.npcType == 6229 || npc.npcType == 6230 || npc.npcType == 6231 || npc.npcType == 6232 || npc.npcType == 6233 || npc.npcType == 6234 || npc.npcType == 6235 || npc.npcType == 6236 || npc.npcType == 6237 || npc.npcType == 6238 || npc.npcType == 6239 || npc.npcType == 6240 || npc.npcType == 6241 || npc.npcType == 6242 || npc.npcType == 6243 || npc.npcType == 6244 || npc.npcType == 6245 || npc.npcType == 6246){
+                            npc.isGodwarsNpc = true;
+                            npc.godwarsFaction = 2; // ammy, for example
+                        }
+                        if(npc.npcType == 6210 || npc.npcType == 6211 || npc.npcType == 6212 || npc.npcType == 6213 || npc.npcType == 6214 || npc.npcType == 6215 || npc.npcType == 6216 || npc.npcType == 6217  || npc.npcType == 6218 || npc.npcType == 6219  || npc.npcType == 6220  || npc.npcType == 6221){
+                            npc.isGodwarsNpc = true;
+                            npc.godwarsFaction = 1; // Zamorak, for example
+                        }
+                        if(npc.npcType == 6254 || npc.npcType == 6255 || npc.npcType == 6256 || npc.npcType == 6257 || npc.npcType == 6258 || npc.npcType == 6259){
+                            npc.isGodwarsNpc = true;
+                            npc.godwarsFaction = 0; // saradomin, for example
                         }
                         if (npc.npcType == 81 || npc.npcType == 397
                                 || npc.npcType == 1766
@@ -2080,17 +2372,18 @@ public class NPCHandler {
                     } else if (npc.IsDead) {// Get killer if not already set
 
                         if (npc.actionTimer == 0 && !npc.DeadApply && !npc.NeedRespawn) {
-                            client target = (client) PlayerHandler.players[npc.killedBy];
-                            if (target != null) {
-                                target.sendSound(getNpcDeathSound(npc.npcType), 100, 0);
-                            }
-                            // Immediately block further combat and interaction
+                            int killerIndex = npc.StartKilling;
+                         // Immediately block further combat and interaction
+                            npc.killedBy =  getNpcKillerId(i);
                             npc.IsUnderAttack = false;
                             npc.IsUnderAttackNpc = false;
+                            client target = (client) PlayerHandler.players[killerIndex];
+                            if (target != null) {
+                                target.sendSound(getNpcDeathSound(npc.npcType), 6, 0);
+                            }
                             npc.animNumber = getNpcDeathAnimation(npc.npcType);
                             npc.updateRequired = true;
                             npc.animUpdateRequired = true;
-                            npc.killedBy =  getNpcKillerId(i);
                             npc.DeadApply = true;
                             npc.actionTimer = AnimationLength.getFrameLength(npc.animNumber);
 
@@ -2102,25 +2395,28 @@ public class NPCHandler {
                             int killerIndex = npc.killedBy;
                             int dropX = npc.absX, dropY = npc.absY;
 
-                            if (misc.random(25) == 0) {
-                                ItemHandler.addItem(ItemIDs.MYSTERY_BOX, dropX, dropY, 1, killerIndex, false);
-                                broadcastDrop(killerIndex, "Mystery box");
-                            }
-
-                            if (misc.random(35) == 0) {
-                                ItemHandler.addItem(ItemIDs.PRESENT, dropX, dropY, 1, killerIndex, false);
-                                broadcastDrop(killerIndex, "Present");
-                            }
-
-                            if (misc.random(20) == 1) {
-                                int combat = GetNpcListCombat(npc.npcType);
-                                int box = combat >= 126 ? 13003 : combat >= 96 ? 13002 : combat >= 62 ? 13001 : -1;
-                                if (box > 0) {
-                                    ItemHandler.addItem(box, dropX, dropY, 1, killerIndex, false);
+                            // Skip drops if killed by NPC
+                            if (npc.targetNpcIndex == -1 && killerIndex >= 0 && killerIndex < PlayerHandler.players.length) {
+                                // --- Random drops ---
+                                if (misc.random(25) == 0) {
+                                    ItemHandler.addItem(ItemIDs.MYSTERY_BOX, dropX, dropY, 1, killerIndex, false);
+                                    broadcastDrop(killerIndex, "Mystery box");
                                 }
-                            }
 
-                            if (killerIndex >= 0 && killerIndex < PlayerHandler.players.length) {
+                                if (misc.random(35) == 0) {
+                                    ItemHandler.addItem(ItemIDs.PRESENT, dropX, dropY, 1, killerIndex, false);
+                                    broadcastDrop(killerIndex, "Present");
+                                }
+
+                                if (misc.random(20) == 1) {
+                                    int combat = GetNpcListCombat(npc.npcType);
+                                    int box = combat >= 126 ? 13003 : combat >= 96 ? 13002 : combat >= 62 ? 13001 : -1;
+                                    if (box > 0) {
+                                        ItemHandler.addItem(box, dropX, dropY, 1, killerIndex, false);
+                                    }
+                                }
+
+                                // --- Slayer & Guild ---
                                 client target = (client) PlayerHandler.players[killerIndex];
                                 if (target != null) {
                                     target.getSlayer().killTaskMonster(npc);
@@ -2130,10 +2426,10 @@ public class NPCHandler {
                                         AnimatedArmour.dropTokens(target, npc.npcType, dropX, dropY);
                                     }
                                 }
-                            }
 
-                            dropItems(i);
-                            MonsterDropItem(i);
+                                dropItems(i);
+                                MonsterDropItem(i);
+                            }
 
                             npc.NeedRespawn = true;
                             npc.actionTimer = 60;
@@ -2142,7 +2438,6 @@ public class NPCHandler {
                             npc.HP = npc.MaxHP;
                             npc.updateRequired = true;
                             npc.animUpdateRequired = true;
-
                         } else if (npc.actionTimer == 0 && npc.NeedRespawn) {
                             if (npc.Respawns) {
                                 int type = (npc.npcType == 1267 || npc.npcType == 1265) ? npc.npcType + 1 : npc.npcType;
@@ -2159,6 +2454,10 @@ public class NPCHandler {
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+    public boolean isTileWalkable(int x, int y, int z) {
+        int clipping = Region.getClipping(x, y, z);
+        return (clipping & 0x1280120) == 0; // You can adjust this based on your clip flags
     }
     private void broadcastDrop(int playerIndex, String itemName) {
         if (playerIndex >= 0 && playerIndex < PlayerHandler.players.length) {
@@ -2758,54 +3057,89 @@ public class NPCHandler {
     }
     public int getNpcDeathSound(int npcType) {
         String npc = GetNpcName(npcType).toLowerCase();
+
         if (npc.contains("bat")) {
-            return 7;
+            return 293; // Bat death screech
+        }
+        if (npc.equals("rock crab")) {
+            return 719; // Rock crab crumble
         }
         if (npc.contains("cow")) {
-            return 3;
+            return 532; // Cow moo death
         }
-        if (npc.contains("chicken")){
-            return 25;
+        if (npc.contains("chicken")) {
+            return 537; // Chicken death squawk
         }
         if (npc.contains("imp")) {
-            return 9;
+            return 535; // Imp death cackle
         }
-        if (npc.equalsIgnoreCase("rat")) {
-            return 15;
-        }
-        if (npc.equalsIgnoreCase("giant rat")) {
-            return 15;
+        if (npc.equals("rat") || npc.equals("giant rat")) {
+            return 711; // Rat death squeal
         }
         if (npc.contains("duck")) {
-            return 25;
+            return 537; // Shares with chicken
         }
-        if (npc.contains("wolf") || npc.contains("bear")) {
-            return 35;
+        if (npc.contains("wolf")) {
+            return 584; // Wolf dying growl
+        }
+        if (npc.equalsIgnoreCase("barbarian woman")) {
+            return 505; // Ghostly moan
+        }
+        if (npc.contains("bear")) {
+            return 597; // Bear groan on death
         }
         if (npc.contains("dragon")) {
-            return 44;
+            return 409; // Dragon death roar (same as attack — reused)
         }
         if (npc.contains("ghost")) {
-            return 60;
+            return 438; // Ghost wail
         }
         if (npc.contains("goblin")) {
-            return 125;
+            return 471; // Goblin death yell
         }
         if (npc.contains("skeleton")) {
-            return 109;
+            return 777; // Bone collapse
         }
-        if(npc.contains("demon")
-                || npc.contains("ogre") || npc.contains("giant")
-                || npc.contains("tz-") || npc.contains("jad")) {
-            return 70;
+        if (npc.contains("demon") || npc.contains("ogre") || npc.contains("giant") || npc.contains("jad")) {
+            return 793; // Large monster death
         }
         if (npc.contains("zombie")) {
-            return 1140;
+            return 1140; // Confirmed zombie death
         }
-        return 70;
+        if (npc.equalsIgnoreCase("frost dragon")) {
+            return 96; // Confirmed zombie death
+        }
+
+// Death Sounds
+        if (npc.equalsIgnoreCase("tzhaar-hur")) return 252;
+        if (npc.equalsIgnoreCase("tzhaar-ket")) return 256;
+        if (npc.equalsIgnoreCase("tzhaar-mej")) return 263;
+        if (npc.equalsIgnoreCase("tzhaar-xil")) return 270;
+        // Generic fallback death sound for unknowns
+        return 793;
     }
+
     public int getNpcDeathAnimation(int npcType) {
         switch (npcType) {
+            case 5362:
+            case 53:
+            case 54:
+            case 55:
+            case 941:
+                return 92;
+            case 2615:
+            case 2616:
+            case 2605:
+            case 2607:
+                return 9288;
+            case 10773: return 13153;
+            case 8349:
+            case 8350:
+            case 8351:// torm demon
+                return 10924;
+
+            case 1265:
+                return 1314;
                 case 2591: return 9288;
             case 105: return 4929;
             case 132: return 223;
@@ -2909,8 +3243,7 @@ public class NPCHandler {
             case 107:
             case 144:
                 return 6256; // Specific NPCs
-            case 1265:
-                return 1314; // Dragon
+
             case 4415:
                 return 2707; // Rat
             case 4413:
@@ -2944,70 +3277,129 @@ public class NPCHandler {
             case 4389:
             case 4390:
             case 4391:return 1187;
+            case 2598:
+            case 2599:
+            case 2600:
+                return 9288;
             default:
                 return 0x900; // Default death animation for unspecified NPCs
         }
     }
     public int getNpcAttackSound(int npcType) {
         String npc = GetNpcName(npcType).toLowerCase();
+        if (npc.equalsIgnoreCase("frost dragon")) {
+            return 85; // Confirmed zombie death
+        }
         if (npc.contains("bat")) {
-            return 1;
+            return 292; // (Still valid — no updated version found)
         }
         if (npc.contains("cow")) {
-            return 4;
+            return 531; // OSRS/614 cow attack
         }
-        if (npc.contains("chicken")){
-            return 26;
+        if (npc.contains("chicken")) {
+            return 538; // Chicken peck/hit
         }
         if (npc.contains("imp")) {
-            return 11;
+            return 534; // Imp attack laugh
         }
-        if (npc.equalsIgnoreCase("rat")) {
-            return 17;
-        }
-        if (npc.equalsIgnoreCase("giant rat")) {
-            return 17;
+        if (npc.equals("rat") || npc.equals("giant rat")) {
+            return 710; // Generic rat attack
         }
         if (npc.contains("duck")) {
-            return 26;
+            return 538; // Same as chicken, reused
         }
-        if (npc.contains("wolf") || npc.contains("bear")) {
-            return 28;
+        if (npc.contains("wolf")) {
+            return 583; // Wolf snarl
         }
+        if (npc.contains("bear")) {
+            return 596; // Bear growl/slash
+        }
+
         if (npc.contains("dragon")) {
-            return 47;
+            return 408; // Dragon attack roar (used in 614+)
+        }
+        if (npc.equals("rock crab")) {
+            return 718; // Classic rock crab
         }
         if (npc.contains("ghost")) {
-            return 57;
+            return 436; // Ghostly moan
+        }
+        if (npc.equalsIgnoreCase("barbarian woman")) {
+            return 506; // Ghostly moan
         }
         if (npc.contains("goblin")) {
-            return 88;
+            return 469; // Goblin attack grunt
         }
         if (npc.contains("skeleton")) {
-            return 108;
+            return 776; // Skeleton bone clash
         }
-            if(npc.contains("demon")
-                || npc.contains("ogre") || npc.contains("giant")
-                || npc.contains("tz-") || npc.contains("jad")) {
-            return 48;
+        if (npc.contains("demon") || npc.contains("ogre")
+                || npc.contains("giant")
+                || npc.contains("jad")) {
+            return 64; // Strong generic monster (original), optionally: return 793;
         }
+        // Attack Sounds
+        if (npc.equalsIgnoreCase("tzhaar-hur")) return 251;
+        if (npc.equalsIgnoreCase("tzhaar-ket")) return 250;
+        if (npc.equalsIgnoreCase("tzhaar-mej")) return 260;
+        if (npc.equalsIgnoreCase("tzhaar-xil")) return 266;
+
         if (npc.contains("zombie")) {
-            return 1155;
+            return 1155; // Still used in 600+ (confirmed zombie grunt)
         }
         if (npc.contains("man") || npc.contains("woman")
                 || npc.contains("monk") || npc.contains("thief")) {
-            return 417;
+            return 417; // Human grunt (may upgrade to 586 or 787)
         }
-        if (npc.contains("wizard"))
-        {
-            return 1002;
+        if (npc.contains("wizard")) {
+            return 1002; // Still valid — classic magic sound
         }
-        if (npc.contains("guard") || npc.contains("farmer"))
-            return 403;
-        return misc.random(6) > 3 ? 398 : 394;
+        if (npc.contains("guard") || npc.contains("farmer")) {
+            return 403; // Light NPC attack
+        }
+
+        // Fallback random melee swing sounds (OSRS-style)
+        return misc.random(6) > 3 ? 793 : 789;
     }
-    public int getNpcAttackAnimation(int npcType) {
-        switch (npcType) {
+
+    public int getNpcAttackAnimation(int npcId) {
+        NPC npc = npcs[npcId];
+        if (npc == null) {
+            return 0; // or a default animation
+        }
+
+        switch (npc.npcType) {
+            case 5362:
+            case 53:
+            case 54:
+            case 55:
+            case 941:
+                return 91;
+            case 2605:
+            case 2607:
+            case 2616:
+
+                return 9286;
+            case 2598:
+            case 2599:
+            case 2600:
+                return 9286;
+            case 10773: return 13151;
+            case 19:
+                return 7048;
+            case 2615:
+                return 9286;
+            case 8349:
+            case 8350:
+            case 8351://tormented demon
+                if (npc.attackType == 2)
+                    return 10917;
+                else if (npc.attackType == 1)
+                    return 10918;
+                else if (npc.attackType == 0)
+                    return 10922;
+            case 1265:
+                return 1312;
             case 2591: return 9286;
             case 105:
                 return 4925;
@@ -3106,63 +3498,101 @@ public class NPCHandler {
 
     public int getNpcBlockSound(int npcType) {
         String npc = GetNpcName(npcType).toLowerCase();
+
         if (npc.contains("bat")) {
-            return 7;
+            return 294; // Bat block screech
+        }
+        if (npc.equalsIgnoreCase("frost dragon")) {
+            return 88; // Confirmed zombie death
+        }
+        if (npc.equals("rock crab")) {
+            return 720; // Reused generic melee block
         }
         if (npc.contains("cow")) {
-            return 5;
+            return 533; // Cow block
         }
-        if (npc.contains("chicken")){
-            return 24;
+        if (npc.contains("chicken") || npc.contains("duck")) {
+            return 536; // Chicken/duck block peck
         }
         if (npc.contains("imp")) {
-            return 11;
+            return 536; // Imp block (still has attitude 😈)
         }
-        if (npc.equalsIgnoreCase("rat")) {
-            return 16;
+        if (npc.equals("rat") || npc.equals("giant rat")) {
+            return 713; // Rat block squeal
         }
-        if (npc.equalsIgnoreCase("giant rat")) {
-            return 16;
+        if (npc.contains("wolf")) {
+            return 585; // Wolf deflect
         }
-        if (npc.contains("duck")) {
-            return 24;
-        }
-        if (npc.contains("wolf") || npc.contains("bear")) {
-            return 34;
+        if (npc.contains("bear")) {
+            return 598; // Bear grunt/block
         }
         if (npc.contains("dragon")) {
-            return 45;
+            return 410; // Dragon defensive growl
         }
         if (npc.contains("ghost")) {
-            return 53;
+            return 439; // Echo block
         }
         if (npc.contains("goblin")) {
-            return 87;
+            return 471; // Goblin block grunt
         }
         if (npc.contains("skeleton")) {
-            return 110;
+            return 778; // Rattle/block
         }
-        if(npc.contains("demon")
-                || npc.contains("ogre") || npc.contains("giant")
-                || npc.contains("tz-") || npc.contains("jad")) {
-            return 1154;
+        if (npc.equalsIgnoreCase("barbarian woman")) {
+            return 509; // Ghostly moan
+        }
+        if (npc.contains("demon") || npc.contains("ogre") || npc.contains("giant")
+                || npc.contains("jad")) {
+            return 1154; // Large creature block
         }
         if (npc.contains("zombie")) {
-            return 1151;
+            return 1151; // Confirmed zombie block
         }
+        // Hit Sounds
+        if (npc.equalsIgnoreCase("tzhaar-hur")) return 253;
+        if (npc.equalsIgnoreCase("tzhaar-ket")) return 257;
+        if (npc.equalsIgnoreCase("tzhaar-mej")) return 264;
+        if (npc.equalsIgnoreCase("tzhaar-xil")) return 271;
+
         if (npc.contains("man") && !npc.contains("woman")) {
-            return 816;
+            return 816; // Male NPC block
         }
-        if (npc.contains("monk") || npc.contains("guard") || npc.contains("farmer") || npc.contains("thief") || npc.contains("druid") || npc.contains("wizard")){
-            return 816;
+        if (npc.contains("monk") || npc.contains("guard") || npc.contains("farmer")
+                || npc.contains("thief") || npc.contains("druid") || npc.contains("wizard")) {
+            return 816; // Same group block type
         }
         if (!npc.contains("man") && npc.contains("woman")) {
-            return 818;
+            return 818; // Female NPC block
         }
-        return 791;
+
+        return 791; // Fallback block sound
     }
+
     public int GetNPCBlockAnim(int id) {
         switch (id) {
+            case 5362:
+            case 53:
+            case 54:
+            case 55:
+            case 941:
+                return 89;
+            case 2605:
+            case 2616:
+            case 2607:
+                return 9287;
+            case 2598:
+            case 2599:
+            case 2600:
+                return 9287;
+            case 10773: return 13154;
+            case 19:
+                return 7050;
+            case 2615:
+                return 9287;
+            case 8349: case 8350: case 8351:
+                return 10923;
+            case 1265:
+                return 1313;
             case 2591: return 9287;
             case 105: return 4927;
             case 132: return 221;
@@ -3298,8 +3728,7 @@ public class NPCHandler {
                 return 26;
             case 1610:
                 return 9454;
-            case 1265:
-                return 1313;
+
             case 107:
             case 144:
                 return 6255;
@@ -3314,9 +3743,7 @@ public class NPCHandler {
                 return 5850;
             case 89:
                 return 6375;
-            case 50: // dragons
-            case 53:
-            case 55:
+            case 50: // kbd
                 return 89;
             case 7160://Cockroach soldier
             case 7159:
@@ -3325,12 +3752,10 @@ public class NPCHandler {
             case 8133://corp
                 return 10386;
 
-            case 54:
             case 2256:
                 return 403;
 
-            case 8349:
-                return 10919;
+
 
             case 21:
                 return 403;
@@ -3430,7 +3855,7 @@ public class NPCHandler {
                             int centerY = nY + npcs[NPCID].getNPCSize() / 2;
                             plr.createPlayersProjectile(centerX, centerY, offX, offY, 50, getProjectileSpeed(npcs[NPCID].npcType), npcs[NPCID].projectileId, getProjectileStartHeight(npcs[NPCID].npcId, npcs[NPCID].projectileId), getProjectileEndHeight(npcs[NPCID].npcId, npcs[NPCID].projectileId), -plr.playerId - 1, 65);
                         }
-                        plr.sendSound(soundConfig.getPlayerBlockSounds(plr), 100, 0);
+                        plr.sendSound(soundConfig.getPlayerBlockSounds(plr), 4, 0);
                         plr.startAnimation(
                                 plr.GetBlockAnim(
                                         plr.playerEquipment[plr.playerWeapon]));
@@ -3477,6 +3902,7 @@ public class NPCHandler {
         }
 
         client player = (client) server.playerHandler.players[playerIndex];
+
         if (!playerHasDirection(player)) {
             handleClipping(npcId);
             return false;
@@ -3488,31 +3914,101 @@ public class NPCHandler {
             return false;
         }
 
-        if (npc.actionTimer > 0) return false;
+        if (npc.actionTimer > 0 || player.IsDead) {
+            return false;
+        }
 
         if (shouldTriggerRingOfLife(player)) {
             player.SafeMyLife = true;
             return true;
         }
 
-        if (player.IsDead) {
-            resetAttackPlayer(npcId);
-            return false;
-        }
-
         handleNpcTransform(npc);
-
-        int damage = calculateHit(npc, player);
-        if (damage > player.NewHP) {
+        npc.faceNPC(player.playerId);
+        int damage = calculateHit(npc, player); // uses misc.random(npc.MaxHit)
+        if (damage > player.NewHP)
             damage = player.NewHP;
+
+        // === Attack Type-Specific Effects ===
+        switch (npc.attackType) {
+            case 0: // Melee
+
+                npc.animNumber = getNpcAttackAnimation(npcId);// default melee
+                player.sendSound(getNpcAttackSound(npc.npcType), 5, 0);
+                break;
+
+            case 1: // Ranged
+                npc.animNumber =  getNpcAttackAnimation(npcId);
+                player.sendSound(getNpcAttackSound(npc.npcType), 5, 0);
+                npc.projectileId = getProjectile(npc, 1);
+                if (npc.projectileId > 0) {
+                    sendProjectile(npc, player);
+                }
+                break;
+
+            case 2: // Magic
+                npc.animNumber = getNpcAttackAnimation(npcId);
+                player.sendSound(getNpcAttackSound(npc.npcType), 5, 0);
+                npc.projectileId = getProjectile(npc, 2);
+                if (npc.projectileId > 0) {
+                    sendProjectile(npc, player);
+                }
+                doMagicGFX(npc, player);
+                damage = getMagicDamage(npc, player); // use custom if needed
+                if (damage > player.NewHP) damage = player.NewHP;
+                break;
         }
 
-        playAttackEffects(npc, player);
-        applyDamage(player, damage);
-        npc.actionTimer = AnimationLength.getFrameLength(npc.animNumber);
+        // Common animation + sound + effects
+        player.sendSound(soundConfig.getPlayerBlockSounds(player), 5, 0);
+        player.startAnimation(player.GetBlockAnim(player.playerEquipment[player.playerWeapon]));
 
+        npc.animUpdateRequired = true;
+        npc.updateRequired = true;
+
+        // Apply damage
+        player.hitDiff = damage;
+        player.updateRequired = true;
+        player.hitUpdateRequired = true;
+        player.appearanceUpdateRequired = true;
+
+        int animId = npc.animNumber;
+        int actualLength = AnimationLength.getFrameLength(animId);
+        npc.actionTimer = Math.max(4, actualLength);
         return true;
     }
+    private int getMagicDamage(NPC npc, client p) {
+        switch (npc.npcType) {
+            case 1645: return 6 + misc.random(43);
+            case 509:  return 8 + misc.random(20);
+            case 1241: return 2 + misc.random(19);
+            case 124:  return 4 + misc.random(35);
+            case 1246: return 4 + misc.random(35);
+            case 1159: return 2 + misc.random(88);
+            case 54:   return 2 + misc.random(96);
+            default:   return misc.random(npc.MaxHit);
+        }
+    }
+    private int getProjectile(NPC npc, int type) {
+        switch (npc.npcType) {
+            case 3231: return 9;
+            // Add more custom cases if needed
+            default: return 0;
+        }
+    }
+    private void doMagicGFX(NPC npc, client p) {
+        switch (npc.npcType) {
+            case 1645: p.stillgfx(369, p.absY, p.absX); break;
+            case 1241: p.stillgfx(363, p.absY, p.absX); break;
+            case 1246:
+                p.stillgfx(368, npc.absY, npc.absX);
+                p.stillgfx(367, p.absY, p.absX);
+                break;
+            case 1159: p.stillgfx(552, p.absY, p.absX); break;
+            case 54:   p.stillgfx(197, p.absY, p.absX); break;
+        }
+    }
+
     public void resetAttackPlayer(int npcId) {
         if (npcId < 0 || npcId >= npcs.length || npcs[npcId] == null) return;
 
@@ -3594,7 +4090,7 @@ public class NPCHandler {
     }
 
     private void playAttackEffects(NPC npc, client player) {
-        player.sendSound(getNpcAttackSound(npc.npcType), 100, 0);
+        player.sendSound(getNpcAttackSound(npc.npcType), 5, 0);
         npc.animNumber = getNpcAttackAnimation(npc.npcType);
         npc.animUpdateRequired = true;
         npc.updateRequired = true;
@@ -3603,7 +4099,7 @@ public class NPCHandler {
             sendProjectile(npc, player);
         }
 
-        player.sendSound(soundConfig.getPlayerBlockSounds(player), 100, 0);
+        player.sendSound(soundConfig.getPlayerBlockSounds(player), 5, 0);
         player.startAnimation(player.GetBlockAnim(player.playerEquipment[player.playerWeapon]));
     }
 
@@ -4047,6 +4543,7 @@ public class NPCHandler {
         }
         return false;
     }
+
 
     public int GetNpcListHP(int NpcID) {
         for (int i = 0; i < maxListedNPCs; i++) {

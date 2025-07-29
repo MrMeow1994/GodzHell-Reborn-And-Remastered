@@ -190,12 +190,12 @@ public class stream {
 	}
     public void createFrame(int id) {
         ensureCapacity(1);
-         buffer[currentOffset++] = (byte) (id + packetEncryption.getNextKey());
+         buffer[currentOffset++] = (byte) (id + packetEncryption.getNextIntKey());
     }
 
     public void createFrameVarSize(int id) { // creates a variable sized frame
 		ensureCapacity(3);
-        buffer[currentOffset++] = (byte) (id + packetEncryption.getNextKey());
+        buffer[currentOffset++] = (byte) (id + packetEncryption.getNextIntKey());
         buffer[currentOffset++] = 0;        // placeholder for size byte
         if (frameStackPtr >= frameStackSize - 1) {
             throw new RuntimeException("Stack overflow");
@@ -204,7 +204,7 @@ public class stream {
 
     public void createFrameVarSizeWord(int id) { // creates a variable sized frame
 		ensureCapacity(2);
-        buffer[currentOffset++] = (byte) (id + packetEncryption.getNextKey());
+        buffer[currentOffset++] = (byte) (id + packetEncryption.getNextIntKey());
         writeWord(0);        // placeholder for size word
         if (frameStackPtr >= frameStackSize - 1) {
             throw new RuntimeException("Stack overflow");
@@ -217,10 +217,13 @@ public class stream {
         else writeFrameSize(currentOffset - frameStack[frameStackPtr--]);
     }
 
-    public void endFrameVarSizeWord() { // ends a variable sized frame
-        if (frameStackPtr < 0) throw new RuntimeException("Stack empty");
-        else writeFrameSizeWord(currentOffset - frameStack[frameStackPtr--]);
+    public void endFrameVarSizeWord() {
+        if (frameStackPtr < 0)
+            throw new RuntimeException("Stack empty");
+        else
+            writeFrameSizeWord(currentOffset - frameStack[frameStackPtr--]);
     }
+
 
     public void writeByte(int value) {
         if (currentOffset >= buffer.length) {

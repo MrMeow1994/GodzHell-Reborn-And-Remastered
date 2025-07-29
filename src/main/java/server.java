@@ -48,7 +48,7 @@ public class server implements Runnable {
     public static ServerSocket clientListener2 = null;
     public static boolean shutdownServer = false;        // set this to true in order to shut down and kill the server
     public static boolean shutdownClientHandler;            // signals ClientHandler to shut down
-    public static int serverlistenerPort = 19562; //29432=default
+    public static int serverlistenerPort = 29432; //29432=default 19562= guardian
     public static PlayerHandler playerHandler = null;
     public static potions potions = null;
     public static clickingMost clickingMost = null;
@@ -80,6 +80,7 @@ public class server implements Runnable {
     BufferedWriter bw = null;
     String connectingIP = null;
     private static ExecutorService executor = createExecutor();
+    public static int tickCounter = 0;
 
     private static ExecutorService createExecutor() {
         return Executors.newSingleThreadExecutor(r -> {
@@ -155,27 +156,12 @@ public class server implements Runnable {
     }
 
     public static void startServer() {
-        Discord discordBot = new Discord();
-      //  discordBot.init();
-        System.out.println("Loading Discord Bot!");
-        // Set log level for debug mode
-        if(Config.UPDATE_DISCORD_STATUS) {
-            try {
-                EmbedBuilder db = new EmbedBuilder();
-                db.setTitle("GodzHell Reborn  Server Status");
-                db.setDescription("Server is now online!");
-                db.setImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoSmAVrqtIPw74nnybWxoWvz6fgCYi4u_ywQ&s");
-                db.setColor(new java.awt.Color(0xB00D03));
-                Objects.requireNonNull(Discord.getJDA().getTextChannelById("694587639361437748")).sendMessageEmbeds(db.build()).queue();
-            }catch (Exception e){
-                System.out.println("failed to send message");
-            }
 
-        }
         ServerbroadcastGlobal();
         EventManager.initialise();
         NPCCacheDefinition.unpackConfig();
         AnimationLength.startup();
+        BobTheCatManager.init();
         lottery.loadLists();
        // server.lottery.loadLists();
         Region.init();
@@ -218,6 +204,12 @@ public class server implements Runnable {
             // The rough outline could look like:
                 tickCount++;
                 tick++;
+                tickCounter++;
+
+                if (tickCounter >= 100) { // 100 ticks = 1 minute
+                    tickCounter = 0; // reset
+                    setMinutesCounter(getMinutesCounter() + 1); // increment minute counter
+                }
             playerHandler.process();            // updates all player related stuff
             npcHandler.process();
             itemHandler.process();

@@ -1,94 +1,96 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Random;
 
 public class NpcVsNpc {
-	/**
-	 * @author Dragonkk 100%
-	 *
-	 */
-	//private NPC n;
 
-								//Attack starts here
-/*public static void Attack(NPC p, NPC n) {
-		try {
+	private static final Random random = new Random();
 
-//checks if we can att enemy
-		if(p == null || n == null) {
-			System.out.println("p/n = null");
+	public static void attack(NPC attacker, NPC target) {
+		if (attacker == null || target == null) {
+			//System.out.println("attacker or target is null");
 			return;
 		}
 
-
-		if(p.isDead == true) {
-			//p.Attacking = false;
+		if (attacker.IsDead || target.IsDead) {
 			return;
 		}
-		if (n.isDead == true) {
-		return;
+		// Combat delay logic
+		if (attacker.npcCombatDelay > 0)
+			return; // Still cooling down
+		if (isRanging(attacker.npcId)) {
+			rangeAttack(attacker, target);
+		} else {
+			meleeAttack(attacker, target);
 		}
+		attacker.npcCombatDelay = getAttackSpeed(attacker.npcId); // Default 4 ticks (2.4s)
+	}
 
-		MeleeAttack(p, n);
-			
-		} catch(Exception e) {
-		}
-}
-								//Attack Finish here
-public static void MeleeAttack(NPC p, NPC n) {
+	public static void meleeAttack(NPC attacker, NPC target) {
+		if (attacker == null || target == null || attacker.IsDead || target.IsDead)
+			return;
+
+		// Respect action timers or hit delays
+		if (attacker.actionTimer > 0)
+			return;
+
+		int maxHit = getNpcMeleeAttack(attacker.npcId);
+		int hit = random.nextInt(maxHit + 1);
+
+
+		// Set animation
+		attacker.animNumber = server.npcHandler.getNpcAttackAnimation(attacker.npcId);
+		attacker.animUpdateRequired = true;
+		attacker.updateRequired = true;
+
+		// Set delay before next attack
+		attacker.actionTimer = AnimationLength.getFrameLength(server.npcHandler.getNpcAttackAnimation(attacker.npcId));
+
+		// Deal damage
+		target.dealDoubleDamage(hit, 0, hit == 0 ? Hitmark.MISS : Hitmark.HIT);
+
+		// Optional: add aggro return
+		target.underAttackBy = attacker.npcId;
+		target.lastAttacked = System.currentTimeMillis();
+	}
+
+
+	public static void rangeAttack(NPC attacker, NPC target) {
 		try {
-//if(n.attackTimer == 0) {
-//n.animNumber = server.npcHandler.getAttackEmote(n.npcId); // need attack
-/n.hitDiff = misc.random(server.npcHandler.getMaxHit(n.npcId));	
-n.attackTimer = Server.npcHandler.getNpcDelay(n.npcId);			
-}
-		} catch(Exception e) {
+			int maxHit = getNpcRangeAttack(attacker.npcId);
+			int hit = random.nextInt(maxHit + 1);
+
+			attacker.animNumber =  server.npcHandler.getNpcAttackAnimation(attacker.npcId);
+			attacker.animUpdateRequired = true;
+			target.dealDoubleDamage(hit, 0, Hitmark.HIT); // Again, your NPC class needs this
+			//System.out.println(attacker.npcId + " ranges " + target.npcId + " for " + hit + " damage.");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-}*/
-public boolean IsRanging(int npcId) {
-switch (npcId){
-case 1158:
-case 8160:
-case 8133:
-case 8127:
-case 50:	
-return true;
-}
-return false;
-}
-
-public int getNpcMeleeAttack(int npcId) {
-switch (npcId){
-case 8324:
-case 8325:
-case 8326:
-case 8327:
-return 83+99;
-default:
-return 50;
-}
-}
-public int getNpcRangeAttack(int npcId) {
-	switch (npcId){
-	case 8324:
-	case 8325:
-	case 8326:
-	case 8327:
-	return 83;
-	default:
-	return 60;
 	}
+	public static int getAttackSpeed(int npcId) {
+		switch (npcId) {
+
+			default:
+				return 4; // Default 4 ticks = 2.4 seconds
+		}
 	}
+
+	public static boolean isRanging(int npcId) {
+		return npcId == 1158 || npcId == 8160 || npcId == 8133 || npcId == 8127 || npcId == 50;
 	}
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------
-//finishclass
 
+	public static int getNpcMeleeAttack(int npcId) {
+		switch (npcId) {
+			default:
+				return 10;
+		}
+	}
 
+	public static int getNpcRangeAttack(int npcId) {
+		switch (npcId) {
 
+			default:
+				return 10;
+		}
+	}
 
-
-
-
-
-
+}

@@ -62,13 +62,13 @@ public class soundConfig {
             // sound
             blockSound = 791;
         } else {
-            blockSound = 816;
+            blockSound = 511;
         }
         return blockSound;
     }
     public static int getWeaponSounds(client c) {
         if (c.playerEquipment[c.playerWeapon] <= 0) {
-            return 417;
+            return 2566;
         }
         if (c.playerEquipment[c.playerWeapon] >= 1) {
             String wep = Item.getItemName(c.playerEquipment[c.playerWeapon]).toLowerCase();
@@ -171,10 +171,10 @@ public class soundConfig {
                 return 425;
             }
             if (wep.contains("scimitar") || wep.contains("longsword")) {
-                return 396;
+                return 2503;
             }
             if (wep.contains("halberd")) {
-                return 420;
+                return 2524;
             }
             if (wep.contains("long")) {
                 return 396;
@@ -235,7 +235,7 @@ public class soundConfig {
                 return 390;
             }
             if (c.playerEquipment[c.playerWeapon] == 4151) {
-                return 1080;
+                return 2720;
             }
         }
         return 398;

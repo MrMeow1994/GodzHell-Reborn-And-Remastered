@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class NPC {
     public final int[][] fearShadow = new int[100][100];
     public final int[][] CONTAIN_THIS = new int[2][2];
@@ -27,6 +30,11 @@ public class NPC {
     public int makeX, makeY, moverangeX1, moverangeY1, moverangeX2, moverangeY2, moveX, moveY, direction, walkingType, attacknpc, followPlayer;
     public int spawnX, spawnY;
     public int viewX, viewY;
+    public boolean canAttackNpcs = false; // default: off
+    public int targetNpcIndex = -1;       // which NPC it's attacking
+    public int faction = -1; // -1 = neutral, 0 = humans, 1 = demons, etc.
+    // Inside your NPC class
+    public int targetScanCooldown = 0;
     public boolean walkingHome, underAttack;
     public int HP, MaxHP, hitDiff, MaxHit, animNumber, actionTimer, StartKilling, enemyX, enemyY;
     public boolean IsDead, DeadApply, NeedRespawn, IsUnderAttack, IsClose, Respawns, IsUnderAttackNpc, IsAttackingNPC, poisondmg, walkingToPlayer, followingPlayer;
@@ -46,11 +54,13 @@ public class NPC {
     public int freezeTimer, killerId;
     public long lastDamageTaken;
     public int underAttackBy;
-    public int attackTimer;
+    public boolean isGodwarsNpc = false;
+    public int godwarsFaction = -1;
+    public int npcCombatDelay = 0;
+    public int attackTimer = 0;      // cooldown for attacking
     public boolean summoner;
     public int summonedBy;
     public int hitDelayTimer;
-    public int attackType;
     public int projectileId;
     public int oldIndex;
     public int attack;
@@ -58,6 +68,7 @@ public class NPC {
     public int lastX;
     public int lastY;
     public boolean randomWalk;
+    public long lastAttacked;
     int npcSize;
     private Tile currentTile;
     private boolean transformUpdateRequired = false;
@@ -71,7 +82,13 @@ public class NPC {
     private long randomWalkDelay;
     private long randomStopDelay;
     private boolean teleporting;
-
+    protected Hitmark hitmark1;
+    protected Hitmark hitmark2;
+    // Inside NPC.java or as runtime fields
+    public int hansWalkTimer = 0;
+    public int hansWaypointIndex = 0;
+    public int attackType = 0; // -1 = unknown, 0 = melee, 1 = range, 2 = magic, etc.
+    public Queue<int[]> walkingQueue = new LinkedList<>();
     public NPC(int _npcId, int _npcType) {
         npcId = _npcId;
         npcType = _npcType;
@@ -113,6 +130,75 @@ public class NPC {
         absY = y;
         heightLevel = z;
     }
+    public void move() {
+        absX += moveX;
+        absY += moveY;
+        moveX = 0;
+        moveY = 0;
+    }
+    public void dealDoubleDamage(int primary, int secondary, Hitmark hitmark) {
+        // No point applying damage to a dead NPC
+        if (HP <= 0 || IsDead) {
+            IsDead = true;
+            return;
+        }
+
+        // Default to HIT if something passed a MISS with damage > 0
+        if (hitmark == null) {
+            hitmark = Hitmark.HIT;
+        } else if (hitmark == Hitmark.MISS && (primary > 0 || secondary > 0)) {
+            hitmark = Hitmark.HIT;
+        }
+
+        // Clamp damage to not exceed current HP
+        int totalDamage = primary + secondary;
+        if (totalDamage > HP) totalDamage = HP;
+
+        // If both hits present, scale them proportionally
+        if (primary > 0 && secondary > 0) {
+            float ratio = primary / (float)(primary + secondary);
+            primary = Math.round(totalDamage * ratio);
+            secondary = totalDamage - primary;
+        } else {
+            primary = totalDamage;
+            secondary = 0;
+        }
+
+        HP -= totalDamage;
+        if (HP <= 0) {
+            HP = 0;
+            IsDead = true;
+        }
+
+        // Avoid hitting if total damage is 0
+        if (totalDamage == 0) {
+            hitDiff = 0;
+            hitmark1 = Hitmark.MISS;
+            hitUpdateRequired = true;
+        } else {
+            hitDiff = primary;
+            hitmark1 = hitmark;
+            hitUpdateRequired = true;
+
+            if (secondary > 0) {
+                hitDiff2 = secondary;
+                hitmark2 = hitmark;
+                hitUpdateRequired2 = true;
+            }
+        }
+
+        updateRequired = true;
+    }
+
+
+    private boolean supportsDoubleHit() {
+        return false; // or true if your client supports it
+    }
+
+
+
+
+
     public void setRandomWalkDelay(long randomWalkDelay) {
         this.randomWalkDelay = randomWalkDelay;
     }
@@ -258,55 +344,46 @@ public class NPC {
     }
 
     public void appendNPCUpdateBlock(stream str) {
-        if (!updateRequired)
-            return; // nothing required
-        int updateMask = 0;
-        if (animUpdateRequired)
-            updateMask |= 0x10;
-        if(hitUpdateRequired2)
-            updateMask |= 8;
-        if (gfxUpdateRequired)
-            updateMask |= 0x80;
-        if (faceEntityUpdateRequired)
-            updateMask |= 0x20;
-        if (textUpdateRequired)
-            updateMask |= 1;
-        if (hitUpdateRequired)
-            updateMask |= 0x40;
-        if (transformUpdateRequired)
-            updateMask |= 2;
-        if (FocusPointX != -1)
-            updateMask |= 4;
-        /*
-         * if(updateMask >= 0x100) { // byte isn't sufficient updateMask |=
-         * 0x40; // indication for the client that updateMask is stored in a
-         * word str.writeByte(updateMask & 0xFF); str.writeByte(updateMask >>
-         * 8); } else {
-         */
-        str.writeUnsignedWord(updateMask);
-        // }
+        if (!updateRequired) return;
 
-        // now writing the various update blocks itself - note that their order
-        // crucial
-        if (animUpdateRequired)
-            appendAnimUpdate(str);
-        if (hitUpdateRequired2 && !IsDead)
-            appendHitUpdate2(str);
-        if (gfxUpdateRequired)
-            appendMask80Update(str);
-        if (faceEntityUpdateRequired)
-            appendFaceEntity(str);
-        if (textUpdateRequired) {
-            str.writeString(textUpdate);
+        int updateMask = buildUpdateMask();
+        if (updateMask >= 0x100) {
+            // Old WRONG version:
+            // updateMask |= 0x10; ❌ BAD: Conflicts with animation block!
+
+            // ✅ CORRECT VERSION:
+            updateMask |= 0x100;
+            str.writeByte(updateMask & 0xFF);
+            str.writeByte(updateMask >> 8);
+        } else {
+            str.writeByte(updateMask);
         }
-        if (hitUpdateRequired && !IsDead)
-            appendHitUpdate(str);
-        if (transformUpdateRequired)
-            appendTransformUpdate(str);
-        if (FocusPointX != -1)
-            appendSetFocusDestination(str);
-        // TODO: add the various other update blocks
+
+        // Write update blocks in correct order
+        if (animUpdateRequired) appendAnimUpdate(str);
+        if (!IsDead && hitUpdateRequired2) appendHitUpdate2(str);
+        if (gfxUpdateRequired) appendMask80Update(str);
+        if (faceEntityUpdateRequired) appendFaceEntity(str);
+        if (textUpdateRequired) str.writeString(textUpdate);
+        if (hitUpdateRequired && !IsDead) appendHitUpdate(str);
+        if (transformUpdateRequired) appendTransformUpdate(str);
+        if (FocusPointX != -1) appendSetFocusDestination(str);
+
+        // Apply actual damage logic after updates sent
     }
+    private int buildUpdateMask() {
+        int mask = 0;
+        if (animUpdateRequired) mask |= 0x10;
+        if (hitUpdateRequired2) mask |= 0x08;
+        if (gfxUpdateRequired) mask |= 0x80;
+        if (faceEntityUpdateRequired) mask |= 0x20;
+        if (textUpdateRequired) mask |= 0x01;
+        if (hitUpdateRequired) mask |= 0x40;
+        if (transformUpdateRequired) mask |= 0x02;
+        if (FocusPointX != -1) mask |= 0x04;
+        return mask;
+    }
+
     public int mask80var1 = 0;
     public int mask80var2 = 0;
     public void appendMask80Update(stream str) {
@@ -381,51 +458,51 @@ public class NPC {
         str.writeUnsignedWord(face);
     }
     protected void appendHitUpdate(stream str) {
-        try {
-            int damage = Math.max(0, hitDiff);
-            int type = poisondmg ? 2 : (damage > 0 ? 1 : 0);
-
-            str.writeByteC(damage);     // Main damage
-            str.writeByteS(type);       // Hit type
-            str.writeWord(HP - damage); // Future HP
-            str.writeWord(MaxHP);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            HP -= hitDiff;
-            if (HP <= 0 && !IsDead) {
-                IsDead = true;
-                DeadApply = false; // This flags the death animation next tick
-            }
-
-            poisondmg = false;
-            hitUpdateRequired = false;
+        HP -= hitDiff;
+        if (HP <= 0) {
+            IsDead = true;
         }
+        if (hitmark1 != null && !hitmark1.isMiss() && hitDiff == 0) {
+            hitDiff = 0;
+            hitmark1 = Hitmark.MISS;
+        }
+
+        str.writeByteC(hitDiff); // What the perseon got 'hit' for
+        if (hitDiff > 0 && !poisondmg) {
+            str.writeByteS(1); // 0: red hitting - 1: blue hitting
+        } else if (hitDiff > 0 && poisondmg) {
+            str.writeByteS(2); // 0: red hitting - 1: blue hitting
+        } else {
+            str.writeByteS(0); // 0: red hitting - 1: blue hitting
+        }
+        str.writeUnsignedWord(HP);              // Current HP (NOT predicted!)
+        str.writeUnsignedWord(MaxHP);           // Max HP
+        poisondmg = false;
     }
 
 
     protected void appendHitUpdate2(stream str) {
-        try {
-            int damage = Math.max(0, hitDiff2);
-            int type = poisondmg ? 2 : (damage > 0 ? 1 : 0);
-
-            str.writeByteA(damage);     // Secondary damage
-            str.writeByteC(type);       // Hit type
-            str.writeWord(HP - damage); // Future HP
-            str.writeWord(MaxHP);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            HP -= hitDiff2;
-            if (HP <= 0 && !IsDead) {
-                IsDead = true;
-                DeadApply = false;
-            }
-
-            poisondmg = false;
-            hitUpdateRequired2 = false;
+        HP -= hitDiff2;
+        if (HP <= 0) {
+            IsDead = true;
         }
+        if (hitmark2 != null && !hitmark2.isMiss() && hitDiff2 == 0) {
+            hitDiff2 = 0;
+            hitmark2 = Hitmark.MISS;
+        }
+        str.writeByteA(hitDiff2);         // Hit amount
+        if (hitDiff2 > 0 && !poisondmg) {
+            str.writeByteC(1); // 0: red hitting - 1: blue hitting
+        } else if (hitDiff2 > 0 && poisondmg) {
+            str.writeByteC(2); // 0: red hitting - 1: blue hitting
+        } else {
+            str.writeByteC(0); // 0: red hitting - 1: blue hitting
+        }
+        str.writeUnsignedWord(HP);              // Current HP (already reduced!)
+        str.writeUnsignedWord(MaxHP);           // Max HP
+        poisondmg = false;
     }
+
 
 
     public void TurnNpcTo(int i, int j) {
@@ -496,5 +573,9 @@ public class NPC {
 
     public int getProjectileDelay () {
         return 0;
+    }
+
+    public boolean isAlive() {
+        return !IsDead;
     }
 }

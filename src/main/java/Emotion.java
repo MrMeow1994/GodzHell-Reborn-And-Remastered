@@ -1,44 +1,38 @@
 public enum Emotion {
-
+    DEFAULT(9803),
     HAPPY(9850),
     HAPPY_TALK(9850),
     CALM(9830),
-    CALM_CONTINUED(590),
-    DEFAULT(9803),
-    EVIL(592),
-    EVIL_CONTINUED(593),
-    DELIGHTED_EVIL(594),
+    CALM_CONTINUED(9845),
+    QUESTIONING(9853),
+    QUESTIONING_ALT(9854),
+    SCRATCHING_HEAD(9831),
+    EVIL(9840),
+    EVIL_CONTINUED(9841),
+    DELIGHTED_EVIL(9842),
     ANNOYED(9808),
-    DISTRESSED(596),
-    DISTRESSED_CONTINUED(597),
-    DISORIENTED_LEFT(600),
-    DISORIENTED_RIGHT(601),
-    UNINTERESTED(602),
-    SLEEPY(603),
-    PLAIN_EVIL(604),
-    LAUGHING(605),
-    LAUGHING_2(608),
-    LONGER_LAUGHING(606),
-    LONGER_LAUGHING_2(607),
-    EVIL_LAUGH_SHORT(609),
-    SLIGHTLY_SAD(610),
+    DISTRESSED(9765),
+    DISTRESSED_CONTINUED(9766),
+    DISORIENTED_LEFT(9767),
+    DISORIENTED_RIGHT(9768),
+    UNINTERESTED(9769),
+    SLEEPY(9770),
+    PLAIN_EVIL(9771),
+    LAUGHING(9852),
+    LAUGHING_2(9855),
+    EVIL_LAUGH_SHORT(9856),
+    SLIGHTLY_SAD(9761),
     SAD(9760),
-    VERY_SAD(611),
-    OTHER(612),
-    NEAR_TEARS(598),
-    NEAR_TEARS_2(613),
+    VERY_SAD(9762),
+    OTHER(9772),
+    NEAR_TEARS(9773),
+    NEAR_TEARS_2(9774),
     ANGRY_1(9781),
     ANGRY_2(9782),
     ANGRY_3(9783),
     ANGRY_4(9784);
 
-	private int emoteId;
-
-	private Emotion(int emoteId) {
-		this.emoteId = emoteId;
-	}
-
-	public int getEmoteId() {
-		return emoteId;
-	}
+    private final int emoteId;
+    Emotion(int id) { this.emoteId = id; }
+    public int getEmoteId() { return emoteId; }
 }

@@ -35,6 +35,9 @@ public abstract class Player {
 	public long buySlayerTimer;
 	public boolean isMoving;
 	public final stream updateBlock = new stream(new byte[20000]);
+	public int runeMist, gertCat, restGhost,
+			romeojuliet, lostCity, vampSlayer, cookAss, doricQuest, blackKnight, shieldArrav,
+			sheepShear, impsC, knightS, witchspot, pirateTreasure;
 	private boolean hitUpdateRequired2;
 	boolean stopPlayerSkill = false;
 	int runEnergy = 100,  talkingNpc = -1;
@@ -375,17 +378,17 @@ public abstract class Player {
 		playerLook[5] = 10;*/
 
 		// Giving the player an unique look
-		playerEquipment[playerHat]=-1;
-		playerEquipment[playerCape]=-1;
-		playerEquipment[playerAmulet]=-1;
-		playerEquipment[playerChest]=-1;
-		playerEquipment[playerShield]=-1;
-		playerEquipment[playerLegs]=-1;
+		playerEquipment[playerHat]=ItemIDs.HELM_OF_NEITIZNOT;
+		playerEquipment[playerCape]=ItemIDs.OBSIDIAN_CAPE;
+		playerEquipment[playerAmulet]=ItemIDs.AMULET_OF_FURY;
+		playerEquipment[playerChest]=ItemIDs.FIGHTER_TORSO_2;
+		playerEquipment[playerShield]=ItemIDs.RUNE_DEFENDER;
+		playerEquipment[playerLegs]=ItemIDs.RUNE_PLATELEGS;
 		playerEquipment[playerHands]=-1;
-		playerEquipment[playerFeet]=-1;
-		playerEquipment[playerRing]=-1;
+		playerEquipment[playerFeet]=11732;
+		playerEquipment[playerRing]=ItemIDs.RING_OF_WEALTH;
 		playerEquipment[playerArrows]=-1;
-		playerEquipment[playerWeapon]=-1;
+		playerEquipment[playerWeapon]=ItemIDs.DRAGON_SCIMITAR;
 
 /*
 0-9: male head
@@ -627,9 +630,77 @@ public abstract class Player {
 	public String playerPass = null;			// name of the connecting client
 	public boolean isRunning2 = false;
 	public boolean stoprunning = false;
+
 	public boolean nonWild() {
-		return !inSafePvP() && (absX < 2944 || absX > 3392 || absY < 3523 || absY > 3967);
+		if((absX == 3125 && absY == 9845) || (absX == 3125 && absY == 9844) || (absX == 3122 && absY == 9836) || (absX == 3122 && absY == 9835) || (absX == 3119 && absY == 9831)) {
+			return false;
+		}
+		if(Boundary.isIn((client) this, Boundary.rdleveloftrain)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.DUNGEONS)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.UMBYSWAPES)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.GODWARS_BOSSROOMS)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.GH_NONWILD)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.TZHAAR_CITY_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.SLAYER_TOWER_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.LUNAR_ISLE_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.FREMENNIK_ISLES_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.WATERBIRTH_ISLAND_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.MISCELLANIA_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.APE_ATOLL_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.FELDIP_HILLS_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.YANILLE_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.DESERT_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.LLETYA_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.GNOME_STRONGHOLD_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.HANG)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.Theive)){
+			return true;
+		}
+		if(inSafePvP()){
+			return false;
+		}
+		return false;
 	}
+
+
+
+
 
 	public boolean inSafePvP() {
 		return absX >= 1889 && absX <= 1910 && absY >= 5345 && absY <= 5366 && heightLevel == 2;
@@ -1185,30 +1256,43 @@ public abstract class Player {
 	// we know if we have to transmit those or can make use of the cached char appearances in the client
 	public byte cachedPropertiesBitmap[] = new byte[(PlayerHandler.maxPlayers+7) >> 3];
 
-	public void addNewNPC(NPC npc, stream str, stream updateBlock)
-	{
-		int id = npc.npcId;
-		npcInListBitmap[id >> 3] |= (byte) (1 << (id&7));	// set the flag
+	public void addNewNPC(NPC npc, stream str, stream updateBlock) {
+		final int npcId = npc.npcId;
+		final int npcType = npc.npcType;
+
+		// ✅ Mark the NPC as active for this client
+		npcInListBitmap[npcId >> 3] |= (1 << (npcId & 7));
 		npcList[npcListSize++] = npc;
 
-		str.writeBits(14, id);	// client doesn't seem to like id=0
+		// ✅ Write the NPC ID (must be 14-bit max for client compatibility)
+		str.writeBits(14, npcId);
 
-		int z = npc.absY-absY;
-		if(z < 0) z += 32;
-		str.writeBits(5, z);	// y coordinate relative to thisPlayer
-		z = npc.absX-absX;
-		if(z < 0) z += 32;
-		str.writeBits(5, z);	// x coordinate relative to thisPlayer
+		// ✅ Calculate relative Y position (modulo 32 to handle wrapping)
+		int deltaY = npc.absY - absY;
+		if (deltaY < 0) deltaY += 32;
+		str.writeBits(5, deltaY);
 
-		str.writeBits(1, 0); //something??
-		str.writeBits(14, npc.npcType);
+		// ✅ Calculate relative X position (same logic)
+		int deltaX = npc.absX - absX;
+		if (deltaX < 0) deltaX += 32;
+		str.writeBits(5, deltaX);
 
-		boolean savedUpdateRequired = npc.updateRequired;
+		// ✅ Direction flag — 0 means no forced movement (teleport flag or reserved bit)
+		str.writeBits(1, 0);
+
+		// ✅ Write NPC type (model definition ID)
+		str.writeBits(14, npcType);
+
+		// ✅ Temporarily mark update required to force update block writing
+		boolean wasUpdateRequired = npc.updateRequired;
 		npc.updateRequired = true;
 		npc.appendNPCUpdateBlock(updateBlock);
-		npc.updateRequired = savedUpdateRequired;
-		str.writeBits(1, 1); // update required
+		npc.updateRequired = wasUpdateRequired;
+
+		// ✅ Signal that update block follows
+		str.writeBits(1, 1);
 	}
+
 
 	public void addNewPlayer(Player plr, stream str, stream updateBlock) {
 		int id = plr.playerId;

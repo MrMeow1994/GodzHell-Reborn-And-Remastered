@@ -37,41 +37,41 @@ public class RebootSystem {
 
             server liveServer = server.clientHandler;
             if (liveServer == null) {
-                System.out.print("Live server instance not found.");
+                System.out.print("\nLive server instance not found.");
                 continue;
             }
 
             switch (input) {
                 case "reboot":
-                    System.out.print("Manual reboot initiated.");
+                    System.out.print("\nManual reboot initiated.");
                     new RebootTask().run();
                     break;
 
                 case "status":
-                    System.out.print("Server Running: " + !server.shutdownServer);
-                    System.out.print("Uptime (minutes): " + server.getMinutesCounter());
+                    System.out.print("\nServer Running: " + !server.shutdownServer);
+                    System.out.print("\nUptime (minutes): " + server.getMinutesCounter());
                     break;
 
                 case "threads":
-                    System.out.print("Active Threads: " + Thread.activeCount());
+                    System.out.print("\nActive Threads: " + Thread.activeCount());
                     break;
 
                 case "connections":
-                    System.out.print("Active Connections: " + server.hasActiveConnections());
+                    System.out.print("\nActive Connections: " + server.hasActiveConnections());
                     break;
 
                 case "forcekill":
-                    System.out.print("Force killing server...");
+                    System.out.print("\nForce killing server...");
                     liveServer.killServer();
                     break;
 
                 case "exit":
-                    System.out.print("Console exiting. Server still running.");
+                    System.out.print("\nConsole exiting. Server still running.");
                     return;
 
                 default:
-                    System.out.print("Unknown command: " + input);
-                    System.out.print("Available: reboot, status, threads, connections, forcekill, exit");
+                    System.out.print("\nUnknown command: " + input);
+                    System.out.print("\nAvailable: reboot, status, threads, connections, forcekill, exit");
                     break;
             }
         }
@@ -84,16 +84,16 @@ public class RebootSystem {
 
             synchronized (liveServer) {
                 try {
-                    System.out.print("Rebooting now...");
+                    System.out.print("\nRebooting now...");
                     shutdownServerGracefully(liveServer);
                     Thread.sleep(10000); // short cooldown
 
                     // Fully reinitialize the server instance
                     server.clientHandler = new server();
                     server.clientHandler.startServer();
-                    System.out.print("Server restarted successfully.");
+                    System.out.print("S\nerver restarted successfully.");
                 } catch (InterruptedException e) {
-                    System.out.print("Reboot interrupted.");
+                    System.out.print("\nReboot interrupted.");
                     Thread.currentThread().interrupt();
                 }
             }
@@ -101,24 +101,34 @@ public class RebootSystem {
 
         private void shutdownServerGracefully(server liveServer) {
             if (liveServer.isShuttingDown()) {
-                System.out.print("Server is already shutting down. Aborting reboot.");
+                System.out.print("\nServer is already shutting down. Aborting reboot.");
                 return;
             }
+            System.out.println("Saving all active players before shutdown...");
 
-            System.out.print("Shutting down server...");
+            for (int i = 0; i < server.playerHandler.maxPlayers; i++) {
+                Player p = server.playerHandler.players[i];
+                if (p != null && p.isActive) {
+                    server.playerHandler.handleDisconnect(p); // ✅ force it
+                }
+            }
+
+
+
+            System.out.print("\nShutting down server...");
             liveServer.killServer();
 
             while (liveServer.hasActiveConnections() || liveServer.hasRunningThreads()) {
-                System.out.print("Waiting for all connections and threads to finish...");
+                System.out.print("\nWaiting for all connections and threads to finish...");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    System.out.print("Interrupted while waiting for shutdown.");
+                    System.out.print("\nInterrupted while waiting for shutdown.");
                     Thread.currentThread().interrupt();
                 }
             }
 
-            System.out.print("Shutdown complete.");
+            System.out.print("\nShutdown complete.");
         }
     }
 
@@ -131,7 +141,7 @@ public class RebootSystem {
 
         @Override
         public void run() {
-            System.out.print("* * * Server Rebooting in " + time + " minutes * * *");
+            System.out.print("\n* * * Server Rebooting in " + time + " minutes * * *");
             PlayerHandler.messageToAll = "@blu@* * * Server Rebooting in " + time + " minutes * * *";
         }
     }

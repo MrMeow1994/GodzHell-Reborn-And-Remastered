@@ -1,5 +1,7 @@
 package com.mystycdh
 
+import com.Ghreborn.jagcached.util.DeepTracer
+import com.Ghreborn.jagcached.util.HyperTraceEngine
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.io.BufferedWriter
 import java.io.File
@@ -21,6 +23,7 @@ object GuardianServer {
     private val BLACKLIST_DURATION_MS: Long = Duration.ofMinutes(1).toMillis()
     private const val BAN_FILE = "banned_ips.txt"
     private const val MAX_LOG_ENTRIES = 100
+    private val portToRealIp = ConcurrentHashMap<Int, String>()
 
     // Sliding‑window counters via Caffeine
     private val requestCounts = Caffeine.newBuilder()
@@ -74,13 +77,25 @@ object GuardianServer {
             }
         }
     }
-
+    private fun isUntrusted(trace: String, hyperTrace: String): Boolean {
+        return trace.contains("Proxy: true") || trace.contains("Hosting: true") || hyperTrace.contains("Data Center")
+    }
     private fun handleClient(clientSocket: Socket) {
         val ip = clientSocket.inetAddress.hostAddress
+
         //logger.debug("Incoming connection from {}", ip)
         liveSockets[ip] = clientSocket
         try {
+            val traceReport = DeepTracer.analyze(ip)
+            val hyperTrace = HyperTraceEngine.traceIP(ip)
 
+            if (isUntrusted(traceReport, hyperTrace)) {
+                kotlin.io.println("[BLOCKED] $ip | Reason: Untrusted | Trace: $traceReport | Hyper: $hyperTrace")
+                //returnCode = 26;
+                // savefile = false;
+                // disconnected = true;
+                return
+            }
             if (rateLimit(ip) && throttleConnections(ip)) {
                 forwardToGameServer(clientSocket)
             } else {
@@ -98,7 +113,10 @@ object GuardianServer {
         val banInfo = bannedClients[ip]
         return banInfo != null && System.currentTimeMillis() < banInfo.banEndTime
     }
-
+    @JvmStatic
+    fun getRealIpForLoginSocket(socket: Socket): String {
+        return portToRealIp[socket.port] ?: socket.inetAddress.hostAddress
+    }
     fun ban(ip: String) {
         val banEnd = System.currentTimeMillis() + BLACKLIST_DURATION_MS
         bannedClients[ip] = BanInfo(ip, banEnd)
@@ -178,8 +196,12 @@ object GuardianServer {
 
     private fun forwardToGameServer(clientSocket: Socket) {
         val ip = clientSocket.inetAddress.hostAddress
-        Socket("127.0.0.1", 19562).use { gameServerSocket ->
+        Socket("127.0.0.1", 19562).use {
 
+            gameServerSocket ->
+            // Store the *real* IP associated with Guardian’s outbound port
+            portToRealIp[clientSocket.localPort] = ip
+            // Store the mapping: Guardian's local port used to connect RSPS → real client IP
             val connectionInfo = activeConnections.computeIfAbsent(ip) {
                 ConnectionInfo(ip, MAX_LOG_ENTRIES)
             }

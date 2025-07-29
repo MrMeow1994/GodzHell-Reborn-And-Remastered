@@ -54,24 +54,24 @@ public class PlayerAssistant {
         c.getOutStream().writeByteA(menuId);
     }
     public void resetItems(int WriteFrame) {
-        if (c.getOutStream() != null)
-        c.getOutStream().createFrameVarSizeWord(53);
-        c.getOutStream().writeWord(WriteFrame);
-        c.getOutStream().writeWord(c.playerItems.length);
+        c.outStream.createFrameVarSizeWord(53);
+        c.outStream.writeWord(WriteFrame);
+        c.outStream.writeWord(c.playerItems.length);
         for (int i = 0; i < c.playerItems.length; i++) {
             if (c.playerItemsN[i] > 254) {
-                c.getOutStream().writeByte(255); // item's stack count. if over 254, write byte 255
-                c.getOutStream().writeDWord_v2(c.playerItemsN[i]); // and then the real value with writeDWord_v2
+                c.outStream.writeByte(255);                        // item's stack count. if over 254, write byte 255
+                c.outStream.writeDWord_v2(c.playerItemsN[i]);    // and then the real value with writeDWord_v2
             } else {
-                c.getOutStream().writeByte(c.playerItemsN[i]);
+                c.outStream.writeByte(c.playerItemsN[i]);
             }
-            if (c.playerItems[i] > Config.MAX_ITEMS || c.playerItems[i] < 0) {
-                c.playerItems[i] = Config.MAX_ITEMS;
+            if (c.playerItems[i] > 20000 || c.playerItems[i] < 0) {
+                c.playerItems[i] = 20000;
             }
-            c.getOutStream().writeWordBigEndianA(c.playerItems[i]); // item id
+            c.outStream.writeWordBigEndianA(c.playerItems[i]); //item id
         }
-        c.getOutStream().endFrameVarSizeWord();
+        c.outStream.endFrameVarSizeWord();
     }
+
     public void openUpBank() {
         if (c.getOutStream() != null) {
             resetItems(5064);
@@ -117,11 +117,12 @@ public class PlayerAssistant {
 
     }
     public void sendQuest(String s, int id) {
-        if (c.getOutStream() != null)
-            c.getOutStream().createFrameVarSizeWord(126);
-        c.getOutStream().writeString(s);
-        c.getOutStream().writeWordA(id);
-        c.getOutStream().endFrameVarSizeWord();
+
+             c.getOutStream().createFrameVarSizeWord(126);
+             c.getOutStream().writeString(s);
+             c.getOutStream().writeWordA(id);
+             c.getOutStream().endFrameVarSizeWord();
+
     }
     public void randomize(int o, int oo, int ooo, int oooo) {
         if (c.getOutStream() != null)
@@ -254,4 +255,15 @@ public class PlayerAssistant {
         }
     }
 
+    public void sendQuickSong(int id, int songDelay) {
+        if (c.getOutStream() != null) {
+
+            if (c != null) {
+                c.getOutStream().createFrame(121);
+                c.getOutStream().writeWordBigEndian(id);
+                c.getOutStream().writeWordBigEndian(songDelay);
+                c.flushOutStream();
+            }
+        }
+    }
 }

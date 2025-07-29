@@ -70,7 +70,7 @@ public class Boundary {
      * @param boundaries The array of Boundary objects
      * @return
      */
-    public static boolean isIn(Player player, Boundary... boundaries) {
+    public static boolean isIn(client player, Boundary... boundaries) {
         for(Boundary b : boundaries) {
             if (b.height > 0) {
                 if (player.heightLevel != b.height) {
@@ -84,7 +84,7 @@ public class Boundary {
         return false;
     }
 
-    public static boolean isIn1(Player player, Boundary[] boundaries) {
+    public static boolean isIn1(client player, Boundary[] boundaries) {
         for(Boundary b : boundaries) {
             if (b.height > 0) {
                 if (player.heightLevel != b.height) {
@@ -98,7 +98,7 @@ public class Boundary {
         return false;
     }
 
-    public static boolean isIn2(Player player, Boundary... boundaries) {
+    public static boolean isIn2(client player, Boundary... boundaries) {
         for(Boundary b : boundaries) {
             if (player.absX >= b.minX && player.absX <= b.highX && player.absY >= b.minY && player.absY <= b.highY) {
                 return true;
@@ -220,13 +220,6 @@ public class Boundary {
     public static final Boundary FREMENNIK_ISLES_BOUNDARY = new Boundary(2300, 3776, 2436, 3902);
     public static final Boundary WATERBIRTH_ISLAND_BOUNDARY = new Boundary(2495, 3711, 2559, 3772);
     public static final Boundary MISCELLANIA_BOUNDARY = new Boundary(2493, 3835, 2628, 3921);
-    public static final Boundary WOODCUTTING_GUILD_BOUNDARY = new Boundary(1608,3479,1657,3516);
-
-    /**
-     * Halloween
-     */
-    public static final Boundary HALLOWEEN_ORDER_MINIGAME = new Boundary(2591, 4764, 2617, 4786);
-
     /**
      * Hunter
      */
@@ -249,6 +242,8 @@ public class Boundary {
     public static final Boundary SAFEPKSAFE = new Boundary(3068, 3516, 3109, 3536);
 
     public static final Boundary SAFEPK = new Boundary(3068, 3524, 3109, 3536);
+    public static final  Boundary HANG = new Boundary(2381, 3478, 2409, 3498);
+    public static final Boundary Theive = new Boundary(2959, 3374, 2972, 3388);
     /**
      * Raids bosses
      */
@@ -279,7 +274,65 @@ public class Boundary {
     public static final Boundary BOUNDARY_BOSS = new Boundary(3254, 3870, 3272, 3888);
     public static final Boundary Train = new Boundary(1728, 5440, 1791, 5503);
     public static final Boundary STAFF_ZONE = new Boundary(2816, 5056, 2879, 5119);
+    public static final Boundary[] GH_NONWILD = {
+            new Boundary(3242, 3282, 3265, 3298),
+            new Boundary(3244, 3278, 3265, 3281),
+            new Boundary(3250, 3273, 3265, 3277),
+            new Boundary(3253, 3255, 3265, 3272),
+            new Boundary(3178, 6861, 3202, 6884),
+            new Boundary(3189, 6839, 3202, 6860),
+            new Boundary(2447, 3160, 2484, 3201),
+            new Boundary(3530, 9673, 3539, 9682),
+            new Boundary(3547, 9673, 3556, 9682),
+            new Boundary(3564, 9673, 3573, 9682),
+            new Boundary(3564, 9690, 3573, 9699),
+            new Boundary(3547, 9690, 3556, 9699),
+            new Boundary(3530, 9690, 3539, 9699),
+            new Boundary(3530, 9707, 3539, 9716),
+            new Boundary(3547, 9707, 3556, 9716),
+            new Boundary(3564, 9707, 3573, 9716),
+            new Boundary(3333, 3331, 3370, 3349),
+            new Boundary(3180, 3433, 3190, 3447),
+            new Boundary(3184, 3420, 3194, 3427),
+            new Boundary(3207, 3420, 3221, 3438),
+            new Boundary(3071, 3403, 3137, 3520),
+            new Boundary(3139, 3466, 3193, 3515),
+            new Boundary(3005, 3439, 3028, 3464),
+            new Boundary(3039, 3473, 3065, 3520),
+            new Boundary(3090, 3353, 3119, 3366),
+            new Boundary(3120, 3353, 3126, 3360),
+            new Boundary(3096, 3367, 3119, 3373),
+            new Boundary(3074, 3236, 3105, 3284),
+            new Boundary(2945, 3200, 2970, 3223),
+            new Boundary(3035, 3370, 3056, 3386),
+            new Boundary(3139, 3137, 3155, 3162),
+            new Boundary(3218, 3139, 3234, 3154),
+            new Boundary(3281, 3157, 3302, 3177),
+            new Boundary(3312, 3178, 3318, 3186),
+            new Boundary(3313, 3173, 3318, 3176),
+            new Boundary(3317, 3190, 3324, 3197),
+            new Boundary(3264, 3161, 3272, 3173),
+            new Boundary(2648, 3292, 2676, 3324),
+            new Boundary(2718, 3486, 2730, 3497),
+            new Boundary(2792, 3408, 2864, 3438),
+            new Boundary(2792, 3438, 2837, 3493),
+            new Boundary(2838, 3536, 2876, 3555),
+            new Boundary(3105, 9822, 3127, 9852),
+            new Boundary(3129, 6844, 3147, 6859),
+            new Boundary(3080, 9949, 3099, 9964),
+            new Boundary(2692, 9555, 2711, 9574),
+            new Boundary(2625, 9515, 2687, 9600),
+            new Boundary(2652, 9508, 2678, 9514),
+            new Boundary(2638, 9482, 2672, 9504),
+            new Boundary(2675, 9476, 2692, 9488),
+            new Boundary(2696, 9478, 2719, 9493),
+            new Boundary(2699, 9421, 2745, 9466),
+            new Boundary(2727, 9481, 2746, 9507),
+            new Boundary(2694, 9502, 2725, 9552),
+            new Boundary(2812, 5243, 2949, 5380, 2),
+            new Boundary(2498, 4628, 2545, 4665)
 
+    };
     public static final Boundary[] GODWARS_BOSSROOMS = {
             BANDOS_GODWARS,
             ARMADYL_GODWARS,
@@ -324,6 +377,36 @@ public class Boundary {
             new Boundary(3298, 3117, 3310, 3131),
             new Boundary(3360, 3164, 3374, 3171)
     };
+    public static final Boundary[] DUNGEONS = {
+            new Boundary(2759, 9681, 3068, 9860),
+            new Boundary(2880, 9660, 2938, 9680),
+            new Boundary(2981, 9533, 3088, 9605),
+            new Boundary(2824, 9536, 2876, 9668),
+            new Boundary(2686, 9655, 2748, 9724),
+            new Boundary(2684, 9729, 2745, 9785),
+            new Boundary(3062, 9629, 3139, 9706),
+            new Boundary(3135, 9599, 3196, 9668),
+            new Boundary(3205, 9610, 3224, 9634),
+            new Boundary(2628, 9403, 2758, 9610),
+            new Boundary(2815, 9471, 2880, 9536),
+            new Boundary(2759, 9520, 2820, 9613),
+            new Boundary(2624, 9613, 2686, 9734)
+    };
+    public static final Boundary[] UMBYSWAPES = {
+            new Boundary(3135, 3133, 3256, 3190),
+            new Boundary(3135, 3190, 3185, 3205),
+            new Boundary(3184, 3187, 3228, 3198),
+            new Boundary(3182, 3195, 3192, 3205),
+            new Boundary(3227, 3187, 3237, 3194),
+            new Boundary(3225, 3192, 3229, 3196),
+            new Boundary(3235, 3188, 3266, 3226),
+            new Boundary(3191, 3196, 3234, 3237),
+            new Boundary(3234, 3226, 3265, 3254),
+            new Boundary(3265, 3223, 3267, 3232),
+            new Boundary(3264, 3231, 3266, 3238),
+            new Boundary(3191, 3236, 3265, 3302)
+    };
+    public static final Boundary rdleveloftrain = new Boundary(2366,4669,2434,4737);
     public static final Boundary TzHarr_City = new Boundary(2432, 5056, 2558, 5183);
     //public static final Boundary FOUNTAIN_OF_RUNE_BOUNDARY = new Boundary(3367, 3888, 3380, 3899);
     public static final Boundary[] ROOFTOP_COURSES = { SEERS_BOUNDARY, VARROCK_BOUNDARY, ARDOUGNE_BOUNDARY };

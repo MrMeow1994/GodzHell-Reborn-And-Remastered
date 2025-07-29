@@ -67,6 +67,9 @@ public class PlayerData {
     private long[] ignores;
     private int consecutiveTasks; // Field for consecutive tasks
     private int loyaltyRank; // Field for loyalty rank
+    public int runeMist, gertCat, restGhost,
+            romeojuliet, lostCity, vampSlayer, cookAss, doricQuest, blackKnight, shieldArrav,
+            sheepShear, impsC, knightS, witchspot, pirateTreasure;
     public static PlayerData from(Player plr) {
         PlayerData data = new PlayerData();
 
@@ -89,7 +92,21 @@ public class PlayerData {
         data.hasThirdFloorDone = plr.hasthirdfloorDone;
         data.hasFourthFloorDone = plr.hasfourthfloorDone;
         data.skullTimer = plr.skullTimer;
-
+        data.runeMist = plr.runeMist;
+        data.gertCat = plr.gertCat;
+        data.restGhost = plr.restGhost;
+        data.romeojuliet = plr.romeojuliet;
+        data.lostCity = plr.lostCity;
+        data.vampSlayer = plr.vampSlayer;
+        data.cookAss = plr.cookAss;
+        data.doricQuest = plr.doricQuest;
+        data.blackKnight = plr.blackKnight;
+        data.shieldArrav = plr.shieldArrav;
+        data.sheepShear = plr.sheepShear;
+        data.impsC = plr.impsC;
+        data.knightS = plr.knightS;
+        data.witchspot = plr.witchspot;
+        data.pirateTreasure = plr.pirateTreasure;
         client target = (client) plr;
         data.slayerTask = target.getSlayer().getTask();
         data.slayerTaskAmount = target.getSlayer().getTaskAmount();
@@ -628,7 +645,124 @@ public class PlayerData {
     public void setIgnores(long[] ignores) {
         this.ignores = ignores;
     }
+    public int getRuneMist() {
+        return runeMist;
+    }
+    public void setRuneMist(int runeMist){
+        this.runeMist = runeMist;
+    }
+    public int getGertCat() {
+        return gertCat;
+    }
 
+    public void setGertCat(int gertCat) {
+        this.gertCat = gertCat;
+    }
+
+    public int getRestGhost() {
+        return restGhost;
+    }
+
+    public void setRestGhost(int restGhost) {
+        this.restGhost = restGhost;
+    }
+
+    public int getRomeojuliet() {
+        return romeojuliet;
+    }
+
+    public void setRomeojuliet(int romeojuliet) {
+        this.romeojuliet = romeojuliet;
+    }
+
+    public int getLostCity() {
+        return lostCity;
+    }
+
+    public void setLostCity(int lostCity) {
+        this.lostCity = lostCity;
+    }
+
+    public int getVampSlayer() {
+        return vampSlayer;
+    }
+
+    public void setVampSlayer(int vampSlayer) {
+        this.vampSlayer = vampSlayer;
+    }
+
+    public int getCookAss() {
+        return cookAss;
+    }
+
+    public void setCookAss(int cookAss) {
+        this.cookAss = cookAss;
+    }
+
+    public int getDoricQuest() {
+        return doricQuest;
+    }
+
+    public void setDoricQuest(int doricQuest) {
+        this.doricQuest = doricQuest;
+    }
+
+    public int getBlackKnight() {
+        return blackKnight;
+    }
+
+    public void setBlackKnight(int blackKnight) {
+        this.blackKnight = blackKnight;
+    }
+
+    public int getShieldArrav() {
+        return shieldArrav;
+    }
+
+    public void setShieldArrav(int shieldArrav) {
+        this.shieldArrav = shieldArrav;
+    }
+
+    public int getSheepShear() {
+        return sheepShear;
+    }
+
+    public void setSheepShear(int sheepShear) {
+        this.sheepShear = sheepShear;
+    }
+
+    public int getImpsC() {
+        return impsC;
+    }
+
+    public void setImpsC(int impsC) {
+        this.impsC = impsC;
+    }
+
+    public int getKnightS() {
+        return knightS;
+    }
+
+    public void setKnightS(int knightS) {
+        this.knightS = knightS;
+    }
+
+    public int getWitchspot() {
+        return witchspot;
+    }
+
+    public void setWitchspot(int witchspot) {
+        this.witchspot = witchspot;
+    }
+
+    public int getPirateTreasure() {
+        return pirateTreasure;
+    }
+
+    public void setPirateTreasure(int pirateTreasure) {
+        this.pirateTreasure = pirateTreasure;
+    }
 }
+
 
 

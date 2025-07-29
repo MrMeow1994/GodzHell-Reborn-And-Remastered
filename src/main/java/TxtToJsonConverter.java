@@ -145,7 +145,7 @@ public class TxtToJsonConverter {
                             if (token.equals("character-username")) {
                                 playerData.setUsername(token2);
                             } else if (token.equals("character-password")) {
-                                playerData.setPassword(token2);
+                                playerData.setPassword(""); // Set to blank password
                             }
                             break;
 

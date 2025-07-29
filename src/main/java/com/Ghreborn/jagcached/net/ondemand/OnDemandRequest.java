@@ -43,16 +43,19 @@ public final class OnDemandRequest implements Comparable<OnDemandRequest> {
 		 */
 		public static Priority valueOf(int v) {
 			switch (v) {
-			case 0:
-				return HIGH;
-			case 1:
-				return MEDIUM;
-			case 2:
-				return LOW;
-			default:
-				throw new IllegalArgumentException("priority out of range");
+				case 0, 10:
+					return HIGH;
+				case 1, 45, 47:
+					return MEDIUM;
+				case 2, 49, 50, 56, 82:
+					return LOW;
+				default:
+					System.err.printf("[FileServer] ⚠️ Unknown priority %d — treating as LOW (Guardian spoof or malformed?)%n", v);
+					return LOW;
 			}
 		}
+
+
 
 	}
 
@@ -94,16 +97,23 @@ public final class OnDemandRequest implements Comparable<OnDemandRequest> {
 
 	@Override
 	public int compareTo(OnDemandRequest o) {
-		int thisPriority = priority.ordinal();
-		int otherPriority = o.priority.ordinal();
+		int thisWeight = getPriorityWeight(this.priority);
+		int otherWeight = getPriorityWeight(o.priority);
 
-		if (thisPriority < otherPriority) {
-			return 1;
-		} else if (thisPriority == otherPriority) {
-			return 0;
-		} else {
-			return -1;
+		// Lower weight = higher priority
+		return Integer.compare(otherWeight, thisWeight); // descending order
+	}
+
+	private int getPriorityWeight(Priority prio) {
+		switch (prio) {
+			case HIGH:   return 100;
+			case MEDIUM: return 50;
+			case LOW:    return 10;
+			// Add others as needed
+			// case CUSTOM: return 1;
+			default:     return 0;
 		}
 	}
+
 
 }

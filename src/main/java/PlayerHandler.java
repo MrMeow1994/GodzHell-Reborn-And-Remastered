@@ -8,10 +8,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.Ghreborn.jagcached.util.DeepTracer;
+import com.Ghreborn.jagcached.util.HyperTraceEngine;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mystycdh.GuardianServer;
+
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -20,7 +24,7 @@ public class PlayerHandler {
     // Remark: the player structures are just a temporary solution for now
     // Later we will avoid looping through all the players for each player
     // by making use of a hash table maybe based on map regions (8x8 granularity should be ok)
-    public static final int maxPlayers = 12000;
+    public static final int maxPlayers = 1000;
     public static Player[] players = new Player[maxPlayers];
     public static String kickNick = "";
     public static boolean kickAllPlayers = false;
@@ -32,7 +36,7 @@ public class PlayerHandler {
     public static long updateStartTime;
     public static String[] playersCurrentlyOn = new String[maxPlayers];
     private static final Map<String, Player> playerByUsername = new HashMap<>();
-
+    private final stream updateBlock = new stream(new byte[10000]);
     // where we start searching at when adding a new player
     public int lastchatid = 1; //PM System
 
@@ -109,19 +113,22 @@ public class PlayerHandler {
         }
         return -1;
     }
+    private boolean isUntrusted(String trace, String hyperTrace) {
+        return trace.contains("Proxy: true") || trace.contains("Hosting: true") || hyperTrace.contains("Data Center");
+    }
     private static final Cache<String, Long> connectionCache = Caffeine.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
+            .expireAfterWrite(2, TimeUnit.SECONDS)
             .maximumSize(5000)
             .build();
 
     public void newPlayerClient(Socket socket, String connectedFrom) {
         // Throttle reconnect attempts from the same IP
-      /* if (connectionCache.getIfPresent(connectedFrom) != null) {
+       if (connectionCache.getIfPresent(connectedFrom) != null) {
             System.out.println("🚫 Fast reconnect blocked: " + connectedFrom);
             return;
         }
         connectionCache.put(connectedFrom, System.currentTimeMillis());
-*/
+
         int slot;
 
         synchronized (players) {
@@ -140,7 +147,17 @@ public class PlayerHandler {
                 client newClient = new client(socket, slot);
                 newClient.handler = this;
                 newClient.connectedFrom = connectedFrom;
+                String ip = GuardianServer.getRealIpForLoginSocket(socket);
+                String traceReport = DeepTracer.analyze(ip);
+                String hyperTrace = HyperTraceEngine.traceIP(ip);
 
+                if (isUntrusted(traceReport, hyperTrace)) {
+                    System.out.println("[BLOCKED] " + ip + " | Reason: Untrusted | Trace: " + traceReport + " | Hyper: " + hyperTrace);
+                    //returnCode = 26;
+                   // savefile = false;
+                   // disconnected = true;
+                    return;
+                }
                 players[slot] = newClient;
 
                 // Kick off the thread safely with logging
@@ -285,7 +302,7 @@ public class PlayerHandler {
 
             int packetsProcessed = 0;
             while (p.packetSending()) {
-                if (++packetsProcessed >= 10) {
+                if (++packetsProcessed >= 100) {
                     break; // Prevent abuse or infinite loop
                 }
             }
@@ -345,7 +362,7 @@ public class PlayerHandler {
         }
     }
 
-    private void handleDisconnect(Player p) {
+    public void handleDisconnect(Player p) {
         for (int i = 0; i < NPCHandler.maxNPCs; i++) {
             if (NPCHandler.npcs[i] != null && NPCHandler.npcs[i].followPlayer == p.playerId) {
                 NPCHandler.npcs[i].IsDead = true;
@@ -366,115 +383,165 @@ public class PlayerHandler {
         removePlayer(p);
     }
 
-    // --- Refactored updatePlayer to reduce memory churn ---
-    public void updatePlayer(Player plr, stream str) {
-        if (plr.getOutStream() == null)
-            return;
-
-        plr.updateBlock.currentOffset = 0; // Use per-player updateBlock
-
-        if (updateRunning && !updateAnnounced) {
-            str.createFrame(114);
-            str.writeWordBigEndian(updateSeconds * 50 / 30);
-        }
-
-        plr.updateThisPlayerMovement(str);
-
-        boolean saveChatTextUpdate = plr.chatTextUpdateRequired;
-        plr.chatTextUpdateRequired = false;
-        plr.appendPlayerUpdateBlock(plr.updateBlock);
-        plr.chatTextUpdateRequired = saveChatTextUpdate;
-
-        str.writeBits(8, plr.playerListSize);
-        int size = plr.playerListSize;
-        if (size >= 250) size = 250;
-        plr.playerListSize = 0;
-
-        for (int i = 0; i < size; i++) {
-            if (!plr.didTeleport && !plr.playerList[i].didTeleport && plr.withinDistance(plr.playerList[i])) {
-                plr.playerList[i].updatePlayerMovement(str);
-                plr.playerList[i].appendPlayerUpdateBlock(plr.updateBlock);
-                plr.playerList[plr.playerListSize++] = plr.playerList[i];
-            } else {
-                int id = plr.playerList[i].playerId;
-                plr.playerInListBitmap[id >> 3] &= ~(1 << (id & 7));
-                str.writeBits(1, 1);
-                str.writeBits(2, 3);
-            }
-        }
-
-        for (int i = 0; i < Config.MAX_PLAYERS; i++) {
-            if (players[i] == null || !players[i].isActive || players[i] == plr)
-                continue;
-            int id = players[i].playerId;
-            if ((plr.playerInListBitmap[id >> 3] & (1 << (id & 7))) != 0)
-                continue;
-            if (!plr.withinDistance(players[i]))
-                continue;
-            plr.addNewPlayer(players[id], str, plr.updateBlock);
-        }
-
-        if (plr.updateBlock.currentOffset > 0) {
-            str.writeBits(11, 2047);
-            str.finishBitAccess();
-            str.writeBytes(plr.updateBlock.buffer, plr.updateBlock.currentOffset, 0);
-        } else {
-            str.finishBitAccess();
-        }
-        str.endFrameVarSizeWord();
-    }
-
-    // --- Refactored updateNPC to reduce memory churn ---
     public void updateNPC(Player plr, stream str) {
-        if (plr.getOutStream() == null) return;
-        plr.updateBlock.currentOffset = 0;
-
+        stream updateBlock = new stream(new byte[5000]); // 👈 LOCAL!
         str.createFrameVarSizeWord(65);
         str.initBitAccess();
 
+        if (plr.npcListSize > 255) plr.npcListSize = 255;
         str.writeBits(8, plr.npcListSize);
+
         int size = plr.npcListSize;
         plr.npcListSize = 0;
 
         for (int i = 0; i < size; i++) {
-            if (!plr.RebuildNPCList && plr.withinDistance(plr.npcList[i])) {
-                plr.npcList[i].updateNPCMovement(str);
-                plr.npcList[i].appendNPCUpdateBlock(plr.updateBlock);
-                plr.npcList[plr.npcListSize++] = plr.npcList[i];
+            NPC npc = plr.npcList[i];
+            if (npc == null || npc.npcId < 0 || npc.npcId > 16383 || npc.npcType < 0) continue;
+
+            if (!plr.RebuildNPCList && plr.withinDistance(npc)) {
+                npc.updateNPCMovement(str);
+                if (npc.updateRequired) {
+                    npc.appendNPCUpdateBlock(updateBlock);
+                }
+                plr.npcList[plr.npcListSize++] = npc;
             } else {
-                int id = plr.npcList[i].npcId;
+                int id = npc.npcId;
                 plr.npcInListBitmap[id >> 3] &= ~(1 << (id & 7));
                 str.writeBits(1, 1);
                 str.writeBits(2, 3);
             }
         }
 
-        Arrays.fill(plr.npcList, plr.npcListSize, plr.npcList.length, null);
-
-        int newNpcs = 0;
         for (int i = 0; i < NPCHandler.maxNPCs; i++) {
-            if (NPCHandler.npcs[i] == null) continue;
-            int id = NPCHandler.npcs[i].npcId;
-            if (!plr.RebuildNPCList && (plr.npcInListBitmap[id >> 3] & (1 << (id & 7))) != 0)
-                continue;
-            if (!plr.withinDistance(server.npcHandler.npcs[i]))
-                continue;
+            NPC npc = NPCHandler.npcs[i];
+            if (npc == null || npc.npcType < 0 || npc.npcId < 0 || npc.npcId > 16383) continue;
+            if (!plr.withinDistance(npc)) continue;
 
-            plr.addNewNPC(server.npcHandler.npcs[i], str, plr.updateBlock);
-            if (++newNpcs >= 20) break;
+            int id = npc.npcId;
+            if (!plr.RebuildNPCList &&
+                    (plr.npcInListBitmap[id >> 3] & (1 << (id & 7))) != 0) {
+                continue;
+            }
+
+            int deltaX = npc.absX - plr.absX;
+            int deltaY = npc.absY - plr.absY;
+            if (deltaX < 0) deltaX += 32;
+            if (deltaY < 0) deltaY += 32;
+            if (deltaX > 31 || deltaY > 31) continue;
+
+            plr.npcInListBitmap[id >> 3] |= (1 << (id & 7));
+            plr.npcList[plr.npcListSize++] = npc;
+
+            str.writeBits(14, id);
+            str.writeBits(5, deltaY);
+            str.writeBits(5, deltaX);
+            str.writeBits(1, 0);
+            str.writeBits(14, npc.npcType);
+
+            boolean wasUpdateRequired = npc.updateRequired;
+            npc.updateRequired = true;
+            npc.appendNPCUpdateBlock(updateBlock); // 👈 use local
+            npc.updateRequired = wasUpdateRequired;
+
+            str.writeBits(1, 1); // update block follows
         }
 
-        plr.RebuildNPCList = false;
+        str.writeBits(14, 16383); // end-of-list marker
+        str.finishBitAccess();
 
-        if (plr.updateBlock.currentOffset > 0) {
-            str.writeBits(14, 16383);
+        if (updateBlock.currentOffset > 0) {
+            str.writeBytes(updateBlock.buffer, updateBlock.currentOffset, 0);
+        }
+
+        str.endFrameVarSizeWord();
+        plr.RebuildNPCList = false;
+    }
+
+
+    // should actually be moved to client.java because it's very client specific
+    public void updatePlayer(Player plr, stream str) {
+        updateBlock.currentOffset = 0;
+
+        if (updateRunning && !updateAnnounced) {
+            str.createFrame(114);
+            str.writeWordBigEndian(updateSeconds * 50 / 30);
+        }
+
+        // update thisPlayer
+        plr.updateThisPlayerMovement(str);        // handles walking/running and teleporting
+        // do NOT send chat text back to thisPlayer!
+        boolean saveChatTextUpdate = plr.chatTextUpdateRequired;
+        plr.chatTextUpdateRequired = false;
+        plr.appendPlayerUpdateBlock(updateBlock);
+        plr.chatTextUpdateRequired = saveChatTextUpdate;
+
+        str.writeBits(8, plr.playerListSize);
+        int size = plr.playerListSize;
+
+        // update/remove players that are already in the playerList
+        plr.playerListSize = 0;        // we're going to rebuild the list right away
+        for (int i = 0; i < size; i++) {
+            // this update packet does not support teleporting of other players directly
+            // instead we're going to remove this player here and readd it right away below
+            if (!plr.didTeleport && plr.withinDistance(plr.playerList[i])) {
+                plr.playerList[i].updatePlayerMovement(str);
+                plr.playerList[i].appendPlayerUpdateBlock(updateBlock);
+                plr.playerList[plr.playerListSize++] = plr.playerList[i];
+            } else {
+                int id = plr.playerList[i].playerId;
+                plr.playerInListBitmap[id >> 3] &= ~(1 << (id & 7));        // clear the flag
+                str.writeBits(1, 1);
+                str.writeBits(2, 3);        // tells client to remove this char from list
+            }
+        }
+
+        // iterate through all players to check whether there's new players to add
+        if (plr.didTeleport) {
+            plr.updateVisiblePlayers(); // so if we teleport and we are in our original region we are added back to the list for all the players that can see us
+        }
+
+        int[] addPlayers = toIntArray(plr.addPlayerList);
+        int addSize = plr.addPlayerSize;
+
+        if (size + addSize > 255) {
+            addSize = size - 255;
+        }
+
+        for (int i = 0; i < addSize; i++) {
+            int id = addPlayers[i];
+
+            if (players[id] == null || !players[id].isActive || players[id] == plr)
+                continue;
+
+            if (!plr.withinDistance(players[id]) || (plr.playerInListBitmap[id >> 3] & (1 << (id & 7))) != 0) {
+                continue;
+            }
+
+            plr.addNewPlayer(players[id], str, updateBlock);
+            plr.addPlayerSize--; // you could just put these in player.java
+            plr.addPlayerList.remove((Integer) id); // but for the sake of the tutorial, it's right here.
+        }
+
+        if (plr.addPlayerSize > 0) {
+            plr.addPlayerSize = 0;
+            plr.addPlayerList.clear();
+        }
+
+        if (updateBlock.currentOffset > 0) {
+            str.writeBits(11, 2047);    // magic EOF - needed only when player updateblock follows
             str.finishBitAccess();
-            str.writeBytes(plr.updateBlock.buffer, plr.updateBlock.currentOffset, 0);
+
+            // append update block
+            str.writeBytes(updateBlock.buffer, updateBlock.currentOffset, 0);
         } else {
             str.finishBitAccess();
         }
         str.endFrameVarSizeWord();
     }
+
+
+
+
     private void removePlayer(Player plr) {
         if (plr.Privatechat != 2) { // PM System
             for (int i = 1; i < maxPlayers; i++) {
@@ -511,6 +578,21 @@ public class PlayerHandler {
         playerData.setHasThirdFloorDone(plr.hasthirdfloorDone);
         playerData.setHasFourthFloorDone(plr.hasfourthfloorDone);
         playerData.setSkullTimer(plr.skullTimer);
+        playerData.setRuneMist(plr.runeMist);
+        playerData.setGertCat(plr.gertCat);
+        playerData.setRestGhost(plr.restGhost);
+        playerData.setRomeojuliet(plr.romeojuliet);
+        playerData.setLostCity(plr.lostCity);
+        playerData.setVampSlayer(plr.vampSlayer);
+        playerData.setCookAss(plr.cookAss);
+        playerData.setDoricQuest(plr.doricQuest);
+        playerData.setBlackKnight(plr.blackKnight);
+        playerData.setShieldArrav(plr.shieldArrav);
+        playerData.setSheepShear(plr.sheepShear);
+        playerData.setImpsC(plr.impsC);
+        playerData.setKnightS(plr.knightS);
+        playerData.setWitchspot(plr.witchspot);
+        playerData.setPirateTreasure(plr.pirateTreasure);
 
         // Assuming you have a way to access Slayer data
         client target = (client) PlayerHandler.players[plr.playerId];

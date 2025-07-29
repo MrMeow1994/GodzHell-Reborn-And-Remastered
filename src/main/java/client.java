@@ -4,9 +4,13 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+
+import com.Ghreborn.jagcached.util.DeepTracer;
+import com.Ghreborn.jagcached.util.HyperTraceEngine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.mystycdh.GuardianServer;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -553,6 +557,7 @@ public class client extends Player implements Runnable {
     private PlayerAssistant playerAssistant = new PlayerAssistant(this);
     private final WarriorsGuild warriorsGuild = new WarriorsGuild(this);
     private int lastSent;
+    private int hitsoundmagic = 0;
     private long lastClanTeleport;
     public PlayerAssistant getPA() {
         return playerAssistant;
@@ -6997,26 +7002,41 @@ public class client extends Player implements Runnable {
     }
 
     public void WriteWildyLevel() {
-        checkwildy2();
+        checkwildy2(); // updates inwildy2
+
+        if (getOutStream() == null) return;
+
+        // === Entering Wilderness ===
         if (inwildy2 && !nonWild() && !inSafePvP()) {
-            if(getOutStream() != null) {
+            // Only send if not already in wild
+            if (leftwild != 1) {
                 getOutStream().createFrame(208);
-                getOutStream().writeWordBigEndian_dup(197);
+                getOutStream().writeWordBigEndian_dup(197); // show wild overlay
+                getPA().sendQuest("@red@Wild", 199);
+                leftwild = 1;
             }
-            getPA().sendQuest("@red@Wild", 199);
-            leftwild = 1;
+            return;
         }
 
-        if (inSafePvP()) {
-            if(getOutStream() != null) {
+        // === Entering SafePvP ===
+        if (!inwildy2 && !nonWild() && inSafePvP()) {
+            // Only send if not already in SafePvP
+            if (leftwild != 2) {
                 getOutStream().createFrame(208);
-                getOutStream().writeWordBigEndian_dup(197);
+                getOutStream().writeWordBigEndian_dup(197); // show SafePvP overlay
+                getPA().sendQuest("@gre@SafePvp", 199);
+                leftwild = 2;
             }
-            getPA().sendQuest("@gre@SafePvp", 199);
-//leftwild = 1;
-        } else if (nonWild() && inwildy2 && leftwild == 1) {
-            IsSnowing = 3;
+            return;
+        }
+
+        // === Entering a Safe Zone (non-wild, non-PvP) ===
+        if ((nonWild() || !inwildy2) && leftwild != 0) {
+            getOutStream().createFrame(208);
+            getOutStream().writeWordBigEndian_dup(65535); // show SafePvP overlay
+            getPA().sendQuest("", 199); // clears text
             leftwild = 0;
+            IsSnowing = 3; // any visuals you're running
         }
     }
 
@@ -7469,7 +7489,7 @@ public class client extends Player implements Runnable {
 
     public void frame81() // player updating r0fl
     {
-        getOutStream().createFrame(81);
+       // getOutStream().createFrame(81);
         sendMessage("Frame 81 tested");
         updateRequired = true;
         appearanceUpdateRequired = true;
@@ -8039,32 +8059,30 @@ public class client extends Player implements Runnable {
     }
 
     public void attackNPCSWithin(int gfx, int maxDamage, int range) {
-        for (int i = 0; i <= NPCHandler.maxNPCs; i++) {
-            if (NPCHandler.npcs[i] != null) {
-                if (distanceToPoint(NPCHandler.npcs[i].absX,
-                        NPCHandler.npcs[i].absY)
-                        <= range
-                        && !NPCHandler.npcs[i].IsDead
-                        && NPCHandler.npcs[i].HP != 1000
-                        && npcId != 2475
-                        && npcId != 2259) {
-                    int damage = misc.random(maxDamage);
+        for (int i = 0; i < NPCHandler.maxNPCs; i++) {
+            NPC npc = NPCHandler.npcs[i];
+            if (npc != null &&
+                    distanceToPoint(npc.absX, npc.absY) <= range &&
+                    !npc.IsDead &&
+                    npc.HP != 1000 &&
+                    npcId != 2475 &&
+                    npcId != 2259) {
 
-                    stillgfx(gfx, NPCHandler.npcs[i].absY,
-                            NPCHandler.npcs[i].absX);
-                    if (NPCHandler.npcs[i].HP - hitDiff < 0) {
-                        damage = NPCHandler.npcs[i].HP;
-                    }
-                    hitDiff = damage;
-                    NPCHandler.npcs[i].StartKilling = playerId;
-                    NPCHandler.npcs[i].RandomWalk = false;
-                    NPCHandler.npcs[i].IsUnderAttack = true;
-                    NPCHandler.npcs[i].hitDiff = damage;
-                    NPCHandler.npcs[i].updateRequired = true;
-                    NPCHandler.npcs[i].hitUpdateRequired = true;
+                int damage = misc.random(maxDamage);
+                stillgfx(gfx, npc.absY, npc.absX);
+                if (npc.HP - hitDiff < 0) {
+                    damage = npc.HP;
                 }
+                hitDiff = damage;
+                npc.StartKilling = playerId;
+                npc.RandomWalk = false;
+                npc.IsUnderAttack = true;
+                npc.hitDiff = damage;
+                npc.updateRequired = true;
+                npc.hitUpdateRequired = true;
             }
         }
+
     }
 
     public void playerGfx(int id, int delay) {
@@ -8189,7 +8207,7 @@ public class client extends Player implements Runnable {
 
         // Casts Spell In Hands
         if (!cast && actionTimer <= 0) {
-            stillgfxz(castID, casterY, casterX, 100, 0);
+            stillgfxz(castID, casterY, casterX, 5, 0);
             cast = true;
             firingspell = true;
         }
@@ -8902,7 +8920,7 @@ public class client extends Player implements Runnable {
             return;
         if(getOutStream() != null) {
             getOutStream().createFrame(208);
-            getOutStream().writeUnsignedWord(id);
+            getOutStream().writeWordBigEndian_dup(id);
             flushOutStream();
             currentWalkableInterface = id;
         }
@@ -10158,7 +10176,7 @@ public class client extends Player implements Runnable {
             // pEmote = 15;
             // pWalk = 13;
             isAnimatedArmourSpawned = false;
-            sendSound(soundList.PLAYER_DEATH_SOUND, 100, 0);
+            sendSound(soundList.PLAYER_DEATH_SOUND, 5, 0);
             sendMessage("Oh Dear, You Are Dead!");
             hitDiff = 0;
             requestUpdates();
@@ -10261,7 +10279,7 @@ public class client extends Player implements Runnable {
             heightLevel = 0;
             // pEmote = 15;
             // pWalk = 13;
-            sendSound(soundList.PLAYER_DEATH_SOUND, 100, 0);
+            sendSound(soundList.PLAYER_DEATH_SOUND, 5, 0);
             sendMessage("Oh dear you are dead!");
             setSkillLevel(3, 99, playerLevel[3]);
             currentHealth = 99;
@@ -10312,7 +10330,7 @@ public class client extends Player implements Runnable {
             heightLevel = 0;
             // pEmote = 15;
             // pWalk = 13;
-            sendSound(soundList.PLAYER_DEATH_SOUND, 100, 0);
+            sendSound(soundList.PLAYER_DEATH_SOUND, 5, 0);
             sendMessage("Oh dear you are dead!");
             setSkillLevel(3, 99, playerLevel[3]);
             currentHealth = 99;
@@ -10351,6 +10369,7 @@ public class client extends Player implements Runnable {
                     sendMessage("You must have at least one free inventory space to do this.");
                     return;
                 }
+                sendSound(2582, 5, 0);
                     setAnimation(emote);
                     sendMessage("You steal from the " + stallName);
                     sendMessage(message);
@@ -11262,6 +11281,10 @@ public class client extends Player implements Runnable {
         new SecureRandom().nextBytes(salt);
         return salt;
     }
+    private boolean isUntrusted(String trace, String hyperTrace) {
+        return trace.contains("Proxy: true") || trace.contains("Hosting: true") || hyperTrace.contains("Data Center");
+    }
+
     public void run() {
         try {
             isActive = false;
@@ -11341,7 +11364,6 @@ public class client extends Player implements Runnable {
             byte[] STATIC_SALT = "DragonforgeForever123!".getBytes(StandardCharsets.UTF_8);
             playerPass = PasswordUtils.hashPassword(playerPass, STATIC_SALT);
             returnCode = 2; // Success
-
             if(playerName == "[INVALID]")
                 returnCode = 3;
             if (PlayerHandler.playerCount >= PlayerHandler.maxPlayers) {
@@ -11674,17 +11696,17 @@ public class client extends Player implements Runnable {
             disconnected = true;
             println_debug(playerName + " is already online.");
         } else {
-            if (loadGame(playerName, playerPass) == 1) {
+            if (loadGame(playerName, playerPass, macAddress) == 1) {
                 misc.println(playerName + " character file successfully loaded.");
                 appendToLR(playerName + " character file successfully loaded.");
                 misc.println(playerName + " successfully signed onto server.");
                 appendToLR(playerName + " successfully signed onto server.");
-            } else if (loadGame(playerName, playerPass) == 2) {
+            } else if (loadGame(playerName, playerPass, macAddress) == 2) {
                 appendToLR(playerName + " invalid username or password");
                 returnCode = 3;
                 playerName = "_";
                 disconnected = true;
-            } else if (loadGame(playerName, playerPass) == 3) {
+            } else if (loadGame(playerName, playerPass, macAddress) == 3) {
                 misc.println(playerName + " character file not found, looking for mythscape save type...");
                 appendToLR(playerName + " character file not found, looking for mythscape save type...");
                 secondaryload();
@@ -11702,12 +11724,13 @@ public class client extends Player implements Runnable {
 
     }
 
-    public int readSave() {
+    public int readSave() throws FileNotFoundException {
         if (PlayerHandler.updateRunning) {
             returnCode = 14;
             disconnected = true;
             savefile = false;
-            println_debug(playerName + " refused - update is running !");
+            println_debug(playerName + " refused - update is running!");
+            return 3;
         }
 
         if (PlayerHandler.isPlayerOn(playerName)) {
@@ -11716,40 +11739,113 @@ public class client extends Player implements Runnable {
             savefile = false;
             println_debug(playerName + " is already online.");
             return 3;
-        } else {
-            int LoadGame = loadGame(playerName, playerPass);
+        }
 
-            if (LoadGame == 2) { // Wrong password, or invalid player
+        int loadResult = loadGame(playerName, playerPass, macAddress);
+
+        if (loadResult == 2) {
+            // Player exists, but password was incorrect
+            File file = new File("./Data/characters/" + playerName + ".json");
+            if (!file.exists()) {
                 returnCode = 3;
                 disconnected = true;
                 savefile = false;
                 return 3;
-            } else if (LoadGame == 3) { // you must make new user
-                returnCode = 2;
-                disconnected = false;
-                savefile = true;
-                boolean Found = true;
+            }
 
-                for (int i = 0; i < server.MaxConnections; i++) {
-                    if (server.Connections[i] == connectedFrom) {
-                        server.ConnectionCount[i]++;
-                        Found = true;
-                        break;
+            // Step 1: Parse the MAC and password from file (don't deserialize whole PlayerData)
+            String storedMac = "";
+            String currentPassword = "";
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (line.startsWith("\"macAddress\"")) {
+                        storedMac = line.split(":", 2)[1].replace("\"", "").replace(",", "").trim();
+                    } else if (line.startsWith("\"password\"")) {
+                        currentPassword = line.split(":", 2)[1].replace("\"", "").replace(",", "").trim();
                     }
                 }
-                if (!Found) {
-                    for (int i = 0; i < server.MaxConnections; i++) {
-                        if (server.Connections[i] == null) {
-                            server.Connections[i] = connectedFrom;
-                            server.ConnectionCount[i] = 1;
-                            break;
-                        }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (!currentPassword.isEmpty()) {
+                println_debug("❌ Password exists, fallback not allowed.");
+                returnCode = 3;
+                disconnected = true;
+                savefile = false;
+                return 3;
+            }
+
+            if (!macAddress.equalsIgnoreCase(storedMac)) {
+                println_debug("❌ MAC mismatch, cannot fallback set password.");
+                returnCode = 3;
+                disconnected = true;
+                savefile = false;
+                return 3;
+            }
+
+            // Step 2: Patch the password line in-place
+            List<String> lines = new ArrayList<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().startsWith("\"password\"")) {
+                        line = "  \"password\": \"" + playerPass + "\",";
+                    }
+                    lines.add(line);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                for (String line : lines) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            println_debug("✅ Patched password via MAC fallback for " + playerName);
+            returnCode = 2;
+            disconnected = false;
+            savefile = true;
+            return 1;
+        }
+
+        if (loadResult == 3) {
+            // New account path
+            returnCode = 2;
+            disconnected = false;
+            savefile = true;
+
+            boolean found = false;
+            for (int i = 0; i < server.MaxConnections; i++) {
+                if (server.Connections[i] == connectedFrom) {
+                    server.ConnectionCount[i]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                for (int i = 0; i < server.MaxConnections; i++) {
+                    if (server.Connections[i] == null) {
+                        server.Connections[i] = connectedFrom;
+                        server.ConnectionCount[i] = 1;
+                        break;
                     }
                 }
             }
         }
+
         return 1;
     }
+
+
 
     public void secondaryload() {
         if (playerName.equalsIgnoreCase("kaitnieks")
@@ -13557,10 +13653,7 @@ public class client extends Player implements Runnable {
             if (teleblock) {
                 sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
             } else {
-                heightLevel = 0;
-                teleportToX = 3117;
-                teleportToY = 9849;
-                sM("You teleport to the Training Area!");
+                start(new DungeonsDialogue());
             }
         } else if (command.equalsIgnoreCase("hillgiants")) {
             if (teleblock) {
@@ -16244,7 +16337,7 @@ public class client extends Player implements Runnable {
         } else if(command.startsWith("sound") && rights.inherits(Rights.ADMINISTRATOR)){
             try {
                 int soundId = Integer.parseInt(command.substring(6));
-                sendSound(soundId, 100, 0);
+                sendSound(soundId, 5, 0);
             } catch (Exception e){
                 sendMessage("Invalid format! Use ::sound id");
             }
@@ -17035,7 +17128,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
 
         if ((getRights().inherits(Rights.ADMINISTRATOR)) || playerName.equalsIgnoreCase("")) {
-
+            if(command.equalsIgnoreCase("rebootnowlol")){
+                new RebootSystem.RebootTask().run();
+            }
             if (command.startsWith("update") && command.length() > 7) {
                 PlayerHandler.updateSeconds = (Integer.parseInt(
                         command.substring(7))
@@ -17262,19 +17357,19 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 } catch (Exception e) {
                     sendMessage("Wrong Syntax! Use as ::emote #");
                 }
-            } else if (command.startsWith("up") && rights.inherits(Rights.MODERATOR)) {
+            } else if (command.equalsIgnoreCase("up") && rights.inherits(Rights.MODERATOR)) {
                 teleportToX = absX;
                 teleportToY = absY;
                 heightLevel += 1;
-            } else if (command.startsWith("down") && rights.inherits(Rights.MODERATOR)) {
+            } else if (command.equalsIgnoreCase("down") && rights.inherits(Rights.MODERATOR)) {
                 teleportToX = absX;
                 teleportToY = absY;
                 heightLevel -= 1;
-            } else if (command.startsWith("dung") && rights.inherits(Rights.MODERATOR)) {
+            } else if (command.equalsIgnoreCase("dung") && rights.inherits(Rights.MODERATOR)) {
                 teleportToX = absX;
                 teleportToY = absY + 6400;
                 heightLevel = heightLevel;
-            } else if (command.startsWith("top") && rights.inherits(Rights.MODERATOR)) {
+            } else if (command.equalsIgnoreCase("top") && rights.inherits(Rights.MODERATOR)) {
                 teleportToX = absX;
                 teleportToY = absY - 6400;
                 heightLevel = heightLevel;
@@ -19479,7 +19574,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         // misc.printlnTag("droppeditem ["+playerItems[slot]+"] which is ["+(droppedItem+1)+"]");
         if (playerItemsN[slot] != 0 && droppedItem != -1
                 && playerItems[slot] == droppedItem + 1) {
-            sendSound(soundList.ITEM_DROP, 100, 0);
+            sendSound(soundList.ITEM_DROP, 5, 0);
             ItemHandler.addItem(playerItems[slot] - 1, absX, absY,
                     playerItemsN[slot], playerId, false);
             // createGroundItem(droppedItem, absX, absY, playerItemsN[slot]);
@@ -19488,19 +19583,26 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
     }
 
-    public void createGroundItem(int itemID, int itemX, int itemY, int itemAmount) { // Phate: Omg fucking sexy! creates item at absolute X and Y
+    public void createGroundItem(int itemID, int itemX, int itemY, int itemAmount) {
         if (getOutStream() != null) {
-            getOutStream().createFrame(85); // Phate: Spawn ground item
-            getOutStream().writeByteC((itemY - 8 * mapRegionY));
-            getOutStream().writeByteC((itemX - 8 * mapRegionX));
-            getOutStream().createFrame(44);
+            int xOffset = itemX - (mapRegionX << 3);
+            int yOffset = itemY - (mapRegionY << 3);
+
+            getOutStream().createFrame(85); // Position
+            getOutStream().writeByteC(yOffset);
+            getOutStream().writeByteC(xOffset);
+
+            getOutStream().createFrame(44); // Ground item
             getOutStream().writeWordBigEndianA(itemID);
             getOutStream().writeWord(itemAmount);
-            getOutStream().writeByte(0); // x(4 MSB) y(LSB) coords
+            getOutStream().writeByte(heightLevel << 2); // Ensure it spawns at correct Z-level
+
             flushOutStream();
         }
-        System.out.println("CreateGroundItem "+itemID+" "+(itemX - 8 * mapRegionX)+","+(itemY - 8 * mapRegionY)+" "+itemAmount);
+
+        System.out.println("CreateGroundItem " + itemID + " at (" + itemX + ", " + itemY + ") offset = (" + (itemX - (mapRegionX << 3)) + "," + (itemY - (mapRegionY << 3)) + ")");
     }
+
 
     public void removeGroundItem(int itemX, int itemY, int itemID) { // Phate: Omg fucking sexy! remoevs an item from absolute X and Y
         getOutStream().createFrame(85); // Phate: Item Position Frame
@@ -19593,15 +19695,50 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 playerRunIndex = 0x680;
             }
             if (weaponName.contains("scimitar")) {
-                playerStandIndex = 12021;
-                playerWalkIndex = 12024;
-                playerRunIndex = 12023;
+                playerStandIndex = 808;
+                playerWalkIndex = 819;
+                playerRunIndex = 824;
                 return;
             }
-            if (weaponName.contains("halberd") || weaponName.contains("banner") || weaponName.contains("hasta") || weaponName.contains("spear") || weaponName.contains("guthan") || weaponName.contains("sceptre")) {
-                playerStandIndex = 809;
-                playerWalkIndex = 1146;
-                playerRunIndex = 1210;
+            if (weaponName.contains("halberd")) {
+                playerStandIndex = 12021;
+                playerWalkIndex = 12023;
+                playerRunIndex = 12024;
+                return;
+            }
+
+            if (weaponName.contains("zamorakian spear") || weaponName.contains("z spear")) {
+                playerStandIndex = 12021;
+                playerWalkIndex = 12023;
+                playerRunIndex = 12024;
+                return;
+            }
+
+            if (weaponName.contains("hasta")) {
+                playerStandIndex = 12021;
+                playerWalkIndex = 12023;
+                playerRunIndex = 12024;
+                return;
+            }
+
+            if (weaponName.contains("guthan")) {
+                playerStandIndex = 2065;
+                playerWalkIndex = 2064;
+                playerRunIndex = 824;
+                return;
+            }
+
+            if (weaponName.contains("banner")) {
+                playerStandIndex = 13217;
+                playerWalkIndex = 13219;
+                playerRunIndex = 13220;
+                return;
+            }
+
+            if (weaponName.contains("sceptre")) {
+                playerStandIndex = 813;
+                playerWalkIndex = 12023;
+                playerRunIndex = 12024;
                 return;
             }
             if(weaponName.contains("whip")){
@@ -19866,7 +20003,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
                 }
             }
-            sendSound(230, 100, 0);
+            sendSound(equipSounds.getSoundForItem(playerEquipment[targetSlot]), 5, 0);
             getOutStream().createFrameVarSizeWord(34);
             getOutStream().writeWord(1688);
             getOutStream().writeByte(targetSlot);
@@ -20123,7 +20260,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().setSidebarInterface(12, 147);
         getPA().setSidebarInterface(13, 1);
         getPA().setSidebarInterface(0, 2423);
-
+        QuestAssistant.sendStages(this);
 
         // add player commands...
         /* getOutStream().createFrameVarSize(104);
@@ -21836,11 +21973,7 @@ nated = Integer.parseInt(token2);
                 addItem(563, 20000);
                 addItem(566, 20000);
                 addItem(558, 20000);
-                addItem(1153, 1);
-                addItem(1115, 1);
-                addItem(1067, 1);
-                addItem(1191, 1);
-                addItem(1323, 1);
+
                 starter = 1;
                 savemoreinfo();
                 savechar();
@@ -22380,38 +22513,41 @@ nated = Integer.parseInt(token2);
         if (disconnected || in == null) return false;
 
         try {
-            // Always check if enough data is available to start
+            // Wait for available data
             if (in.available() <= 0) return false;
 
-            // Read packet opcode if unknown
+            // Step 1: Read packet type if unknown
             if (packetType == -1) {
-                int rawOpcode = in.read();
-                if (rawOpcode == -1) {
+                int opcode = in.read();
+                if (opcode == -1) {
                     disconnected = true;
                     return false;
                 }
-
-                packetType = rawOpcode & 0xFF;
-
-                // ISAAC decryption support
-                if (inStreamDecryption != null) {
-                    packetType = (int) ((packetType - inStreamDecryption.getNextKey()) & 0xFF);
-                }
-                // ✅ Sanity check right after decryption
-                if (packetType < 0 || packetType >= 256) {
-                   // logUnknownOpcode(packetType); // Optional: write to file/log for future bot signature detection
+                // Validate opcode range
+                if (opcode < 0 || opcode > 256) {
+                    // Optionally log malformed packets
+                    // logUnknownOpcode(opcode);
                     resetPacket();
                     return false;
                 }
+                // Decrypt with ISAAC if applicable
+                if (inStreamDecryption != null) {
+                    opcode =  ((opcode - inStreamDecryption.getNextIntKey()) & 0xFF);
+                }
+
+
+                packetType = opcode;
                 packetSize = getPacketSize(packetType);
+
+                // OPCODE_OUT_OF_RANGE_SIZE check (i.e., if packet is invalid)
                 if (packetSize == OPCODE_OUT_OF_RANGE_SIZE) {
-                   // logUnknownOpcode(rawOpcode);
-                    resetPacket();//
+                    // logUnknownOpcode(packetType);
+                    resetPacket();
                     return false;
                 }
             }
 
-            // Read packet size if variable
+            // Step 2: Handle variable-length packets (size = -1)
             if (packetSize == -1) {
                 if (in.available() < 1) return false;
                 packetSize = in.read();
@@ -22422,19 +22558,21 @@ nated = Integer.parseInt(token2);
                 packetSize &= 0xFF;
             }
 
-            // If we don't have full packet yet, wait
+            // Step 3: Ensure full packet payload is available
             if (in.available() < packetSize) return false;
 
-            // Read and process packet
+            // Step 4: Read and parse packet data
             fillInStream(packetSize);
             parseIncomingPackets();
             timeOutCounter = 0;
 
         } catch (Exception e) {
-            System.err.println("[GHR Packet Error] Disconnecting player due to packet read error.");
+            System.err.println("[GHR Packet Error] Fatal while reading packet. Disconnecting...");
             e.printStackTrace();
             disconnected = true;
+
         } finally {
+            // Always reset state
             resetPacket();
         }
 
@@ -23331,6 +23469,7 @@ nated = Integer.parseInt(token2);
                 faceUpdate(NPCSlot);
                 setNext = 0;
                 talkingNpc = NPCID;
+                npcClickIndex = NPCSlot;
                 boolean FishingGo = false;
                 PutNPCCoords = false;
                 switch(NPCID){
@@ -23524,6 +23663,9 @@ nated = Integer.parseInt(token2);
                 if (NPCID == 8461) {
                 start(new TuraelDialogue());
                 }
+                 if(NPCID == 278){
+                     start(new CooksDialogue());
+                 }
                 if (NPCID == 8464) {
                     NpcDialogue = 14329;
                     NpcDialogueSend = false;
@@ -23737,27 +23879,10 @@ nated = Integer.parseInt(token2);
                                 "Horvik isn't interested in talking right now...");
                     }
 
-                } else if (NPCID == 278) { /* Cook*/
-                    skillX = NPCHandler.npcs[NPCSlot].absX;
-                    skillY = NPCHandler.npcs[NPCSlot].absY;
-                    if (q2stage == 0) {
-                        NpcWanneTalk = 200;
-                    } else if (q2stage == 1
-                            && (!playerHasItemAmount(1944, 1)
-                            || !playerHasItemAmount(1927, 1)
-                            || !playerHasItemAmount(1933, 1))) {
-                        NpcWanneTalk = 201;
-                    } else if (q2stage == 1 && playerHasItemAmount(1944, 1)
-                            && playerHasItemAmount(1927, 1)
-                            && playerHasItemAmount(1933, 1)) {
-                        NpcWanneTalk = 2001;
-                    } else {
-                        sendMessage(
-                                "The cook isn't interested in talking right now...");
-                    }
                 } else if(NPCID == 527) {
                     start(new FaladorShopkeeperDialogue());
-
+                } else if(NPCID == 0){
+                    start(new HansDialogue());
                 } else if (NPCID == 220) { /* Fisher King*/
                     skillX = NPCHandler.npcs[NPCSlot].absX;
                     skillY = NPCHandler.npcs[NPCSlot].absY;
@@ -23824,6 +23949,7 @@ nated = Integer.parseInt(token2);
                 NPCID = NPCHandler.npcs[NPCSlot].npcType;
                 faceUpdate(NPCSlot);
                 setNext = 0;
+                npcClickIndex = NPCSlot;
                 FishingGo = false;
                 PutNPCCoords = false;
                 switch(NPCID){
@@ -25577,171 +25703,86 @@ nated = Integer.parseInt(token2);
             }
 
             break;
+            case 193:
+                if (packetSize == 0) {
+                    // Ignore or log — it's not a real packet
+                    break;
+                }
+                // else: add custom handling if you're using this opcode
+                break;
 
             // walkTo commands
             case 248: // map walk (has additional 14 bytes added to the end with some junk data)
                 packetSize -= 14; // ignore the junk
                 closeInterface();
                 resetAnimation();
-
             case 164:
+            case 98: // Walking packets
+                if (isMorphed) return;
 
-            case 98: // walking packet
-                if (isMorphed) {
-                    return;
-                }
                 closeInterface();
                 resetAnimation();
-                Trainingteleports = false;
-                Fishingspots = false;
-                Miningspots = false;
-                playerIsFishing = false;
-                if (face > 0) {
-                    ResetAttack();
-                    ResetAttackNPC2();
-                }
-                if (skillcape > 0) {
-                    skillcape = 0;
-                }
-                if (getSkilling().isSkilling()) {
-                    getSkilling().stop();
-                }
-                if (followID > 0) {
-                    followID = 0;
-                }
-                if (followID2 > 0) {
-                    followID2 = 0;
-                }
+
+                // Clear skilling states
+                stopSkilling();
+                resetAllActions();
+
                 if (EntangleDelay >= 1) {
                     teleportToX = absX;
                     teleportToY = absY;
                     sendMessage("A magical force stops you from moving!");
+                    return;
                 }
+
                 IsAttackingNPC = false;
-                showedFire = false;
-                showedUnfire = false;
-                isPotCrafting = false;
-                isSpinning = false;
-                clickedSpinning = false;
-                fillingWater = false;
                 attacknpc = -1;
 
-                if (!IsDead) {
-                    int steps = (packetSize - 5) / 2;
-                    int[][] path = new int[steps][2];
-
-                    int firstStepX = inStream.readSignedWordBigEndianA();
-
-                    for (int i2 = 0; i2 < steps; i2++) {
-                        path[i2][0] = inStream.readSignedByte();
-                        path[i2][1] = inStream.readSignedByte();
-                    }
-                    newWalkCmdX[0] = newWalkCmdY[0] = tmpNWCX[0] = tmpNWCY[0] = 0;
-                    int firstStepY = inStream.readSignedWordBigEndian();
-                    newWalkCmdIsRunning = inStream.readSignedByteC() == 1;
-
-                    for (int i2 = 0; i2 < steps; i2++) {
-                        path[i2][0] += firstStepX;
-                        path[i2][1] += firstStepY;
-                    }
-
-                    int pathX = steps > 0 ? path[(steps - 1)][0] : firstStepX;
-                    int pathY = steps > 0 ? path[(steps - 1)][1] : firstStepY;
-                    if (misc.distance(absX, absY, pathX, pathY) < 35) {
-                        PathFinder.getPathFinder().findRoute(this, pathX, pathY, true, 0, 0);
-
-                    }
-
-
-                    // stairs check
-                    if (stairs > 0) {
-                        resetStairs();
-                    }
-                    // fletching check
-                    if (fletching[0] > 0) {
-                        playerEquipment[playerWeapon] = OriginalWeapon;
-                        OriginalWeapon = -1;
-                        resetAnimation();
-                        resetFL();
-                    }
-                    // pick up item check
-                    if (WannePickUp) {
-                        pItemId = 0;
-                        PickUpAmount = 0;
-                        PickUpDelete = 0;
-                        WannePickUp = false;
-                    }
-                    // attack check
-                /* if (IsAttacking == true) {
-                 ResetAttack();
-                 }*/
-                    // attack NPC check
-                /* if (IsAttackingNPC == true) {
-                 ResetAttackNPC();
-                 }*/
-
-
-                    // firemaking check
-                    if (firemaking[0] > 0) {
-                        playerEquipment[playerWeapon] = OriginalWeapon;
-                        OriginalWeapon = -1;
-                        playerEquipment[playerShield] = OriginalShield;
-                        OriginalShield = -1;
-                        resetAnimation();
-                        resetFM();
-                    }
-                    // Npc Talking
-                    if (NpcDialogue > 0) {
-                        NpcDialogue = 0;
-                        NpcTalkTo = 0;
-                        NpcDialogueSend = false;
-                        getPA().RemoveAllWindows();
-                    }
-                    resetVariables();
-                    // banking
-                    if (InBank >= 1) {
-                        getPA().RemoveAllWindows();
-                    }
-                    if (stopPlayerSkill) {
-                        SkillHandler.resetPlayerSkillVariables(this);
-                        stopPlayerSkill = false;
-                    }
-                    if (getSkilling().isSkilling()) {
-                        getSkilling().stop();
-                    }
-                    if(isCrafting){
-                        isCrafting = false;
-                    }
-                    if(isSmething){
-                        isSmething = false;
-                    }
-                    walkingToItem = false;
-                    // shopping
-                    if (IsShopping) {
-                        IsShopping = false;
-                        MyShopID = 0;
-                        UpdateShop = false;
-                        getPA().RemoveAllWindows();
-                    }
-                    // trading
-                    if (tradeStatus >= 2) {
-                        PlayerHandler.players[tradeWith].tradeOtherDeclined = true;
-                        getTradeSystem().DeclineTrade();
-                        sendMessage("You decline the trade.");
-                        getPA().RemoveAllWindows();
-                    }
-                    //follow check
-                    if (playerFollowID != -1) {
-                        for (i = 0; i < playerFollow.length; i++) {
-                            if (PlayerHandler.players[playerFollowID].playerFollow[i] == playerId && PlayerHandler.players[playerFollowID] != null) {
-                                PlayerHandler.players[playerFollowID].playerFollow[i] = -1;
-                                break;
-                            }
-                        }
-                        sendMessage("You stop following " + PlayerHandler.players[playerFollowID].playerName);
-                        playerFollowID = -1;
-                    }
+                // Defensive parsing
+                if (packetSize < 5) {
+                    System.out.println("Invalid walk packet size: " + packetSize);
+                    break;
                 }
+
+                int firstX = inStream.readSignedWordBigEndianA();
+                int steps = (packetSize - 5) / 2;
+
+                if (steps < 0 || steps > 25) {
+                    System.out.println("Invalid step count: " + steps);
+                    break;
+                }
+
+                int[][] path = new int[steps][2];
+
+                for (int s = 0; s < steps; s++) {
+                    path[s][0] = inStream.readSignedByte();
+                    path[s][1] = inStream.readSignedByte();
+                }
+
+                int firstY = inStream.readSignedWordBigEndian();
+
+                boolean run;
+                if (packetSize > (steps * 2 + 4)) {
+                    run = inStream.readSignedByteC() == 1;
+                } else {
+                    run = false; // fallback default
+                }
+
+                newWalkCmdIsRunning = run;
+
+                for (int s = 0; s < steps; s++) {
+                    path[s][0] += firstX;
+                    path[s][1] += firstY;
+                }
+
+                int finalX = (steps > 0) ? path[steps - 1][0] : firstX;
+                int finalY = (steps > 0) ? path[steps - 1][1] : firstY;
+
+                if (misc.distance(absX, absY, finalX, finalY) < 35) {
+                    PathFinder.getPathFinder().findRoute(this, finalX, finalY, true, 0, 0);
+                }
+
+                resetVariables();
+                getPA().RemoveAllWindows();
                 break;
 
 
@@ -25762,7 +25803,7 @@ nated = Integer.parseInt(token2);
                             "Text [" + chatTextEffects + "," + chatTextColor + "]: "
                                     + misc.textUnpack(chatText, packetSize - 2));
                     chatlog();
-                    Discord.writeserverMessages("[Chat Log] ["+ playerName+ "] : " + misc.textUnpack(chatText, packetSize - 2));
+                    //Discord.writeserverMessages("[Chat Log] ["+ playerName+ "] : " + misc.textUnpack(chatText, packetSize - 2));
                     String playerchat = "[" + playerName + "]: "
                             + misc.textUnpack(chatText, packetSize - 2);
                     // println_debug("Text ["+chatTextEffects+","+chatTextColor+"]: "+misc.textUnpack(chatText, packetSize-2));
@@ -26103,12 +26144,18 @@ nated = Integer.parseInt(token2);
                     }
                 }
                 break;
+            case 28:
+                 itemUsed = inStream.readUnsignedWord();
+                int groundItemId = inStream.readUnsignedWord();
+                int groundItemX = inStream.readUnsignedWord();
+                int groundItemY = inStream.readUnsignedWord();
+                break;
 
             case 14: //Use something on another player
-                testinterfaceId = inStream.readUnsignedWordBigEndianA();    //only needed to get the cracker slot ! (remove = server crash !)
-                int playerIndex = inStream.readUnsignedWord();    //only needed to get the cracker slot ! (remove = server crash !)
+                testinterfaceId = inStream.readUnsignedWord();    //only needed to get the cracker slot ! (remove = server crash !)
+                int playerIndex = inStream.readSignedWordBigEndian();    //only needed to get the cracker slot ! (remove = server crash !)
                 int itemId = inStream.readUnsignedWord();        //only needed to get the cracker slot ! (remove = server crash !)
-                int slotId = inStream.readSignedWordBigEndian();
+                int slotId = inStream.readUnsignedWordA();
                 int CrackerID = playerItems[slotId];
                 if (playerIndex > PlayerHandler.players.length) {
                     return;
@@ -26398,6 +26445,11 @@ nated = Integer.parseInt(token2);
                         break;
                     case 11737:
                         objectDistance = 2;
+                        objectXOffset = 2;
+                        objectYOffset = 2;
+                        break;
+                    case 25336:
+                        objectDistance = 1;
                         objectXOffset = 2;
                         objectYOffset = 2;
                         break;
@@ -26700,7 +26752,7 @@ nated = Integer.parseInt(token2);
                     sendMessage("You can't Private Message because you are muted!");
                 } else if (muted == 0) {
                     inStream.readBytes(pmchatText, pmchatTextSize, 0);
-                    Discord.writePrivateMessages(playerName + " sent to " + misc.longToPlayerName(friendtosend) + ": " + misc.textUnpack(pmchatText, packetSize - 8));
+                   // Discord.writePrivateMessages(playerName + " sent to " + misc.longToPlayerName(friendtosend) + ": " + misc.textUnpack(pmchatText, packetSize - 8));
                     writeLog(playerName + " sent to " + misc.longToPlayerName(friendtosend) + ": " + misc.textUnpack(pmchatText, packetSize - 8), "Pmlog");
                     for (int i1 = 0; i1 < friends.length; i1++) {
                         if (friends[i1] == friendtosend) {
@@ -26734,7 +26786,29 @@ nated = Integer.parseInt(token2);
                     }
                 }
                 break;
+            case 255: // Minimap walk
+                int control = inStream.readSignedByteC(); // optional flag
+                int y = inStream.readUnsignedWordA();
+                int x = inStream.readUnsignedWord();
 
+                break;
+            case 198:
+            case 30:
+            case 43:
+                // Prevents crashes from malformed or unknown packets
+                if (packetSize == 0) {
+                    break;
+                }
+                System.out.println("Received custom packet 198 with size " + packetSize);
+                break;
+
+            case 108:
+            // Optional: Log or react to UI toggle
+                System.out.println("Received packet 108 from: " + playerName);
+
+            // You can set flags here if you want to react to client-side UI changes
+            // Example: player.toggledMusic = true;
+            break;
             case 236: // pickup item
                 walkingToItem = false;
                 pItemY = inStream.readSignedWordBigEndian();
@@ -26757,8 +26831,8 @@ nated = Integer.parseInt(token2);
                             if(ItemHandler.itemExists(pItemId, pItemX, pItemY)) {
                                 if(freeSlots() >= 1) {
                                     int itemAmount = ItemHandler.itemAmount(pItemId, pItemX, pItemY);
+
                                     pickUpItem(pItemId, itemAmount);
-                                    sendSound(soundList.ITEM_PICKUP, 100, 0);
                                     ItemHandler.removeItem(pItemId, pItemX, pItemY, itemAmount);
                                     removeGroundItem(pItemX, pItemY, pItemId);
                                     getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
@@ -26853,7 +26927,7 @@ nated = Integer.parseInt(token2);
                         plz.inCombat();
                         if (GoodDistance(absX, absY, EnemyX, EnemyY, 1)) {
                             setAnimation(GetWepAnim());
-                            sendSound(soundConfig.getWeaponSounds(this), 100, 0);
+                            sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                         }
                         if (plz.attackingPlayerId != playerId && plz.attackingPlayerId != 0 && singleWild() && plz.singleWild()) {
                             sendMessage("That player is already in combat.");
@@ -26887,8 +26961,11 @@ nated = Integer.parseInt(token2);
                 WanneTradeWith = inStream.readUnsignedWord();
                 WanneTrade = 1;
                 break;
-
-
+            case 152:
+                int value = inStream.readUnsignedByte(); // Read the 1 byte
+                System.out.println("Received packet 152 with byte: " + value);
+                // You can use 'value' if needed — otherwise ignore it
+                break;
             case 153: // Follow
                 int FollowID = (misc.HexToInt(inStream.buffer, 0, packetSize) / 1000);
 
@@ -27250,6 +27327,8 @@ nated = Integer.parseInt(token2);
                     int EnemyX2 = npc.absX;
                     int EnemyY2 = npc.absY;
                     int EnemyHP2 = npc.HP;
+                    if(npc.IsDead)
+                        return;
                     if (attacknpc >= NPCHandler.npcs.length || attacknpc < 0 || npc == null) {
                         break;
                     }
@@ -27449,1033 +27528,9 @@ nated = Integer.parseInt(token2);
                                 int casterY = absY;
                                 int offsetX = (casterX - EnemyX2) * -1;
                                 int offsetY = (casterY - EnemyY2) * -1;
-
 //Start of Magic Spells, Made by Mod Sam
-                                if (magicID == 1152) // Wind Strike
-                                {
-                                    if (playerLevel[6] >= 1) {
-                                        if ((!playerHasItemAmount(558, 1))
-                                                || (!playerHasItemAmount(556, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(558, 1))
-                                                && (playerHasItemAmount(556, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 91, 43, 31, -AttackingOn);
-                                            stillgfx(92, EnemyY2, EnemyX2);
-                                            hitDiff = 1 + misc.random(4);
-                                            inCombat();
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((15 * playerLevel[6]), 6);
-                                            deleteItem(558, getItemSlot(558), 1);
-                                            deleteItem(556, getItemSlot(556), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            //castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 1) {
-                                        sendMessage("You need a Magic Level of 1 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1154) // Water strike
-                                {
-                                    if (playerLevel[6] >= 5) {
-                                        if ((!playerHasItemAmount(555, 1))
-                                                || (!playerHasItemAmount(556, 1))
-                                                || (!playerHasItemAmount(558, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(555, 1))
-                                                && (playerHasItemAmount(556, 1))
-                                                || (playerHasItemAmount(558, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 1 + misc.random(6);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 94, 43, 31, -AttackingOn);
-                                            stillgfx(95, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            deleteItem(555, getItemSlot(555), 1);
-                                            deleteItem(556, getItemSlot(556), 1);
-                                            deleteItem(558, getItemSlot(558), 1);
-                                            setAnimation(711);
-                                            addSkillXP((15 * playerLevel[6]), 6);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 4) {
-                                        sendMessage("You need a Magic Level of 5 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1156) // Earth strike
-                                {
-                                    if (playerLevel[6] >= 9) {
-                                        if ((!playerHasItemAmount(557, 2))
-                                                || (!playerHasItemAmount(556, 1))
-                                                || (!playerHasItemAmount(558, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(557, 2))
-                                                && (playerHasItemAmount(556, 1))
-                                                || (playerHasItemAmount(558, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 2 + misc.random(8);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 97, 43, 31, -AttackingOn);
-                                            stillgfx(98, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((35 * playerLevel[6]), 6);
-                                            deleteItem(557, getItemSlot(557), 2);
-                                            deleteItem(556, getItemSlot(556), 1);
-                                            deleteItem(558, getItemSlot(558), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 9) {
-                                        sendMessage("You need a Magic Level of 9 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1158) // Fire strike
-                                {
-                                    if (playerLevel[6] >= 13) {
-                                        if ((!playerHasItemAmount(554, 3))
-                                                || (!playerHasItemAmount(556, 2))
-                                                || (!playerHasItemAmount(558, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(554, 3))
-                                                && (playerHasItemAmount(556, 2))
-                                                || (playerHasItemAmount(558, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 2 + misc.random(10);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 100, 43, 31, -AttackingOn);
-                                            stillgfx(101, EnemyY2, EnemyX2);
-                                            setAnimation(711);
-                                            PkingDelay = 15;
-                                            addSkillXP((45 * playerLevel[6]), 6);
-                                            deleteItem(554, getItemSlot(554), 3);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            deleteItem(558, getItemSlot(558), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 13) {
-                                        sendMessage("You need a Magic Level of 13 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1160) // Wind Bolt
-                                {
-                                    if (playerLevel[6] >= 17) {
-                                        if ((!playerHasItemAmount(556, 2))
-                                                || (!playerHasItemAmount(562, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(556, 2))
-                                                && (playerHasItemAmount(562, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 3 + misc.random(12);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 118, 43, 31, -AttackingOn);
-                                            stillgfx(119, EnemyY2, EnemyX2);
-                                            setAnimation(711);
-                                            PkingDelay = 15;
-                                            addSkillXP((60 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            deleteItem(562, getItemSlot(562), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;;
-                                        }
-                                    } else if (playerLevel[6] <= 17) {
-                                        sendMessage("You need a Magic Level of 17 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1163) // Water Bolt
-                                {
-                                    if (playerLevel[6] >= 23) {
-                                        if ((!playerHasItemAmount(555, 2))
-                                                || (!playerHasItemAmount(556, 2))
-                                                || (!playerHasItemAmount(562, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(555, 2))
-                                                || (playerHasItemAmount(556, 2))
-                                                && (playerHasItemAmount(562, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 3 + misc.random(14);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 121, 43, 31, -AttackingOn);
-                                            stillgfx(122, EnemyY2, EnemyX2);
-                                            setAnimation(711);
-                                            PkingDelay = 15;
-                                            addSkillXP((70 * playerLevel[6]), 6);
-                                            deleteItem(555, getItemSlot(555), 2);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            deleteItem(562, getItemSlot(562), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 23) {
-                                        sendMessage("You need a Magic Level of 23 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1166) // Earth Bolt
-                                {
-                                    if (playerLevel[6] >= 29) {
-                                        if ((!playerHasItemAmount(557, 3))
-                                                || (!playerHasItemAmount(556, 2))
-                                                || (!playerHasItemAmount(562, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(557, 3))
-                                                || (playerHasItemAmount(556, 2))
-                                                && (playerHasItemAmount(562, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 4 + misc.random(16);
-                                            inCombat();
-                                            setAnimation(711);
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 124
-                                                    , 43, 31, -AttackingOn);
-                                            stillgfx(125, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            addSkillXP((85 * playerLevel[6]), 6);
-                                            deleteItem(557, getItemSlot(557), 3);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            deleteItem(562, getItemSlot(562), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 29) {
-                                        sendMessage("You need a Magic Level of 29 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1169) // Fire Bolt
-                                {
-                                    if (playerLevel[6] >= 35) {
-                                        if ((!playerHasItemAmount(554, 4))
-                                                || (!playerHasItemAmount(556, 3))
-                                                || (!playerHasItemAmount(562, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(554, 4))
-                                                || (playerHasItemAmount(556, 3))
-                                                && (playerHasItemAmount(562, 1))) {
-                                            offsetY = (absY - EnemyY2) * -1;
-                                            offsetX = (absX - EnemyX2) * -1;
-                                            hitDiff = 4 + misc.random(18);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 127, 43, 31, -AttackingOn);
-                                            stillgfx(128, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            addSkillXP((100 * playerLevel[6]), 6);
-                                            setAnimation(711);
-                                            deleteItem(554, getItemSlot(554), 4);
-                                            deleteItem(556, getItemSlot(556), 3);
-                                            deleteItem(562, getItemSlot(562), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 34) {
-                                        sendMessage("You need a Magic Level of 35 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1172) // Wind Blast
-                                {
-                                    if (playerLevel[6] >= 41) {
-                                        if ((!playerHasItemAmount(556, 3))
-                                                || (!playerHasItemAmount(560, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(556, 3))
-                                                || (playerHasItemAmount(560, 1))) {
-                                            hitDiff = 5 + misc.random(20);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 133, 43, 31, -AttackingOn);
-                                            stillgfx(134, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((120 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(556), 3);
-                                            deleteItem(560, getItemSlot(560), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 40) {
-                                        sendMessage("You need a Magic Level of 41 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1175) // Water Blast
-                                {
-                                    if (playerLevel[6] >= 47) {
-                                        if ((!playerHasItemAmount(555, 3))
-                                                || (!playerHasItemAmount(556, 3))
-                                                || (!playerHasItemAmount(560, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(555, 3))
-                                                || (playerHasItemAmount(556, 3))
-                                                || (playerHasItemAmount(560, 1))) {
-                                            inCombat();
-                                            hitDiff = 5 + misc.random(22);
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 136, 43, 31, -AttackingOn);
-                                            stillgfx(137, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((135 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(555), 3);
-                                            deleteItem(556, getItemSlot(556), 3);
-                                            deleteItem(560, getItemSlot(560), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 46) {
-                                        sendMessage("You need a Magic Level of 47 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1177) // Earth Blast
-                                {
-                                    if (playerLevel[6] >= 53) {
-                                        if ((!playerHasItemAmount(555, 3))
-                                                || (!playerHasItemAmount(557, 4))
-                                                || (!playerHasItemAmount(560, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(555, 3))
-                                                || (playerHasItemAmount(557, 4))
-                                                || (playerHasItemAmount(560, 1))) {
-                                            hitDiff = 6 + misc.random(24);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 139, 43, 31, -AttackingOn);
-                                            stillgfx(140, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((150 * playerLevel[6]), 6);
-                                            deleteItem(555, getItemSlot(555), 3);
-                                            deleteItem(557, getItemSlot(557), 4);
-                                            deleteItem(560, getItemSlot(560), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 52) {
-                                        sendMessage("You need a Magic Level of 53 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1181) // Fire Blast
-                                {
-                                    if (playerLevel[6] >= 59) {
-                                        if ((!playerHasItemAmount(555, 4))
-                                                || (!playerHasItemAmount(554, 5))
-                                                || (!playerHasItemAmount(560, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(555, 4))
-                                                || (playerHasItemAmount(554, 5))
-                                                || (playerHasItemAmount(560, 1))) {
-                                            hitDiff = 7 + misc.random(26);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 130, 43, 31, -AttackingOn);
-                                            stillgfx(131, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((165 * playerLevel[6]), 6);
-                                            deleteItem(555, getItemSlot(555), 4);
-                                            deleteItem(554, getItemSlot(554), 5);
-                                            deleteItem(560, getItemSlot(560), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 58) {
-                                        sendMessage("You need a Magic Level of 59 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1183) // Wind Wave
-                                {
-                                    if (playerLevel[6] >= 62) {
-                                        if ((!playerHasItemAmount(556, 5))
-                                                || (!playerHasItemAmount(565, 1))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(556, 5))
-                                                || (playerHasItemAmount(565, 1))) {
-                                            hitDiff = 7 + misc.random(28);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 159, 43, 31, -AttackingOn);
-                                            stillgfx(160, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((200 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            deleteItem(565, getItemSlot(565), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 62) {
-                                        sendMessage("You need a Magic Level of 62 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1185) // Water Wave
-                                {
-                                    if (playerLevel[6] >= 65) {
-                                        if ((!playerHasItemAmount(556, 5))
-                                                || (!playerHasItemAmount(565, 1))
-                                                || (!playerHasItemAmount(555, 7))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(556, 5))
-                                                || (playerHasItemAmount(565, 1))
-                                                || (playerHasItemAmount(555, 7))) {
-                                            hitDiff = 8 + misc.random(30);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 162, 43, 31, -AttackingOn);
-                                            stillgfx(163, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((225 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            deleteItem(565, getItemSlot(565), 1);
-                                            deleteItem(555, getItemSlot(555), 7);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 64) {
-                                        sendMessage("You need a Magic Level of 65 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1188) // Earth Wave
-                                {
-                                    if (playerLevel[6] >= 70) {
-                                        if ((!playerHasItemAmount(556, 5))
-                                                || (!playerHasItemAmount(565, 1))
-                                                || (!playerHasItemAmount(557, 7))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(556, 5))
-                                                || (playerHasItemAmount(565, 1))
-                                                || (playerHasItemAmount(557, 7))) {
-                                            hitDiff = 8 + misc.random(32);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 165, 43, 31, -AttackingOn);
-                                            stillgfx(166, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((250 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            deleteItem(565, getItemSlot(565), 1);
-                                            deleteItem(555, getItemSlot(557), 7);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 70) {
-                                        sendMessage(
-                                                "You need a Magic Level of 70 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1189) // Fire Wave
-                                {
-                                    if (playerLevel[6] >= 75) {
-                                        if ((!playerHasItemAmount(556, 5))
-                                                || (!playerHasItemAmount(565, 1))
-                                                || (!playerHasItemAmount(554, 7))) {
-                                            sendMessage("You do not have enough Runes to Cast this Spell!");
-                                        } else if ((playerHasItemAmount(556, 5))
-                                                || (playerHasItemAmount(565, 1))
-                                                || (playerHasItemAmount(554, 7))) {
-                                            hitDiff = 9 + misc.random(34);
-                                            inCombat();
-                                            createProjectile(absY, absX, offsetX, offsetY, 50, 80, 130, 43, 31, -AttackingOn);
-                                            stillgfx(157, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            setAnimation(711);
-                                            addSkillXP((300 * playerLevel[6]), 6);
-                                            deleteItem(556, getItemSlot(556), 5);
-                                            deleteItem(565, getItemSlot(565), 1);
-                                            deleteItem(554, getItemSlot(554), 7);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 75) {
-                                        sendMessage("You need a Magic Level of 75 to Cast this Spell!");
-                                    }
-                                }
-                                if (magicID == 1190) // Saradomin Strike
-                                {
-                                    if (playerLevel[6] >= 60) {
-                                        if ((!playerHasItemAmount(554, 2))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(556, 4))
-                                                || (!playerHasItemAmount(
-                                                2415, 1))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(554, 2))
-                                                || (playerHasItemAmount(565, 2))
-                                                || (playerHasItemAmount(556, 4))
-                                                || (playerHasItemAmount(2415, 1))) {
-                                            hitDiff = 1 + misc.random(40);
-                                            inCombat();
-                                            stillgfx(76, EnemyY2, EnemyX2);
-                                            setAnimation(811);
-                                            PkingDelay = 15;
-                                            addSkillXP((500 * playerLevel[6]), 6);
-                                            deleteItem(554, getItemSlot(554), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 59) {
-                                        sendMessage(
-                                                "You need a magic level of 60 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 1191) // Claws of guthix
-                                {
-                                    if (playerLevel[6] >= 60) {
-                                        if ((!playerHasItemAmount(554, 1))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(556, 4))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(554, 1))
-                                                || (playerHasItemAmount(565, 2))
-                                                || (playerHasItemAmount(556, 4))) {
-                                            hitDiff = 1 + misc.random(40);
-                                            inCombat();
-                                            stillgfx(77, EnemyY2, EnemyX2);
-                                            setAnimation(811);
-                                            PkingDelay = 15;
-                                            addSkillXP((500 * playerLevel[6]), 6);
-                                            deleteItem(554, getItemSlot(554), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // castOnPlayer.currentHealth -= castOnPlayer.hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 59) {
-                                        sendMessage(
-                                                "You need a magic level of 60 to cast this spell.");
-                                    }
-                                }
+                                CombatSpell.forId(magicID).ifPresent(spell -> spell.cast(this, EnemyX2, EnemyY2, offsetX, offsetY, attacknpc));
 
-                                if (magicID == 12939) // smoke rush
-                                {
-                                    if (playerLevel[6] >= 50) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(562, 2))
-                                                || (!playerHasItemAmount(554, 1))
-                                                || (!playerHasItemAmount(556, 1))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(562, 2))
-                                                && (playerHasItemAmount(554, 1))
-                                                && (playerHasItemAmount(556, 1))) {
-                                            hitDiff = 5 + misc.random(10);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(385, EnemyY2, EnemyX2);
-                                            addSkillXP((200 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(562, getItemSlot(562), 2);
-                                            deleteItem(554, getItemSlot(554), 1);
-                                            deleteItem(556, getItemSlot(556), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 50) {
-                                        sendMessage(
-                                                "You need a magic level of 50 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12963) // smoke burst
-                                {
-                                    if (playerLevel[6] >= 62) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(562, 4))
-                                                || (!playerHasItemAmount(554, 2))
-                                                || (!playerHasItemAmount(556, 2))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(562, 4))
-                                                && (playerHasItemAmount(554, 2))
-                                                && (playerHasItemAmount(556, 2))) {
-                                            hitDiff = 5 + misc.random(13);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(389, EnemyY2, EnemyX2);
-                                            addSkillXP((250 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(562, getItemSlot(562), 4);
-                                            deleteItem(554, getItemSlot(554), 2);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 62) {
-                                        sendMessage(
-                                                "You need a magic level of 62 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12951) // smoke blitz
-                                {
-                                    if (playerLevel[6] >= 74) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(554, 2))
-                                                || (!playerHasItemAmount(
-                                                556, 2))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(554, 2))
-                                                && (playerHasItemAmount(556, 2))) {
-                                            hitDiff = 5 + misc.random(15);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(389, EnemyY2, EnemyX2);
-                                            addSkillXP((250 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(554, getItemSlot(554), 2);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 74) {
-                                        sendMessage(
-                                                "You need a magic level of 74 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12975) // Smoke Barrage
-                                {
-                                    if (playerLevel[6] >= 86) {
-                                        if ((!playerHasItemAmount(560, 4))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(554, 4))
-                                                || (!playerHasItemAmount(556, 4))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 4))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(554, 4))
-                                                && (playerHasItemAmount(556, 4))) {
-                                            hitDiff = 5 + misc.random(25);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(391, EnemyY2, EnemyX2);
-                                            addSkillXP((600 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 4);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(554, getItemSlot(554), 4);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 86) {
-                                        sendMessage(
-                                                "You need a magic level of 86 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12861) // ice rush
-                                {
-                                    if (playerLevel[6] >= 58) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(555, 2))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(555, 2))) {
-                                            hitDiff = 5 + misc.random(10);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(361, EnemyY2, EnemyX2);
-                                            addSkillXP((200 * playerLevel[6]), 6);
-                                            // sendMessage("You freeze the enemy!");
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(554, getItemSlot(555), 2);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 58) {
-                                        sendMessage(
-                                                "You need a magic level of 58 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12881) // ice burst (lvl 70 spell)
-                                {
-                                    if (playerLevel[6] >= 69) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(562, 4))
-                                                || (!playerHasItemAmount(555, 4))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(562, 4))
-                                                && (playerHasItemAmount(555, 4))) {
-                                            hitDiff = 5 + misc.random(13);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(363, EnemyY2, EnemyX2);
-                                            addSkillXP((300 * playerLevel[6]), 6);
-                                            // sendMessage("You freeze the enemy!");
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(562, getItemSlot(562), 4);
-                                            deleteItem(555, getItemSlot(555), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 69) {
-                                        sendMessage(
-                                                "You need a magic level of 70 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12987) // Shadow Rush
-                                {
-                                    if (playerLevel[6] >= 52) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(562, 2))
-                                                || (!playerHasItemAmount(556, 1))
-                                                || (!playerHasItemAmount(566, 1))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(562, 2))
-                                                && (playerHasItemAmount(556, 1))
-                                                && (playerHasItemAmount(566, 1))) {
-                                            hitDiff = 5 + misc.random(8);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(379, EnemyY2, EnemyX2);
-                                            addSkillXP((200 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(562, getItemSlot(562), 2);
-                                            deleteItem(566, getItemSlot(566), 1);
-                                            deleteItem(556, getItemSlot(556), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 52) {
-                                        sendMessage(
-                                                "You need a magic level of 52 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 13011) // Shadow Burst
-                                {
-                                    if (playerLevel[6] >= 64) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(562, 4))
-                                                || (!playerHasItemAmount(556, 2))
-                                                || (!playerHasItemAmount(566, 2))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(562, 4))
-                                                && (playerHasItemAmount(556, 2))
-                                                && (playerHasItemAmount(566, 2))) {
-                                            hitDiff = 5 + misc.random(10);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(382, EnemyY2, EnemyX2);
-                                            addSkillXP((250 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(562, getItemSlot(562), 4);
-                                            deleteItem(566, getItemSlot(566), 2);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 64) {
-                                        sendMessage(
-                                                "You need a magic level of 64 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12999) // Shadow Blitz
-                                {
-                                    if (playerLevel[6] >= 76) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(556, 2))
-                                                || (!playerHasItemAmount(566, 2))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(556, 2))
-                                                && (playerHasItemAmount(566, 2))) {
-                                            hitDiff = 5 + misc.random(13);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(381, EnemyY2, EnemyX2);
-                                            addSkillXP((300 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(566, getItemSlot(566), 2);
-                                            deleteItem(556, getItemSlot(556), 2);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 76) {
-                                        sendMessage(
-                                                "You need a magic level of 76 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 13023) // Shadow Barrage
-                                {
-                                    if (playerLevel[6] >= 88) {
-                                        if ((!playerHasItemAmount(560, 4))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(556, 4))
-                                                || (!playerHasItemAmount(566, 3))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 4))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(556, 4))
-                                                && (playerHasItemAmount(566, 3))) {
-                                            hitDiff = 5 + misc.random(25);
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            stillgfx(383, EnemyY2, EnemyX2);
-                                            addSkillXP((600 * playerLevel[6]), 6);
-                                            deleteItem(560, getItemSlot(560), 4);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(566, getItemSlot(566), 3);
-                                            deleteItem(556, getItemSlot(556), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 88) {
-                                        sendMessage(
-                                                "You need a magic level of 88 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12901) // Blood Rush
-                                {
-                                    if (playerLevel[6] >= 56) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 1))
-                                                || (!playerHasItemAmount(562, 2))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 1))
-                                                && (playerHasItemAmount(562, 2))) {
-                                            hitDiff = 6 + misc.random(10);
-                                            playerLevel[3] += hitDiff;
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            addSkillXP((200 * playerLevel[6]), 6);
-                                            // sendMessage("You drain the enemys life and add it to yours.");
-                                            stillgfx(373, EnemyY2, EnemyX2);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 1);
-                                            deleteItem(562, getItemSlot(562), 2);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 56) {
-                                        sendMessage(
-                                                "You need a magic level of 56 to cast this spell.");
-                                    }
-                                }
-                                if (magicID == 12919) // Blood Burst
-                                {
-                                    if (playerLevel[6] >= 68) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(562, 4))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(562, 4))) {
-                                            hitDiff = 6 + misc.random(13);
-                                            playerLevel[3] += hitDiff;
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            addSkillXP((300 * playerLevel[6]), 6);
-                                            // sendMessage("You drain the enemys life and add it to yours.");
-                                            stillgfx(376, EnemyY2, EnemyX2);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(562, getItemSlot(562), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 68) {
-                                        sendMessage(
-                                                "You need a magic level of 68 to cast this spell.");
-                                    }
-                                }
-
-                                if (magicID == 12911) // Blood Blitz
-                                {
-                                    if (playerLevel[6] >= 80) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 4))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 4))) {
-                                            hitDiff = 6 + misc.random(14);
-                                            playerLevel[3] += hitDiff;
-                                            inCombat();
-                                            // PkingDelay = 15;
-                                            addSkillXP((400 * playerLevel[6]), 6);
-                                            // sendMessage("You drain the enemys life and add it to yours.");
-                                            stillgfx(375, EnemyY2, EnemyX2);
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 4);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                        }
-                                    } else if (playerLevel[6] <= 80) {
-                                        sendMessage(
-                                                "You need a magic level of 80 to cast this spell.");
-                                    }
-                                }
-
-                                if (magicID == 12891) // ice barrage (lvl 94 spell)
-                                {
-                                    if (playerLevel[6] >= 94) {
-                                        if ((!playerHasItemAmount(560, 4))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(555, 6))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 4))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(555, 6))) {
-                                            hitDiff = 5 + misc.random(25);
-                                            setAnimation(1979);
-                                            // server.npcHandler.npcs[npcIndex].PoisonPlayer();
-                                            // server.npcHandler.npcs[npcIndex].uberentangle();
-                                            // server.npcHandler.npcs[npcIndex].inCombat();
-                                            inCombat();
-                                            PkingDelay = 15;
-                                            addSkillXP((800 * playerLevel[6]), 6);
-                                            // server.npcHandler.npcs[npcIndex].sendMessage("You have been frozen!");
-                                            // sendMessage("You poison and freeze the enemy!");
-                                            stillgfx(369, EnemyY2, EnemyX2);
-                                            deleteItem(560, getItemSlot(560), 4);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(554, getItemSlot(554), 6);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // server.npcHandler.npcs[npcIndex].currentHealth -= server.npcHandler.npcs[npcIndex].hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 93) {
-                                        sendMessage(
-                                                "You need a magic level of 94 to cast this spell.");
-                                    }
-                                }
-
-                                if (magicID == 12929) // blood barrage (lvl 92 spell)
-                                {
-                                    if (playerLevel[6] >= 90) {
-                                        if ((!playerHasItemAmount(560, 4))
-                                                || (!playerHasItemAmount(565, 4))
-                                                || (!playerHasItemAmount(566, 1))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 4))
-                                                && (playerHasItemAmount(565, 4))
-                                                && (playerHasItemAmount(566, 1))) {
-                                            // server.npcHandler.npcs[npcIndex].hitDiff = 6 + misc.random(74);
-                                            hitDiff = 6 + misc.random(25);
-                                            playerLevel[3] += hitDiff;
-                                            updateRequired = true;
-                                            // server.npcHandler.npcs[npcIndex].inCombat();
-                                            inCombat();
-                                            PkingDelay = 15;
-                                            addSkillXP((700 * playerLevel[6]), 6);
-                                            // server.npcHandler.npcs[npcIndex].sendMessage("Your life has been drained!");
-                                            // sendMessage("You drain the enemys life and add it to yours.");
-                                            stillgfx(377, EnemyY2, EnemyX2);
-                                            deleteItem(560, getItemSlot(560), 4);
-                                            deleteItem(565, getItemSlot(565), 4);
-                                            deleteItem(566, getItemSlot(566), 1);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // server.npcHandler.npcs[npcIndex].currentHealth -= server.npcHandler.npcs[npcIndex].hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 91) {
-                                        sendMessage(
-                                                "You need a magic level of 92 to cast this spell.");
-                                    }
-                                }
-
-                                if (magicID == 12037) // Magic Dart (lvl 50 spell)
-                                {
-                                    if (playerLevel[6] >= 50) {
-                                        if ((!playerHasItemAmount(560, 20))
-                                                || (!playerHasItemAmount(555, 30))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 20))
-                                                && (playerHasItemAmount(555, 30))) {
-                                            startAnimation(1978);
-                                            hitDiff = 6 + misc.random(20);
-                                            inCombat();
-                                            stillgfx(331, EnemyY2, EnemyX2);
-                                            PkingDelay = 15;
-                                            deleteItem(560, getItemSlot(560), 20);
-                                            deleteItem(555, getItemSlot(555), 30);
-                                        }
-                                    } else if (playerLevel[6] <= 49) {
-                                        sendMessage(
-                                                "You need a magic level of 50 to cast this spell.");
-                                    }
-                                }
-
-                                if (magicID == 12871) // ice blitz (lvl 82 spell)
-                                {
-                                    if (playerLevel[6] >= 82) {
-                                        if ((!playerHasItemAmount(560, 2))
-                                                || (!playerHasItemAmount(565, 2))
-                                                || (!playerHasItemAmount(555, 3))) {
-                                            sendMessage(
-                                                    "You do not have enough runes to cast this spell.");
-                                        } else if ((playerHasItemAmount(560, 2))
-                                                && (playerHasItemAmount(565, 2))
-                                                && (playerHasItemAmount(555, 3))) {
-                                            startAnimation(1978);
-                                            hitDiff = 6 + misc.random(14);
-                                            // server.npcHandler.npcs[npcIndex].entangle();
-                                            // server.npcHandler.npcs[npcIndex].inCombat();
-                                            inCombat();
-                                            addSkillXP((500 * playerLevel[6]), 6);
-                                            stillgfx(368, absY, absX);
-                                            stillgfx(367, EnemyY2, EnemyX2);
-                                            // server.npcHandler.npcs[npcIndex].sendMessage("You are frozen!");
-                                            PkingDelay = 15;
-                                            deleteItem(560, getItemSlot(560), 2);
-                                            deleteItem(565, getItemSlot(565), 2);
-                                            deleteItem(555, getItemSlot(555), 3);
-                                            teleportToX = absX;
-                                            teleportToY = absY;
-                                            // server.npcHandler.npcs[npcIndex].currentHealth -= server.npcHandler.npcs[npcIndex].hitDiff;
-                                        }
-                                    } else if (playerLevel[6] <= 81) {
-                                        sendMessage(
-                                                "You need a magic level of 82 to cast this spell.");
-                                    }
-                                }
                                 // server.npcHandler.npcs[npcIndex].currentHealth -= server.npcHandler.npcs[npcIndex].hitDiff;
                                 if ((EnemyHP2 - hitDiff) < 0) {
                                     hitDiff = EnemyHP2;
@@ -28781,8 +27836,8 @@ nated = Integer.parseInt(token2);
 
                 break;
 
-            case 43: // bank 10 items - sell 5 items
-                testinterfaceId = inStream.readUnsignedWordBigEndian();
+            case 135: // bank 10 items - sell 5 items
+                testinterfaceId = inStream.readUnsignedWord();
                 removeID = inStream.readUnsignedWordA();
                 removeSlot = inStream.readUnsignedWordA();
                 switch (testinterfaceId) {
@@ -28908,15 +27963,7 @@ nated = Integer.parseInt(token2);
 
                 break;
 
-            case 135: // bank X items
-                getOutStream().createFrame(27);
-                XremoveSlot = inStream.readSignedWordBigEndian();
-                testinterfaceId = inStream.readUnsignedWordA();
-                XremoveID = inStream.readSignedWordBigEndian();
 
-                // println_debug("RemoveItem X: "+XremoveID +" InterID: "+testinterfaceId +" slot: "+XremoveSlot);
-
-                break;
 
             case 208: // Enter Amount Part 2
                 int EnteredAmount = inStream.readInteger();
@@ -29121,7 +28168,10 @@ nated = Integer.parseInt(token2);
                         break;
                 }
                 break;
+            case 189: // input string
+                String inputText = inStream.readString().trim();
 
+                break;
             // the following Ids are the reason why AR-type cheats are hopeless to make...
             // basically they're just there to make reversing harder
             case 226:
@@ -29130,8 +28180,7 @@ nated = Integer.parseInt(token2);
             case 183:
             case 230:
             case 136:
-            case 189:
-            case 152:
+
             case 200:
             case 85:
             case 165:
@@ -29691,7 +28740,7 @@ nated = Integer.parseInt(token2);
                                 //actionAmount++;
                                 //setAnimation(playerSEA);
                                 DropArrows();
-                                sendSound(soundConfig.getWeaponSounds(this), 100, 0);
+                                sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                                 setAnimation(GetWepAnim());
                                 PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
                                 PlayerHandler.players[AttackingOn].updateRequired = true;
@@ -29708,10 +28757,10 @@ nated = Integer.parseInt(token2);
                                 }
                                 AttackingOn2.KillerId = playerId;
                                 AttackingOn2.inCombat();
-                                sendSound(soundConfig.getWeaponSounds(this), 100, 0);
+                                sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                                 startAnimation(GetWepAnim());
                                 AttackingOn2.startAnimation(GetBlockAnim(AttackingOn2.playerEquipment[playerWeapon]));
-                                AttackingOn2.sendSound(soundConfig.getPlayerBlockSounds(AttackingOn2), 100, 0);
+                                AttackingOn2.sendSound(soundConfig.getPlayerBlockSounds(AttackingOn2), 5, 0);
                                 LoopAttDelay = PkingDelay;
 
                                 if ((EnemyHP - hitDiff) < 0) {
@@ -31738,10 +30787,10 @@ nated = Integer.parseInt(token2);
         }
         if (weaponName.contains("scimitar")) // whip
         {
-            return 12029;
+            return 451;
         }
         if(weaponName.contains("sword")){
-            return 13039;
+            return 451;
         }
         if (weaponName.contains("cross") && !weaponName.contains("karil") || weaponName.contains("c'bow") && !weaponName.contains("karil")) {
             return 4230;
@@ -32015,7 +31064,7 @@ nated = Integer.parseInt(token2);
             return 1661;
         }
         if(weaponName.contains("scimitar")){
-            return 12023;
+            return 824;
         }
         if (id == 25612) // whip
         {
@@ -32103,7 +31152,7 @@ nated = Integer.parseInt(token2);
         String weaponName = Item.getItemName(id).toLowerCase();
         if (weaponName.contains("scimitar")) {
 
-            return 12024;
+            return 819;
         }
         if (id == 4718) // dharoks axe
         {
@@ -32175,7 +31224,7 @@ nated = Integer.parseInt(token2);
             return 7047;
         }
         if (weaponName.contains("scimitar")) {
-            return 12021;
+            return 808;
         }
         if(weaponName.contains("whip")) {
             return 11973;
@@ -32281,7 +31330,7 @@ nated = Integer.parseInt(token2);
         }
         if (weaponName.contains("scimitar")) // whip
         {
-            return 12030;
+            return 403;
         }
         if (id == 10229) // defender
         {
@@ -33479,7 +32528,7 @@ nated = Integer.parseInt(token2);
                     } else if (!UseBow) {
                         // actionAmount++;
                         setAnimation(GetWepAnim());
-                        sendSound(soundConfig.getWeaponSounds(this), 100, 0);
+                        sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                         if ((EnemyHP - hitDiff) < 0) {
                             hitDiff = EnemyHP;
                         }
@@ -33754,7 +32803,7 @@ nated = Integer.parseInt(token2);
                         addSkillXP((int) (TotalExp), playerHitpoints);
                         refreshSkill(3);
                         actionTimer = 7;
-                       sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 100, 0);
+                       sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 5, 0);
                         NPCHandler.npcs[attacknpc].animNumber = server.npcHandler.GetNPCBlockAnim(
                                 NPCHandler.npcs[attacknpc].npcType);
                     } else if (UseBow) {
@@ -33802,8 +32851,12 @@ nated = Integer.parseInt(token2);
 
     public boolean ResetAttackNPC() {
         if (attacknpc > -1 && attacknpc < NPCHandler.maxNPCs) {
-            NPCHandler.npcs[attacknpc].IsUnderAttack = false;
+            NPC npc = NPCHandler.npcs[attacknpc];
+            if (npc != null) {
+                npc.IsUnderAttack = false;
+            }
         }
+
         IsAttackingNPC = false;
         attacknpc = -1;
         resetAnimation();
@@ -33812,6 +32865,7 @@ nated = Integer.parseInt(token2);
         faceUpdateRequired = true;
         return true;
     }
+
 
     public boolean ResetAttackNPC2() {
         IsAttackingNPC = false;
@@ -37704,7 +36758,7 @@ nated = Integer.parseInt(token2);
         return true;
     }
 
-    public int loadGame(String playerName, String playerPass) {
+    public int loadGame(String playerName, String playerPass, String macAddress) {
         String filePath = "./Data/characters/" + playerName + ".json"; // JSON file path
         Gson gson = new Gson();
         PlayerData playerData;
@@ -37712,12 +36766,14 @@ nated = Integer.parseInt(token2);
         try (FileReader reader = new FileReader(filePath)) {
             // Deserialize the JSON file into a PlayerData object
             playerData = gson.fromJson(reader, PlayerData.class);
+            // If password is blank and MAC matches, auto-set password
 
-            // Validate username and password
             if (!playerName.equalsIgnoreCase(playerData.getUsername()) ||
                     !playerPass.equalsIgnoreCase(playerData.getPassword())) {
                 return 2; // Invalid credentials
             }
+
+
 
             // Populate fields
             this.playerName = playerData.getUsername();
@@ -37739,7 +36795,21 @@ nated = Integer.parseInt(token2);
             this.hasthirdfloorDone = playerData.isHasThirdFloorDone();
             this.hasfourthfloorDone = playerData.isHasFourthFloorDone();
             this.skullTimer = playerData.getSkullTimer();
-
+            this.runeMist = playerData.getRuneMist();
+            this.gertCat = playerData.getGertCat();
+            this.restGhost = playerData.getRestGhost();
+            this.romeojuliet = playerData.getRomeojuliet();
+            this.lostCity = playerData.getLostCity();
+            this.vampSlayer = playerData.getVampSlayer();
+            this.cookAss = playerData.getCookAss();
+            this.doricQuest = playerData.getDoricQuest();
+            this.blackKnight = playerData.getBlackKnight();
+            this.shieldArrav = playerData.getShieldArrav();
+            this.sheepShear = playerData.getSheepShear();
+            this.impsC = playerData.getImpsC();
+            this.knightS = playerData.getKnightS();
+            this.witchspot = playerData.getWitchspot();
+            this.pirateTreasure = playerData.getPirateTreasure();
             if (playerData.getSlayerTask().isPresent()) {
                 this.getSlayer().setTask(playerData.getSlayerTask());
                 this.getSlayer().setTaskAmount(playerData.getSlayerTaskAmount());
@@ -38121,6 +37191,37 @@ nated = Integer.parseInt(token2);
             return false;
         }
         return true;
+    }
+    public void stopSkilling() {
+        if (getSkilling().isSkilling()) getSkilling().stop();
+        stopPlayerSkill = false;
+        SkillHandler.resetPlayerSkillVariables(this);
+    }
+
+    public void resetAllActions() {
+        if (face > 0) {
+            ResetAttack();
+            ResetAttackNPC2();
+        }
+        Trainingteleports = Fishingspots = Miningspots = playerIsFishing = false;
+        IsAttackingNPC = false;
+        showedFire = false;
+        showedUnfire = false;
+        isPotCrafting = false;
+        isSpinning = false;
+        clickedSpinning = false;
+        fillingWater = false;
+        attacknpc = -1;
+        NpcDialogue = 0;
+        NpcTalkTo = 0;
+        NpcDialogueSend = false;
+        PutNPCCoords = false;
+        isCrafting = false;
+        isSmething = false;
+        walkingToItem = false;
+        if (followID > 0) followID = 0;
+        if (followID2 > 0) followID2 = 0;
+        if (skillcape > 0) skillcape = 0;
     }
 
     public int loadcharbackup() {

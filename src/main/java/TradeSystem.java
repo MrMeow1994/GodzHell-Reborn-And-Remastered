@@ -5,6 +5,11 @@ import java.util.Objects;
 
 public class TradeSystem {
     public client c;
+    public client getTradePartner() {
+        if (c.tradeWith <= 0 || c.tradeWith >= PlayerHandler.maxPlayers) return null;
+        return (client) PlayerHandler.players[c.tradeWith];
+    }
+
 
     public TradeSystem(client c){
         this.c = c;
@@ -22,8 +27,8 @@ public class TradeSystem {
             }
         }
         if (c.tradeOtherDeclined) {
-            if (PlayerHandler.players[c.tradeWith] != null) {
-                c.sendMessage(PlayerHandler.players[c.tradeWith].playerName
+            if (getTradePartner() != null) {
+                c.sendMessage(getTradePartner().playerName
                         + " declined the trade.");
             } else {
                 c.sendMessage("Other player declined the trade.");
@@ -44,25 +49,25 @@ public class TradeSystem {
             c.AntiTradeScam = false;
         }
         if (c.tradeWith > 0) {
-            if (Objects.equals(c.macAddress, PlayerHandler.players[c.tradeWith].macAddress)) {
+            if (Objects.equals(c.macAddress, getTradePartner().macAddress)) {
                // c.getPA().RemoveAllWindows();
                // c.sendMessage("You can not trade yourself");
                 resetTrade();
                 return;
             }
-            if (PlayerHandler.players[c.tradeWith] != null) {
+            if (getTradePartner() != null) {
                 if (c.tradeStatus == 5) {
-                    if (PlayerHandler.players[c.tradeWith].TradeConfirmed) {
-                        PlayerHandler.players[c.tradeWith].tradeStatus = 5;
+                    if (getTradePartner().TradeConfirmed) {
+                        getTradePartner().tradeStatus = 5;
                     }
                     resetTrade();
                 } else {
-                    int OtherStatus = PlayerHandler.players[c.tradeWith].tradeStatus;
+                    int OtherStatus = getTradePartner().tradeStatus;
                     if (OtherStatus == 1) {
-                        PlayerHandler.players[c.tradeWith].tradeStatus = 2;
+                        getTradePartner().tradeStatus = 2;
                         c.tradeStatus = 2;
                         AcceptTrade();
-                        PlayerHandler.players[c.tradeWith].tradeWaitingTime = 0;
+                        getTradePartner().tradeWaitingTime = 0;
                         c.tradeWaitingTime = 0;
                     } else if (OtherStatus == 3) {
                         if (c.tradeStatus == 2) {
@@ -74,9 +79,11 @@ public class TradeSystem {
                         if (c.tradeStatus == 3) {
                             c.getPA().sendFrame126("Other player has accepted.", 3535);
                         } else if (c.tradeStatus == 4) {
+                            client partner = getTradePartner(); // ✅ Cache it first
                             ConfirmTrade();
-                            if (PlayerHandler.players[c.tradeWith].TradeConfirmed) {
-                                PlayerHandler.players[c.tradeWith].tradeStatus = 5;
+
+                            if (partner != null && partner.TradeConfirmed) {
+                                partner.tradeStatus = 5;
                             }
                         }
                     }
@@ -112,7 +119,7 @@ public class TradeSystem {
                             return;
                         c.tradeWith = c.WanneTradeWith;
                         c.tradeWaitingTime = 40;
-                        PlayerHandler.players[c.tradeWith].tradeRequest = c.playerId;
+                        getTradePartner().tradeRequest = c.playerId;
                         c.sendMessage("Sending trade request...");
                     } else if (tt1 <= 0
                             && tt2 <= 0
@@ -152,7 +159,7 @@ public class TradeSystem {
                             }
                             c.tradeWith = c.WanneTradeWith;
                             c.tradeWaitingTime = 40;
-                            PlayerHandler.players[c.tradeWith].tradeRequest = c.playerId;
+                            getTradePartner().tradeRequest = c.playerId;
                             c.sendMessage("Sending trade request...");
                         }
                         c.WanneTrade = 0;
@@ -172,7 +179,7 @@ public class TradeSystem {
         c.resetTItems(3415);
         c.resetOTItems(3416);
         c.getPA().sendFrame126("Trading With: "
-                + PlayerHandler.players[c.tradeWith].playerName, 3417);
+                + getTradePartner().playerName, 3417);
         c.getPA().sendFrame126("", 3431);
     }
 
@@ -207,64 +214,56 @@ public class TradeSystem {
             c.playerOTItemsN[i] = 0;
         }
     }
+    public void finalizeTrade() {
+        client partner = getTradePartner();
 
-    public void ConfirmTrade() {
-        if (!c.TradeConfirmed) {
-            c.getPA().RemoveAllWindows();
-            for (int i = 0; i < c.playerOTItems.length; i++) {
-                if (c.playerOTItems[i] > 0) {
-                    c.addItem((c.playerOTItems[i] - 1), c.playerOTItemsN[i]);
-                    BufferedWriter bw = null;
-                    try {
-                        bw = new BufferedWriter(new FileWriter(
-                                "./Data/logs/trades.txt", true));
-                        bw.write(PlayerHandler.players[c.tradeWith].playerName
-                                + " trades item: " + (c.playerOTItems[i] - 1)
-                                + " amount: " + c.playerOTItemsN[i] + " with "
-                                + c.playerName);
-                        bw.newLine();
-                        bw.flush();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    } finally {
-                        if (bw != null) {
-                            try {
-                                bw.close();
-                            } catch (IOException ioe2) {
-                                c.sendMessage("Error logging trade!");
-                            }
-                        }
-                    }
-                    try {
-                        bw = new BufferedWriter(
-                                new FileWriter(
-                                        "./Data/logs/trades.txt",
-                                        true));
-                        bw.write(PlayerHandler.players[c.tradeWith].playerName
-                                + " trades item: " + (c.playerOTItems[i] - 1)
-                                + " amount: " + c.playerOTItemsN[i] + " with "
-                                + c.playerName);
-                        bw.newLine();
-                        bw.flush();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    } finally {
-                        if (bw != null) {
-                            try {
-                                bw.close();
-                            } catch (IOException ioe2) {
-                                c.sendMessage("Error logging trade!");
-                            }
-                        }
-                    }
+        if (partner == null || partner.disconnected || partner.getTradeSystem() == null) {
+            c.sendMessage("Trade failed: partner unavailable.");
+            DeclineTrade();
+            return;
+        }
+
+        // Receive items from partner
+        for (int i = 0; i < c.playerOTItems.length; i++) {
+            if (c.playerOTItems[i] > 0) {
+                int itemId = c.playerOTItems[i] - 1;
+                int amount = c.playerOTItemsN[i];
+                if (itemId > 0 && amount > 0) {
+                    c.addItem(itemId, amount);
+                    logTrade(partner.playerName, c.playerName, itemId, amount);
                 }
             }
-            c.getPA().resetItems(3214);
-            Discord.writeTradeMessages(PlayerHandler.players[c.tradeWith].playerName
-                    + " trades item: " + (c.playerOTItems[c.i] - 1)
-                    + " amount: " + c.playerOTItemsN[c.i] + " with "
-                    + c.playerName);
-            c.TradeConfirmed = true;
+        }
+        partner.getPA().RemoveAllWindows();
+        c.getPA().RemoveAllWindows();
+        // Clean up
+        c.getPA().resetItems(3214);
+        resetTrade();
+    }
+    private void logTrade(String from, String to, int itemId, int amount) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("./Data/logs/trades.txt", true))) {
+            bw.write(from + " traded " + amount + "x " + itemId + " with " + to);
+            bw.newLine();
+        } catch (IOException e) {
+            System.err.println("Trade log failed: " + e.getMessage());
+        }
+    }
+
+    public void ConfirmTrade() {
+        if (c.TradeConfirmed) return;
+
+        c.TradeConfirmed = true;
+
+        client partner = (client) getTradePartner();
+        if (partner == null || partner.disconnected || partner.getTradeSystem() == null) {
+            c.sendMessage("Trade partner disconnected. Trade canceled.");
+            DeclineTrade();
+            return;
+        }
+
+        if (partner.TradeConfirmed) {
+            finalizeTrade();
+            partner.getTradeSystem().finalizeTrade(); // safe now
         }
     }
 
@@ -332,6 +331,7 @@ public class TradeSystem {
 
     public boolean fromTrade(int itemID, int fromSlot, int amount) {
         if (c.secondTradeWindow) {
+            c.sendMessage("You can't remove items at this stage of the trade.");
             return false;
         }
         if (amount > 0 && (itemID + 1) == c.playerTItems[fromSlot]) {
@@ -341,16 +341,16 @@ public class TradeSystem {
             c.addItem((c.playerTItems[fromSlot] - 1), amount);
             if (amount == c.playerTItemsN[fromSlot]) {
                 c.playerTItems[fromSlot] = 0;
-                PlayerHandler.players[c.tradeWith].playerOTItems[fromSlot] = 0;
+                getTradePartner().playerOTItems[fromSlot] = 0;
             }
             c.playerTItemsN[fromSlot] -= amount;
-            PlayerHandler.players[c.tradeWith].playerOTItemsN[fromSlot] -= amount;
+            getTradePartner().playerOTItemsN[fromSlot] -= amount;
             c.getPA().resetItems(3322);
             c.resetTItems(3415);
-            PlayerHandler.players[c.tradeWith].tradeUpdateOther = true;
-            if (PlayerHandler.players[c.tradeWith].tradeStatus == 3) {
-                PlayerHandler.players[c.tradeWith].tradeStatus = 2;
-                PlayerHandler.players[c.tradeWith].AntiTradeScam = true;
+            getTradePartner().tradeUpdateOther = true;
+            if (getTradePartner().tradeStatus == 3) {
+                getTradePartner().tradeStatus = 2;
+                getTradePartner().AntiTradeScam = true;
                 c.getPA().sendFrame126("", 3431);
             }
             return true;
@@ -360,7 +360,7 @@ public class TradeSystem {
 
     public boolean tradeItem(int itemID, int fromSlot, int amount) {
         if (c.tradeWith > 0) {
-            if (PlayerHandler.players[c.tradeWith] == null) {
+            if (getTradePartner() == null) {
                 DeclineTrade();
                 c.sendMessage("FORCED DECLINE BY SERVER!");
                 return false;
@@ -380,7 +380,7 @@ public class TradeSystem {
                     if (Item.itemStackable[(c.playerItems[fromSlot] - 1)]
                             || Item.itemIsNote[(c.playerItems[fromSlot] - 1)]) {
                         c.playerTItemsN[i] += amount;
-                        PlayerHandler.players[c.tradeWith].playerOTItemsN[i] += amount;
+                        getTradePartner().playerOTItemsN[i] += amount;
                         IsInTrade = true;
                         break;
                     }
@@ -391,8 +391,8 @@ public class TradeSystem {
                     if (c.playerTItems[i] <= 0) {
                         c.playerTItems[i] = c.playerItems[fromSlot];
                         c.playerTItemsN[i] = amount;
-                        PlayerHandler.players[c.tradeWith].playerOTItems[i] = c.playerItems[fromSlot];
-                        PlayerHandler.players[c.tradeWith].playerOTItemsN[i] = amount;
+                        getTradePartner().playerOTItems[i] = c.playerItems[fromSlot];
+                        getTradePartner().playerOTItemsN[i] = amount;
                         break;
                     }
                 }
@@ -403,10 +403,10 @@ public class TradeSystem {
             c.playerItemsN[fromSlot] -= amount;
             c.getPA().resetItems(3322);
             c.resetTItems(3415);
-            PlayerHandler.players[c.tradeWith].tradeUpdateOther = true;
-            if (PlayerHandler.players[c.tradeWith].tradeStatus == 3) {
-                PlayerHandler.players[c.tradeWith].tradeStatus = 2;
-                PlayerHandler.players[c.tradeWith].AntiTradeScam = true;
+            getTradePartner().tradeUpdateOther = true;
+            if (getTradePartner().tradeStatus == 3) {
+                getTradePartner().tradeStatus = 2;
+                getTradePartner().AntiTradeScam = true;
                 c.getPA().sendFrame126("", 3431);
             }
             return true;

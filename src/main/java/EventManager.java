@@ -1,132 +1,42 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Manages events which will be run in the future. Has its own thread since some
- * events may need to be ran faster than the cycle time in the main thread.
- * 
- * @author Graham
- * 
+ * Manages timed events using a dedicated thread.
+ * Supports safe addition, removal, and execution of multiple async events.
+ *
+ * Rewritten by ChatGPT for DragonSmith
  */
 public class EventManager implements Runnable {
 
-	/**
-	 * A reference to the singleton;
-	 */
-	private static EventManager singleton = null;
+	private static EventManager instance;
 
-	/**
-	 * The waitFor variable is multiplied by this before the call to wait() is
-	 * made. We do this because other events may be executed after waitFor is
-	 * set (and take time). We may need to modify this depending on event count?
-	 * Some proper tests need to be done.
-	 */
+	private final List<EventContainer> events = new CopyOnWriteArrayList<>();
+	private final Thread thread;
+
 	private static final double WAIT_FOR_FACTOR = 0.5;
 
-	/**
-	 * Gets the event manager singleton. If there is no singleton, the singleton
-	 * is created.
-	 * 
-	 * @return The event manager singleton.
-	 */
-	public static EventManager getSingleton() {
-		if (singleton == null) {
-			singleton = new EventManager();
-			singleton.thread = new Thread(singleton);
-			singleton.thread.start();
-		}
-		return singleton;
-	}
-
-	/**
-	 * Initialises the event manager (if it needs to be).
-	 */
-	public static void initialise() {
-		getSingleton();
-	}
-
-	/**
-	 * A list of events that are being executed.
-	 */
-	private List<EventContainer> events;
-
-	/**
-	 * The event manager thread. So we can interrupt it and end it nicely on
-	 * shutdown.
-	 */
-	private Thread thread;
-
-	/**
-	 * Initialise the event manager.
-	 */
 	private EventManager() {
-		events = new ArrayList<EventContainer>();
+		this.thread = new Thread(this, "EventManager-Thread");
+		this.thread.start();
+	}
+	public static void initialise() {
+		getSingleton(); // just calls the singleton and starts the thread
+	}
+	public static synchronized EventManager getSingleton() {
+		if (instance == null) {
+			instance = new EventManager();
+		}
+		return instance;
 	}
 
-	/**
-	 * Adds an event.
-	 * 
-	 * @param event
-	 *            The event to add.
-	 * @param tick
-	 *            The tick time.
-	 */
-	public synchronized void addEvent(Object owner,Event event, int tick) {
-		events.add(new EventContainer(owner, event, tick));
-		notify();
-	}
-
-	@Override
-	/**
-	 * Processes events. Works kinda like newer versions of cron.
-	 */
-	public synchronized void run() {
-		long waitFor = -1;
-		List<EventContainer> remove = new ArrayList<EventContainer>();
-
-		while (true) {
-
-			// reset wait time
-			waitFor = -1;
-
-			// process all events
-			for (EventContainer container : events) {
-				if (container.isRunning()) {
-					if ((System.currentTimeMillis() - container.getLastRun()) >= container
-							.getTick()) {
-						container.execute();
-					}
-					if (container.getTick() < waitFor || waitFor == -1) {
-						waitFor = container.getTick();
-					}
-				} else {
-					// add to remove list
-					remove.add(container);
-				}
-			}
-
-			// remove events that have completed
-			for (EventContainer container : remove) {
-				events.remove(container);
-			}
-			remove.clear();
-
-			// no events running
-			try {
-				if (waitFor == -1) {
-					wait(); // wait with no timeout
-				} else {
-					// an event is running, wait for that time or until a new
-					// event is added
-					int decimalWaitFor = (int) (Math.ceil(waitFor
-							* WAIT_FOR_FACTOR));
-					wait(decimalWaitFor);
-				}
-			} catch (InterruptedException e) {
-				break; // stop running
-			}
+	public void addEvent(Object owner, Event event, int tickMillis) {
+		events.add(new EventContainer(owner, event, tickMillis));
+		synchronized (this) {
+			notify(); // wake up the thread if it's waiting
 		}
 	}
+
 	public void stopEvents(Object owner) {
 		for (EventContainer container : events) {
 			if (container.getOwner().equals(owner)) {
@@ -134,11 +44,50 @@ public class EventManager implements Runnable {
 			}
 		}
 	}
-	/**
-	 * Shuts the event manager down.
-	 */
+
 	public void shutdown() {
-		this.thread.interrupt();
+		thread.interrupt();
 	}
 
+	@Override
+	public void run() {
+		while (!Thread.currentThread().isInterrupted()) {
+			long now = System.currentTimeMillis();
+			long waitFor = Long.MAX_VALUE;
+
+			for (EventContainer container : events) {
+				if (!container.isRunning()) {
+					events.remove(container); // ✅ This is safe with CopyOnWriteArrayList
+					continue;
+				}
+
+				long elapsed = now - container.getLastRun();
+
+				if (elapsed >= container.getTick()) {
+					try {
+						container.execute();
+					} catch (Throwable t) {
+						System.err.println("Error executing event: " + t.getMessage());
+						t.printStackTrace();
+						container.stop();
+					}
+				}
+
+				waitFor = Math.min(waitFor, container.getTick() - elapsed);
+			}
+
+
+			try {
+				synchronized (this) {
+					if (waitFor == Long.MAX_VALUE) {
+						wait(); // no active events
+					} else {
+						wait(Math.max(1, (long) (waitFor * WAIT_FOR_FACTOR)));
+					}
+				}
+			} catch (InterruptedException e) {
+				break; // allow graceful shutdown
+			}
+		}
+	}
 }

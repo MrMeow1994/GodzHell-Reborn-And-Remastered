@@ -196,7 +196,7 @@ public class Food {
         player.stopMovement();
         player.startAnimation(829);
         player.deleteItem(id, slot, 1);
-        player.sendSound(soundList.FOOD_EAT, 100, 0);
+        player.sendSound(soundList.FOOD_EAT, 8, 0);
 
         // If the Food is a combo food it will also reset the potion timer
         if (FoodToEat.isComboFood(foodToEat)) {

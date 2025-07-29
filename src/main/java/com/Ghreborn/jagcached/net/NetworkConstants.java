@@ -25,7 +25,7 @@ public final class NetworkConstants {
 	 * The number of seconds a channel can be idle before being closed
 	 * automatically.
 	 */
-	public static final int IDLE_TIME = 15;
+	public static final int IDLE_TIME = 60;
 	
 	/**
 	 * Default private constructor to prevent instantiaton.

@@ -72,6 +72,10 @@ public class ByteStream {
 		var2 += var3;
 		return var2;
 	}
+	public int getRemaining() {
+		return buffer.length - offset;
+	}
+
 	public int readUShortSmart() {
 		int var1 = this.buffer[this.offset] & 0xff;
 		return var1 < 128?this.getUByte() : this.getUShort() - '\u8000';
