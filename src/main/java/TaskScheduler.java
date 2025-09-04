@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,7 @@ public final class TaskScheduler implements Runnable {
     /**
      * A list of active tasks.
      */
-    private final List<Task> tasks = new ArrayList<Task>();
+    private final List<Task> tasks = new ArrayList<>();
 
     /**
      * A queue of tasks that still need to be added.
@@ -52,8 +53,18 @@ public final class TaskScheduler implements Runnable {
      * Stops the task scheduler.
      */
     public void terminate() {
-        service.shutdown();
+        try {
+            System.out.println("TaskScheduler shutting down...");
+            service.shutdown();
+            if (!service.awaitTermination(2, TimeUnit.SECONDS)) {
+                System.out.println("Forcefully terminating lingering tasks.");
+                service.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
+
 
     /**
      * Schedules the specified task. If this scheduler has been stopped with
@@ -84,21 +95,34 @@ public final class TaskScheduler implements Runnable {
      */
     @Override
     public void run() {
+        long start = System.nanoTime(); // Start timing
+
+        // === Add new tasks ===
         synchronized (newTasks) {
             Task task;
-            while ((task = newTasks.poll()) != null)
+            while ((task = newTasks.poll()) != null) {
                 tasks.add(task);
+            }
         }
 
+        // === Execute current tasks ===
         for (Iterator<Task> it = tasks.iterator(); it.hasNext(); ) {
             Task task = it.next();
             try {
-                if (!task.tick())
+                if (!task.tick()) {
                     it.remove();
+                }
             } catch (Throwable t) {
-                logger.log(Level.SEVERE, "Exception during task execution.", t);
+                logger.log(Level.SEVERE, "Exception during task execution in " + task.getClass().getSimpleName(), t);
             }
         }
+
+        // === Measure duration ===
+        long duration = System.nanoTime() - start;
+        if (duration > TimeUnit.MILLISECONDS.toNanos(10)) {
+           // System.err.println("Slow task: " + tasks.getClass().getCanonicalName() + " took " + (duration / 1_000_000) + " ms");
+        }
     }
+
 
 }

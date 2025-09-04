@@ -19,13 +19,13 @@ class ShopHandler internal constructor() {
         loadShops("./Data/cfg/shops.cfg")
     }
 
-    fun restockTimeItem(itemId: Int): Int {
+    private fun restockTimeItem(itemId: Int): Int {
         return when (itemId) {
             else -> 1000
         }
     }
     fun process() {
-        var DidUpdate = false
+        var didUpdate = false
         for (i in 1..TotalShops) {
             for (j in 0 until MaxShopItems) {
                 if (ShopItems[i][j] > 0) {
@@ -38,20 +38,20 @@ class ShopHandler internal constructor() {
                                 ShopItemsN[i][j] += 1 //if amount lower then standard, increase it !
                                 ShopItemsDelay[i][j] = 1
                                 ShopItemsDelay[i][j] = 0
-                                DidUpdate = true
+                                didUpdate = true
                                 shopItemsRestock[i][j] = System.currentTimeMillis()
                             }
                         } else if (ShopItemsDelay[i][j] >= MaxShowDelay) {
                             DiscountItem(i, j)
                             ShopItemsDelay[i][j] = 0
-                            DidUpdate = true
+                            didUpdate = true
                         }
                         refreshShop(i)
                     }
                     ShopItemsDelay[i][j]++
                 }
             }
-            if (DidUpdate) {
+            if (didUpdate) {
                 for (k in 1 until PlayerHandler.maxPlayers) {
                     if (PlayerHandler.players[k] != null) {
                         if (PlayerHandler.players[k].IsShopping && PlayerHandler.players[k].MyShopID == i) {
@@ -59,11 +59,11 @@ class ShopHandler internal constructor() {
                         }
                     }
                 }
-                DidUpdate = false
+                didUpdate = false
             }
         }
     }
-    fun refreshShop(shopId: Int) {
+    private fun refreshShop(shopId: Int) {
         // We don't want to remove items that should be kept in stock
         for (j in ShopItemsStandard[shopId] until MaxShopItems) {
             if (ShopItemsN[shopId][j] <= 0) {
@@ -78,7 +78,7 @@ class ShopHandler internal constructor() {
             }
         }
     }
-    fun DiscountItem(ShopID: Int, ArrayID: Int) {
+    private fun DiscountItem(ShopID: Int, ArrayID: Int) {
         ShopItemsN[ShopID][ArrayID] -= 1
         if (ShopItemsN[ShopID][ArrayID] <= 0) {
             ShopItemsN[ShopID][ArrayID] = 0
@@ -92,16 +92,14 @@ class ShopHandler internal constructor() {
         ShopItemsDelay[ShopID][ArrayID] = 0
     }
 
-    fun loadShops(FileName: String): Boolean {
-        var line = ""
-        var token = ""
-        var token2 = ""
-        var token2_2 = ""
-        var token3 = arrayOfNulls<String>(MaxShopItems * 2)
+    private fun loadShops(FileName: String): Boolean {
+        var line: String
+        var token: String
+        var token2: String
+        var token2_2: String
+        var token3: Array<String?>
         var EndOfFile = false
-        val ReadMode = 0
-        var characterfile: BufferedReader? = null
-        characterfile = try {
+        val characterfile: BufferedReader? = try {
             BufferedReader(FileReader("./$FileName"))
         } catch (fileex: FileNotFoundException) {
             misc.println("$FileName: file not found.")
@@ -147,14 +145,15 @@ class ShopHandler internal constructor() {
             } else {
                 if (line == "[ENDOFSHOPLIST]") {
                     try {
-                        characterfile!!.close()
+                        characterfile.close()
                     } catch (ioexception: IOException) {
+                        ioexception.printStackTrace()
                     }
                     return true
                 }
             }
             try {
-                line = characterfile!!.readLine()
+                line = characterfile.readLine()
             } catch (ioexception1: IOException) {
                 EndOfFile = true
             }
@@ -162,6 +161,7 @@ class ShopHandler internal constructor() {
         try {
             characterfile.close()
         } catch (ioexception: IOException) {
+            ioexception.printStackTrace()
         }
         return false
     }
@@ -179,12 +179,12 @@ class ShopHandler internal constructor() {
 
         var MaxShops = 500 //1 more because we don't use [0] !
         @JvmField
-        public var MaxShopItems = 1500 //1 more because we don't use [0] !
+        var MaxShopItems = 1500 //1 more because we don't use [0] !
         var MaxInShopItems = 60
         var MaxShowDelay = 10
         var TotalShops = 0
         @JvmField
-        public var ShopItems = Array(MaxShops) { IntArray(MaxShopItems) }
+        var ShopItems = Array(MaxShops) { IntArray(MaxShopItems) }
         @JvmField
         var ShopItemsN = Array(MaxShops) { IntArray(MaxShopItems) }
 
@@ -207,6 +207,3 @@ class ShopHandler internal constructor() {
     }
 }
 
-private operator fun Int.plusAssign(get: IntArray) {
-
-}

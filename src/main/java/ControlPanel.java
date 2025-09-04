@@ -115,7 +115,7 @@ public class ControlPanel extends JFrame {
 
         // Refresh the chart to ensure it updates dynamically
         ramChart.fireChartChanged();
-        System.gc(); // Light suggestion to GC (won't force it)
+       // System.gc(); // Light suggestion to GC (won't force it)
     }
     @SuppressWarnings("serial")
     public void initComponents() {

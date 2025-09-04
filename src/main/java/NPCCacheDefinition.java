@@ -17,7 +17,7 @@ public class NPCCacheDefinition {
     /**
      * Represents the total whole number integer of NPCs.
      */
-    public static int NPC_TOTAL = 9000;
+    public static int NPC_TOTAL = 15000;
 
     /**
      * Returns a {@link NPCCacheDefinition} for the specified ID.
@@ -84,10 +84,10 @@ public class NPCCacheDefinition {
                     str.readUnsignedWord();
             } else
             if(opcode == 2)
-                name = str.readString();
+                name = str.readNewString();
             else
             if(opcode == 3)
-                examine = str.readString();
+                examine = str.readNewString();
             else
             if(opcode == 12)
                 boundDim = str.readSignedByte();
@@ -110,7 +110,7 @@ public class NPCCacheDefinition {
                 if(actions == null)
                     actions = new String[10];
                 try {
-                    actions[opcode - 30] = str.readString();
+                    actions[opcode - 30] = str.readNewString();
                     if(actions[opcode - 30].equalsIgnoreCase("hidden"))
                         actions[opcode - 30] = null;
                 } catch(Exception e) { }

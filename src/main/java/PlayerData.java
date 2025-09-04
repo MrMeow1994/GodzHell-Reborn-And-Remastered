@@ -69,7 +69,7 @@ public class PlayerData {
     private int loyaltyRank; // Field for loyalty rank
     public int runeMist, gertCat, restGhost,
             romeojuliet, lostCity, vampSlayer, cookAss, doricQuest, blackKnight, shieldArrav,
-            sheepShear, impsC, knightS, witchspot, pirateTreasure;
+            sheepShear, impsC, knightS, witchspot, pirateTreasure, desertTreasure;
     public static PlayerData from(Player plr) {
         PlayerData data = new PlayerData();
 
@@ -107,6 +107,7 @@ public class PlayerData {
         data.knightS = plr.knightS;
         data.witchspot = plr.witchspot;
         data.pirateTreasure = plr.pirateTreasure;
+        data.desertTreasure = plr.desertTreasure;
         client target = (client) plr;
         data.slayerTask = target.getSlayer().getTask();
         data.slayerTaskAmount = target.getSlayer().getTaskAmount();
@@ -762,6 +763,15 @@ public class PlayerData {
     public void setPirateTreasure(int pirateTreasure) {
         this.pirateTreasure = pirateTreasure;
     }
+
+    public int getDesertTreasure() {
+        return desertTreasure;
+    }
+
+    public void setDesertTreasure(int desertTreasure) {
+        this.desertTreasure = desertTreasure;
+    }
+
 }
 
 

@@ -37,7 +37,7 @@ public abstract class Player {
 	public final stream updateBlock = new stream(new byte[20000]);
 	public int runeMist, gertCat, restGhost,
 			romeojuliet, lostCity, vampSlayer, cookAss, doricQuest, blackKnight, shieldArrav,
-			sheepShear, impsC, knightS, witchspot, pirateTreasure;
+			sheepShear, impsC, knightS, witchspot, pirateTreasure, desertTreasure;
 	private boolean hitUpdateRequired2;
 	boolean stopPlayerSkill = false;
 	int runEnergy = 100,  talkingNpc = -1;
@@ -381,7 +381,7 @@ public abstract class Player {
 		playerEquipment[playerHat]=ItemIDs.HELM_OF_NEITIZNOT;
 		playerEquipment[playerCape]=ItemIDs.OBSIDIAN_CAPE;
 		playerEquipment[playerAmulet]=ItemIDs.AMULET_OF_FURY;
-		playerEquipment[playerChest]=ItemIDs.FIGHTER_TORSO_2;
+		playerEquipment[playerChest]=ItemIDs.FIGHTER_TORSO;
 		playerEquipment[playerShield]=ItemIDs.RUNE_DEFENDER;
 		playerEquipment[playerLegs]=ItemIDs.RUNE_PLATELEGS;
 		playerEquipment[playerHands]=-1;
@@ -389,7 +389,17 @@ public abstract class Player {
 		playerEquipment[playerRing]=ItemIDs.RING_OF_WEALTH;
 		playerEquipment[playerArrows]=-1;
 		playerEquipment[playerWeapon]=ItemIDs.DRAGON_SCIMITAR;
-
+		playerEquipmentN[playerHat]=1;
+		playerEquipmentN[playerCape]=1;
+		playerEquipmentN[playerAmulet]= 1;
+		playerEquipmentN[playerChest]= 1;
+		playerEquipmentN[playerShield]=1;
+		playerEquipmentN[playerLegs]=1;
+		playerEquipmentN[playerHands]=-1;
+		playerEquipmentN[playerFeet]=1;
+		playerEquipmentN[playerRing]=1;
+		playerEquipmentN[playerArrows]= 0;
+		playerEquipmentN[playerWeapon]=1;
 /*
 0-9: male head
 10-17: male beard

@@ -22,6 +22,21 @@ public class DungeonsDialogue extends Dialogue{
     @Override
     public boolean clickButton(int id) {
         switch(id) {
+            case DialogueConstants.OPTIONS_3_1:
+                getPlayer().movePlayer(3117,9849,0);
+                end();
+                getPlayer().getPA().RemoveAllWindows();
+                break;
+            case DialogueConstants.OPTIONS_3_2:
+                getPlayer().movePlayer(2528,4641,0);
+                end();
+                getPlayer().getPA().RemoveAllWindows();
+                break;
+            case DialogueConstants.OPTIONS_3_3:
+                getPlayer().movePlayer(2382,4679,0);
+                end();
+                getPlayer().getPA().RemoveAllWindows();
+                break;
             case DialogueConstants.OPTIONS_2_1:
                 if(getNext() == 0) {
                     DialogueManager.sendOption(getPlayer(), "Old Gh Train", "Ghr Train", "2nd Level of Gh Train");
@@ -41,11 +56,27 @@ public class DungeonsDialogue extends Dialogue{
                     getPlayer().movePlayer(2711,9564,0);
                     end();
                     getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 2) {
+                    getPlayer().movePlayer(2806,10003,0);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 3) {
+                    getPlayer().movePlayer(2859,9569,0);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                 break;
             case DialogueConstants.OPTIONS_5_2:
                 if(getNext() == 1) {
                     getPlayer().movePlayer(3096,9869,0);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 2) {
+                    getPlayer().movePlayer(2883,9800,0);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 3) {
+                    getPlayer().movePlayer(2828,9520,0);
                     end();
                     getPlayer().getPA().RemoveAllWindows();
                 }
@@ -55,11 +86,27 @@ public class DungeonsDialogue extends Dialogue{
                     getPlayer().movePlayer(3485,9509,2);
                     end();
                     getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 2) {
+                    getPlayer().movePlayer(3010,9549,0);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 3) {
+                    getPlayer().movePlayer(3141,4230,2);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
                 }
                 break;
             case DialogueConstants.OPTIONS_5_4:
                 if(getNext() == 1) {
                     getPlayer().movePlayer(1764,5365,1);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 2) {
+                    getPlayer().movePlayer(1752,5236,0);
+                    end();
+                    getPlayer().getPA().RemoveAllWindows();
+                } else if(getNext() == 3) {
+                    getPlayer().movePlayer(3236,9863,0);
                     end();
                     getPlayer().getPA().RemoveAllWindows();
                 }
@@ -71,7 +118,7 @@ public class DungeonsDialogue extends Dialogue{
                 } else if(getNext() == 2) {
                     DialogueManager.sendOption(getPlayer(), "Crandor and Karamja Dungeon", "Jogre Dungeon", "Stronghold of Player Safety", "Varrock Sewers", "More Options");
                     setNext(3);
-                }else if(getNext() == 4) {
+                }else if(getNext() == 3) {
                     DialogueManager.sendOption(getPlayer(), "Brimhaven Dungeon", "Edgeville Dungeon", "Kalphite Cave", "Ancient Cavern", "More Options");
                     setNext(1);
                 }

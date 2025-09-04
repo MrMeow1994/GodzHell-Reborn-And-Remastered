@@ -64,8 +64,8 @@ public class PlayerAssistant {
             } else {
                 c.outStream.writeByte(c.playerItemsN[i]);
             }
-            if (c.playerItems[i] > 20000 || c.playerItems[i] < 0) {
-                c.playerItems[i] = 20000;
+            if (c.playerItems[i] > Config.MAX_ITEMS || c.playerItems[i] < 0) {
+                c.playerItems[i] = Config.MAX_ITEMS;
             }
             c.outStream.writeWordBigEndianA(c.playerItems[i]); //item id
         }

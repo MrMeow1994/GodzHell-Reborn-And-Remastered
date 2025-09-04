@@ -1081,7 +1081,7 @@ public class SkillInterfaces {
 
         else if (screen == 2) {
             clearMenu();
-            menuLine("99", "Skill Mastery", ItemIDs.HITPOINTS_CAPE, 0);
+            menuLine("99", "Skill Mastery", ItemIDs.CONSTITUTION_CAPE, 0);
             optionTab("Hitpoints", "Milestones", "Hitpoints", "Milestones", "", "", "", "", "", "", "", "", "", "", "");
         }
     }

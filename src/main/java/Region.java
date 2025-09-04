@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -33,11 +34,10 @@ public class Region {
 
 
     private int[][][] shootable = new int[4][][];
-    private RegionData regionData;
 
     public Region(int id, int map, int mapObj) {
         this.id = id;
-        regionData = new RegionData(id, map, mapObj);
+        RegionData regionData = new RegionData(id, map, mapObj);
     }
 
     public int getId() {
@@ -67,7 +67,7 @@ public class Region {
             new WorldObject2(2213, 3116, 9846, 0, 10, 0),
             new WorldObject2(2513, 3121, 9838, 0, 10, 0),
             new WorldObject2(61, 3114, 9836, 0, 10, 0),
-            new WorldObject2(2187, 3123, 9848, 0, 10, 1),
+          //  new WorldObject2(2187, 3123, 9848, 0, 10, 1),
             new WorldObject2(2213, 3284, 2777, 0, 10, 0),
             new WorldObject2(2213, 3283, 2777, 0, 10, 0),
             new WorldObject2(2213, 3282, 2777, 0, 10, 0),
@@ -84,16 +84,16 @@ public class Region {
             new WorldObject2(6552, 2467, 3176, 0, 10, 0),
             new WorldObject2(410, 2467, 3179, 0, 10, 0),
             new WorldObject2(409, 2469, 3182, 0, 10, 0),
-            new WorldObject2(2213, 3193, 6874, 0, 10, 1),
-            new WorldObject2(2213, 3193, 6875, 0, 10, 1),
-            new WorldObject2(2213, 3193, 6872, 0, 10, 1),
-            new WorldObject2(2213, 3193, 6871, 0, 10, 1),
-            new WorldObject2(2783, 3188, 6873, 0, 10, 0),
-            new WorldObject2(2783, 3188, 6875, 0, 10, 0),
-            new WorldObject2(2728, 3192, 6877, 0, 10, 0),
-            new WorldObject2(2728, 3190, 6877, 0, 10, 0),
-            new WorldObject2(2380, 3192, 6869, 0, 10, -1),
-            new WorldObject2(2513, 3192, 6867, 0, 10, -1),
+            new WorldObject2(2213, 2361, 5786, 0, 10, 1),
+            new WorldObject2(2213, 2361, 5787, 0, 10, 1),
+            new WorldObject2(2213, 2361, 5784, 0, 10, 1),
+            new WorldObject2(2213, 2361, 5783, 0, 10, 1),
+            new WorldObject2(2783, 2356, 5785, 0, 10, 0),
+            new WorldObject2(2783, 2356, 5787, 0, 10, 0),
+            new WorldObject2(2728, 2360, 5789, 0, 10, 0),
+            new WorldObject2(2728, 2358, 5789, 0, 10, 0),
+            new WorldObject2(2380, 2360, 5781, 0, 10, -1),
+            new WorldObject2(2513, 2360, 5779, 0, 10, -1),
             new WorldObject2(8151, 2603, 4774, 0, 10, 0),
             new WorldObject2(8151, 2605, 4774, 0, 10, 0),
             new WorldObject2(8151, 2599, 4774, 0, 10, 0),
@@ -1087,30 +1087,36 @@ public class Region {
     public static void init() {
         try {
             ObjectDef.loadConfig();
-            final File file = new File("./Data/world/525map_index");
-            final byte[] buffer = new byte[(int) file.length()];
-            final DataInputStream input = new DataInputStream(
-                    new FileInputStream(file));
-            input.readFully(buffer);
-            input.close();
-            final ByteStream stream = new ByteStream(buffer);
-            int size = stream.getUShort();
-            int[] regionIds = new int[size];
-            int[] mapGroundFileIds = new int[size];
-            int[] mapObjectsFileIds = new int[size];
-            RegionData[] data = new RegionData[size];
-            regionArray = new Region[size];
-            for (int i = 0; i < size; i++) {
-                regionIds[i] = stream.getUShort();
-                mapGroundFileIds[i] = stream.getUShort();
-                mapObjectsFileIds[i] = stream.getUShort();
-                data[i] = new RegionData(regionIds[i], mapGroundFileIds[i], mapObjectsFileIds[i]);
-                regionArray[i] = new Region(regionIds[i],
-                        mapGroundFileIds[i], mapObjectsFileIds[i]);
+
+            File file = new File("./Data/world/map_index");
+            if (!file.exists()) {
+                System.err.println("Missing map_index file.");
+                return;
             }
 
-            Arrays.stream(data).forEach(Region::loadMap);
-            Arrays.asList(EXISTANT_OBJECTS).forEach(o -> addWorldObject(o));
+            byte[] buffer = Files.readAllBytes(file.toPath());
+            ByteStream stream = new ByteStream(buffer);
+
+            int size = stream.getUShort();
+            regionArray = new Region[size];
+            RegionData[] data = new RegionData[size];
+
+            for (int i = 0; i < size; i++) {
+                int regionId = stream.getUShort();
+                int mapGroundId = stream.getUShort();
+                int mapObjectsId = stream.getUShort();
+
+                Region region = new Region(regionId, mapGroundId, mapObjectsId);
+                regionArray[i] = region;
+                data[i] = new RegionData(regionId, mapGroundId, mapObjectsId);
+            }
+
+            for (RegionData rd : data)
+                Region.loadMap(rd);
+
+            for (WorldObject2 obj : EXISTANT_OBJECTS)
+                Region.addWorldObject(obj);
+
             System.out.println("Loaded " + size + " region maps.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -1119,13 +1125,13 @@ public class Region {
         get(11051).setClipToZero(2804, 2784, 1);
         get(11051).setClipToZero(2803, 2786, 1);
         get(11051).setClipToZero(2803, 2784, 1);
-        get(12650).setClipToZero(3170, 6791, 0);
-        get(12650).setClipToZero(3169, 6791, 0);
-        get(12649).setClipToZero(3171, 6783, 0);
-        get(12649).setClipToZero(3171, 6782, 0);
-        get(12649).setClipToZero(3180, 6779, 0);
-        get(12649).setClipToZero(3180, 6780, 0);
-        get(12649).setClipToZero(3180, 6781, 0);
+       // get(12650).setClipToZero(3170, 6791, 0);
+       // get(12650).setClipToZero(3169, 6791, 0);
+      //  get(12649).setClipToZero(3171, 6783, 0);
+     //   get(12649).setClipToZero(3171, 6782, 0);
+      //  get(12649).setClipToZero(3180, 6779, 0);
+     //   get(12649).setClipToZero(3180, 6780, 0);
+     //   get(12649).setClipToZero(3180, 6781, 0);
         get(12849).setClipToZero(3244, 3196, 0);
         get(12849).setClipToZero(3244, 3197, 0);
         get(12849).setClipToZero(3244, 3195, 0);
@@ -1187,35 +1193,24 @@ public class Region {
             e.printStackTrace();
         }
     }
-    public static byte[] getBuffer(File f) throws Exception
-    {
-        if(!f.exists())
-            return null;
-        byte[] buffer = new byte[(int) f.length()];
-        DataInputStream dis = new DataInputStream(new FileInputStream(f));
-        dis.readFully(buffer);
-        dis.close();
-        byte[] gzipInputBuffer = new byte[999999];
-        int bufferlength = 0;
-        GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(buffer));
-        do {
-            if(bufferlength == gzipInputBuffer.length)
-            {
-                System.out.println("Error inflating data.\nGZIP buffer overflow.");
-                break;
+    public static byte[] getBuffer(File file) throws IOException {
+        if (!file.exists()) return null;
+
+        try (FileInputStream fis = new FileInputStream(file);
+             GZIPInputStream gzip = new GZIPInputStream(fis);
+             ByteArrayOutputStream out = new ByteArrayOutputStream(8192)) {
+
+            byte[] buffer = new byte[4096];
+            int len;
+            while ((len = gzip.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
             }
-            int readByte = gzip.read(gzipInputBuffer, bufferlength, gzipInputBuffer.length - bufferlength);
-            if(readByte == -1)
-                break;
-            bufferlength += readByte;
-        } while(true);
-        byte[] inflated = new byte[bufferlength];
-        System.arraycopy(gzipInputBuffer, 0, inflated, 0, bufferlength);
-        buffer = inflated;
-        if(buffer.length < 10)
-            return null;
-        return buffer;
+
+            byte[] result = out.toByteArray();
+            return result.length < 10 ? null : result;
+        }
     }
+
     private static void loadMaps(int regionId, ByteStream str1, ByteStream str2) {
         int absX = (regionId >> 8) * 64;
         int absY = (regionId & 0xff) * 64;
@@ -1256,23 +1251,17 @@ public class Region {
         }
         int objectId = -1;
         int incr;
-        while ((incr = str1.method1606()) != 0) {
+        while ((incr = str1.getUSmart2()) != 0) {
             objectId += incr;
             int location = 0;
             int incr2;
-            while ((incr2 = str1.readUShortSmart()) != 0) {
+            while ((incr2 = str1.getUSmart()) != 0) {
                 location += incr2 - 1;
                 int localX = (location >> 6) & 0x3f;
                 int localY = location & 0x3f;
                 int height = location >> 12;
 
-                // ✅ Check if enough data is available
-                if (str1.remaining() <= 0) {
-                    System.out.println("WARNING: Not enough data left to read objectData for objectId " + objectId);
-                    break;
-                }
-
-                int objectData = str1.getUByte();
+                int objectData = str1.readUShortSmart();
                 int type = objectData >> 2;
                 int direction = objectData & 0x3;
 

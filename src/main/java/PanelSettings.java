@@ -71,7 +71,7 @@ public class PanelSettings {
         return null;
     }
     public client getPlayer(int id) {
-        return (client) PlayerHandler.players[id];
+        return (client) PlayerHandler.getPlayerSafe(id);
     }
     public boolean validPlayer(int id) {
         if(id < 0 || id > Config.MAX_PLAYERS)

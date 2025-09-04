@@ -245,10 +245,10 @@ itemStackable[12159] = true;
                 counter++;
             }
             dataIn.close();
-            itemTwoHanded[ItemIDs.ARMADYL_GODSWORD_2] = true;
+            itemTwoHanded[ItemIDs.ARMADYL_GODSWORD] = true;
             itemTwoHanded[ItemIDs.SARADOMIN_GODSWORD] = true;
             itemTwoHanded[ItemIDs.ZAMORAK_GODSWORD] = true;
-            itemTwoHanded[ItemIDs.BANDOS_GODSWORD_] = true;
+            itemTwoHanded[ItemIDs.BANDOS_GODSWORD] = true;
         } catch (IOException e) {
             System.out.println("Critical error while loading twohanded! Trace:");
             e.printStackTrace();

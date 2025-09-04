@@ -31,8 +31,8 @@ public final class ObjectDef
         description = null;
         modifiedModelColors = null;
         originalModelColors = null;
-        anInt744 = 1;
-        anInt761 = 1;
+        sizeX = 1;
+        sizeY = 1;
         projectileCliped = true;
         aBoolean757 = true;
         hasActions = false;
@@ -128,9 +128,9 @@ public final class ObjectDef
                     }
                 }
             } else if (j == 14) {
-                anInt744 = stream.readUnsignedByte();
+                sizeX = stream.readUnsignedByte();
             } else if (j == 15) {
-                anInt761 = stream.readUnsignedByte();
+                sizeY = stream.readUnsignedByte();
             } else if (j == 17) {
                 projectileCliped = false;
                 aBoolean757 = false;
@@ -321,12 +321,12 @@ public final class ObjectDef
 
     public int xLength()
     {
-        return anInt744;
+        return sizeX;
     }
 
     public int yLength()
     {
-        return anInt761;
+        return sizeY;
     }
 
     public boolean isProjectileCliped()
@@ -336,7 +336,7 @@ public final class ObjectDef
 
     public boolean aBoolean736;
     public String name;
-    public int anInt744;
+    public int sizeX;
     private int[] bgsounds;
     private int hillskewType = 0;
     private short hillskewAmount = -1;
@@ -358,7 +358,7 @@ public final class ObjectDef
     public boolean aBoolean757;
     public int anInt758;
     public int childrenIDs[];
-    public int anInt761;
+    public int sizeY;
     public boolean aBoolean762;
     public boolean aBoolean764;
     public boolean projectileCliped;

@@ -116,6 +116,13 @@ public class QuestAssistant {
         } else {
             player.getPA().sendFrame126("@yel@Lost City", 7367);
         }
+        if (player.desertTreasure == 0) {
+            player.getPA().sendFrame126("Desert Treasure", 12852);
+        } else if (player.desertTreasure == 8) {
+            player.getPA().sendFrame126("@gre@Desert Treasure", 12852);
+        } else {
+            player.getPA().sendFrame126("@yel@Desert Treasure", 12852);
+        }
     }
 
     public enum Quests {
@@ -144,7 +151,7 @@ public class QuestAssistant {
         CLOCK(28185, 7353, "Clock Tower", false),
         DEATH(32246, 8438, "Death Plateau", false),
         CREATURE(47097, 12129, "Creature of Fenkenstrain", false),
-        DESERT_TREASURE(50052, 12852, "Desert Treasure", false),
+        DESERT_TREASURE(50052, 12852, "Desert Treasure", true),
         DRUDIC_RITUAL(28187, 7355, "Drudic Ritual", false),
         DWARF_CANNON(28188, 7356, "Dwarf Cannon", false),
         EADGARS_RUSE(33231, 8679, "Eadgars Ruse", false),
@@ -266,6 +273,9 @@ public class QuestAssistant {
 
             case 28165:
                 CooksAssistant.showInformation(player);
+                break;
+            case 50052:
+                DesertTreasureQuestLog.showInformation(player);
                 break;
             /*case 28167:
                 RuneMysteries.showInformation(player);

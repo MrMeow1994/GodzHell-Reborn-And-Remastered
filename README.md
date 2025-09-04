@@ -8,7 +8,7 @@ Welcome to **GodzHell Reborn and Remastered**! Follow this guide to set up and r
 
 Before starting, ensure you have the following:
 
-1. **Java Development Kit (JDK 11)** installed.
+1. **Java Development Kit (JDK 15)** installed.
    - Download from [Oracle JDK 11](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html).
 2. **Data Files** required for the servers.
 

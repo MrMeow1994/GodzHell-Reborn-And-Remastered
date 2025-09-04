@@ -1,25 +1,34 @@
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.management.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class MemoryLogger implements Runnable {
 
-    private static final String LOG_FILE = "./Data/logs/memory.log";
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final long STACK_DUMP_COOLDOWN = 5 * 60 * 1000;
+    private static final long HISTOGRAM_TRIGGER_MB = 400;
+    private static final boolean ENABLE_HISTOGRAM_DUMP = true;
+
     private long lastHeapUsed = -1;
+    private long lastStackDumpTime = 0;
+
+    private String getLogFile(String type) {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String dirPath = "./Data/logs/memory/" + date;
+        new File(dirPath).mkdirs();
+        return dirPath + "/" + type + ".log";
+    }
 
     @Override
     public void run() {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         var gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
 
         while (true) {
-            try (PrintWriter out = new PrintWriter(new FileWriter(LOG_FILE, true))) {
+            try (PrintWriter out = new PrintWriter(new FileWriter(getLogFile("heap"), true))) {
                 MemoryUsage heap = memoryMXBean.getHeapMemoryUsage();
                 MemoryUsage nonHeap = memoryMXBean.getNonHeapMemoryUsage();
 
@@ -27,49 +36,86 @@ public class MemoryLogger implements Runnable {
                 long maxHeap = heap.getMax() / (1024 * 1024);
                 long usedNonHeap = nonHeap.getUsed() / (1024 * 1024);
 
-                String time = TIME_FORMAT.format(new Date());
+                String time = TIME_FORMAT.format(LocalTime.now());
                 out.printf("[%s] Heap: %dMB / %dMB, Non-Heap: %dMB%n", time, usedHeap, maxHeap, usedNonHeap);
 
-                // GC Info
-                for (GarbageCollectorMXBean gc : gcBeans) {
-                    out.printf("GC [%s]: count=%d, time=%dms%n",
+                lastHeapUsed = usedHeap;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try (PrintWriter out = new PrintWriter(new FileWriter(getLogFile("gc"), true))) {
+                for (GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
+                    out.printf("[%s] GC [%s]: count=%d, time=%dms%n",
+                            TIME_FORMAT.format(LocalTime.now()),
                             gc.getName(), gc.getCollectionCount(), gc.getCollectionTime());
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-                // Thread count info
-                out.printf("Threads: current=%d, peak=%d, totalStarted=%d%n",
+            try (PrintWriter out = new PrintWriter(new FileWriter(getLogFile("threads"), true))) {
+                out.printf("[%s] Threads: current=%d, peak=%d, totalStarted=%d%n",
+                        TIME_FORMAT.format(LocalTime.now()),
                         threadMXBean.getThreadCount(),
                         threadMXBean.getPeakThreadCount(),
                         threadMXBean.getTotalStartedThreadCount());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-                // Spike detection
-                if (lastHeapUsed > 0 && usedHeap - lastHeapUsed > 10) {
-                    out.println("⚠️ Memory spike detected — Dumping all thread stack traces:");
+            long now = System.currentTimeMillis();
+            boolean memorySpike = lastHeapUsed > 0 && lastHeapUsed >= HISTOGRAM_TRIGGER_MB;
 
-                    Map<Thread, StackTraceElement[]> traces = Thread.getAllStackTraces();
-                    for (Map.Entry<Thread, StackTraceElement[]> entry : traces.entrySet()) {
-                        Thread t = entry.getKey();
-                        StackTraceElement[] stack = entry.getValue();
-                        out.printf("🧵 Thread: \"%s\" [%s]%n", t.getName(), t.getState());
-                        for (StackTraceElement ste : stack) {
+            if ((memorySpike) && (now - lastStackDumpTime) >= STACK_DUMP_COOLDOWN) {
+                lastStackDumpTime = now;
+
+                try (PrintWriter out = new PrintWriter(new FileWriter(getLogFile("stacktrace"), true))) {
+                    out.printf("[%s] ⚠️ Stack trace dump:%n", TIME_FORMAT.format(LocalTime.now()));
+                    long[] ids = threadMXBean.getAllThreadIds();
+                    ThreadInfo[] infos = threadMXBean.getThreadInfo(ids, Integer.MAX_VALUE);
+                    for (ThreadInfo info : infos) {
+                        if (info == null) continue;
+                        out.printf("🧵 Thread: \"%s\" [%s]%n", info.getThreadName(), info.getThreadState());
+                        for (StackTraceElement ste : info.getStackTrace()) {
                             out.println("    at " + ste);
                         }
                         out.println();
                     }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
 
-                lastHeapUsed = usedHeap;
-
-            } catch (Exception e) {
-                System.err.println("Failed to write memory log: " + e.getMessage());
-                e.printStackTrace();
+                if (ENABLE_HISTOGRAM_DUMP) {
+                    try (PrintWriter out = new PrintWriter(new FileWriter(getLogFile("histogram"), true))) {
+                        dumpMemoryHistogram(out);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
 
             try {
-                Thread.sleep(30 * 1000); // 30 seconds
+                Thread.sleep(30 * 1000);
             } catch (InterruptedException e) {
                 break;
             }
+        }
+    }
+
+    private static void dumpMemoryHistogram(PrintWriter out) {
+        try {
+            String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+            Process proc = Runtime.getRuntime().exec("jcmd " + pid + " GC.class_histogram");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            out.printf("[%s] 🔍 Memory Histogram:%n", TIME_FORMAT.format(LocalTime.now()));
+            String line;
+            int lines = 0;
+            while ((line = reader.readLine()) != null && lines++ < 100) {
+                out.println(line);
+            }
+        } catch (Exception e) {
+            out.println("⚠️ Failed to dump memory histogram: " + e.getMessage());
         }
     }
 }

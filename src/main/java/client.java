@@ -5,26 +5,21 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
-import com.Ghreborn.jagcached.util.DeepTracer;
-import com.Ghreborn.jagcached.util.HyperTraceEngine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.mystycdh.GuardianServer;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.spec.KeySpec;
 import java.util.*;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class client extends Player implements Runnable {
-    private static final BigInteger RSA_MODULUS = new BigInteger("129054814732918521522820496413796482564146106440479997463524816763080780831995631078504790292317658383472514719172206718041945316394359609923527595131308647792229034016245090408424074669977492602693984712211573066192823392981891207916047022843940335910271752018248983400185186778063159281890985050648461506327");
-    private static final BigInteger RSA_EXPONENT = new BigInteger("27879794116127690124968988330661009813436388223206979326007970394306997497892704042136057814038381485164164722127044306483938260669718530864966411216092703568459272195616972250949028972715026029275458872491464626190477393610376016122097525453604219605982427230471753462793826647632158051175202981586824371457");
-    public static final int bufferSize = 20000;
+    private static final BigInteger RSA_MODULUS = new BigInteger("109146498026789313726826224373459558208050127700378246305873710995315714783684251038666549407762991475007000587532182005003279074831900986161303462490626538608294667460272328302125530424189692575104242196104595067933708123073135778015307595620436012118775654418370935818679069485674062571131950728740325985423");
+
+    private static final BigInteger RSA_EXPONENT = new BigInteger("4773087925061845570305078948599037090868847612635367104271389531296440767353389130976674712035166906745350926711128578151874480499080339752175041938113364963813903302320604458480524363908708508723321745501640064523402673896241792464923652293310384789487471094984494514770075931564248597823520110267743803777");
+  public static final int bufferSize = 20000;
     public static final int[] packetSizes = {
             0, 0, 0, 1, -1, 0, 0, 0, 0, 0, //0 - 9
             0, 0, 0, 0, 8, 0, 6, 2, 2, 0, //10 - 19
@@ -131,6 +126,7 @@ public class client extends Player implements Runnable {
     public boolean hasntLoggedin = false;
     public boolean Fishingspots = false;
     public boolean Miningspots = false;
+    public boolean isTeleporting = false;
     public boolean Trainingteleports = false;
     public boolean oldagetrain = false;
     public int kickTimer = 0;
@@ -427,6 +423,7 @@ public class client extends Player implements Runnable {
     public int Read3 = 0;
     public int playerLastLogin = 20060101;
     public String lastlogin = "127.0.0.1";
+    public long aggrotimer; // default unset
     public int lastlogintime;
     public int reputation = 0;
     public int mutedate = 0; // date muted so they can be unmuted in 24 hours
@@ -1005,10 +1002,14 @@ public class client extends Player implements Runnable {
         return house;
     }
 
+public void setHouse(House house) {
+    this.house = house;
+}
     public void moveplayer(int x, int y, int h) {
         heightLevel = h;
         teleportToX = x;
         teleportToY = y;
+        isTeleporting = true;
     }
 
     public void rightClickCheck() {
@@ -2054,7 +2055,7 @@ public class client extends Player implements Runnable {
     }
 
     public void bandosSpecial() {
-        if (IsAttackingNPC && playerEquipment[playerWeapon] == 15334) {
+        if (IsAttackingNPC && playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD) {
             hitDiff = 60 + misc.random(5);
             setAnimation(7073);
             DDStimer = 0;
@@ -2068,7 +2069,7 @@ public class client extends Player implements Runnable {
     }
 
     public void SaradominSpecial() {
-        if (IsAttackingNPC && playerEquipment[playerWeapon] == 15335) {
+        if (IsAttackingNPC && playerEquipment[playerWeapon] == ItemIDs.SARADOMIN_GODSWORD) {
             hitDiff = 60 + misc.random(5);
             setAnimation(7071);
             DDStimer = 0;
@@ -2082,7 +2083,7 @@ public class client extends Player implements Runnable {
     }
 
     public void zamorakSpecial() {
-        if (IsAttackingNPC && playerEquipment[playerWeapon] == 15336) {
+        if (IsAttackingNPC && playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD) {
             hitDiff = 60 + misc.random(5);
             setAnimation(7070);
             DDStimer = 0;
@@ -2096,7 +2097,7 @@ public class client extends Player implements Runnable {
     }
 
     public void armadylSpecial() {
-        if (IsAttackingNPC && playerEquipment[playerWeapon] == 15333) {
+        if (IsAttackingNPC && playerEquipment[playerWeapon] == ItemIDs.ARMADYL_GODSWORD) {
             hitDiff = 65 + misc.random(10);
             setAnimation(7074);
             DDStimer = 0;
@@ -2838,6 +2839,59 @@ public class client extends Player implements Runnable {
         }
     }
 
+    public void chopVine(int objX, int objY, int originalId, int cutId) {
+        Hatchet hatchet = Hatchet.getBest(this);
+
+        //if (!isWearingItem(hatchet.getItemId()) && !playerHasItem(hatchet.getItemId())) {
+          //  sendMessage("You need an axe to chop through the vines.");
+          //  return;
+       // }
+
+        face(objX, objY);
+        //setAnimation(hatchet.getAnimation());
+
+        Optional<WorldObject2> worldObject = Region.getWorldObject(originalId, objX, objY, heightLevel);
+        if (!worldObject.isPresent()) {
+            sendMessage("You can't chop through that.");
+            return;
+        }
+
+        int face = worldObject.get().getFace();
+        int respawnTime = 60;
+
+       // server.getGlobalObjects().add(new GlobalObject(cutId, objX, objY, heightLevel, face, 10, respawnTime, originalId));
+       // Region.getRegion(objX, objY).setClipToZero(objX, objY, heightLevel);
+
+        EventManager.getSingleton().addEvent(this, new Event() {
+            int tick = 0;
+
+            @Override
+            public void execute(EventContainer container) {
+                if (tick == 1) {
+                    if (absX == objX && absY == objY - 1) {
+                        movePlayer(objX, objY + 1, 0);
+                    } else if (absX == objX && absY == objY + 1) {
+                        movePlayer(objX, objY - 1, 0);
+                    } else if (absX == objX - 1 && absY == objY) {
+                        movePlayer(objX + 1, objY, 0);
+                    } else if (absX == objX + 1 && absY == objY) {
+                        movePlayer(objX - 1, objY, 0);
+                    } else {
+                        sendMessage("You can't chop through from this angle.");
+                    }
+                } else if (tick == 2) {
+                    container.stop();
+                }
+                tick++;
+            }
+
+            @Override
+            public void stop() {}
+        }, 600); // Tick interval in ms
+    }
+
+
+
     /* OBJECTS MAIN */
     public int GetObject(int X, int Y, int ObjectID) {
         for (int i = 0; i < ObjectHandler.MaxObjects; i++) {
@@ -3303,16 +3357,16 @@ public class client extends Player implements Runnable {
         server.getGlobalObjects().add(new GlobalObject(6552, 2467, 3176, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(410, 2467, 3179, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(409, 2469, 3182, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3193, 6874, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3193, 6875, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3193, 6872, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3193, 6871, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2783, 3188, 6873, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2783, 3188, 6875, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2728, 3192, 6877, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2728, 3190, 6877, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2380, 3192, 6869, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2513, 3192, 6867, 0, -1, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5786, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5787, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5784, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5783, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(2783, 2356, 5785, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2783, 2356, 5787, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2728, 2360, 5789, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2728, 2358, 5789, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2380, 2360, 5781, 0, -1, 10));
+        server.getGlobalObjects().add(new GlobalObject(2513, 2360, 5779, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(8151, 2603, 4774, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(8151, 2605, 4774, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(8151, 2599, 4774, 0, 0, 10));
@@ -3628,7 +3682,7 @@ public class client extends Player implements Runnable {
         server.getGlobalObjects().add(new GlobalObject(2213, 3116, 9846, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2513, 3121, 9838, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(61, 3114, 9836, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2187, 3123, 9848, 0, 1, 10));
+        //server.getGlobalObjects().add(new GlobalObject(2187, 3123, 9848, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4643, 1, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4642, 1, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4641, 1, 1, 10));
@@ -4260,6 +4314,7 @@ public class client extends Player implements Runnable {
                 }
                 break;
             case 6552:
+                if(desertTreasure == 8){
                 if (ancients == 0) {
                     emotes = 2;
                     updateRequired = true;
@@ -4272,6 +4327,16 @@ public class client extends Player implements Runnable {
                     getPA().setSidebarInterface(6, 1151);
                     ancients = 0;
                     sendMessage("You seem to forgot the magic of Ancients...");
+                }
+                } else {
+                    if (ancients == 1) {
+                        emotes = 0;
+                        updateRequired = true;
+                        getPA().setSidebarInterface(6, 1151);
+                        ancients = 0;
+                        //sendMessage("You seem to forgot the magic of Ancients...");
+                    }
+                    sendMessage("You need to do Desert Treasure to use Ancient Magicks.");
                 }
                 break;
             case 15644:
@@ -4343,7 +4408,6 @@ public class client extends Player implements Runnable {
             case 4756:
             case 4879:
             case 5492:
-            case 5096:
             case 6278:
             case 11724:
             case 11725:
@@ -5473,15 +5537,47 @@ public class client extends Player implements Runnable {
                 teleportToY = 3507;
                 sendMessage("You Teleport To The Ghost Quest.");
                 break;
-
-            case 5103:
-                if (absX == 2691 && absY == 9564) {
-                    walkTo2(-2, 0);
-                } else if (absX == 2689 && absY == 9564) {
-                    walkTo2(2, 0);
+            case 5094:
+                if(getX() == 2649 && getY() == 9591 && heightLevel == 0) {
+                    movePlayer(2643, 9594, 2);
+                } else if(getX() == 2650 && getY() == 9591 && heightLevel == 0) {
+                    movePlayer(2643, 9595, 2);
                 }
                 break;
 
+            case 5096:
+                if(getX() == 2643 && getY() == 9594 && heightLevel == 2) {
+                    movePlayer(2649, 9591, 0);
+                } else if(getX() == 2643 && getY() == 9595 && heightLevel == 2) {
+                    movePlayer(2650, 9591, 0);
+                }
+                break;
+            case 5097:
+                if(getX() == 2637 && getY() == 9517 && heightLevel == 0) {
+                    movePlayer(2637, 9510, 2);
+                } else if(getX() == 2636 && getY() == 9517 && heightLevel == 0) {
+                    movePlayer(2636, 9510, 2);
+                }
+                break;
+            case 5098:
+                if(getX() == 2637 && getY() == 9510 && heightLevel == 2) {
+                    movePlayer(2637, 9517, 0);
+                } else if(getX() == 2636 && getY() == 9510 && heightLevel == 2) {
+                    movePlayer(2636, 9517, 0);
+                }
+                break;
+            case 5103:
+                chopVine(objectX, objectY, 5103, -1);
+                break;
+            case 5104:
+                chopVine(objectX, objectY, 5104, -1);
+                break;
+            case 5106:
+                chopVine(objectX, objectY, 5106, -1);
+                break;
+            case 5107:
+                chopVine(objectX, objectY, 5107, -1);
+                break;
             case 29728: // ladder at train
                 if (objectX == 3076 && objectY == 3463) {
                     teleportToX = 3158;
@@ -5587,16 +5683,7 @@ public class client extends Player implements Runnable {
                 teleportToY = 3536;
                 sendMessage("You Teleport To The Slayer area.");
                 break;
-
-            case 2187: // modportal
-                if ((rights.isStaff()) || (amDonated >= 25)) {
-                    teleportToX = 2528;
-                    teleportToY = 4641;
-                    sendMessage("Welcome to the Donator Training.");
-                } else {
-                    sendMessage("Sorry You Are Not A Donator.");
-                }
-                break;
+                
 
 
             case 2557:
@@ -12444,11 +12531,11 @@ public class client extends Player implements Runnable {
         }
 
         if (command.equalsIgnoreCase("poh")) {
-            final client p = c;
+            client p = this;
             teleportToX = 48;
             teleportToY = 48;
             heightLevel = playerId * 4;
-            EventManager.getSingleton().addEvent(this,new Event() {
+            EventManager.getSingleton().addEvent(p,new Event() {
 
                 @Override
                 public void execute(EventContainer container) {
@@ -12458,10 +12545,10 @@ public class client extends Player implements Runnable {
 
                 @Override
                 public void stop() {
-                    House.showHouse(p, p);
+                    House.showHouse(p);
                 }
 
-            }, 1+600);
+            }, 1*600);
         }
         if(command.equalsIgnoreCase("broadcast") && (rights.isAdministrator())) {
             String[] arg = command.split(" ");
@@ -13364,7 +13451,7 @@ public class client extends Player implements Runnable {
             txt4 = "I'm Back mates!";
             string4UpdateRequired = true;
         }
-        if (command.equalsIgnoreCase("master") && getRights().isPlayer()) {
+        if (command.equalsIgnoreCase("master") && getRights().isStaff()) {
             addSkillXP(2147000000, 0);
             addSkillXP(2147000000, 1);
             addSkillXP(2147000000, 2);
@@ -13474,6 +13561,7 @@ public class client extends Player implements Runnable {
             heightLevel = 0;
             teleportToX = 2466;
             teleportToY = 3188;
+            isTeleporting = true;
             sendMessage("You teleport to Home.");
         }
         } else if (command.equalsIgnoreCase("west")) {
@@ -13483,6 +13571,7 @@ public class client extends Player implements Runnable {
                 heightLevel = 0;
                 teleportToX = 3015;
                 teleportToY = 3452;
+                isTeleporting = true;
                 sendMessage("You teleport to West.");
             }
         } else if (command.equalsIgnoreCase("ancientcavern")) {
@@ -13491,6 +13580,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 1;
                 teleportToX = 1763;
+                isTeleporting = true;
                 teleportToY = 5365;
                 sendMessage("You teleport to Ancient cavern.");
             }
@@ -13500,6 +13590,7 @@ public class client extends Player implements Runnable {
                 sendMessage("A magical force stops you from teleporting."); // made by Braiton
             } else {
                 heightLevel = 0;
+                isTeleporting = true;
                 teleportToX = 2412;
                 teleportToY = 5111;
                 sendMessage("You teleport to Jad. Kill him for a fire cape");
@@ -13510,6 +13601,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 1;
                 teleportToX = 2984;
+                isTeleporting = true;
                 teleportToY = 9518;
                 sendMessage("You teleport to seaqueen. Kill him for a water cape");
                 sendMessage("You Can Not! Pk Here! or IpBan!");
@@ -13520,6 +13612,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 0;
                 teleportToX = 2858;
+                isTeleporting = true;
                 teleportToY = 9844;
                 sendMessage("You Teleport to the Metal Dragon Lair");
             }
@@ -13528,6 +13621,7 @@ public class client extends Player implements Runnable {
                 sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
             } else {
                 heightLevel = 0;
+                isTeleporting = true;
                 teleportToX = 3300;
                 teleportToY = 3483;
                 sendMessage("You Teleport The The Woodcutting Area");
@@ -13539,6 +13633,7 @@ public class client extends Player implements Runnable {
                 heightLevel = 0;
                 teleportToX = 3485;
                 teleportToY = 9483;
+                isTeleporting = true;
                 sendMessage("You teleport to the kalphite area.");
             }
         } else if (command.equalsIgnoreCase("edge")) {
@@ -13547,6 +13642,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 0;
                 teleportToX = 3085;
+                isTeleporting = true;
                 teleportToY = 3518;
                 sendMessage(
                         "Have fun at Edge, - !All lootings aloud! -");
@@ -13568,6 +13664,7 @@ public class client extends Player implements Runnable {
                 heightLevel = 0;
                 teleportToX = 2473;
                 teleportToY = 3190;
+                isTeleporting = true;
                 sendMessage(
                         "You Teleport To W");
             }
@@ -13578,6 +13675,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 0;
                 teleportToX = 3427;
+                isTeleporting = true;
                 teleportToY = 3538;
                 sendMessage(
                         "You Teleport To slayer.");
@@ -13588,6 +13686,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 0;
                 teleportToX = 2862;
+                isTeleporting = true;
                 teleportToY = 3757;
                 sendMessage(
                         "You teleport to godwars OMG");
@@ -13600,6 +13699,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 0;
                 teleportToX = 3227;
+                isTeleporting = true;
                 teleportToY = 3438;
                 sendMessage(
                         "You teleport to the smithing area, grab a hammer and start smithin'!");
@@ -13610,6 +13710,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 0;
                 teleportToX = 2388;
+                isTeleporting = true;
                 teleportToY = 3488;
                 sendMessage(
                         "You Teleport To Hang!");
@@ -13620,6 +13721,7 @@ public class client extends Player implements Runnable {
             } else {
                 heightLevel = 2;
                 teleportToX = 2881;
+                isTeleporting = true;
                 teleportToY = 5310;
                 sendMessage(
                         "You Teleport To God Wars Dung!");
@@ -13646,6 +13748,7 @@ public class client extends Player implements Runnable {
                 heightLevel = 0;
                 teleportToX = 3243;
                 teleportToY = 3517;
+                isTeleporting = true;
                 sendMessage(
                         "You teleport to the Team Pk area!");
             }
@@ -13669,8 +13772,9 @@ public class client extends Player implements Runnable {
                 sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
             } else {
                 heightLevel = 0;
-                teleportToX = 3190;
-                teleportToY = 6871;
+                teleportToX = 2358;
+                teleportToY = 5783;
+                isTeleporting = true;
                 sendMessage(
                         "You teleport To Skillz");
             }
@@ -13681,6 +13785,7 @@ public class client extends Player implements Runnable {
                 heightLevel = 0;
                 teleportToX = 2964;
                 teleportToY = 3378;
+                isTeleporting = true;
                 sendMessage(
                         "You teleport To thieve");
             }
@@ -13691,6 +13796,7 @@ public class client extends Player implements Runnable {
                 heightLevel = 0;
                 teleportToX = 2823;
                 teleportToY = 3001;
+                isTeleporting = true;
                 sendMessage(
                         "You teleport to the Shilo Village Mining!");
             }
@@ -14035,9 +14141,9 @@ public class client extends Player implements Runnable {
             ItemHandler.addItem(2663, absX - 6, absY + 1, playerItemsN[1], playerId, false);
             ItemHandler.addItem(2661, absX + 5, absY - 1, playerItemsN[1], playerId, false);
             ItemHandler.addItem(4732, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4716, absX + 1, absY + 1, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(ItemIDs.DHAROKS_HELM, absX + 1, absY + 1, playerItemsN[1], playerId, false);
             ItemHandler.addItem(4718, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4720, absX + 4, absY - 3, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(ItemIDs.DHAROKS_PLATEBODY, absX + 4, absY - 3, playerItemsN[1], playerId, false);
             ItemHandler.addItem(4722, absX - 1, absY, playerItemsN[1], playerId, false);
             ItemHandler.addItem(4753, absX + 9, absY - 2, playerItemsN[1], playerId, false);
             ItemHandler.addItem(4755, absX - 6, absY + 6, playerItemsN[1], playerId, false);
@@ -17076,8 +17182,8 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             sendMessage("You Teleport to corp");
         }
         if (command.equalsIgnoreCase("td")) {                      //Voule Command Generator
-            teleportToX = 3244;
-            teleportToY = 9360;
+            teleportToX = 2525;
+            teleportToY = 5809;
             heightLevel = 0;
             sendMessage("You Teleport to Tormented demon's");
 
@@ -17977,6 +18083,8 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         int Slayer = getLevelForXP(playerXP[18]);
         int Farming = getLevelForXP(playerXP[19]);
         int Runecrafting = getLevelForXP(playerXP[20]);
+        int construction = getLevelForXP(playerXP[21]);
+        int hunter = getLevelForXP(playerXP[22]);
         if ((exp + playerXP[skill]) < 0 || playerXP[skill] > 2000000000) {
             if(debugMessages) {
                 sendMessage("Max XP value reached");
@@ -19658,28 +19766,32 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (targetSlot == playerWeapon) {
             Stat = playerAttack;
         }
-        getOutStream().createFrameVarSizeWord(34);
-        getOutStream().writeWord(1688);
-        getOutStream().writeByte(targetSlot);
-        getOutStream().writeWord((wearID + 1));
-        if (amount > 254) {
-            getOutStream().writeByte(255);
-            getOutStream().writeDWord(amount);
-        } else {
-            getOutStream().writeByte(amount); // amount
+        if(getOutStream() != null) {
+            getOutStream().createFrameVarSizeWord(34);
+            getOutStream().writeWord(1688);
+            getOutStream().writeByte(targetSlot);
+            getOutStream().writeWord((wearID + 1));
+            if (amount > 254) {
+                getOutStream().writeByte(255);
+                getOutStream().writeDWord(amount);
+            } else {
+                getOutStream().writeByte(amount); // amount
+            }
+            getOutStream().endFrameVarSizeWord();
         }
-        getOutStream().endFrameVarSizeWord();
-        getOutStream().createFrameVarSizeWord(34);
-        getOutStream().writeWord(19041);
-        getOutStream().writeByte(targetSlot);
-        getOutStream().writeWord((wearID + 1));
-        if (amount > 254) {
-            getOutStream().writeByte(255);
-            getOutStream().writeDWord(amount);
-        } else {
-            getOutStream().writeByte(amount); // amount
+        if(getOutStream() != null) {
+            getOutStream().createFrameVarSizeWord(34);
+            getOutStream().writeWord(19041);
+            getOutStream().writeByte(targetSlot);
+            getOutStream().writeWord((wearID + 1));
+            if (amount > 254) {
+                getOutStream().writeByte(255);
+                getOutStream().writeDWord(amount);
+            } else {
+                getOutStream().writeByte(amount); // amount
+            }
+            getOutStream().endFrameVarSizeWord();
         }
-        getOutStream().endFrameVarSizeWord();
         if (targetSlot == playerWeapon && wearID >= 0) {
             SendWeapon(wearID, weaponName);
             playerStandIndex = GetStandAnim(wearID);
@@ -21529,42 +21641,42 @@ nated = Integer.parseInt(token2);
             specialDamage = 30 + misc.random(10);
             specialAmount -= 50;
         }
-        if (playerEquipment[playerWeapon] == 15335 && specialAmount <= 49) {
+        if (playerEquipment[playerWeapon] == ItemIDs.SARADOMIN_GODSWORD && specialAmount <= 49) {
             specialDamage = 0;
             specialDamage2 = 0;
             sendMessage("You do not have enough special energy left.");
         }
-        if (playerEquipment[playerWeapon] == 15335 && specialAmount >= 50) {
+        if (playerEquipment[playerWeapon] == ItemIDs.SARADOMIN_GODSWORD && specialAmount >= 50) {
             startAnimation(7071);
             SaradominSpecial();
             specialAmount -= 50;
         }
-        if (playerEquipment[playerWeapon] == 15334 && specialAmount <= 49) {
+        if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD && specialAmount <= 49) {
             specialDamage = 0;
             specialDamage2 = 0;
             sendMessage("You do not have enough special energy left.");
         }
-        if (playerEquipment[playerWeapon] == 15334 && specialAmount >= 50) {
+        if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD && specialAmount >= 50) {
             startAnimation(7073);
             bandosSpecial();
             specialAmount -= 50;
         }
-        if (playerEquipment[playerWeapon] == 15336 && specialAmount <= 49) {
+        if (playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD && specialAmount <= 49) {
             specialDamage = 0;
             specialDamage2 = 0;
             sendMessage("You do not have enough special energy left.");
         }
-        if (playerEquipment[playerWeapon] == 15336 && specialAmount >= 50) {
+        if (playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD && specialAmount >= 50) {
             startAnimation(7070);
             zamorakSpecial();
             specialAmount -= 50;
         }
-        if (playerEquipment[playerWeapon] == 15333 && specialAmount <= 49) {
+        if (playerEquipment[playerWeapon] == ItemIDs.ARMADYL_GODSWORD && specialAmount <= 49) {
             specialDamage = 0;
             specialDamage2 = 0;
             sendMessage("You do not have enough special energy left.");
         }
-        if (playerEquipment[playerWeapon] == 15333 && specialAmount >= 50) {
+        if (playerEquipment[playerWeapon] == ItemIDs.ARMADYL_GODSWORD && specialAmount >= 50) {
             startAnimation(7074);
             armadylSpecial();
             specialAmount -= 50;
@@ -21676,22 +21788,22 @@ nated = Integer.parseInt(token2);
             specialDamage = 18 + misc.random(5);
             specialAmount -= 50;
         }
-        if (playerEquipment[playerWeapon] == 15334 && specialAmount <= 49) { // bandos756
+        if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD && specialAmount <= 49) { // bandos756
             specialDamage = 0;
             specialDamage2 = 0;
             sendMessage("You do not have enough special energy left.");
         }
-        if (playerEquipment[playerWeapon] == 15334 && specialAmount >= 50) { // bandos756
+        if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD && specialAmount >= 50) { // bandos756
             startAnimation(2890);
             specialDamage = 40 + misc.random(5);
             specialAmount -= 50;
         }
-        if (playerEquipment[playerWeapon] == 15336 && specialAmount <= 49) { // zam756
+        if (playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD && specialAmount <= 49) { // zam756
             specialDamage = 0;
             specialDamage2 = 0;
             sendMessage("You do not have enough special energy left.");
         }
-        if (playerEquipment[playerWeapon] == 15336 && specialAmount >= 50) { // zam756
+        if (playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD && specialAmount >= 50) { // zam756
             startAnimation(1499);
             stillgfx(437, absY, absX);
             stillgfx(293, absY, absX);
@@ -22012,7 +22124,7 @@ nated = Integer.parseInt(token2);
             } else if (flowers == 2986) {
                 floweritem = 2472;
             } else if (flowers == 2987) {
-                floweritem = ObjectIDs.PORTAL_13;
+                floweritem = 2474;
             }
             if (seedtimer > 0) {
                 seedtimer--;
@@ -22026,15 +22138,6 @@ nated = Integer.parseInt(token2);
                 disconnected = true;
             }
 
-            for (int k = 0; k < server.Rocks; k++) {
-                if (server.ROCKSPAWN[k] > 0) {
-                    server.ROCKSPAWN[k]--;
-                }
-                if (server.ROCKSPAWN[k] == 0 && server.ORELEFT[k] == 0) {
-                    makeGlobalObject(server.ROCKX[k], server.ROCKY[k], server.ROCKID[k], server.ROCKFACE[k], 10);
-                    server.ORELEFT[k] = misc.random(server.ORE[k] + 1);
-                }
-            }
             if (WannePickUp) {
                 pItemId = 0;
                 PickUpAmount = 0;
@@ -22694,6 +22797,9 @@ nated = Integer.parseInt(token2);
                 break;
             case 210: // loads new area
                 server.getGlobalObjects().updateRegionObjects(this);
+                if (IsAttackingNPC || showedFire || showedUnfire || isTeleporting) {
+                    aggrotimer = System.currentTimeMillis();
+                }
                 break;
 
             case 53: // Use Item on another Item
@@ -22804,6 +22910,7 @@ nated = Integer.parseInt(token2);
                     } else if (!teleblock) {
                         teleportToX = 2461;
                         teleportToY = 3177;
+                        isTeleporting = true;
                         heightLevel = 0;
                         sendMessage("Home, sweet home");
                         // selectoption("Where would you like to go?", "Wilderness Agility Course", "Edgeville", "Karamja");
@@ -23525,6 +23632,15 @@ nated = Integer.parseInt(token2);
                     case 560:
                         start(new JiminuaDialogue());
                         break;
+                    case 8172:
+                        start(new DimintheisDialogue());
+                        break;
+                    case 619:
+                        start(new ArchaeologicalExpertDialogue());
+                        break;
+                    case 1920:
+                        start(new MalakDialogue());
+                        break;
                 }
                 if(NPCID == 494){
                     start(new BankerDialogue());
@@ -23544,40 +23660,15 @@ nated = Integer.parseInt(token2);
 
                     }
                 }
-                if (NPCID == 619) { // Archaeological expert
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 619; // assuming 619 is taken
-                }
-                if (NPCID == 1920) {
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 1920;
-                }
                 if (NPCID == 818) {
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 818;
+                    start(new ElizabethDialogue());
                 }
-                if (NPCID ==  8171) {
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 664;
-                }
-                if (NPCID == 501) {
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 501;
-                }
+
                 if (NPCID == 1972) {
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 1972;
+                start(new RasoloDialogue());
                 }
                 if (NPCID == 905) {
-                    skillX = server.npcHandler.npcs[NPCSlot].absX;
-                    skillY = server.npcHandler.npcs[NPCSlot].absY;
-                    NpcWanneTalk = 905;
+                    start(new KolodionDialogue());
                 }
                 if (NPCID == 522) {
                     start(new SkillzShopkeeperDialogue());
@@ -25024,13 +25115,13 @@ nated = Integer.parseInt(token2);
                     if(playerHasItem(ItemIDs.GODSWORD_BLADE) && playerHasItem(ItemIDs.BANDOS_HILT)) {
                         deleteItem2(ItemIDs.GODSWORD_BLADE, 1);
                         deleteItem2(ItemIDs.BANDOS_HILT, 1);
-                        addItem(ItemIDs.BANDOS_GODSWORD_, 1);
+                        addItem(ItemIDs.BANDOS_GODSWORD, 1);
                     }
                 } else if(itemUsed == ItemIDs.BANDOS_HILT && useWith == ItemIDs.GODSWORD_BLADE){
                     if(playerHasItem(ItemIDs.GODSWORD_BLADE) && playerHasItem(ItemIDs.BANDOS_HILT)) {
                         deleteItem2(ItemIDs.GODSWORD_BLADE, 1);
                         deleteItem2(ItemIDs.BANDOS_HILT, 1);
-                        addItem(ItemIDs.BANDOS_GODSWORD_, 1);
+                        addItem(ItemIDs.BANDOS_GODSWORD, 1);
                     }
                 } else if(itemUsed == ItemIDs.GODSWORD_BLADE && useWith == ItemIDs.SARADOMIN_HILT){
                     if(playerHasItem(ItemIDs.GODSWORD_BLADE) && playerHasItem(ItemIDs.SARADOMIN_HILT)) {
@@ -25048,13 +25139,13 @@ nated = Integer.parseInt(token2);
                     if(playerHasItem(ItemIDs.GODSWORD_BLADE) && playerHasItem(ItemIDs.ARMADYL_HILT)) {
                         deleteItem2(ItemIDs.GODSWORD_BLADE, 1);
                         deleteItem2(ItemIDs.ARMADYL_HILT, 1);
-                        addItem(ItemIDs.ARMADYL_GODSWORD_2, 1);
+                        addItem(ItemIDs.ARMADYL_GODSWORD, 1);
                     }
                 } else if(itemUsed == ItemIDs.ARMADYL_HILT && useWith == ItemIDs.GODSWORD_BLADE){
                     if(playerHasItem(ItemIDs.GODSWORD_BLADE) && playerHasItem(ItemIDs.ARMADYL_HILT)) {
                         deleteItem2(ItemIDs.GODSWORD_BLADE, 1);
                         deleteItem2(ItemIDs.ARMADYL_HILT, 1);
-                        addItem(ItemIDs.ARMADYL_GODSWORD_2, 1);
+                        addItem(ItemIDs.ARMADYL_GODSWORD, 1);
                     }
                 } else if(itemUsed == ItemIDs.GODSWORD_BLADE && useWith == ItemIDs.ZAMORAK_HILT){
                     if(playerHasItem(ItemIDs.GODSWORD_BLADE) && playerHasItem(ItemIDs.ZAMORAK_HILT)) {
@@ -25103,13 +25194,13 @@ nated = Integer.parseInt(token2);
                         deleteItem2(ItemIDs.GODSWORD_SHARD_3, 1);
                         addItem(ItemIDs.GODSWORD_BLADE, 1);
                     }
-                } else if (itemUsed == ItemIDs.HALF_OF_A_KEY && useWith == ItemIDs.HALF_OF_A_KEY_2) {
-                    deleteItem(ItemIDs.HALF_OF_A_KEY, getItemSlot(ItemIDs.HALF_OF_A_KEY), 1);
-                    deleteItem(ItemIDs.HALF_OF_A_KEY_2, getItemSlot(ItemIDs.HALF_OF_A_KEY_2), 1);
+                } else if (itemUsed == ItemIDs.TOOTH_HALF_OF_A_KEY && useWith == ItemIDs.LOOP_HALF_OF_A_KEY) {
+                    deleteItem(ItemIDs.TOOTH_HALF_OF_A_KEY, getItemSlot(ItemIDs.TOOTH_HALF_OF_A_KEY), 1);
+                    deleteItem(ItemIDs.LOOP_HALF_OF_A_KEY, getItemSlot(ItemIDs.LOOP_HALF_OF_A_KEY), 1);
                     addItem(ItemIDs.CRYSTAL_KEY, 1);
-                } else if (itemUsed == ItemIDs.HALF_OF_A_KEY_2 && useWith == ItemIDs.HALF_OF_A_KEY) {
-                    deleteItem(ItemIDs.HALF_OF_A_KEY_2, getItemSlot(ItemIDs.HALF_OF_A_KEY_2), 1);
-                    deleteItem(ItemIDs.HALF_OF_A_KEY, getItemSlot(ItemIDs.HALF_OF_A_KEY), 1);
+                } else if (itemUsed == ItemIDs.LOOP_HALF_OF_A_KEY && useWith == ItemIDs.TOOTH_HALF_OF_A_KEY) {
+                    deleteItem(ItemIDs.LOOP_HALF_OF_A_KEY, getItemSlot(ItemIDs.LOOP_HALF_OF_A_KEY), 1);
+                    deleteItem(ItemIDs.TOOTH_HALF_OF_A_KEY, getItemSlot(ItemIDs.TOOTH_HALF_OF_A_KEY), 1);
                     addItem(ItemIDs.CRYSTAL_KEY, 1);
                 }
                 if (itemUsed == 5340 && useWith == 5314) { //By System
@@ -26211,6 +26302,7 @@ nated = Integer.parseInt(token2);
                 objectX = inStream.readSignedWordBigEndianA();
                 int objectID = inStream.readInteger();
                 objectY = inStream.readUnsignedWordA();
+                ObjectDef objedtdef = ObjectDef.getObjectDef(objectID);
                 int objectDistance = 0;
                 int objectXOffset = 0;
                 int objectYOffset = 0;
@@ -26462,6 +26554,14 @@ nated = Integer.parseInt(token2);
                         objectDistance = 2;
                         objectXOffset = 1;
                         objectYOffset = 1;
+                        break;
+                    case 5094:
+                    case 5096:
+                    case 5097:
+                        case 5098:
+                        objectDistance = 3;
+                        objectXOffset = objedtdef.sizeX;
+                        objectYOffset = objedtdef.sizeY;
                         break;
                     default:
                         objectDistance = 1;
@@ -28568,12 +28668,12 @@ nated = Integer.parseInt(token2);
             PkingDelay = 2;
             wepdelay = 2;
         }
-        if (playerEquipment[playerWeapon] == (15333)) // Godswords.
+        if (playerEquipment[playerWeapon] == (ItemIDs.ARMADYL_GODSWORD)) // Godswords.
         {
             PkingDelay = 30;
             wepdelay = 30;
         }
-        if (playerEquipment[playerWeapon] == (15334)) // Godswords.
+        if (playerEquipment[playerWeapon] == (ItemIDs.BANDOS_GODSWORD)) // Godswords.
         {
             PkingDelay = 30;
             wepdelay = 30;
@@ -28583,12 +28683,12 @@ nated = Integer.parseInt(token2);
             PkingDelay = 2;
             wepdelay = 2;
         }
-        if (playerEquipment[playerWeapon] == (15335)) // Godswords.
+        if (playerEquipment[playerWeapon] == (ItemIDs.SARADOMIN_GODSWORD)) // Godswords.
         {
             PkingDelay = 30;
             wepdelay = 30;
         }
-        if (playerEquipment[playerWeapon] == (15336)) // Godswords.
+        if (playerEquipment[playerWeapon] == (ItemIDs.ZAMORAK_GODSWORD)) // Godswords.
         {
             PkingDelay = 30;
             wepdelay = 30;
@@ -28801,7 +28901,7 @@ nated = Integer.parseInt(token2);
                                         specialDamage = 0;
                                         specialDamage2 = 0;
                                     }
-                                    if (playerEquipment[playerWeapon] == 15336 && specialAmount >= 50) {
+                                    if (playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD && specialAmount >= 50) {
                                         ProjectileSpec(282, absY, absX, offsetY, offsetX, AttackingOn, EnemyY, EnemyX);
                                         calculateSpecial();
                                         hitDiff = specialDamage;
@@ -28809,7 +28909,7 @@ nated = Integer.parseInt(token2);
                                         specialDamage = 0;
                                         specialDamage2 = 0;
                                     }
-                                    if (playerEquipment[playerWeapon] == 15335 && specialAmount >= 50) {
+                                    if (playerEquipment[playerWeapon] == ItemIDs.SARADOMIN_GODSWORD && specialAmount >= 50) {
                                         ProjectileSpec(2067, absY, absX, offsetY, offsetX, AttackingOn, EnemyY, EnemyX);
                                         calculateSpecial();
                                         hitDiff = specialDamage;
@@ -28817,7 +28917,7 @@ nated = Integer.parseInt(token2);
                                         specialDamage = 0;
                                         specialDamage2 = 0;
                                     }
-                                    if (playerEquipment[playerWeapon] == 15334 && specialAmount >= 50) {
+                                    if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD && specialAmount >= 50) {
                                         ProjectileSpec(ItemIDs.COPPER_ORE, absY, absX, offsetY, offsetX, AttackingOn, EnemyY, EnemyX);
                                         calculateSpecial();
                                         hitDiff = specialDamage;
@@ -29119,7 +29219,7 @@ nated = Integer.parseInt(token2);
             actionTimer = 0;
             ResetAttack();
             ResetAttackNPC();
-            startAnimation(2304);
+            setAnimation(2304);
             IsDeadTimer = true;
 
             specialAttacks();
@@ -29220,88 +29320,88 @@ nated = Integer.parseInt(token2);
 
     public void setSkillLevel(int skillNum, int currentLevel, int XP) {
         if (skillNum == 0) {
-            getPA().sendQuest(String.valueOf(playerLevel[0]), 4004);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[0])), 4005);
+            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[0])), 4005);
         }
         if (skillNum == 2) {
-            getPA().sendQuest(String.valueOf(playerLevel[2]), 4006);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[2])), 4007);
+            getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[2])), 4007);
         }
         if (skillNum == 1) {
-            getPA().sendQuest(String.valueOf(playerLevel[1]), 4008);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[1])), 4009);
+            getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[1])), 4009);
         }
         if (skillNum == 4) {
-            getPA().sendQuest(String.valueOf(playerLevel[4]), 4010);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[4])), 4011);
+            getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[4])), 4011);
         }
         if (skillNum == 5) {
-            getPA().sendQuest(String.valueOf(playerLevel[5]), 4012);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[5])), 4013);
+            getPA().sendFrame126(String.valueOf(playerLevel[5]), 4012);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[5])), 4013);
         }
         if (skillNum == 6) {
-            getPA().sendQuest(String.valueOf(playerLevel[6]), 4014);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[6])), 4015);
+            getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[6])), 4015);
         }
         if (skillNum == 3) {
-            getPA().sendQuest(String.valueOf(playerLevel[3]), 4016);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[3])), 4017);
+            getPA().sendFrame126(String.valueOf(playerLevel[3]), 4016);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[3])), 4017);
         }
         if (skillNum == 16) {
-            getPA().sendQuest(String.valueOf(playerLevel[16]), 4018);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[16])), 4019);
+            getPA().sendFrame126(String.valueOf(playerLevel[16]), 4018);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[16])), 4019);
         }
         if (skillNum == 15) {
-            getPA().sendQuest(String.valueOf(playerLevel[15]), 4020);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[15])), 4021);
+            getPA().sendFrame126(String.valueOf(playerLevel[15]), 4020);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[15])), 4021);
         }
         if (skillNum == 17) {
-            getPA().sendQuest(String.valueOf(playerLevel[17]), 4022);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[17])), 4023);
+            getPA().sendFrame126(String.valueOf(playerLevel[17]), 4022);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[17])), 4023);
         }
         if (skillNum == 12) {
-            getPA().sendQuest(String.valueOf(playerLevel[12]), 4024);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[12])), 4025);
+            getPA().sendFrame126(String.valueOf(playerLevel[12]), 4024);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[12])), 4025);
         }
         if (skillNum == 9) {
-            getPA().sendQuest(String.valueOf(playerLevel[9]), 4026);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[9])), 4027);
+            getPA().sendFrame126(String.valueOf(playerLevel[9]), 4026);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[9])), 4027);
         }
         if (skillNum == 14) {
-            getPA().sendQuest(String.valueOf(playerLevel[14]), 4028);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[14])), 4029);
+            getPA().sendFrame126(String.valueOf(playerLevel[14]), 4028);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[14])), 4029);
         }
         if (skillNum == 13) {
-            getPA().sendQuest(String.valueOf(playerLevel[13]), 4030);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[13])), 4031);
+            getPA().sendFrame126(String.valueOf(playerLevel[13]), 4030);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[13])), 4031);
         }
         if (skillNum == 10) {
-            getPA().sendQuest(String.valueOf(playerLevel[10]), 4032);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[10])), 4033);
+            getPA().sendFrame126(String.valueOf(playerLevel[10]), 4032);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[10])), 4033);
         }
         if (skillNum == 7) {
-            getPA().sendQuest(String.valueOf(playerLevel[7]), 4034);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[7])), 4035);
+            getPA().sendFrame126(String.valueOf(playerLevel[7]), 4034);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[7])), 4035);
         }
         if (skillNum == 11) {
-            getPA().sendQuest(String.valueOf(playerLevel[11]), 4036);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[11])), 4037);
+            getPA().sendFrame126(String.valueOf(playerLevel[11]), 4036);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[11])), 4037);
         }
         if (skillNum == 8) {
-            getPA().sendQuest(String.valueOf(playerLevel[8]), 4038);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[8])), 4039);
+            getPA().sendFrame126(String.valueOf(playerLevel[8]), 4038);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[8])), 4039);
         }
         if (skillNum == 20) {
-            getPA().sendQuest(String.valueOf(playerLevel[20]), 4152);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[20])), 4153);
+            getPA().sendFrame126(String.valueOf(playerLevel[20]), 4152);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[20])), 4153);
         }
         if (skillNum == 18) {
-            getPA().sendQuest(String.valueOf(playerLevel[18]), 12166);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[18])), 12167);
+            getPA().sendFrame126(String.valueOf(playerLevel[18]), 12166);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[18])), 12167);
         }
         if (skillNum == 19) {
-            getPA().sendQuest(String.valueOf(playerLevel[19]), 13926);
-            getPA().sendQuest(String.valueOf(getLevelForXP(playerXP[19])), 13927);
+            getPA().sendFrame126(String.valueOf(playerLevel[19]), 13926);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[19])), 13927);
         } else {
             if(getOutStream() != null) {
                 getOutStream().createFrame(134);
@@ -30789,9 +30889,6 @@ nated = Integer.parseInt(token2);
         {
             return 451;
         }
-        if(weaponName.contains("sword")){
-            return 451;
-        }
         if (weaponName.contains("cross") && !weaponName.contains("karil") || weaponName.contains("c'bow") && !weaponName.contains("karil")) {
             return 4230;
         }
@@ -30830,11 +30927,18 @@ nated = Integer.parseInt(token2);
         {
             return 451;
         }
-        if (playerEquipment[playerWeapon] == 15334 ||
-                playerEquipment[playerWeapon] == 21690 || playerEquipment[playerWeapon] == 15336 || playerEquipment[playerWeapon] == 15335
-                || playerEquipment[playerWeapon] == 15333 || playerEquipment[playerWeapon] == 15337 || playerEquipment[playerWeapon] == 15339 || playerEquipment[playerWeapon] == ItemIDs.LUCKY_SARADOMIN_GODSWORD || playerEquipment[playerWeapon] == 15341 || playerEquipment[playerWeapon] == 15342 || playerEquipment[playerWeapon] == 15343) // 756
+        if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD
+                || playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD
+                || playerEquipment[playerWeapon] == ItemIDs.SARADOMIN_GODSWORD
+                || playerEquipment[playerWeapon] == ItemIDs.ARMADYL_GODSWORD
+                || playerEquipment[playerWeapon] == 15337
+                || playerEquipment[playerWeapon] == 15339
+                || playerEquipment[playerWeapon] == ItemIDs.LUCKY_SARADOMIN_GODSWORD
+                || playerEquipment[playerWeapon] == 15341
+                || playerEquipment[playerWeapon] == 15342
+                || playerEquipment[playerWeapon] == 15343) // 756
         {
-            return 407;
+            return 11979;
         }
         if (playerEquipment[playerWeapon] == 14915) // anchor
         {
@@ -31095,7 +31199,7 @@ nated = Integer.parseInt(token2);
         {
             return 1664;
         }
-        if (id == 15333) // scythe
+        if (id == ItemIDs.ARMADYL_GODSWORD) // scythe
         {
             return 7039;
         }
@@ -31120,7 +31224,7 @@ nated = Integer.parseInt(token2);
         {
             return 7039;
         }
-        if (id == 15336) // scythe
+        if (id == ItemIDs.ZAMORAK_GODSWORD) // scythe
         {
             return 7039;
         }
@@ -31132,11 +31236,11 @@ nated = Integer.parseInt(token2);
         {
             return 7039;
         }
-        if (id == 15334) // scythe
+        if (id == ItemIDs.BANDOS_GODSWORD) // scythe
         {
             return 7039;
         }
-        if (id == 15335) // scythe
+        if (id == ItemIDs.SARADOMIN_GODSWORD) // scythe
         {
             return 7039;
         }
@@ -31247,7 +31351,7 @@ nated = Integer.parseInt(token2);
         {
             return 2074;
         }
-        if (id == 15333 || id == 21690 || id == 15334 || id == 15335 || id == 15337 || id == 15339 || id == 15336 || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
         {
             return 7047;
         }
@@ -31285,7 +31389,7 @@ nated = Integer.parseInt(token2);
         if(weaponName.contains("whip")) {
             return 11975;
         }
-        if (id == 15333 || id == 21690 || id == 15334 || id == 15335 || id == 15337 || id == 15339 || id == 15336 || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
         {
             return 7043;
         } else {
@@ -31297,7 +31401,7 @@ nated = Integer.parseInt(token2);
         if (weaponName.contains("whip")) {
             return 11975;
         }
-        if (id == 15333 || id == 21690 || id == 15334 || id == 15335 || id == 15337 || id == 15339 || id == 15336 || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul{
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul{
         {
             return 7043;
         } else {
@@ -31310,7 +31414,7 @@ nated = Integer.parseInt(token2);
         if(weaponName.contains("whip")) {
             return 11975;
         }
-        if (id == 15333 || id == 21690 || id == 15334 || id == 15335 || id == 15337 || id == 15339 || id == 15336 || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
         {
             return 7044;
         } else {
@@ -31348,15 +31452,15 @@ nated = Integer.parseInt(token2);
         {
             return 5866;
         }
-        if (id == 15335) // rune sq shield
+        if (id == ItemIDs.SARADOMIN_GODSWORD) // rune sq shield
         {
             return 7050;
         }
-        if (id == 15334) // rune sq shield
+        if (id == ItemIDs.BANDOS_GODSWORD) // rune sq shield
         {
             return 7050;
         }
-        if (id == 15333) // rune sq shield
+        if (id == ItemIDs.ARMADYL_GODSWORD) // rune sq shield
         {
             return 7050;
         }
@@ -31380,7 +31484,7 @@ nated = Integer.parseInt(token2);
         {
             return 7050;
         }
-        if (id == 15336) // rune sq shield
+        if (id == ItemIDs.ZAMORAK_GODSWORD) // rune sq shield
         {
             return 7050;
         }
@@ -31554,9 +31658,10 @@ nated = Integer.parseInt(token2);
     }
 
     public void pmupdate(int pmid, int world) {
-        long l = misc.playerNameToInt64(PlayerHandler.players[pmid].playerName);
-
-        if (PlayerHandler.players[pmid].Privatechat == 0) {
+        Player target = PlayerHandler.getPlayerSafe(pmid); // add a safe helper
+        if (target == null) return;
+        long l = misc.playerNameToInt64(target.playerName);
+        if (target.Privatechat == 0) {
             for (int i = 0; i < friends.length; i++) {
                 if (friends[i] != 0) {
                     if (l == friends[i]) {
@@ -31565,11 +31670,11 @@ nated = Integer.parseInt(token2);
                     }
                 }
             }
-        } else if (PlayerHandler.players[pmid].Privatechat == 1) {
+        } else if (target.Privatechat == 1) {
             for (int i1 = 0; i1 < friends.length; i1++) {
                 if (friends[i] != 0) {
                     if (l == friends[i1]) {
-                        if (PlayerHandler.players[pmid].isinpm(
+                        if (target.isinpm(
                                 misc.playerNameToInt64(playerName))
                                 && rights.inherits(Rights.ADMINISTRATOR)) {
                             loadpm(l, world);
@@ -31581,7 +31686,7 @@ nated = Integer.parseInt(token2);
                     }
                 }
             }
-        } else if (PlayerHandler.players[pmid].Privatechat == 2) {
+        } else if (target.Privatechat == 2) {
             for (int i2 = 0; i2 < friends.length; i2++) {
                 if (friends[i] != 0) {
                     if (l == friends[i2] && getRights().isPlayer()) {
@@ -33097,8 +33202,8 @@ nated = Integer.parseInt(token2);
     }
 
     public boolean FullDharokEquipped() {
-        return playerEquipment[playerHat] == 4716
-                && playerEquipment[playerChest] == 4720
+        return playerEquipment[playerHat] == ItemIDs.DHAROKS_HELM
+                && playerEquipment[playerChest] == ItemIDs.DHAROKS_PLATEBODY
                 && playerEquipment[playerLegs] == 4722
                 && playerEquipment[playerWeapon] == 4718;
 
@@ -35306,7 +35411,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.ATTACK_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.ATTACK_CAPET) {
+        if (ItemID == ItemIDs.ATTACK_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.ATTACK_HOOD) {
@@ -35330,16 +35435,16 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.DRAGON_2H_SWORD) {
             return 60;
         }
-        if (ItemID == 15333) {
+        if (ItemID == ItemIDs.ARMADYL_GODSWORD) {
             return 75;
         }
-        if (ItemID == 15334) {
+        if (ItemID == ItemIDs.BANDOS_GODSWORD) {
             return 75;
         }
-        if (ItemID == 15335) {
+        if (ItemID == ItemIDs.SARADOMIN_GODSWORD) {
             return 75;
         }
-        if (ItemID == 15336) {
+        if (ItemID == ItemIDs.ZAMORAK_GODSWORD) {
             return 75;
         }
         if (ItemID == 3101) {
@@ -35410,7 +35515,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.PRAYER_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.PRAYER_CAPET) {
+        if (ItemID == ItemIDs.PRAYER_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.PRAYER_HOOD) {
@@ -35434,7 +35539,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.FLETCHING_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.FLETCHING_CAPET) {
+        if (ItemID == ItemIDs.FLETCHING_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.FLETCHING_HOOD) {
@@ -35458,7 +35563,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.WOODCUTTING_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.WOODCUT_CAPET) {
+        if (ItemID == ItemIDs.WOODCUT_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.WOODCUTTING_HOOD) {
@@ -35482,7 +35587,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.COOKING_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.COOKING_CAPET) {
+        if (ItemID == ItemIDs.COOKING_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.COOKING_HOOD) {
@@ -35506,7 +35611,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.FISHING_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.FISHING_CAPET) {
+        if (ItemID == ItemIDs.FISHING_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.FISHING_HOOD) {
@@ -35530,7 +35635,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.THIEVING_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.THIEVING_CAPET) {
+        if (ItemID == ItemIDs.THIEVING_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.THIEVING_HOOD) {
@@ -35552,13 +35657,13 @@ nated = Integer.parseInt(token2);
     }
 
     public int GetCLHitpoints(int ItemID) {
-        if (ItemID == ItemIDs.HITPOINTS_CAPE) {
+        if (ItemID == ItemIDs.CONSTITUTION_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.HITPOINTS_CAPET) {
+        if (ItemID == ItemIDs.CONSTITUTION_CAPE_T) {
             return 99;
         }
-        if (ItemID == ItemIDs.HITPOINTS_HOOD) {
+        if (ItemID == ItemIDs.CONSTITUTION_HOOD) {
             return 99;
         }
         if (ItemID == -1) {
@@ -35579,7 +35684,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.FARMING_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.FARMING_CAPET) {
+        if (ItemID == ItemIDs.FARMING_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.FARMING_HOOD) {
@@ -35603,7 +35708,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.SLAYER_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.SLAYER_CAPET) {
+        if (ItemID == ItemIDs.SLAYER_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.SLAYER_HOOD) {
@@ -35642,7 +35747,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.BLACK_DHIDE_CHAPS) {
             return 40;
         }
-        if (ItemID == ItemIDs.BLACK_DHIDE_VAMB) {
+        if (ItemID == ItemIDs.BLACK_DHIDE_VAMBRACES) {
             return 40;
         }
         if (ItemID == ItemIDs.BLACK_DHIDE_BODY) {
@@ -35651,13 +35756,13 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.RED_DHIDE_CHAPS) {
             return 40;
         }
-        if (ItemID == ItemIDs.RED_DHIDE_VAMB) {
+        if (ItemID == ItemIDs.RED_DHIDE_VAMBRACES) {
             return 40;
         }
         if (ItemID == ItemIDs.RED_DHIDE_BODY) {
             return 40;
         }
-        if (ItemID == ItemIDs.GREEN_DHIDE_VAMB) {
+        if (ItemID == ItemIDs.GREEN_DHIDE_VAMBRACES) {
             return 40;
         }
         if (ItemID == ItemIDs.GREEN_DHIDE_CHAPS) {
@@ -35678,7 +35783,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.DEFENCE_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.DEFENCE_CAPET) {
+        if (ItemID == ItemIDs.DEFENCE_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.DEFENCE_HOOD) {
@@ -35687,22 +35792,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.RUNE_FULL_HELM) {
             return 40;
         }
-        if (ItemID == 10228) {
-            return 5;
-        }
-        if (ItemID == 10229) {
-            return 10;
-        }
-        if (ItemID == 10230) {
-            return 20;
-        }
-        if (ItemID == 10231) {
-            return 30;
-        }
-        if (ItemID == 10232) {
-            return 40;
-        }
-        if (ItemID == 1127) {
+        if (ItemID == ItemIDs.RUNE_PLATEBODY) {
             return 40;
         }
         if (ItemID == 1079) {
@@ -35720,10 +35810,10 @@ nated = Integer.parseInt(token2);
         if (ItemID == 4131) {
             return 40;
         }
-        if (ItemID == 4716) {
+        if (ItemID == ItemIDs.DHAROKS_HELM) {
             return 70;
         }
-        if (ItemID == 4720) {
+        if (ItemID == ItemIDs.DHAROKS_PLATEBODY) {
             return 70;
         }
         if (ItemID == 4722) {
@@ -35857,7 +35947,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.STRENGTH_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.STRENGTH_CAPET) {
+        if (ItemID == ItemIDs.STRENGTH_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.STRENGTH_HOOD) {
@@ -35883,7 +35973,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.MAGIC_CAPE) {
             return 99;
         }
-        if (ItemID == ItemIDs.MAGIC_CAPET) {
+        if (ItemID == ItemIDs.MAGIC_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.MAGIC_HOOD) {
@@ -35934,7 +36024,7 @@ nated = Integer.parseInt(token2);
         if (ItemID == 11154) {
             return 80;
         }
-        if (ItemID == ItemIDs.RANGING_CAPET) {
+        if (ItemID == ItemIDs.RANGING_CAPE_T) {
             return 99;
         }
         if (ItemID == ItemIDs.RANGING_HOOD) {
@@ -36810,6 +36900,7 @@ nated = Integer.parseInt(token2);
             this.knightS = playerData.getKnightS();
             this.witchspot = playerData.getWitchspot();
             this.pirateTreasure = playerData.getPirateTreasure();
+            this.desertTreasure = playerData.getDesertTreasure();
             if (playerData.getSlayerTask().isPresent()) {
                 this.getSlayer().setTask(playerData.getSlayerTask());
                 this.getSlayer().setTaskAmount(playerData.getSlayerTaskAmount());
@@ -37203,8 +37294,12 @@ nated = Integer.parseInt(token2);
             ResetAttack();
             ResetAttackNPC2();
         }
+        if (IsAttackingNPC || showedFire || showedUnfire || isTeleporting) {
+            aggrotimer = System.currentTimeMillis();
+        }
         Trainingteleports = Fishingspots = Miningspots = playerIsFishing = false;
         IsAttackingNPC = false;
+        isTeleporting = false;
         showedFire = false;
         showedUnfire = false;
         isPotCrafting = false;

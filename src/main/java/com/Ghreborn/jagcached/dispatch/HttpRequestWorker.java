@@ -68,7 +68,7 @@ public final class HttpRequestWorker extends RequestWorker<HttpRequest, Resource
 		String hyperTrace = HyperTraceEngine.traceIP(ip);
 
 		if (isRateLimited(ip) || isUntrusted(traceReport, hyperTrace)) {
-			System.out.println("[BLOCKED] " + ip + " | Reason: Untrusted | Trace: " + traceReport + " | Hyper: " + hyperTrace);
+			System.out.println("[BLOCKED Http request] " + ip + " | Reason: Untrusted | Trace: " + traceReport + " | Hyper: " + hyperTrace);
 			serveStaticPage(channel, DECOY_PAGE);
 			return;
 		}

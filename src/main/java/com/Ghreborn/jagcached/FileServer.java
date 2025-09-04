@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 
 import com.Ghreborn.jagcached.dispatch.RequestWorkerPool;
-import com.Ghreborn.jagcached.fs.IndexedFileSystem;
 import com.Ghreborn.jagcached.net.FileServerHandler;
 import com.Ghreborn.jagcached.net.HttpPipelineFactory;
 import com.Ghreborn.jagcached.net.JagGrabPipelineFactory;

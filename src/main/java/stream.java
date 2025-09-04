@@ -28,7 +28,6 @@ public class stream {
     public byte readSignedByteA() {
         return (byte) (buffer[currentOffset++] - 128);
     }
-
     public byte[] decryptRSA(BigInteger d, BigInteger n) {
         int rsaLength = buffer[currentOffset++] & 0xff;
         byte[] rsaArray = new byte[rsaLength];
@@ -38,6 +37,7 @@ public class stream {
         BigInteger m = new BigInteger(rsaArray).modPow(d, n);
         return m.toByteArray();
     }
+
 
     public byte readSignedByteC() {
         return (byte) (-buffer[currentOffset++]);
@@ -389,4 +389,13 @@ public class stream {
         buffer[currentOffset++] = (byte) i;
     }
 
+    public String readNewString() {
+        int i = this.currentOffset;
+
+        while(this.buffer[this.currentOffset++] != 0) {
+            ;
+        }
+
+        return new String(this.buffer, i, this.currentOffset - i - 1);
+    }
 }

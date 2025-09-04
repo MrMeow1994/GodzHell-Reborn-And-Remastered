@@ -36,7 +36,7 @@ public class NPC {
     // Inside your NPC class
     public int targetScanCooldown = 0;
     public boolean walkingHome, underAttack;
-    public int HP, MaxHP, hitDiff, MaxHit, animNumber, actionTimer, StartKilling, enemyX, enemyY;
+    public int HP, MaxHP, hitDiff, MaxHit, animNumber, actionTimer, hitDelayTimer, pendingDamage,StartKilling, enemyX, enemyY;
     public boolean IsDead, DeadApply, NeedRespawn, IsUnderAttack, IsClose, Respawns, IsUnderAttackNpc, IsAttackingNPC, poisondmg, walkingToPlayer, followingPlayer;
     public int[] Killing = new int[PlayerHandler.maxPlayers];
     public boolean RandomWalk;
@@ -60,7 +60,6 @@ public class NPC {
     public int attackTimer = 0;      // cooldown for attacking
     public boolean summoner;
     public int summonedBy;
-    public int hitDelayTimer;
     public int projectileId;
     public int oldIndex;
     public int attack;
@@ -69,6 +68,12 @@ public class NPC {
     public int lastY;
     public boolean randomWalk;
     public long lastAttacked;
+    public long lastAggroTick = 0;
+    public int combatLevel;
+    public boolean alwaysAggressive = false; // True for dragons, demons, bosses, etc.
+
+    public int startGfx;
+    public long lastAggroCheck;
     int npcSize;
     private Tile currentTile;
     private boolean transformUpdateRequired = false;
@@ -396,6 +401,19 @@ public class NPC {
         gfxUpdateRequired = true;
         updateRequired = true;
     }
+    public void stillgfx(int gfx, int y, int x, int height) {
+        this.mask80var1 = gfx;
+        this.mask80var2 = 65536 * height;
+        this.gfxUpdateRequired = true;
+        this.updateRequired = true;
+    }
+    public void stillgfx(int gfx, int y, int x) {
+        this.mask80var1 = gfx;
+        this.mask80var2 = 65536; // default height 100
+        this.gfxUpdateRequired = true;
+        this.updateRequired = true;
+    }
+
     public void gfx100(int gfx, int height) {
         mask80var1 = gfx;
         mask80var2 = 65536 * height;
@@ -577,5 +595,10 @@ public class NPC {
 
     public boolean isAlive() {
         return !IsDead;
+    }
+
+    public void startAnimation(int i) {
+        animNumber = i;
+        animUpdateRequired = true;
     }
 }

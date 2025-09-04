@@ -16,15 +16,15 @@ public class House implements Serializable {
 		    return new File(houseLocation + player.playerName + ".house").exists();
 		  }
 	
-	public static void showHouse(client host, client visiter) {
-		host.sM("entering house");
+	public static void showHouse(client visiter) {
+		visiter.sM("entering house");
 		visiter.getOutStream().createFrameVarSizeWord(241);
 		visiter.getOutStream().writeWordA(visiter.mapRegionY + 6);
 		visiter.getOutStream().initBitAccess();
 		for(int z = 0; z < 4; z++) {
 			for(int x = 0; x < 13; x++) {
 				for(int y = 0; y < 13; y++) {
-					Room room = host.getHouse().rooms[x][y][z];
+					Room room = visiter.getHouse().rooms[x][y][z];
 					visiter.getOutStream().writeBits(1, room != null ? 1 : 0);
 					if(room != null) {
 						visiter.getOutStream().writeBits(26, room.locationHash);
@@ -37,8 +37,8 @@ public class House implements Serializable {
 		visiter.getOutStream().endFrameVarSizeWord();
 		visiter.flushOutStream();
 		visiter.inHouse = true;
-		loadObjects(host);
-		System.out.println("house loaded for "+host);
+		loadObjects(visiter);
+		System.out.println("house loaded for "+visiter);
 	}
 	
 	public static void loadObjects(client c) {
@@ -250,6 +250,6 @@ public class House implements Serializable {
 	
 	public static void addRoom(client player, int id, int x, int y, Room room, int slotX, int slotY) {
 		player.getHouse().rooms[slotX][slotY][0] = room;
-		showHouse(player, player);
+		showHouse(player);
 	}
 }
