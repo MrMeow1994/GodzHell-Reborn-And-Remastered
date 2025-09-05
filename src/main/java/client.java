@@ -16,44 +16,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class client extends Player implements Runnable {
-    private static final BigInteger RSA_MODULUS = new BigInteger("109146498026789313726826224373459558208050127700378246305873710995315714783684251038666549407762991475007000587532182005003279074831900986161303462490626538608294667460272328302125530424189692575104242196104595067933708123073135778015307595620436012118775654418370935818679069485674062571131950728740325985423");
-
-    private static final BigInteger RSA_EXPONENT = new BigInteger("4773087925061845570305078948599037090868847612635367104271389531296440767353389130976674712035166906745350926711128578151874480499080339752175041938113364963813903302320604458480524363908708508723321745501640064523402673896241792464923652293310384789487471094984494514770075931564248597823520110267743803777");
-  public static final int bufferSize = 20000;
-    public static final int[] packetSizes = {
-            0, 0, 0, 1, -1, 0, 0, 0, 0, 0, //0 - 9
-            0, 0, 0, 0, 8, 0, 6, 2, 2, 0, //10 - 19
-            0, 2, 0, 6, 0, 12, 0, 0, 0, 0, //20 - 29
-            0, 0, 0, 0, 0, 8, 4, 0, 0, 2, //30 - 39
-            2, 6, 0, 6, 0, -1, 0, 0, 0, 0, //40 - 49
-            0, 0, 0, 12, 0, 0, 0, 8, 8, 0, //50 - 59
-            8, 8, 0, 0, 0, 0, 0, 0, 0, 0, //60 - 69
-            8, 0, 2, 2, 8, 6, 0, -1, 0, 6, //70 - 79
-            0, 0, 0, 0, 0, 1, 4, 6, 0, 0, //80 - 89
-            0, 0, 0, 0, 0, 3, 0, 0, -1, 0, //90 - 99
-            0, 26, 0, -1, 0, 0, 0, 0, 0, 0, //100 - 109
-            0, 0, 0, 0, 0, 0, 0, 6, 0, 0, //110 - 119
-            1, 0, 6, 0, 0, 0, -1, -1, 2, 6, //120 - 129
-            0, 4, 8, 8, 0, 6, 0, 0, 0, 2, //130 - 139
-            6, 10, -1, 0, 0, 6, 0, 0, 0, 0, //140 - 149
-            0, 0, 1, 2, 0, 2, 6, 0, 0, 0, //150 - 159
-            0, 0, 0, 0, -1, -1, 0, 0, 0, 0, //160 - 169
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //170 - 179
-            0, 8, 0, 3, 0, 2, 0, 0, 8, 1, //180 - 189
-            0, 0, 14, 0, 0, 0, 0, 0, 0, 1, //190 - 199
-            2, 0, 0, 0, 0, 0, 0, 0, 4, 0, //200 - 209
-            4, 0, 0, 4, 7, 8, 0, 0, 10, 0, //210 - 219
-            0, 0, 0, 0, 0, 0, -1, 0, 8, 0, //220 - 229
-            1, 0, 0, 0, 8, 0, 6, 8, 1, 0, //230 - 239
-            0, 4, 0, 0, 0, 0, -1, 0, -1, 4, //240 - 249
-            0, 0, 8, 6, 0, 0, 0, //250 - 255
-    };
-    public static final int OPCODE_OUT_OF_RANGE_SIZE = -5000;
-    public static int getPacketSize(int opcode) {
-        if (opcode < 0 || opcode >= packetSizes.length)
-            return OPCODE_OUT_OF_RANGE_SIZE;
-        return packetSizes[opcode];
-    }
+public static final int bufferSize = 20000;
     private static final int[][] MALE_VALUES = {{0, 8}, // head
             {10, 17}, // jaw
             {18, 25}, // torso
@@ -11410,7 +11373,7 @@ public void setHouse(House house) {
             lowMemoryVersion = inStream.readUnsignedByte();
             for (int i = 0; i < 9; i++) inStream.readInteger(); // data file version junk
 
-            stream rsaStream = new stream(inStream.decryptRSA(RSA_EXPONENT, RSA_MODULUS));
+            stream rsaStream = new stream(inStream.decryptRSA(packetSizes.RSA_EXPONENT, packetSizes.RSA_MODULUS));
             if (rsaStream.readUnsignedByte() != 10) {
                 shutdownError("Invalid RSA opcode");
                 return;
@@ -22640,10 +22603,10 @@ nated = Integer.parseInt(token2);
 
 
                 packetType = opcode;
-                packetSize = getPacketSize(packetType);
+                packetSize = packetSizes.getPacketSize(packetType);
 
                 // OPCODE_OUT_OF_RANGE_SIZE check (i.e., if packet is invalid)
-                if (packetSize == OPCODE_OUT_OF_RANGE_SIZE) {
+                if (packetSize == packetSizes.OPCODE_OUT_OF_RANGE_SIZE) {
                     // logUnknownOpcode(packetType);
                     resetPacket();
                     return false;

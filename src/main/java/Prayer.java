@@ -30,7 +30,8 @@ public class Prayer {
             { 4832, 96 }, // RAURG BONES
             { 4834, 140 }, // OURG BONES
             { 6729, 125 }, // DAGANNOTH BONES
-            { 6812, 50 }, // WYVERN BONES
+            { 6812, 50 },// WYVERN BONES
+            {18832, 160}// Frost dragon BONES
     };
 
     public static boolean playerBones(client player, int item) {
@@ -63,7 +64,7 @@ public class Prayer {
                         public void stop() {
 
                         }
-                    }, 1+600);
+                    }, 1*600);
                 }
             }
         }

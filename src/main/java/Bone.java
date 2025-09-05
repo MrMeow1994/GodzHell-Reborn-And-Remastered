@@ -11,7 +11,8 @@ public enum Bone {
     JOGRE(3125, 15),
     WYVERN(6812, 72),
     RAURG(4832, 96),
-    OURG(4834,140);
+    OURG(4834,140),
+    FROST_DRAG(18832, 160);
 
     /**
      * The item identification value for the bone
