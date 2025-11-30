@@ -225,7 +225,7 @@ swoc trades item: 1051 amount: 15 with liam
 ladu joe do trades item: 15195 amount: 1 with liam
 ladu joe do trades item: 1187 amount: 1 with liam
 ladu joe do trades item: 4087 amount: 1 with liam
-ladu joe do trades item: 13665 amount: 1 with liam
+ladu joe do trades item: 14479 amount: 1 with liam
 ladu joe do trades item: 2904 amount: 1 with liam
 ladu joe do trades item: 9119 amount: 1 with liam
 ladu joe do trades item: 6666 amount: 1 with liam
@@ -694,7 +694,7 @@ mewantags trades item: 18354 amount: 1 with traxxas
 mewantags trades item: 18355 amount: 1 with traxxas
 mewantags trades item: 13664 amount: 1 with traxxas
 mewantags trades item: 14097 amount: 1 with traxxas
-mewantags trades item: 13665 amount: 1 with traxxas
+mewantags trades item: 14479 amount: 1 with traxxas
 parkyisbeast trades item: 554 amount: 5 with payton
 parkyisbeast trades item: 561 amount: 1 with payton
 payton trades item: 13664 amount: 1 with mandem
@@ -1062,7 +1062,7 @@ payton trades item: 14340 amount: 1 with ownersdp
 payton trades item: 14339 amount: 1 with ownersdp
 payton trades item: 14338 amount: 1 with ownersdp
 payton trades item: 14343 amount: 1 with ownersdp
-payton trades item: 13665 amount: 1 with ownersdp
+payton trades item: 14479 amount: 1 with ownersdp
 payton trades item: 11345 amount: 1 with ownersdp
 payton trades item: 11340 amount: 1 with ownersdp
 payton trades item: 11342 amount: 1 with ownersdp
@@ -2634,21 +2634,21 @@ italianboy trades item: 4081 amount: 1 with sethg
 italianboy trades item: 15333 amount: 1 with payton
 italianboy trades item: 13664 amount: 1 with payton
 sethg trades item: 2904 amount: 1 with slayer245
-sethg trades item: 13665 amount: 1 with slayer245
+sethg trades item: 14479 amount: 1 with slayer245
 sethg trades item: 4087 amount: 1 with slayer245
 sethg trades item: 892 amount: 2807 with slayer245
 sethg trades item: 7158 amount: 1 with slayer245
 sethg trades item: 6585 amount: 1 with slayer245
 sethg trades item: 2904 amount: 1 with slayer245
 sethg trades item: 892 amount: 2807 with slayer245
-sethg trades item: 13665 amount: 1 with slayer245
+sethg trades item: 14479 amount: 1 with slayer245
 sethg trades item: 4087 amount: 1 with slayer245
 sethg trades item: 7158 amount: 1 with slayer245
 sethg trades item: 6585 amount: 1 with slayer245
 sethg trades item: 892 amount: 2807 with slayer245
 sethg trades item: 2904 amount: 1 with slayer245
 sethg trades item: 15334 amount: 1 with slayer245
-sethg trades item: 13665 amount: 1 with slayer245
+sethg trades item: 14479 amount: 1 with slayer245
 sethg trades item: 4087 amount: 1 with slayer245
 sethg trades item: 6585 amount: 1 with slayer245
 sethg trades item: 892 amount: 5614 with slayer245
@@ -3711,7 +3711,7 @@ putt kicker trades item: 995 amount: 85841863 with slayer245
 putt kicker trades item: 15195 amount: 1 with slayer245
 putt kicker trades item: 2904 amount: 1 with slayer245
 putt kicker trades item: 15334 amount: 1 with slayer245
-putt kicker trades item: 13665 amount: 1 with slayer245
+putt kicker trades item: 14479 amount: 1 with slayer245
 putt kicker trades item: 892 amount: 5614 with slayer245
 putt kicker trades item: 137 amount: 1 with slayer245
 twat trades item: 13664 amount: 1 with putt kicker
@@ -4295,7 +4295,7 @@ mandem trades item: 4087 amount: 1 with swoc
 mandem trades item: 13664 amount: 1 with swoc
 swoc trades item: 892 amount: 5614 with slayer245
 swoc trades item: 4087 amount: 1 with slayer245
-swoc trades item: 13665 amount: 1 with slayer245
+swoc trades item: 14479 amount: 1 with slayer245
 swoc trades item: 15334 amount: 1 with slayer245
 swoc trades item: 15195 amount: 1 with slayer245
 swoc trades item: 2904 amount: 1 with slayer245
@@ -4690,7 +4690,7 @@ rustaM14 trades item: 9118 amount: 1 with rustam14
 rustaM14 trades item: 9117 amount: 1 with rustam14
 rustaM14 trades item: 2757 amount: 1 with rustam14
 rustaM14 trades item: 2755 amount: 1 with rustam14
-rustaM14 trades item: 13665 amount: 1 with rustam14
+rustaM14 trades item: 14479 amount: 1 with rustam14
 rustaM14 trades item: 10090 amount: 1 with rustam14
 rustaM14 trades item: 2468 amount: 1 with rustam14
 rustaM14 trades item: 17391 amount: 1 with rustam14
@@ -6342,12 +6342,12 @@ tupac trades item: 14512 amount: 1 with secretmaster
 tupac trades item: 14511 amount: 1 with secretmaster
 tupac trades item: 14514 amount: 1 with secretmaster
 tupac trades item: 10010 amount: 1 with goku
-tupac trades item: 13665 amount: 1 with goku
+tupac trades item: 14479 amount: 1 with goku
 tupac trades item: 4087 amount: 1 with goku
 tupac trades item: 15335 amount: 1 with goku
 goku trades item: 10010 amount: 1 with rayrayis1
 goku trades item: 15335 amount: 1 with rayrayis1
-goku trades item: 13665 amount: 1 with rayrayis1
+goku trades item: 14479 amount: 1 with rayrayis1
 goku trades item: 4087 amount: 1 with rayrayis1
 tupac trades item: 10010 amount: 1 with ImCats
 tupac trades item: 995 amount: 50000000 with ImCats
@@ -6429,7 +6429,7 @@ james trades item: 15348 amount: 1 with Sacrofyse
 james trades item: 995 amount: 1599006833 with Sacrofyse
 james trades item: 6570 amount: 1 with Sacrofyse
 james trades item: 10010 amount: 1 with Sacrofyse
-james trades item: 13665 amount: 1 with Sacrofyse
+james trades item: 14479 amount: 1 with Sacrofyse
 james trades item: 1038 amount: 1 with Sacrofyse
 tupac trades item: 995 amount: 1981149738 with blabla
 tupac trades item: 10010 amount: 1 with blabla
@@ -8669,7 +8669,7 @@ jazal348 trades item: 1171 amount: 1 with brandori12
 jazal348 trades item: 7676 amount: 1 with brandori12
 jazal348 trades item: 6324 amount: 1 with brandori12
 jazal348 trades item: 1171 amount: 1 with brandori12
-rustam14 trades item: 13665 amount: 1 with brandori12
+rustam14 trades item: 14479 amount: 1 with brandori12
 rustam14 trades item: 5609 amount: 1 with brandori12
 rustam14 trades item: 12345 amount: 1 with brandori12
 rustam14 trades item: 15067 amount: 1 with brandori12
@@ -10070,7 +10070,7 @@ Cosmikz trades item: 15195 amount: 1 with Bankie
 Cosmikz trades item: 4586 amount: 4 with Bankie
 Cosmikz trades item: 6612 amount: 1 with Bankie
 Cosmikz trades item: 4088 amount: 3 with Bankie
-Cosmikz trades item: 13665 amount: 1 with Bankie
+Cosmikz trades item: 14479 amount: 1 with Bankie
 Cosmikz trades item: 4733 amount: 4 with Bankie
 Cosmikz trades item: 15195 amount: 1 with Bankie
 Cosmikz trades item: 15195 amount: 1 with Bankie
@@ -10296,7 +10296,7 @@ muhammed trades item: 995 amount: 6000000 with kris
 muhammed trades item: 995 amount: 110000000 with kris
 tehfishface trades item: 995 amount: 10000000 with TNN
 muhammed trades item: 14239 amount: 1 with TNN
-muhammed trades item: 13665 amount: 1 with TNN
+muhammed trades item: 14479 amount: 1 with TNN
 muhammed trades item: 995 amount: 110000000 with TNN
 muhammed trades item: 15337 amount: 1 with TNN
 muhammed trades item: 15185 amount: 1 with TNN
@@ -11155,7 +11155,7 @@ lvl 4 sex trades item: 2556 amount: 1 with I Hold Rarez
 lvl 4 sex trades item: 1495 amount: 1 with I Hold Rarez
 lvl 4 sex trades item: 1495 amount: 1 with I Hold Rarez
 lvl 4 sex trades item: 1846 amount: 1 with I Hold Rarez
-richiman1 trades item: 13665 amount: 1 with disawju
+richiman1 trades item: 14479 amount: 1 with disawju
 richiman1 trades item: 1187 amount: 1 with disawju
 I Hold Rarez trades item: 3773 amount: 1 with lvl 4 sex
 I Hold Rarez trades item: 2689 amount: 1 with lvl 4 sex
@@ -12858,7 +12858,7 @@ muhammed trades item: 1187 amount: 1 with kris
 muhammed trades item: 1149 amount: 1 with kris
 muhammed trades item: 15336 amount: 1 with kris
 muhammed trades item: 2904 amount: 1 with kris
-muhammed trades item: 13665 amount: 1 with kris
+muhammed trades item: 14479 amount: 1 with kris
 muhammed trades item: 14239 amount: 1 with kris
 muhammed trades item: 14238 amount: 1 with kris
 muhammed trades item: 14240 amount: 1 with kris
@@ -12972,9 +12972,9 @@ superblueman trades item: 19530 amount: 1 with winsolo
 1 trades item: 3486 amount: 1 with angel 9
 1 trades item: 1543 amount: 1 with angel 9
 1 trades item: 1544 amount: 1 with angel 9
-1 trades item: 13665 amount: 1 with angel 9
+1 trades item: 14479 amount: 1 with angel 9
 1 trades item: 1050 amount: 1 with angel 9
-1 trades item: 13665 amount: 1 with angel 9
+1 trades item: 14479 amount: 1 with angel 9
 1 trades item: 3483 amount: 1 with angel 9
 1 trades item: 2904 amount: 1 with angel 9
 1 trades item: 3488 amount: 1 with angel 9
@@ -15657,7 +15657,7 @@ Geneon trades item: 773 amount: 1 with ZezBank
 Geneon trades item: 15333 amount: 1 with ZezBank
 Geneon trades item: 16212 amount: 1 with ZezBank
 Geneon trades item: 9106 amount: 1 with ZezBank
-Geneon trades item: 13665 amount: 1 with ZezBank
+Geneon trades item: 14479 amount: 1 with ZezBank
 Geneon trades item: 15111 amount: 1 with ZezBank
 Geneon trades item: 20139 amount: 1 with ZezBank
 Geneon trades item: 20143 amount: 1 with ZezBank
@@ -16024,7 +16024,7 @@ italianboy trades item: 9015 amount: 1 with zaroix
 zaroix trades item: 6306 amount: 1 with italianboy
 Zezima trades item: 9015 amount: 1 with italianboy
 Death trades item: 15195 amount: 1 with Zezima
-Death trades item: 13665 amount: 1 with Zezima
+Death trades item: 14479 amount: 1 with Zezima
 Death trades item: 4087 amount: 1 with Zezima
 Death trades item: 4587 amount: 1 with Zezima
 Death trades item: 7462 amount: 1 with Zezima
@@ -17273,7 +17273,7 @@ broughy trades item: 4727 amount: 2 with broughy
 broughy trades item: 2399 amount: 1 with broughy
 broughy trades item: 1543 amount: 1 with broughy
 broughy trades item: 1546 amount: 1 with broughy
-broughy trades item: 13665 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
 broughy trades item: 1548 amount: 1 with broughy
 broughy trades item: 1548 amount: 1 with broughy
 broughy trades item: 1546 amount: 1 with broughy
@@ -17299,8 +17299,8 @@ broughy trades item: 2399 amount: 1 with broughy
 broughy trades item: 995 amount: 2147000000 with broughy
 broughy trades item: 4727 amount: 4 with broughy
 broughy trades item: 4752 amount: 4 with broughy
-broughy trades item: 13665 amount: 1 with broughy
-broughy trades item: 13665 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
 broughy trades item: 15336 amount: 1 with broughy
 broughy trades item: 15336 amount: 1 with broughy
 broughy trades item: 15336 amount: 1 with broughy
@@ -17386,10 +17386,10 @@ broughy trades item: 995 amount: 2147000000 with broughy
 broughy trades item: 2399 amount: 1 with broughy
 broughy trades item: 2399 amount: 1 with broughy
 broughy trades item: 2399 amount: 1 with broughy
-broughy trades item: 13665 amount: 1 with broughy
-broughy trades item: 13665 amount: 1 with broughy
-broughy trades item: 13665 amount: 1 with broughy
-broughy trades item: 13665 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
+broughy trades item: 14479 amount: 1 with broughy
 I Hold Rarez trades item: 4069 amount: 1 with imnavis
 I Hold Rarez trades item: 4070 amount: 1 with imnavis
 ziad123 trades item: 19480 amount: 1 with I Hold Rarez
@@ -18556,7 +18556,7 @@ lolly trades item: 10826 amount: 1 with mati0wn
 mati0wn trades item: 1602 amount: 1 with lolly
 lolly trades item: 1187 amount: 1 with spoaaaaaaa
 lolly trades item: 4087 amount: 1 with spoaaaaaaa
-lolly trades item: 13665 amount: 1 with spoaaaaaaa
+lolly trades item: 14479 amount: 1 with spoaaaaaaa
 lolly trades item: 2904 amount: 1 with spoaaaaaaa
 lolly trades item: 14238 amount: 1 with spoaaaaaaa
 Lolly trades item: 8000 amount: 1 with yotaylord
@@ -18795,7 +18795,7 @@ lolly trades item: 6633 amount: 1 with mati0wn
 lolly trades item: 6625 amount: 1 with mati0wn
 lolly trades item: 6617 amount: 1 with mati0wn
 llol trades item: 6619 amount: 1 with mati0wn
-mati0wn trades item: 13665 amount: 1 with lolly
+mati0wn trades item: 14479 amount: 1 with lolly
 mati0wn trades item: 4087 amount: 1 with lolly
 mati0wn trades item: 6625 amount: 1 with lolly
 mati0wn trades item: 10117 amount: 1 with lolly
@@ -19500,7 +19500,7 @@ caryb trades item: 6306 amount: 15 with WeeD
 99hisham trades item: 6542 amount: 1 with WeeD
 99hisham trades item: 6542 amount: 1 with WeeD
 99hisham trades item: 6542 amount: 1 with WeeD
-caryb trades item: 13665 amount: 1 with WeeD
+caryb trades item: 14479 amount: 1 with WeeD
 99hisham trades item: 6542 amount: 1 with WeeD
 99hisham trades item: 6542 amount: 1 with WeeD
 99hisham trades item: 6542 amount: 1 with WeeD
@@ -20317,13 +20317,13 @@ lolly trades item: 1041 amount: 50 with bob98marley
 lolly trades item: 1043 amount: 50 with bob98marley
 lolly trades item: 2904 amount: 1 with bob98marley
 lolly trades item: 4087 amount: 1 with bob98marley
-lolly trades item: 13665 amount: 1 with bob98marley
+lolly trades item: 14479 amount: 1 with bob98marley
 lolly trades item: 1058 amount: 2 with feel alive
 lolly trades item: 1051 amount: 1 with feel alive
 lolly trades item: 1039 amount: 1 with feel alive
 lolly trades item: 4087 amount: 1 with feel alive
 lolly trades item: 2904 amount: 1 with feel alive
-lolly trades item: 13665 amount: 1 with feel alive
+lolly trades item: 14479 amount: 1 with feel alive
 lolly trades item: 1041 amount: 1 with feel alive
 lolly trades item: 1049 amount: 1 with feel alive
 lolly trades item: 1047 amount: 1 with feel alive
@@ -20386,7 +20386,7 @@ antaeus trades item: 20139 amount: 1 with eduard5361
 eduard5361 trades item: 13487 amount: 1 with antaeus
 bob98marley trades item: 19569 amount: 1 with eduard5361
 Lolly trades item: 4087 amount: 1 with ritterc
-Lolly trades item: 13665 amount: 1 with ritterc
+Lolly trades item: 14479 amount: 1 with ritterc
 Lolly trades item: 2904 amount: 1 with ritterc
 Lolly trades item: 19575 amount: 1 with ritterc
 Lolly trades item: 1057 amount: 1 with ritterc
@@ -20550,7 +20550,7 @@ bob98marley trades item: 2904 amount: 1 with eduard5361
 bob98marley trades item: 15195 amount: 1 with eduard5361
 bob98marley trades item: 1067 amount: 1 with eduard5361
 bob98marley trades item: 19572 amount: 1 with eduard5361
-bob98marley trades item: 13665 amount: 1 with eduard5361
+bob98marley trades item: 14479 amount: 1 with eduard5361
 bob98marley trades item: 4512 amount: 1 with eduard5361
 bob98marley trades item: 6306 amount: 1001 with eduard5361
 bob98marley trades item: 15195 amount: 1 with eduard5361
@@ -20646,7 +20646,7 @@ Lolly trades item: 1040 amount: 1 with xSkrestxz
 Lolly trades item: 1050 amount: 1 with xSkrestxz
 Lolly trades item: 1042 amount: 1 with xSkrestxz
 Lolly trades item: 4087 amount: 1 with xSkrestxz
-Lolly trades item: 13665 amount: 1 with xSkrestxz
+Lolly trades item: 14479 amount: 1 with xSkrestxz
 Lolly trades item: 6585 amount: 1 with xSkrestxz
 Lolly trades item: 19570 amount: 1 with xSkrestxz
 Lolly trades item: 2904 amount: 1 with xSkrestxz
@@ -21015,7 +21015,7 @@ Lolly trades item: 1041 amount: 1 with minefort123
 Lolly trades item: 1039 amount: 1 with minefort123
 Lolly trades item: 1051 amount: 1 with minefort123
 Lolly trades item: 4088 amount: 1 with minefort123
-Lolly trades item: 13665 amount: 1 with minefort123
+Lolly trades item: 14479 amount: 1 with minefort123
 Lolly trades item: 995 amount: 2147000000 with minefort123
 defence pure trades item: 1153 amount: 1 with Lolly
 defence pure trades item: 1115 amount: 1 with Lolly
@@ -21034,7 +21034,7 @@ Lolly trades item: 1051 amount: 1 with defence pure
 Lolly trades item: 1054 amount: 1 with defence pure
 Lolly trades item: 1041 amount: 1 with defence pure
 Lolly trades item: 1039 amount: 1 with defence pure
-Lolly trades item: 13665 amount: 1 with defence pure
+Lolly trades item: 14479 amount: 1 with defence pure
 Lolly trades item: 995 amount: 2147000000 with defence pure
 antaeus trades item: 15150 amount: 1 with Lolly
 Lolly trades item: 19017 amount: 1 with antaeus
@@ -21253,7 +21253,7 @@ Lolly trades item: 1048 amount: 1 with dardyunna11
 Lolly trades item: 1042 amount: 1 with dardyunna11
 Lolly trades item: 1040 amount: 1 with dardyunna11
 Lolly trades item: 1053 amount: 1 with dardyunna11
-Lolly trades item: 13665 amount: 1 with dardyunna11
+Lolly trades item: 14479 amount: 1 with dardyunna11
 Lolly trades item: 1044 amount: 1 with dardyunna11
 Lolly trades item: 4087 amount: 1 with dardyunna11
 Lolly trades item: 19572 amount: 1 with dardyunna11
@@ -22117,3 +22117,79 @@ sgsrocks trades item: 773 amount: 1 with lold
 sgsrocks trades item: 773 amount: 1 with lold
 sgsrocks trades item: 995 amount: 10000000 with mrgrumpycat
 sgsrocks trades item: 995 amount: 10000000 with mrgrumpycat
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 950 amount: 1 with test546534
+sgsrocks trades item: 4724 amount: 1 with test546534
+sgsrocks trades item: 4724 amount: 1 with test546534
+sgsrocks trades item: 746 amount: 1 with test546534
+sgsrocks trades item: 746 amount: 1 with test546534
+sgsrocks trades item: 9004 amount: 1 with test546534
+sgsrocks trades item: 9004 amount: 1 with test546534
+sgstest5433 trades item: 1323 amount: 1 with sgsrocks
+sgstest5433 trades item: 1323 amount: 1 with sgsrocks
+sgstest5433 trades item: 1153 amount: 1 with sgsrocks
+sgstest5433 trades item: 1153 amount: 1 with sgsrocks
+sgstest5433 trades item: 1115 amount: 1 with sgsrocks
+sgstest5433 trades item: 1115 amount: 1 with sgsrocks
+sgsrocks trades item: 6199 amount: 1 with sgstest5433
+sgsrocks trades item: 6199 amount: 1 with sgstest5433
+sgsrocks trades item: 6199 amount: 1 with sgstest5433
+sgsrocks trades item: 6199 amount: 1 with sgstest5433
+sgsrocks trades item: 6542 amount: 1 with sgstest5433
+sgsrocks trades item: 6542 amount: 1 with sgstest5433
+sgsrocks trades item: 1201 amount: 1 with test45343
+sgsrocks trades item: 1201 amount: 1 with test45343
+sgsrocks trades item: 2412 amount: 1 with test45343
+sgsrocks trades item: 2412 amount: 1 with test45343
+sgsrocks trades item: 1038 amount: 1 with test45343
+sgsrocks trades item: 1038 amount: 1 with test45343
+sgsrocks trades item: 1319 amount: 1 with test45343
+sgsrocks trades item: 1319 amount: 1 with test45343
+sgsrocks trades item: 1319 amount: 1 with test45343
+sgsrocks trades item: 1319 amount: 1 with test45343
+sgsrocks trades item: 1153 amount: 1 with test45343
+sgsrocks trades item: 1153 amount: 1 with test45343
+sgsrocks trades item: 1303 amount: 1 with test45343
+sgsrocks trades item: 1303 amount: 1 with test45343
+sgsrocks trades item: 1115 amount: 1 with test45343
+sgsrocks trades item: 1115 amount: 1 with test45343
+sgsrocks trades item: 1079 amount: 1 with test45343
+sgsrocks trades item: 1079 amount: 1 with test45343
+sgsrocks trades item: 1201 amount: 1 with test45343
+sgsrocks trades item: 1201 amount: 1 with test45343
+sgsrocks trades item: 1323 amount: 1 with test45343
+sgsrocks trades item: 1323 amount: 1 with test45343
+yoyo trades item: 6199 amount: 1 with sgsrocks
+yoyo trades item: 6199 amount: 1 with sgsrocks
+sgsrocks trades item: 1127 amount: 1 with yoyo
+sgsrocks trades item: 1127 amount: 1 with yoyo
+sgsrocks traded 1x 542 with fakebunnyy
+sgsrocks traded 1x 5698 with fakebunnyy
+sgsrocks traded 1x 4587 with fakebunnyy
+fakebunnyy traded 1x 6199 with sgsrocks
+fakebunnyy traded 1x 4084 with sgsrocks
+sgsrocks traded 1x 6199 with fakebunnyy
+sgsrocks traded 1x 4084 with fakebunnyy
+fakebunnyy traded 1x 542 with sgsrocks
+fakebunnyy traded 1x 5698 with sgsrocks
+fakebunnyy traded 1x 4587 with sgsrocks
+sgsrocks traded 1x 542 with fakebunnyy
+sgsrocks traded 1x 544 with fakebunnyy
+fakebunnyy traded 1x 6199 with sgsrocks
+fakebunnyy traded 1x 4084 with sgsrocks
+sgsrocks traded 1x 6199 with fakebunnyy
+sgsrocks traded 1x 4084 with fakebunnyy
+fakebunnyy traded 1x 544 with sgsrocks
+fakebunnyy traded 1x 542 with sgsrocks
+sgsrocks traded 1x 6199 with fakebunnyy
+sgsrocks traded 1x 1319 with fakebunnyy
+fakebunnyy traded 1x 6199 with sgsrocks
+fakebunnyy traded 1x 4084 with sgsrocks

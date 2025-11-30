@@ -1,6 +1,10 @@
 package com.Ghreborn.jagcached.fs;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.zip.CRC32;
 
@@ -397,64 +401,4 @@ public final class IndexedFileSystem implements Closeable {
 			}
 		}
 	}
-	public void packCrcAndVersion(int index, String nameOverride) {
-		CRC32 crc32 = new CRC32();
-
-		String name = nameOverride != null ? nameOverride : "index" + index;
-		File outputDir = new File("crc"); // Ensure we're writing to ./crc/
-
-		// Create the directory if it doesn't exist
-		if (!outputDir.exists()) {
-			outputDir.mkdirs();
-		}
-
-		File crcFile = new File(outputDir, name + "_crc");
-		File versionFile = new File(outputDir, name + "_version");
-
-		try (DataOutputStream crcOut = new DataOutputStream(new FileOutputStream(crcFile));
-			 DataOutputStream versionOut = new DataOutputStream(new FileOutputStream(versionFile))) {
-
-			int fileCount = getFileCount(index);
-
-			for (int fileId = 0; fileId < fileCount; fileId++) {
-				try {
-					ByteBuffer buffer = getFile(index, fileId);
-					byte[] data = new byte[buffer.remaining()];
-					buffer.get(data);
-
-					if (data.length >= 2) {
-						int version = ((data[data.length - 2] & 0xFF) << 8) | (data[data.length - 1] & 0xFF);
-
-						crc32.reset();
-						crc32.update(data, 0, data.length - 2);
-						int crc = (int) crc32.getValue();
-
-						writeDWord(crcOut, crc);
-						versionOut.writeShort(version);
-					} else {
-						writeDWord(crcOut, 0);
-						versionOut.writeShort(0);
-					}
-				} catch (IOException ex) {
-					System.err.printf("⚠️ Skipped index %d, file %d: %s%n", index, fileId, ex.getMessage());
-					writeDWord(crcOut, 0);
-					versionOut.writeShort(0);
-				}
-			}
-
-			System.out.printf("✅ CRC/Version packed for index %d (%s → ./crc)%n", index, name);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	private void writeDWord(DataOutputStream out, int value) throws IOException {
-		out.writeByte((value >> 24) & 0xFF);
-		out.writeByte((value >> 16) & 0xFF);
-		out.writeByte((value >> 8) & 0xFF);
-		out.writeByte(value & 0xFF);
-	}
-
 }

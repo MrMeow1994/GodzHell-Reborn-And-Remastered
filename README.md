@@ -9,7 +9,7 @@ Welcome to **GodzHell Reborn and Remastered**! Follow this guide to set up and r
 Before starting, ensure you have the following:
 
 1. **Java Development Kit (JDK 15)** installed.
-   - Download from [Oracle JDK 11](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html).
+   - Download from [Oracle JDK 15](https://www.oracle.com/java/technologies/javase/jdk15-archive-downloads.html).
 2. **Data Files** required for the servers.
 
 ---
@@ -17,9 +17,9 @@ Before starting, ensure you have the following:
 ## 📥 Download Required Files
 
 1. Download `Data.zip` from the link below:
-   [**Download Data.zip**](https://www.mediafire.com/file/0odwcvvmxllkbz1/Data.zip/file)
-
-2. Extract `Data.zip` and ensure the folder structure looks like this:
+   [**Download 525Data.zip**](https://www.mediafire.com/file/0odwcvvmxllkbz1/Data.zip/file)
+   [**Download 602 Data.zip**](https://www.mediafire.com/file/pe9ddiojofov3x1/Data.zip/file)
+2. Extract `Data.zip` thats you want and ensure the folder structure looks like this:
 
 ```plaintext
 project-root/

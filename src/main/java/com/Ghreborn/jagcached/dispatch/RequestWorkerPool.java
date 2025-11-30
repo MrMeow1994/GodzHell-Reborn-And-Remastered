@@ -58,11 +58,9 @@ public final class RequestWorkerPool {
 	 */
 	public void start() throws Exception {
 		File base = new File(Constants.FILE_SYSTEM_DIR);
-		IndexedFileSystem fs = new IndexedFileSystem(base, true);
-		fs.packCrcAndVersion(4, "map");
+
 		for (int i = 0; i < THREADS_PER_REQUEST_TYPE; i++) {
-			//IndexedFileSystem fs = new IndexedFileSystem(base, true);
-			//fs.packCrcAndVersion(4, "map");
+			IndexedFileSystem fs = new IndexedFileSystem(base, true);
 			workers.add(new JagGrabRequestWorker(fs));
 			workers.add(new OnDemandRequestWorker(fs));
 			workers.add(new HttpRequestWorker(fs));

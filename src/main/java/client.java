@@ -22905,7 +22905,12 @@ nated = Integer.parseInt(token2);
                 }
 
                 checkwildy();
-
+                switch(item_id){
+                    case ItemIDs.RING_OF_KINSHIP:
+                        movePlayer(3442,3694, 0);
+                        isTeleporting = true;
+                        break;
+            }
                 if (item_id == 3840) {
                     getPA().sendInterfaceHidden(1, 2465);
                     getPA().sendInterfaceHidden(0, 2468);
