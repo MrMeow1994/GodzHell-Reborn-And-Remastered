@@ -3370,8 +3370,8 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(4876, 2969, 3384, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(4878, 2969, 3381, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(4877, 2961, 3383, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2562, 2961, 3380, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2560, 2965, 3376, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(34385, 2961, 3380, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(34383, 2965, 3376, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 3353, 3332, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 3352, 3332, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 3351, 3332, 0, 0, 10));
@@ -3402,7 +3402,7 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(7409, 2389, 3482, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7409, 2389, 3481, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 2474, 3192, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 2462, 3187, 0, -1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 2462, 3187, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 2462, 3186, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2091, 2462, 3185, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2096, 2462, 3184, 0, -1, 10));
@@ -3539,16 +3539,16 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2213, 3492, 9938, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 3492, 9937, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3491, 9942, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3491, 9943, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3491, 9943, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3485, 9946, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3484, 9946, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3484, 9946, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3480, 9939, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3480, 9938, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3484, 9941, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3488, 9933, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3483, 9939, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3486, 9937, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2106, 3488, 9944, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3480, 9938, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3484, 9941, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3488, 9933, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3483, 9939, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3486, 9937, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(14859, 3488, 9944, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3481, 9943, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3487, 9940, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3486, 9934, 0, 1, 10));
@@ -5641,7 +5641,7 @@ public void setHouse(House house) {
                 sendMessage("You Teleport To The RuneCrafting Area.");
                 break;
 
-            case ObjectIDs.PORTAL_59:
+            case ObjectIDs.PORTAL_63:
                 teleportToX = 3428;
                 teleportToY = 3536;
                 sendMessage("You Teleport To The Slayer area.");
@@ -6859,10 +6859,7 @@ public void setHouse(House house) {
                 }
                 break;
 
-            case 2562:
-                TheifStall("gem stall", "and recieve 275k", 70, 160 * playerLevel[17],
-                        ItemIDs.COINS, 275000, 3, 0x340, 634, objectX, objectY, 55, 2562);
-                break;
+
             case 34387:
                 TheifStall("Fur stall", "and recieve a Grey wolf fur.", 35, 45 * Config.THIEVING_EXPERIENCE,
                         ItemIDs.GREY_WOLF_FUR, 1, 3, 0x340, 34381, objectX, objectY, 25, 34387);
@@ -6872,8 +6869,13 @@ public void setHouse(House house) {
                         ItemIDs.SPICE, 1, 3, 0x340, 34381, objectX, objectY, 25, 34386);
                 break;
             case 34385:
-                TheifStall("gem stall", "and recieve red topaz.", 75, 408 * Config.THIEVING_EXPERIENCE,
-                        ItemIDs.RED_TOPAZ, 1, 3, 0x340, 34381, objectX, objectY, 25, 34385);
+                if(Boundary.isIn(this, Boundary.FALADOR_BOUNDARY)){
+                    TheifStall("gem stall", "and recieve 275k", 70, 160 * playerLevel[17],
+                            ItemIDs.COINS, 275000, 3, 0x340, 634, objectX, objectY, 55, 34385);
+                } else {
+                    TheifStall("gem stall", "and recieve red topaz.", 75, 408 * Config.THIEVING_EXPERIENCE,
+                            ItemIDs.RED_TOPAZ, 1, 3, 0x340, 34381, objectX, objectY, 25, 34385);
+                }
                 break;
             case 34384:
                 TheifStall("Baker's stall", "and recieve a chocolate slice.", 5, 16 * Config.THIEVING_EXPERIENCE,
@@ -6885,8 +6887,14 @@ public void setHouse(House house) {
                 break;
 
             case 34383:
-                TheifStall("silk stall", "and recieve silk", 20,
-                        24 * Config.THIEVING_EXPERIENCE, ItemIDs.SILK, 1, 3, 0x340, 34381, objectX, objectY, 25, 34383);
+                if(Boundary.isIn(this, Boundary.FALADOR_BOUNDARY)){
+                    TheifStall("silk stall", "and recieve 2m", 95,
+                            200 * playerLevel[17], ItemIDs.COINS, 2000000, 3, 0x340, 634, objectX, objectY, 65, 34383);
+
+                } else {
+                    TheifStall("silk stall", "and recieve silk", 20,
+                            24 * Config.THIEVING_EXPERIENCE, ItemIDs.SILK, 1, 3, 0x340, 34381, objectX, objectY, 25, 34383);
+                }
                 break;
             case 4878:
                 TheifStall("scimitar stall", "and recieve 50k", 50,
@@ -6901,11 +6909,6 @@ public void setHouse(House house) {
             case 4876:
                 TheifStall("general stall", "and recieve 25k", 1,
                         20 * playerLevel[17], ItemIDs.COINS, 25000, 3, 0x340, 620, objectX, objectY, 95, 4876);
-                break;
-
-            case 2560:
-                TheifStall("silk stall", "and recieve 2m", 95,
-                        200 * playerLevel[17], ItemIDs.COINS, 2000000, 3, 0x340, 634, objectX, objectY, 65, 2560);
                 break;
 
             case 4705:
@@ -12807,17 +12810,17 @@ public void setHouse(House house) {
         }
 
         if (command.equals("2tr") && rights.inherits(Rights.OWNER)) { //
-            makeGlobalObject(3242, 3283, 2106, 1, 10);
-            makeGlobalObject(3243, 3283, 2106, 1, 10);
-            makeGlobalObject(3244, 3283, 2106, 1, 10);
-            makeGlobalObject(3245, 3283, 2106, 1, 10);
-            makeGlobalObject(3246, 3283, 2106, 1, 10);
-            makeGlobalObject(3247, 3283, 2106, 1, 10);
-            makeGlobalObject(3248, 3282, 2106, 1, 10);
-            makeGlobalObject(3248, 3281, 2106, 1, 10);
-            makeGlobalObject(3248, 3280, 2106, 1, 10);
-            makeGlobalObject(3248, 3279, 2106, 1, 10);
-            makeGlobalObject(3248, 3278, 2106, 1, 10);
+            makeGlobalObject(3242, 3283, 14859, 1, 10);
+            makeGlobalObject(3243, 3283, 14859, 1, 10);
+            makeGlobalObject(3244, 3283, 14859, 1, 10);
+            makeGlobalObject(3245, 3283, 14859, 1, 10);
+            makeGlobalObject(3246, 3283, 14859, 1, 10);
+            makeGlobalObject(3247, 3283, 14859, 1, 10);
+            makeGlobalObject(3248, 3282, 14859, 1, 10);
+            makeGlobalObject(3248, 3281, 14859, 1, 10);
+            makeGlobalObject(3248, 3280, 14859, 1, 10);
+            makeGlobalObject(3248, 3279, 14859, 1, 10);
+            makeGlobalObject(3248, 3278, 14859, 1, 10);
             sendMessage("You build a trap 2nd verson");
         }
     }
@@ -14681,7 +14684,7 @@ public void setHouse(House house) {
             sendMessage("You've teleported to the Staff Mining.");
         }
         if (command.equals("makerunerock") && rights.inherits(Rights.OWNER)) { //
-            makeGlobalObject(absX, absY, 2106, 1, 10);
+            makeGlobalObject(absX, absY, 14859, 1, 10);
             sendMessage("You Made A rune Rock");
         }
         if (command.startsWith("reward")) {
@@ -14716,44 +14719,44 @@ public void setHouse(House house) {
             });
         }
         if (command.equals("maze") && rights.inherits(Rights.OWNER)) { //
-            makeGlobalObject(3250, 3289, 2106, 1, 10);
-            makeGlobalObject(3249, 3289, 2106, 1, 10);
-            makeGlobalObject(3247, 3289, 2106, 1, 10);
-            makeGlobalObject(3247, 3290, 2106, 1, 10);
-            makeGlobalObject(3247, 3291, 2106, 1, 10);
-            makeGlobalObject(3247, 3292, 2106, 1, 10);
-            makeGlobalObject(3248, 3292, 2106, 1, 10);
-            makeGlobalObject(3249, 3292, 2106, 1, 10);
-            makeGlobalObject(3250, 3292, 2106, 1, 10);
-            makeGlobalObject(3250, 3291, 2106, 1, 10);
-            makeGlobalObject(3250, 3290, 2106, 1, 10);
-            makeGlobalObject(3249, 3288, 2106, 1, 10);
-            makeGlobalObject(3249, 3287, 2106, 1, 10);
-            makeGlobalObject(3249, 3286, 2106, 1, 10);
-            makeGlobalObject(3249, 3285, 2106, 1, 10);
-            makeGlobalObject(3247, 3288, 2106, 1, 10);
-            makeGlobalObject(3247, 3287, 2106, 1, 10);
-            makeGlobalObject(3247, 3286, 2106, 1, 10);
-            makeGlobalObject(3247, 3285, 2106, 1, 10);
-            makeGlobalObject(3247, 3284, 2106, 1, 10);
-            makeGlobalObject(3247, 3283, 2106, 1, 10);
-            makeGlobalObject(3248, 3283, 2106, 1, 10);
-            makeGlobalObject(3249, 3283, 2106, 1, 10);
+            makeGlobalObject(3250, 3289, 14859, 1, 10);
+            makeGlobalObject(3249, 3289, 14859, 1, 10);
+            makeGlobalObject(3247, 3289, 14859, 1, 10);
+            makeGlobalObject(3247, 3290, 14859, 1, 10);
+            makeGlobalObject(3247, 3291, 14859, 1, 10);
+            makeGlobalObject(3247, 3292, 14859, 1, 10);
+            makeGlobalObject(3248, 3292, 14859, 1, 10);
+            makeGlobalObject(3249, 3292, 14859, 1, 10);
+            makeGlobalObject(3250, 3292, 14859, 1, 10);
+            makeGlobalObject(3250, 3291, 14859, 1, 10);
+            makeGlobalObject(3250, 3290, 14859, 1, 10);
+            makeGlobalObject(3249, 3288, 14859, 1, 10);
+            makeGlobalObject(3249, 3287, 14859, 1, 10);
+            makeGlobalObject(3249, 3286, 14859, 1, 10);
+            makeGlobalObject(3249, 3285, 14859, 1, 10);
+            makeGlobalObject(3247, 3288, 14859, 1, 10);
+            makeGlobalObject(3247, 3287, 14859, 1, 10);
+            makeGlobalObject(3247, 3286, 14859, 1, 10);
+            makeGlobalObject(3247, 3285, 14859, 1, 10);
+            makeGlobalObject(3247, 3284, 14859, 1, 10);
+            makeGlobalObject(3247, 3283, 14859, 1, 10);
+            makeGlobalObject(3248, 3283, 14859, 1, 10);
+            makeGlobalObject(3249, 3283, 14859, 1, 10);
             sendMessage("You build a Maze.");
         }
         if (command.equals("tr") && rights.inherits(Rights.OWNER)) { //
-            makeGlobalObject(3250, 3289, 2106, 1, 10);
-            makeGlobalObject(3249, 3289, 2106, 1, 10);
-            makeGlobalObject(3248, 3289, 2106, 1, 10);
-            makeGlobalObject(3247, 3289, 2106, 1, 10);
-            makeGlobalObject(3247, 3290, 2106, 1, 10);
-            makeGlobalObject(3247, 3291, 2106, 1, 10);
-            makeGlobalObject(3247, 3292, 2106, 1, 10);
-            makeGlobalObject(3248, 3292, 2106, 1, 10);
-            makeGlobalObject(3249, 3292, 2106, 1, 10);
-            makeGlobalObject(3250, 3292, 2106, 1, 10);
-            makeGlobalObject(3250, 3291, 2106, 1, 10);
-            makeGlobalObject(3250, 3290, 2106, 1, 10);
+            makeGlobalObject(3250, 3289, 14859, 1, 10);
+            makeGlobalObject(3249, 3289, 14859, 1, 10);
+            makeGlobalObject(3248, 3289, 14859, 1, 10);
+            makeGlobalObject(3247, 3289, 14859, 1, 10);
+            makeGlobalObject(3247, 3290, 14859, 1, 10);
+            makeGlobalObject(3247, 3291, 14859, 1, 10);
+            makeGlobalObject(3247, 3292, 14859, 1, 10);
+            makeGlobalObject(3248, 3292, 14859, 1, 10);
+            makeGlobalObject(3249, 3292, 14859, 1, 10);
+            makeGlobalObject(3250, 3292, 14859, 1, 10);
+            makeGlobalObject(3250, 3291, 14859, 1, 10);
+            makeGlobalObject(3250, 3290, 14859, 1, 10);
             sendMessage("You build a trap");
         }
         if (command.equals("superskills") && rights.inherits(Rights.OWNER)) { //
@@ -14762,7 +14765,7 @@ public void setHouse(House house) {
             makeGlobalObject(3244, 3289, 2096, -2, 10);//tin rock
             makeGlobalObject(3244, 3290, 2103, -2, 10);//tin rock
             makeGlobalObject(3244, 3291, 2105, -2, 10);//tin rock
-            makeGlobalObject(3244, 3292, 2106, -2, 10);//tin rock
+            makeGlobalObject(3244, 3292, 14859, -2, 10);//tin rock
             makeGlobalObject(3244, 3293, 2111, -2, 10);//tin rock
             makeGlobalObject(3246, 3280, 11666, -1, 10);//furnace
             makeGlobalObject(3262, 3279, 1276, -1, 10); // regtree
@@ -14773,8 +14776,8 @@ public void setHouse(House house) {
             makeGlobalObject(3264, 3284, 4876, 0, 10); // general stall
             makeGlobalObject(3264, 3286, 4878, 0, 10); // scimtar stall
             makeGlobalObject(3264, 3288, 4877, 0, 10); // magic stall
-            makeGlobalObject(3264, 3290, 2562, -1, 10); // gem stall
-            makeGlobalObject(3264, 3293, 2560, -1, 10); // silk stall
+            makeGlobalObject(3264, 3290, 34385, -1, 10); // gem stall
+            makeGlobalObject(3264, 3293, 34383, -1, 10); // silk stall
             sendMessage("You Build The Best Skillz Out There!!!");
         }
         if (command.equals("capes") && rights.inherits(Rights.ADMINISTRATOR)) { //
@@ -24249,7 +24252,7 @@ nated = Integer.parseInt(token2);
                 } else if (NPCID == 557) { // Wydin
                     PutNPCCoords = true;
                     WanneShop = 32; // Port Sarim Food Shop
-                } else if (NPCID == 558) { // Gerrant
+                } else if (NPCID == 2720) { // Gerrant
                     PutNPCCoords = true;
                     WanneShop = 18; // Port Sarim Fishing Shop
                 } else if (NPCID == 559) { // Brian
@@ -26569,8 +26572,7 @@ nated = Integer.parseInt(token2);
                     case 6166:
                         objectDistance = 2;
                         break;
-                    case 2562:
-                    case 2560:
+
                     case 34387:
                     case 34386:
                     case 34385:

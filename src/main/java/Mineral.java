@@ -96,7 +96,7 @@ public enum Mineral {
     ADAMANT_SMALL2(new int[] { 31084 }, 31060, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
     ADAMANT_MID2(new int[] { 31085 }, 31061, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
 
-    RUNE(new int[] { 2106 },450,  -1,"rune", 85, 125, 0, 100, 39, 12500, true, generateExclusive(451)),
+    RUNE(new int[] { 14859 },450,  -1,"rune", 85, 125, 0, 100, 39, 12500, true, generateExclusive(451)),
     ESSENCE(new int[] { 7471, 14912 }, 450, -1,"none", 1, 5, -1, -1, 5, 15000, false, generateExclusive(-1)),
     GEM(new int[] { 9030, 7464 }, 450, -1,"none", 40, 60, 20, 25, 20, 15000, true, new MineralReturn() {
 
