@@ -53,7 +53,7 @@ public class ItemHandler {
 
 		loadItemList("./Data/cfg/item.cfg");
 		loadDrops("./Data/cfg/drops.cfg");
-		loadItemPrices("./Data/cfg/prices.txt");
+		loadItemPrices("prices.txt");
 	}
 	public void loadItemPrices(String filename) {
 		try {

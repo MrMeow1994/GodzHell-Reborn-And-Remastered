@@ -33025,24 +33025,17 @@ nated = Integer.parseInt(token2);
             }
         }
 
-        /* Overstock = server.shopHandler.ShopItemsN[MyShopID][fromSlot] - server.shopHandler.ShopItemsSN[MyShopID][fromSlot];*/
-        TotPrice = (ShopValue
-                * 1); // Calculates price for 1 item, in db is stored for 0 items (strange but true)
+        TotPrice = ShopValue;
 
-        /* if (Overstock > 0 && TotPrice > 1) { //more then default -> cheaper
-         TotPrice -= ((ShopValue / 100) * (1 * Overstock));
-         } else if (Overstock > 0 && TotPrice < 1) { //more then default -> cheaper
-         TotPrice = ((ShopValue / 100) * (1 * Overstock));
-         } else if (Overstock < 0) { //less then default -> exspensive
-         TotPrice += ((ShopValue / 100) * (1 * Overstock));
-         }*/
+
         if (ShopHandler.ShopBModifier[MyShopID] == 1) {
-            TotPrice *= 1; // 25% more expensive (general stores only)
+            TotPrice *= 1;
+            TotPrice *= 1;
             if (Type == 1) {
-                TotPrice *= 1; // general store buys item at 40% of its own selling value
+                TotPrice *= 1;
             }
         } else if (Type == 1) {
-            TotPrice *= 1; // other stores buy item at 60% of their own selling value
+            TotPrice *= 1;
         }
         return TotPrice;
     }
