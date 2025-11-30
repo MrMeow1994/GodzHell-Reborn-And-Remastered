@@ -53,6 +53,30 @@ public class ItemHandler {
 
 		loadItemList("./Data/cfg/item.cfg");
 		loadDrops("./Data/cfg/drops.cfg");
+		loadItemPrices("./Data/cfg/prices.txt");
+	}
+	public void loadItemPrices(String filename) {
+		try {
+			Scanner s = new Scanner(new File("./Data/cfg/" + filename));
+			while (s.hasNextLine()) {
+				String[] line = s.nextLine().split(" ");
+				ItemList temp = getItemList(Integer.parseInt(line[0]));
+				if (temp != null)
+					temp.ShopValue = Integer.parseInt(line[1]);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public ItemList getItemList(int i) {
+		for (int j = 0; j < ItemList.length; j++) {
+			if (ItemList[j] != null) {
+				if (ItemList[j].itemId == i) {
+					return ItemList[j];
+				}
+			}
+		}
+		return null;
 	}
 
 	public void process() {
