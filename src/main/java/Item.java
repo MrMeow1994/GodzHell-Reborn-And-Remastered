@@ -188,6 +188,7 @@ public class Item {
                     new File("./Data/data/stackable.dat"));
 
             while ((c = dataIn.read()) != -1) {
+               // System.out.println("Id: "+counter+", stackble: "+c);
                 if (c == 0) {
                     itemStackable[counter] = true;
                 } else {

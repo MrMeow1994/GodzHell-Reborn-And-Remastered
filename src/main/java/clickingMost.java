@@ -631,12 +631,12 @@ public class clickingMost {
                 c.getPA().setSidebarInterface(3, 3213);
                 c.getPA().setSidebarInterface(4, 1644);
                 c.getPA().setSidebarInterface(5, 5608);
-                if (c.ancients == 0) {
+                if (c.playerMagicBook == 0) {
                     c.getPA().setSidebarInterface(6, 1151);
-                } else if (c.ancients == 1) {
+                } else if (c.playerMagicBook == 1) {
                     c.getPA().setSidebarInterface(6, 12855);
-//} else if (c.playerMagicBook == 2) {
-                    //c.getPA().setSidebarInterface(6, 29999);
+} else if (c.playerMagicBook == 2) {
+                    c.getPA().setSidebarInterface(6, 29999);
                 }
                 c.getPA().setSidebarInterface(7, 18128);
                 c.getPA().setSidebarInterface(8, 5065);

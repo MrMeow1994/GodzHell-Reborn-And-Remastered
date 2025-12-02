@@ -3329,7 +3329,7 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2728, 2360, 5789, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2728, 2358, 5789, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2380, 2360, 5781, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2513, 2360, 5779, 0, -1, 10));
+        server.getGlobalObjects().add(new GlobalObject(1308, 2360, 5779, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(8151, 2603, 4774, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(8151, 2605, 4774, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(8151, 2599, 4774, 0, 0, 10));
@@ -3643,7 +3643,7 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2213, 3120, 9850, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 3121, 9850, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 3116, 9846, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2513, 3121, 9838, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(1308, 3121, 9838, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(61, 3114, 9836, 0, 0, 10));
         //server.getGlobalObjects().add(new GlobalObject(2187, 3123, 9848, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4643, 1, 1, 10));
@@ -4278,25 +4278,25 @@ public void setHouse(House house) {
                 break;
             case 6552:
                 if(desertTreasure == 8){
-                if (ancients == 0) {
+                if (playerMagicBook == 0) {
                     emotes = 2;
                     updateRequired = true;
                     getPA().setSidebarInterface(6, 12855);
-                    ancients = 1;
+                    playerMagicBook = 1;
                     sendMessage("A strange Knowlenge enters your mind...");
-                } else if (ancients == 1) {
+                } else if (playerMagicBook == 1) {
                     emotes = 0;
                     updateRequired = true;
                     getPA().setSidebarInterface(6, 1151);
-                    ancients = 0;
+                    playerMagicBook = 0;
                     sendMessage("You seem to forgot the magic of Ancients...");
                 }
                 } else {
-                    if (ancients == 1) {
+                    if (playerMagicBook == 1) {
                         emotes = 0;
                         updateRequired = true;
                         getPA().setSidebarInterface(6, 1151);
-                        ancients = 0;
+                        playerMagicBook = 0;
                         //sendMessage("You seem to forgot the magic of Ancients...");
                     }
                     sendMessage("You need to do Desert Treasure to use Ancient Magicks.");
@@ -5993,7 +5993,7 @@ public void setHouse(House house) {
                 }
                 break;
 
-            case 2513:
+            case 1308:
                 if (actionTimer == 0) {
                     addSkillXP((1700 * playerLevel[4]), 4);
                     sendMessage("You Gain Some Range.");
@@ -17687,7 +17687,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (amount > 0) {
             if (bankItems[fromSlot] > 0) {
                 if (!takeAsNote) {
-                    if (Item.itemStackable[bankItems[fromSlot] + 1]) {
+                    if (ItemCacheDefinition.forID(bankItems[fromSlot] + 1).isStackable()) {
                         if (bankItemsN[fromSlot] > amount) {
                             if (addItem((bankItems[fromSlot] - 1), amount)) {
                                 bankItemsN[fromSlot] -= amount;
@@ -17776,7 +17776,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         addItem(bankItems[fromSlot] - 1, amount);//adds the item
                         resetBank();
                         getPA().resetItems(5064);
-                    } else if (Item.itemStackable[bankItems[fromSlot] + 1]) {
+                    } else if (ItemCacheDefinition.forID(bankItems[fromSlot] + 1).isStackable()) {
                         if (bankItemsN[fromSlot] > amount) {
                             if (addItem((bankItems[fromSlot] - 1), amount)) {
                                 bankItemsN[fromSlot] -= amount;
@@ -17817,7 +17817,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (amount > 0) {
             if (bankItems2[fromSlot] > 0) {
                 if (!takeAsNote) {
-                    if (Item.itemStackable[bankItems2[fromSlot] + 1]) {
+                    if (ItemCacheDefinition.forID(bankItems2[fromSlot] + 1).isStackable()) {
                         if (bankItemsN2[fromSlot] > amount) {
                             if (addItem((bankItems2[fromSlot] - 1), amount)) {
                                 bankItemsN2[fromSlot] -= amount;
@@ -17868,7 +17868,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     }
                 } else {
                     sendMessage("Item can't be drawn as note.");
-                    if (Item.itemStackable[bankItems2[fromSlot] + 1]) {
+                    if (ItemCacheDefinition.forID(bankItems2[fromSlot] + 1).isStackable()) {
                         if (bankItemsN2[fromSlot] > amount) {
                             if (addItem((bankItems2[fromSlot] - 1), amount)) {
                                 bankItemsN2[fromSlot] -= amount;
@@ -17909,7 +17909,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (amount > 0) {
             if (bankItems3[fromSlot] > 0) {
                 if (!takeAsNote) {
-                    if (Item.itemStackable[bankItems3[fromSlot] + 1]) {
+                    if (ItemCacheDefinition.forID(bankItems3[fromSlot] + 1).isStackable()) {
                         if (bankItemsN3[fromSlot] > amount) {
                             if (addItem((bankItems3[fromSlot] - 1), amount)) {
                                 bankItemsN3[fromSlot] -= amount;
@@ -17960,7 +17960,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     }
                 } else {
                     sendMessage("Item can't be drawn as note.");
-                    if (Item.itemStackable[bankItems3[fromSlot] + 1]) {
+                    if (ItemCacheDefinition.forID(bankItems3[fromSlot] + 1).isStackable()) {
                         if (bankItemsN3[fromSlot] > amount) {
                             if (addItem((bankItems3[fromSlot] - 1), amount)) {
                                 bankItemsN3[fromSlot] -= amount;
@@ -18202,278 +18202,91 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     }
 
     public boolean bankItem(int itemID, int fromSlot, int amount) {
-        if (playerItemsN[fromSlot] <= 0) {
+        // validate
+        if (fromSlot < 0 || fromSlot >= playerItems.length) return false;
+        if (playerItemsN[fromSlot] <= 0) return false;
+
+        ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
+
+        // resolve actual bank ID (handles notes + certs)
+        int bankId = getRealBankId(def, itemID);
+        if (bankId == -1) {
+            sendMessage("Item not supported " + itemID);
             return false;
         }
-        if (!Item.itemIsNote[playerItems[fromSlot] - 1]) {
-            if (playerItems[fromSlot] <= 0) {
+
+        // normalize amount
+        if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
+
+        boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
+
+        // find bank slot
+        int toBankSlot = findBankSlot(bankId);
+        boolean exists = toBankSlot != -1;
+
+        if (!exists) {
+            toBankSlot = findEmptyBankSlot();
+            if (toBankSlot == -1) {
+                sendMessage("Bank full!");
                 return false;
             }
-            if (Item.itemStackable[playerItems[fromSlot] - 1]
-                    || playerItemsN[fromSlot] > 1) {
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
+            bankItems[toBankSlot] = bankId;
+            bankItemsN[toBankSlot] = 0;
+        }
 
-                for (int i = 0; i < playerBankSize; i++) {
-                    if (bankItems[i] == playerItems[fromSlot]) {
-                        if (playerItemsN[fromSlot] < amount) {
-                            amount = playerItemsN[fromSlot];
-                        }
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize + 1;
-                    }
-                }
-
-                if (!alreadyInBank && freeBankSlots() > 0) {
-                    for (int i = 0; i < playerBankSize; i++) {
-                        if (bankItems[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize + 1;
-                        }
-                    }
-                    bankItems[toBankSlot] = playerItems[fromSlot];
-                    if (playerItemsN[fromSlot] < amount) {
-                        amount = playerItemsN[fromSlot];
-                    }
-                    if ((bankItemsN[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN[toBankSlot] + amount) > -1) {
-                        bankItemsN[toBankSlot] += amount;
-                    } else {
-                        sendMessage("Bank full!");
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else if (alreadyInBank) {
-                    if ((bankItemsN[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN[toBankSlot] + amount) > -1) {
-                        bankItemsN[toBankSlot] += amount;
-                    } else {
-                        sendMessage("Bank full!");
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            } else {
-                itemID = playerItems[fromSlot];
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
-
-                for (int i = 0; i < playerBankSize; i++) {
-                    if (bankItems[i] == playerItems[fromSlot]) {
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize + 1;
-                    }
-                }
-                if (!alreadyInBank && freeBankSlots() > 0) {
-                    for (int i = 0; i < playerBankSize; i++) {
-                        if (bankItems[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize + 1;
-                        }
-                    }
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItems[toBankSlot] = playerItems[firstPossibleSlot];
-                            bankItemsN[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else if (alreadyInBank) {
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItemsN[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            }
-        } else if (Item.itemIsNote[playerItems[fromSlot] - 1]
-                && !Item.itemIsNote[playerItems[fromSlot] - 2]) {
-            if (playerItems[fromSlot] <= 0) {
+        // apply
+        if (stackable) {
+            long total = (long) bankItemsN[toBankSlot] + amount;
+            if (total > maxItemAmount) {
+                sendMessage("Bank full!");
                 return false;
             }
-            if (Item.itemStackable[playerItems[fromSlot] - 1]
-                    || playerItemsN[fromSlot] > 1) {
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
+            bankItemsN[toBankSlot] += amount;
+            deleteItem(itemID, fromSlot, amount);
 
-                for (int i = 0; i < playerBankSize; i++) {
-                    if (bankItems[i] == (playerItems[fromSlot] - 1)) {
-                        if (playerItemsN[fromSlot] < amount) {
-                            amount = playerItemsN[fromSlot];
-                        }
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize + 1;
-                    }
-                }
-
-                if (!alreadyInBank && freeBankSlots() > 0) {
-                    for (int i = 0; i < playerBankSize; i++) {
-                        if (bankItems[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize + 1;
-                        }
-                    }
-                    bankItems[toBankSlot] = (playerItems[fromSlot] - 1);
-                    if (playerItemsN[fromSlot] < amount) {
-                        amount = playerItemsN[fromSlot];
-                    }
-                    if ((bankItemsN[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN[toBankSlot] + amount) > -1) {
-                        bankItemsN[toBankSlot] += amount;
-                    } else {
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else if (alreadyInBank) {
-                    if ((bankItemsN[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN[toBankSlot] + amount) > -1) {
-                        bankItemsN[toBankSlot] += amount;
-                    } else {
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            } else {
-                itemID = playerItems[fromSlot];
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
-
-                for (int i = 0; i < playerBankSize; i++) {
-                    if (bankItems[i] == (playerItems[fromSlot] - 1)) {
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize + 1;
-                    }
-                }
-                if (!alreadyInBank && freeBankSlots() > 0) {
-                    for (int i = 0; i < playerBankSize; i++) {
-                        if (bankItems[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize + 1;
-                        }
-                    }
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItems[toBankSlot] = (playerItems[firstPossibleSlot]
-                                    - 1);
-                            bankItemsN[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else if (alreadyInBank) {
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItemsN[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            }
         } else {
-            sendMessage("Item not supported " + (playerItems[fromSlot] - 1));
-            return false;
+            // non-stackable: loop each item
+            int moved = 0;
+            for (int i = 0; i < amount; i++) {
+                bankItemsN[toBankSlot]++;
+                deleteItem(itemID, fromSlot, 1);
+                moved++;
+                if (moved >= amount) break;
+            }
         }
+
+        // refresh
+        getPA().resetItems(5064);
+        resetBank();
+        return true;
     }
+    private int getRealBankId(ItemCacheDefinition def, int invId) {
+        // Normal item with no cert: bank its ID
+        if (def.certID == -1)
+            return invId;
+
+        // Noted item linking to an unnoted item
+        ItemCacheDefinition real = ItemCacheDefinition.forID(def.certID);
+        if (real != null && real.certID == -1)
+            return def.certID;
+
+        return -1; // unsupported weird cert structure
+    }
+
+    private int findBankSlot(int bankId) {
+        for (int i = 0; i < playerBankSize; i++)
+            if (bankItems[i] == bankId)
+                return i;
+        return -1;
+    }
+
+    private int findEmptyBankSlot() {
+        for (int i = 0; i < playerBankSize; i++)
+            if (bankItems[i] <= 0)
+                return i;
+        return -1;
+    }
+
 
     public boolean bankItem2(int itemID, int fromSlot, int amount) {
         if (playerItemsN[fromSlot] <= 0) {
@@ -18483,7 +18296,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             if (playerItems[fromSlot] <= 0) {
                 return false;
             }
-            if (Item.itemStackable[playerItems[fromSlot] - 1]
+            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
                     || playerItemsN[fromSlot] > 1) {
                 int toBankSlot = 0;
                 boolean alreadyInBank = false;
@@ -18616,7 +18429,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             if (playerItems[fromSlot] <= 0) {
                 return false;
             }
-            if (Item.itemStackable[playerItems[fromSlot] - 1]
+            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
                     || playerItemsN[fromSlot] > 1) {
                 int toBankSlot = 0;
                 boolean alreadyInBank = false;
@@ -18757,7 +18570,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             if (playerItems[fromSlot] <= 0) {
                 return false;
             }
-            if (Item.itemStackable[playerItems[fromSlot] - 1]
+            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
                     || playerItemsN[fromSlot] > 1) {
                 int toBankSlot = 0;
                 boolean alreadyInBank = false;
@@ -18890,7 +18703,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             if (playerItems[fromSlot] <= 0) {
                 return false;
             }
-            if (Item.itemStackable[playerItems[fromSlot] - 1]
+            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
                     || playerItemsN[fromSlot] > 1) {
                 int toBankSlot = 0;
                 boolean alreadyInBank = false;
@@ -19522,10 +19335,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (item <= 0) {
             return false;
         }
-        if ((((freeSlots() >= 1) || playerHasItem(item, 1)) && Item.itemStackable[item])
-                || ((freeSlots() > 0) && !Item.itemStackable[item])) {
+        if ((((freeSlots() >= 1) || playerHasItem(item, 1)) && ItemCacheDefinition.forID(item).isStackable())
+                || ((freeSlots() > 0) && !ItemCacheDefinition.forID(item).isStackable())) {
             for (int i = 0; i < playerItems.length; i++) {
-                if (playerItems[i] == (item + 1) && Item.itemStackable[item]
+                if (playerItems[i] == (item + 1) && ItemCacheDefinition.forID(item).isStackable()
                         && playerItems[i] > 0) {
                     playerItems[i] = (item + 1);
                     if ((playerItemsN[i] + amount) < maxItemAmount && (playerItemsN[i] + amount) > -1) {
@@ -19581,14 +19394,14 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             return false;
         }
 
-        if (!Item.itemStackable[item] || amount < 1) {
+        if (!ItemCacheDefinition.forID(item).isStackable() || amount < 1) {
             amount = 1;
         }
 
-        if ((freeSlots() >= amount && !Item.itemStackable[item])
+        if ((freeSlots() >= amount && !ItemCacheDefinition.forID(item).isStackable())
                 || freeSlots() > 0) {
             for (int i = 0; i < playerItems.length; i++) {
-                if (playerItems[i] == (item + 1) && Item.itemStackable[item]
+                if (playerItems[i] == (item + 1) && ItemCacheDefinition.forID(item).isStackable()
                         && playerItems[i] > 0) {
                     playerItems[i] = (item + 1);
                     if ((playerItemsN[i] + amount) < maxItemAmount
@@ -20074,7 +19887,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 if (playerEquipment[targetSlot] != wearID && playerEquipment[targetSlot] >= 0) {
                     addItem(playerEquipment[targetSlot], playerEquipmentN[targetSlot]);
                     getPA().resetItems(3214); // THIS MIGHT STOP CLIENT HACKS HMM?
-                } else if (Item.itemStackable[wearID] && playerEquipment[targetSlot] == wearID) {
+                } else if (ItemCacheDefinition.forID(wearID).isStackable() && playerEquipment[targetSlot] == wearID) {
                     wearAmount = playerEquipmentN[targetSlot] + wearAmount;
                 } else if (playerEquipment[targetSlot] >= 0) {
                     addItem(playerEquipment[targetSlot], playerEquipmentN[targetSlot]);
@@ -20324,12 +20137,15 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().setSidebarInterface(3, 3213);
         getPA().setSidebarInterface(4, 1644);
         getPA().setSidebarInterface(5, 5608);
-        if (ancients == 0) {
+        if (playerMagicBook == 0) {
             getPA().setSidebarInterface(6, 1151);
         }
-        if (ancients == 1) {
+        if (playerMagicBook == 1) {
             getPA().setSidebarInterface(6, 12855);
         }
+    if (playerMagicBook == 2) {
+        getPA().setSidebarInterface(6, 29999);
+    }
         getPA().setSidebarInterface(7, 18128);
         getPA().setSidebarInterface(8, 5065);
         getPA().setSidebarInterface(9, 5715);
@@ -22657,10 +22473,10 @@ nated = Integer.parseInt(token2);
 
     public boolean pickUpItem(int itemId, int amount) {
         if (amount < 1) amount = 1;
-        if (!Item.itemStackable[itemId]) amount = 1;
+        if (!ItemCacheDefinition.forID(itemId).isStackable()) amount = 1;
 
         // Try to stack it first
-        if (Item.itemStackable[itemId]) {
+        if (ItemCacheDefinition.forID(itemId).isStackable()) {
             for (int i = 0; i < playerItems.length; i++) {
                 if (playerItems[i] == itemId + 1) {
                     if ((long) playerItemsN[i] + amount > maxItemAmount) {
@@ -26236,8 +26052,8 @@ nated = Integer.parseInt(token2);
                 if (getRights().inherits(Rights.ADMINISTRATOR) && itemId != 5733 && itemId != 6713) {
                     sendMessage("You gave " + other.playerName + " some " + Item.getItemName(itemId) + ".");
                     other.sendMessage("You were given some " + Item.getItemName(itemId) + " from " + playerName + ".");
-                    other.addItem(itemId, Item.itemStackable[itemId] ? getItemAmount(itemId) : 1);
-                    deleteItem(itemId, Item.itemStackable[itemId] ?getItemAmount(itemId) : 1);
+                    other.addItem(itemId, ItemCacheDefinition.forID(itemId).isStackable() ? getItemAmount(itemId) : 1);
+                    deleteItem(itemId, ItemCacheDefinition.forID(itemId).isStackable() ?getItemAmount(itemId) : 1);
                 }
                 CrackerID -= 1; //Only to fix the ID !
                 if (CrackerID == 962) {
@@ -27764,7 +27580,7 @@ nated = Integer.parseInt(token2);
                     if (!secondTradeWindow)
                         getTradeSystem().fromTrade(removeID, removeSlot, 1);
                 } else if (testinterfaceId == 3823) { // Show value to sell items
-                    if (!Item.itemSellable[removeID]) {
+                    if (!ItemCacheDefinition.forID(removeID).istradable()) {
                         sendMessage("I cannot sell " + GetItemName(removeID) + ".");
                     } else {
                         boolean IsIn = false;
@@ -27971,7 +27787,7 @@ nated = Integer.parseInt(token2);
                 // println_debug("RemoveItem all: "+removeID +" InterID: "+testinterfaceId +" slot: "+removeSlot );
 
                 if (testinterfaceId == 7423) { // remove from dep box to bank
-                    if (Item.itemStackable[removeID]) {
+                    if (ItemCacheDefinition.forID(removeID).isStackable()) {
                         bankItem(playerItems[removeSlot], removeSlot,
                                 playerItemsN[removeSlot]);
                         openUpDepBox();
@@ -27984,7 +27800,7 @@ nated = Integer.parseInt(token2);
 
                 if (testinterfaceId == 5064) { // remove from bag to bank
                     if (InBank == 1) {
-                        if (Item.itemStackable[removeID]) {
+                        if (ItemCacheDefinition.forID(removeID).isStackable()) {
                             bankItem(playerItems[removeSlot], removeSlot,
                                     playerItemsN[removeSlot]);
                         } else {
@@ -27992,7 +27808,7 @@ nated = Integer.parseInt(token2);
                                     itemAmount(playerItems[removeSlot]));
                         }
                     } else if (InBank == 2) {
-                        if (Item.itemStackable[removeID]) {
+                        if (ItemCacheDefinition.forID(removeID).isStackable()) {
                             bankItem2(playerItems[removeSlot], removeSlot,
                                     playerItemsN[removeSlot]);
                         } else {
@@ -28000,7 +27816,7 @@ nated = Integer.parseInt(token2);
                                     itemAmount(playerItems[removeSlot]));
                         }
                     } else if (InBank == 3) {
-                        if (Item.itemStackable[removeID]) {
+                        if (ItemCacheDefinition.forID(removeID).isStackable()) {
                             bankItem3(playerItems[removeSlot], removeSlot,
                                     playerItemsN[removeSlot]);
                         } else {
@@ -34526,6 +34342,7 @@ nated = Integer.parseInt(token2);
 
     /* Shops*/
     public boolean sellItem(int itemID, int fromSlot, int amount) {
+    ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
         if (amount > 0 && itemID == (playerItems[fromSlot] - 1)) {
             if (ShopHandler.ShopSModifier[MyShopID] > 1) {
                 boolean IsIn = false;
@@ -34545,17 +34362,17 @@ nated = Integer.parseInt(token2);
                     return false;
                 }
             }
-            if (!Item.itemSellable[(playerItems[fromSlot] - 1)]) {
+            if (!def.istradable()) {
                 sendMessage("I cannot sell " + GetItemName(itemID) + ".");
                 return false;
             }
             if (amount > playerItemsN[fromSlot]
-                    && (Item.itemIsNote[(playerItems[fromSlot] - 1)]
-                    || Item.itemStackable[(playerItems[fromSlot] - 1)])) {
+                    && (def.isNoted()
+                    || def.isStackable())) {
                 amount = playerItemsN[fromSlot];
             } else if (amount > getItemAmount(itemID)
-                    && !Item.itemIsNote[(playerItems[fromSlot] - 1)]
-                    && !Item.itemStackable[(playerItems[fromSlot] - 1)]) {
+                    && !def.isNoted()
+                    && !def.isStackable()) {
                 amount = getItemAmount(itemID);
             }
             double ShopValue;
@@ -36233,7 +36050,7 @@ nated = Integer.parseInt(token2);
                         } else if (token.equals("character-reputation")) {
                             reputation = Integer.parseInt(token2);
                         } else if (token.equals("character-ancients")) {
-                            ancients = Integer.parseInt(token2);
+                            playerMagicBook = Integer.parseInt(token2);
                         } else if (token.equals("character-starter")) {
                             starter = Integer.parseInt(token2);
                         } else if (token.equals("character-rangestarter")) {
@@ -36504,8 +36321,8 @@ nated = Integer.parseInt(token2);
                     Integer.toString(reputation).length());
             characterfile.newLine();
             characterfile.write("character-ancients = ", 0, 21);
-            characterfile.write(Integer.toString(ancients), 0,
-                    Integer.toString(ancients).length());
+            characterfile.write(Integer.toString(playerMagicBook), 0,
+                    Integer.toString(playerMagicBook).length());
             characterfile.newLine();
             characterfile.write("character-starter = ", 0, 20);
             characterfile.write(Integer.toString(starter), 0,

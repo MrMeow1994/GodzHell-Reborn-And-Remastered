@@ -292,7 +292,7 @@ public class TradeSystem {
                             + c.getItemName((c.playerTItems[i] - 1));
                 }
                 if (Item.itemIsNote[(c.playerTItems[i] - 1)]
-                        || Item.itemStackable[(c.playerTItems[i] - 1)]) {
+                        || ItemCacheDefinition.forID(c.playerTItems[i] - 1).isStackable()) {
                     SendTrade = SendTrade + " x " + SendAmount;
                 }
                 Count++;
@@ -320,7 +320,7 @@ public class TradeSystem {
                             + c.getItemName((c.playerOTItems[i] - 1));
                 }
                 if (Item.itemIsNote[(c.playerOTItems[i] - 1)]
-                        || Item.itemStackable[(c.playerOTItems[i] - 1)]) {
+                        || ItemCacheDefinition.forID(c.playerOTItems[i] - 1).isStackable()) {
                     SendTrade = SendTrade + " x " + SendAmount;
                 }
                 Count++;

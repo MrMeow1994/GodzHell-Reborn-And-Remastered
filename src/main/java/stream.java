@@ -202,15 +202,18 @@ public class stream {
         } else frameStack[++frameStackPtr] = currentOffset;
     }
 
-    public void createFrameVarSizeWord(int id) { // creates a variable sized frame
-		ensureCapacity(2);
+    public void createFrameVarSizeWord(int id) {
+        ensureCapacity(3);
+
         buffer[currentOffset++] = (byte) (id + packetEncryption.getNextIntKey());
-        writeWord(0);        // placeholder for size word
-        if (frameStackPtr >= frameStackSize - 1) {
-            throw new RuntimeException("Stack overflow");
-        } else
-			frameStack[++frameStackPtr] = currentOffset;
+
+        // Record where the size bytes START
+        frameStack[++frameStackPtr] = currentOffset;
+
+        // Write placeholder (2 bytes)
+        writeWord(0);
     }
+
 
     public void endFrameVarSize() {// ends a variable sized frame
         if (frameStackPtr < 0) throw new RuntimeException("Stack empty");
@@ -219,10 +222,15 @@ public class stream {
 
     public void endFrameVarSizeWord() {
         if (frameStackPtr < 0)
-            throw new RuntimeException("Stack empty");
-        else
-            writeFrameSizeWord(currentOffset - frameStack[frameStackPtr--]);
+            throw new RuntimeException("Frame stack empty");
+
+        int sizePos = frameStack[frameStackPtr--];
+        int frameSize = currentOffset - sizePos - 2; // subtract the size of the size field
+
+        writeFrameSizeWord(sizePos, frameSize);
     }
+
+
 
 
     public void writeByte(int value) {
@@ -298,10 +306,12 @@ public class stream {
         buffer[currentOffset - i - 1] = (byte) i;
     }
 
-    public void writeFrameSizeWord(int i) {
-        buffer[currentOffset - i - 2] = (byte) (i >> 8);
-        buffer[currentOffset - i - 1] = (byte) i;
+    private void writeFrameSizeWord(int pos, int size) {
+        buffer[pos]     = (byte) (size >> 8);
+        buffer[pos + 1] = (byte) size;
     }
+
+
 
     public int readUnsignedByte() {
         if (currentOffset >= buffer.length) {
@@ -397,5 +407,21 @@ public class stream {
         }
 
         return new String(this.buffer, i, this.currentOffset - i - 1);
+    }
+
+    public byte[] method416(byte byte0) {
+        int i = this.currentOffset;
+
+        while(this.buffer[this.currentOffset++] != 10) {
+            ;
+        }
+
+        byte[] abyte0 = new byte[this.currentOffset - i - 1];
+
+        for(int j = i; j < this.currentOffset - 1; ++j) {
+            abyte0[j - i] = this.buffer[j];
+        }
+
+        return abyte0;
     }
 }

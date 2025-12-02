@@ -153,6 +153,7 @@ public class server implements Runnable {
         ServerbroadcastGlobal();
         EventManager.initialise();
         NPCCacheDefinition.unpackConfig();
+        ItemCacheDefinition.unpackConfig();
         AnimationLength.startup();
         BobTheCatManager.init();
         lottery.loadLists();
