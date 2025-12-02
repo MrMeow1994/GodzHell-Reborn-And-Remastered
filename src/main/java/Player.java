@@ -648,6 +648,9 @@ public abstract class Player {
 		if(Boundary.isIn((client) this, Boundary.rdleveloftrain)){
 			return true;
 		}
+		if(Boundary.isIn((client) this, Boundary.SKILLZ)){
+			return true;
+		}
 		if(Boundary.isIn((client) this, Boundary.DUNGEONS)){
 			return true;
 		}
@@ -1267,42 +1270,35 @@ public abstract class Player {
 	public byte cachedPropertiesBitmap[] = new byte[(PlayerHandler.maxPlayers+7) >> 3];
 
 	public void addNewNPC(NPC npc, stream str, stream updateBlock) {
-		final int npcId = npc.npcId;
-		final int npcType = npc.npcType;
+		int id = npc.npcId;
 
-		// ✅ Mark the NPC as active for this client
-		npcInListBitmap[npcId >> 3] |= (1 << (npcId & 7));
+		npcInListBitmap[id >> 3] |= 1 << (id & 7); // set the flag
 		npcList[npcListSize++] = npc;
 
-		// ✅ Write the NPC ID (must be 14-bit max for client compatibility)
-		str.writeBits(14, npcId);
+		str.writeBits(14, id); // client doesn't seem to like id=0
 
-		// ✅ Calculate relative Y position (modulo 32 to handle wrapping)
-		int deltaY = npc.absY - absY;
-		if (deltaY < 0) deltaY += 32;
-		str.writeBits(5, deltaY);
+		int z = npc.absY - absY;
 
-		// ✅ Calculate relative X position (same logic)
-		int deltaX = npc.absX - absX;
-		if (deltaX < 0) deltaX += 32;
-		str.writeBits(5, deltaX);
+		if (z < 0) {
+			z += 32;
+		}
+		str.writeBits(5, z); // y coordinate relative to thisPlayer
+		z = npc.absX - absX;
+		if (z < 0) {
+			z += 32;
+		}
+		str.writeBits(5, z); // x coordinate relative to thisPlayer
 
-		// ✅ Direction flag — 0 means no forced movement (teleport flag or reserved bit)
-		str.writeBits(1, 0);
+		str.writeBits(1, 0); // something??
+		str.writeBits(14, npc.npcType);
 
-		// ✅ Write NPC type (model definition ID)
-		str.writeBits(14, npcType);
+		boolean savedUpdateRequired = npc.updateRequired;
 
-		// ✅ Temporarily mark update required to force update block writing
-		boolean wasUpdateRequired = npc.updateRequired;
 		npc.updateRequired = true;
 		npc.appendNPCUpdateBlock(updateBlock);
-		npc.updateRequired = wasUpdateRequired;
-
-		// ✅ Signal that update block follows
-		str.writeBits(1, 1);
+		npc.updateRequired = savedUpdateRequired;
+		str.writeBits(1, 1); // update required
 	}
-
 
 	public void addNewPlayer(Player plr, stream str, stream updateBlock) {
 		int id = plr.playerId;

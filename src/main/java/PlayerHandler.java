@@ -602,80 +602,60 @@ public class PlayerHandler {
     }
 
 
+    private stream updateBlock = new stream(new byte[10000]);
     public void updateNPC(Player plr, stream str) {
-        stream updateBlock = new stream(new byte[5000]); // 👈 LOCAL!
+        updateBlock.currentOffset = 0;
+
         str.createFrameVarSizeWord(65);
         str.initBitAccess();
 
-        if (plr.npcListSize > 255) plr.npcListSize = 255;
         str.writeBits(8, plr.npcListSize);
-
         int size = plr.npcListSize;
+
         plr.npcListSize = 0;
-
         for (int i = 0; i < size; i++) {
-            NPC npc = plr.npcList[i];
-            if (npc == null || npc.npcId < 0 || npc.npcId > 16383 || npc.npcType < 0) continue;
-
-            if (!plr.RebuildNPCList && plr.withinDistance(npc)) {
-                npc.updateNPCMovement(str);
-                if (npc.updateRequired) {
-                    npc.appendNPCUpdateBlock(updateBlock);
-                }
-                plr.npcList[plr.npcListSize++] = npc;
+            if (plr.RebuildNPCList == false
+                    && plr.withinDistance(plr.npcList[i]) == true) {
+                plr.npcList[i].updateNPCMovement(str);
+                plr.npcList[i].appendNPCUpdateBlock(updateBlock);
+                plr.npcList[plr.npcListSize++] = plr.npcList[i];
             } else {
-                int id = npc.npcId;
-                plr.npcInListBitmap[id >> 3] &= ~(1 << (id & 7));
+                int id = plr.npcList[i].npcId;
+
+                plr.npcInListBitmap[id >> 3] &= ~(1 << (id & 7)); // clear the flag
                 str.writeBits(1, 1);
-                str.writeBits(2, 3);
+                str.writeBits(2, 3); // tells client to remove this npc from list
             }
         }
 
+        // iterate through all npcs to check whether there's new npcs to add
         for (int i = 0; i < NPCHandler.maxNPCs; i++) {
-            NPC npc = NPCHandler.npcs[i];
-            if (npc == null || npc.npcType < 0 || npc.npcId < 0 || npc.npcId > 16383) continue;
-            if (!plr.withinDistance(npc)) continue;
+            if (server.npcHandler.npcs[i] != null) {
+                int id = server.npcHandler.npcs[i].npcId;
 
-            int id = npc.npcId;
-            if (!plr.RebuildNPCList &&
-                    (plr.npcInListBitmap[id >> 3] & (1 << (id & 7))) != 0) {
-                continue;
+                if (plr.RebuildNPCList == false
+                        && (plr.npcInListBitmap[id >> 3] & (1 << (id & 7))) != 0) {// npc already in npcList
+                } else if (plr.withinDistance(server.npcHandler.npcs[i])
+                        == false) {// out of sight
+                } else {
+                    plr.addNewNPC(server.npcHandler.npcs[i], str, updateBlock);
+                }
             }
-
-            int deltaX = npc.absX - plr.absX;
-            int deltaY = npc.absY - plr.absY;
-            if (deltaX < 0) deltaX += 32;
-            if (deltaY < 0) deltaY += 32;
-            if (deltaX > 31 || deltaY > 31) continue;
-
-            plr.npcInListBitmap[id >> 3] |= (1 << (id & 7));
-            plr.npcList[plr.npcListSize++] = npc;
-
-            str.writeBits(14, id);
-            str.writeBits(5, deltaY);
-            str.writeBits(5, deltaX);
-            str.writeBits(1, 0);
-            str.writeBits(14, npc.npcType);
-
-            boolean wasUpdateRequired = npc.updateRequired;
-            npc.updateRequired = true;
-            npc.appendNPCUpdateBlock(updateBlock); // 👈 use local
-            npc.updateRequired = wasUpdateRequired;
-
-            str.writeBits(1, 1); // update block follows
         }
 
-        str.writeBits(14, 16383); // end-of-list marker
-        str.finishBitAccess();
+        plr.RebuildNPCList = false;
 
         if (updateBlock.currentOffset > 0) {
+            str.writeBits(14, 16383); // magic EOF - needed only when npc updateblock follows
+            str.finishBitAccess();
+
+            // append update block
             str.writeBytes(updateBlock.buffer, updateBlock.currentOffset, 0);
+        } else {
+            str.finishBitAccess();
         }
-
         str.endFrameVarSizeWord();
-        plr.RebuildNPCList = false;
     }
-
 
     public void updatePlayer(Player plr, stream str) {
         stream updateBlock = plr.updateBlock; // <- per-player buffer

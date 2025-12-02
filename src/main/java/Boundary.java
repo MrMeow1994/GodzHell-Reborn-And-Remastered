@@ -274,6 +274,10 @@ public class Boundary {
     public static final Boundary BOUNDARY_BOSS = new Boundary(3254, 3870, 3272, 3888);
     public static final Boundary Train = new Boundary(1728, 5440, 1791, 5503);
     public static final Boundary STAFF_ZONE = new Boundary(2816, 5056, 2879, 5119);
+    public static final Boundary[] SKILLZ = {
+            new Boundary(2347, 5774, 2369, 5795),
+            new Boundary(2357, 5751, 2369, 5773)
+    };
     public static final Boundary[] GH_NONWILD = {
             new Boundary(3242, 3282, 3265, 3298),
             new Boundary(3244, 3278, 3265, 3281),
@@ -330,8 +334,7 @@ public class Boundary {
             new Boundary(2727, 9481, 2746, 9507),
             new Boundary(2694, 9502, 2725, 9552),
             new Boundary(2812, 5243, 2949, 5380, 2),
-            new Boundary(2498, 4628, 2545, 4665)
-
+            new Boundary(2498, 4628, 2545, 4665),
     };
     public static final Boundary[] GODWARS_BOSSROOMS = {
             BANDOS_GODWARS,

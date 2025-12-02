@@ -516,6 +516,7 @@ public static final int bufferSize = 20000;
     private Slayer slayer = new Slayer(this);
     private PlayerAssistant playerAssistant = new PlayerAssistant(this);
     private final WarriorsGuild warriorsGuild = new WarriorsGuild(this);
+    private final ShopAssistant shopAssistant = new ShopAssistant(this);
     private int lastSent;
     private int hitsoundmagic = 0;
     private long lastClanTeleport;
@@ -17684,10 +17685,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         return -1;
     }
     public void fromBank(int itemID, int fromSlot, int amount) {
+        ItemCacheDefinition def = ItemCacheDefinition.forID(bankItems[fromSlot]);
         if (amount > 0) {
             if (bankItems[fromSlot] > 0) {
                 if (!takeAsNote) {
-                    if (ItemCacheDefinition.forID(bankItems[fromSlot] + 1).isStackable()) {
+                    if (def.isStackable()) {
                         if (bankItemsN[fromSlot] > amount) {
                             if (addItem((bankItems[fromSlot] - 1), amount)) {
                                 bankItemsN[fromSlot] -= amount;
@@ -17719,7 +17721,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         resetBank();
                         getPA().resetItems(5064);
                     }
-                } else if (takeAsNote && Item.itemIsNote[bankItems[fromSlot]]) {
+                } else if (takeAsNote && def.isNoted()) {
                     // if (Item.itemStackable[bankItems[fromSlot]+1])
                     // {
                     if (bankItemsN[fromSlot] < amount) {
@@ -17776,7 +17778,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         addItem(bankItems[fromSlot] - 1, amount);//adds the item
                         resetBank();
                         getPA().resetItems(5064);
-                    } else if (ItemCacheDefinition.forID(bankItems[fromSlot] + 1).isStackable()) {
+                    } else if (def.isStackable()) {
                         if (bankItemsN[fromSlot] > amount) {
                             if (addItem((bankItems[fromSlot] - 1), amount)) {
                                 bankItemsN[fromSlot] -= amount;
@@ -19023,46 +19025,6 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getOutStream().endFrameVarSizeWord();
     }
 
-    public void resetShop(int ShopID) {
-        int TotalItems = 0;
-
-        for (int i = 0; i < ShopHandler.MaxShopItems; i++) {
-            if (ShopHandler.ShopItems[ShopID][i] > 0) {
-                TotalItems++;
-            }
-        }
-        if (TotalItems > ShopHandler.MaxShopItems) {
-            TotalItems = ShopHandler.MaxShopItems;
-        }
-        getOutStream().createFrameVarSizeWord(53);
-        getOutStream().writeWord(64016);
-        getOutStream().writeWord(TotalItems);
-        int TotalCount = 0;
-
-        for (int i = 0; i < ShopHandler.ShopItems.length; i++) {
-            if (ShopHandler.ShopItems[ShopID][i] > 0
-                    || i <= ShopHandler.ShopItemsStandard[ShopID]) {
-                if (ShopHandler.ShopItemsN[ShopID][i] > 254) {
-                    getOutStream().writeByte(255); // item's stack count. if over 254, write byte 255
-                    getOutStream().writeDWord_v2(
-                            ShopHandler.ShopItemsN[ShopID][i]); // and then the real value with writeDWord_v2
-                } else {
-                    getOutStream().writeByte(ShopHandler.ShopItemsN[ShopID][i]);
-                }
-                if (ShopHandler.ShopItems[ShopID][i] > Config.MAX_ITEMS
-                        || ShopHandler.ShopItems[ShopID][i] < 0) {
-                    ShopHandler.ShopItems[ShopID][i] = Config.MAX_ITEMS;
-                }
-                getOutStream().writeWordBigEndianA(
-                        ShopHandler.ShopItems[ShopID][i]); // item id
-                TotalCount++;
-            }
-            if (TotalCount > TotalItems) {
-                break;
-            }
-        }
-        getOutStream().endFrameVarSizeWord();
-    }
 
     public void resetBank() {
         getOutStream().createFrameVarSizeWord(53);
@@ -19261,16 +19223,6 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().showInterface(14924);
     }
 
-    public void openUpShop(int ShopID) {
-        // setScrollHeight(ShopID);
-        // resetScrollPosition(64015);
-        getPA().sendFrame126(ShopHandler.ShopName[ShopID], 64003);
-        getPA().sendFrame248(64000, 3822);
-        getPA().resetItems(3823);
-        resetShop(ShopID);
-        IsShopping = true;
-        MyShopID = ShopID;
-    }
     private void setScrollHeight(int shopId) {
         int size = server.shopHandler.getItemAmount(shopId);
         int defaultHeight = 253;
@@ -22219,7 +22171,7 @@ nated = Integer.parseInt(token2);
                 // Shop
                 if (UpdateShop) {
                     getPA().resetItems(3823);
-                    resetShop(MyShopID);
+                    getShops().resetShop(MyShopID);
                 }
                 // Energy
                 if (playerEnergy < 100) {
@@ -22272,7 +22224,7 @@ nated = Integer.parseInt(token2);
                 // check shopping
                 if (WanneShop > 0) {
                     if (GoodDistance(skillX, skillY, absX, absY, 1)) {
-                        openUpShop(WanneShop);
+                        getShops().openUpShop(WanneShop);
                         WanneShop = 0;
                     }
                 }
@@ -26680,7 +26632,6 @@ nated = Integer.parseInt(token2);
                 break;
             case 198:
             case 30:
-            case 43:
                 // Prevents crashes from malformed or unknown packets
                 if (packetSize == 0) {
                     break;
@@ -27661,8 +27612,8 @@ nated = Integer.parseInt(token2);
                 break;
 
             case 117: // bank 5 items - sell 1 item
-                int interfaceId = inStream.readUnsignedWord();
-                int removeID2 = inStream.readUnsignedWord();
+                int interfaceId = inStream.readSignedWordBigEndianA();
+                int removeID2 = inStream.readSignedWordBigEndianA();
                 int removeSlot2 = inStream.readSignedWordBigEndian();
                 if (debugMessages) {
                     sendMessage("packet 117: interfaceid: " + interfaceId + ", removeSlot: " + removeSlot2 + ", removeID: " + removeID2);
@@ -27682,10 +27633,10 @@ nated = Integer.parseInt(token2);
                         JewelryMaking.mouldItem(this, removeID2, 5);
                         break;
                     case 64016:
-                        buyItem(removeID2, removeSlot2, 1);
+                        getShops().buyItem(removeID2, removeSlot2, 1);
                         break;
                     case 3823:
-                        sellItem(removeID2, removeSlot2, 1);
+                        getShops().sellItem(removeID2, removeSlot2, 1);
                         break;
                 }
                 // println_debug("RemoveItem 5: "+removeID +" InterID: "+testinterfaceId +" slot: "+removeSlot );
@@ -27722,10 +27673,13 @@ nated = Integer.parseInt(token2);
 
                 break;
 
-            case 135: // bank 10 items - sell 5 items
-                testinterfaceId = inStream.readUnsignedWord();
+            case 43: // bank 10 items - sell 5 items
+                testinterfaceId = inStream.readUnsignedWordBigEndian();
                 removeID = inStream.readUnsignedWordA();
                 removeSlot = inStream.readUnsignedWordA();
+                if (debugMessages) {
+                    sendMessage("packet 43: interfaceid: " + testinterfaceId + ", removeSlot: " + removeSlot + ", removeID: " + removeID);
+                }
                 switch (testinterfaceId) {
                     case 1119:
                     case 1120:
@@ -27772,9 +27726,9 @@ nated = Integer.parseInt(token2);
                 } else if (testinterfaceId == 3415) { // remove from trade window
                     getTradeSystem().fromTrade(removeID, removeSlot, 10);
                 } else if (testinterfaceId == 3823) { // Show value to sell items
-                    sellItem(removeID, removeSlot, 5);
+                    getShops().sellItem(removeID, removeSlot, 5);
                 } else if (testinterfaceId == 64016) { // Show value to buy items
-                    buyItem(removeID, removeSlot, 5);
+                     getShops().buyItem(removeID, removeSlot, 5);
                 }
 
                 break;
@@ -27842,9 +27796,9 @@ nated = Integer.parseInt(token2);
                     if (!secondTradeWindow)
                         getTradeSystem().fromTrade(removeID, removeSlot, 1);
                 } else if (testinterfaceId == 3823) { // Show value to sell items
-                    sellItem(removeID, removeSlot, 10);
+                    getShops().sellItem(removeID, removeSlot, 10);
                 } else if (testinterfaceId == 64016) { // Show value to buy items
-                    buyItem(removeID, removeSlot, 10);
+                     getShops().buyItem(removeID, removeSlot, 10);
                 }
 
                 break;
@@ -27859,7 +27813,7 @@ nated = Integer.parseInt(token2);
                     openUpDepBox();
                 } else if (testinterfaceId == 64016) { //Shop
                     if (EnteredAmount <= 10000)
-                        buyItem(XremoveID, XremoveSlot, EnteredAmount);
+                         getShops().buyItem(XremoveID, XremoveSlot, EnteredAmount);
                     else
                         sendMessage("You cannot buy more than 10k items at a time.");
                 }
@@ -34340,285 +34294,6 @@ nated = Integer.parseInt(token2);
 
 
 
-    /* Shops*/
-    public boolean sellItem(int itemID, int fromSlot, int amount) {
-    ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
-        if (amount > 0 && itemID == (playerItems[fromSlot] - 1)) {
-            if (ShopHandler.ShopSModifier[MyShopID] > 1) {
-                boolean IsIn = false;
-
-                for (int i = 0; i
-                        <= ShopHandler.ShopItemsStandard[MyShopID]; i++) {
-                    if (itemID
-                            == (ShopHandler.ShopItems[MyShopID][i] - 1)) {
-                        IsIn = true;
-                        break;
-                    }
-                }
-                if (!IsIn) {
-                    sendMessage(
-                            "You cannot sell " + GetItemName(itemID)
-                                    + " in this store.");
-                    return false;
-                }
-            }
-            if (!def.istradable()) {
-                sendMessage("I cannot sell " + GetItemName(itemID) + ".");
-                return false;
-            }
-            if (amount > playerItemsN[fromSlot]
-                    && (def.isNoted()
-                    || def.isStackable())) {
-                amount = playerItemsN[fromSlot];
-            } else if (amount > getItemAmount(itemID)
-                    && !def.isNoted()
-                    && !def.isStackable()) {
-                amount = getItemAmount(itemID);
-            }
-            double ShopValue;
-            double TotPrice;
-            int TotPrice2;
-            int Overstock;
-
-            for (int i = amount; i > 0; i--) {
-                TotPrice2 = (int) Math.floor(
-                        GetItemShopValue(itemID, 1, fromSlot));
-                if (MyShopID != 99 && MyShopID != 113 && MyShopID != 114 && MyShopID != 115 && MyShopID != 239) {
-                    if (freeSlots() >= 1) {
-                        if (!Item.itemIsNote[itemID]) {
-                            deleteItem2(itemID, 1);
-                        } else {
-                            deleteItem2(itemID, 1);
-                        }
-                        addItem(ItemIDs.COINS, TotPrice2);
-                        addShopItem(itemID, 1);
-                    } else {
-                        sendMessage("Not enough space in your inventory.");
-                        break;
-                    }
-                }
-                else if (MyShopID != 99 && MyShopID != 113 && MyShopID != 114 && MyShopID != 115 && MyShopID == 239) {
-                    if (freeSlots() >= 1) {
-                        if (!Item.itemIsNote[itemID]) {
-                            deleteItem2(itemID, 1);
-                        } else {
-                            deleteItem2(itemID, 1);
-                        }
-                        addItem(ItemIDs.COINS, TotPrice2 * 9);
-                        addShopItem(itemID, 1);
-                    } else {
-                        sendMessage("Not enough space in your inventory.");
-                        break;
-                    }
-                }else if (MyShopID != 99  && MyShopID != 239 && MyShopID == 113 && MyShopID == 114 && MyShopID == 115) {
-                    if (freeSlots() >= 1) {
-                        if (!Item.itemIsNote[itemID]) {
-                            deleteItem2(itemID, 1);
-                        } else {
-                            deleteItem2(itemID, 1);
-                        }
-                        addItem(6529, TotPrice2);
-                        addShopItem(itemID, 1);
-                    } else {
-                        sendMessage("Not enough space in your inventory.");
-                        break;
-                    }
-                }
-            }
-            getPA().resetItems(3823);
-            resetShop(MyShopID);
-            UpdatePlayerShop();
-            return true;
-        }
-        return true;
-    }
-
-    public boolean buyItem(int itemID, int fromSlot, int amount) {
-        if (amount > 0) {
-            if (fromSlot >= ShopHandler.ShopItemsN[MyShopID].length) {
-                sendMessage("There was a problem buying that item, please report it to staff!");
-                return false;
-            }
-            if (amount > ShopHandler.ShopItemsN[MyShopID][fromSlot]) {
-                amount = ShopHandler.ShopItemsN[MyShopID][fromSlot];
-            }
-            double ShopValue;
-            double TotPrice;
-            int TotPrice2;
-            int Overstock;
-            int Slot = 0;
-            int Slot1 = 0;
-            int Slot2 = 0;
-
-            int boughtAmount = 0;
-            for (int i = amount; i > 0; i--) {
-                TotPrice2 = (int) Math.floor(
-                        GetItemShopValue(itemID, 0, fromSlot));
-                Slot = GetItemSlot(ItemIDs.COINS);
-                Slot1 = GetItemSlot(6306);
-                Slot2 = GetItemSlot(6529);
-                if (Slot == -1 && MyShopID != 99 && MyShopID != 113 && MyShopID != 114 && MyShopID != 115) {
-                    sendMessage("You don't have enough coins.");
-                    break;
-                }
-                if (Slot1 == -1 && MyShopID == 99 && MyShopID != 113 && MyShopID != 114 && MyShopID != 115) {
-                    sendMessage("You don't have enough Trading Sticks.");
-                    break;
-                }
-                if (Slot2 == -1 && MyShopID != 99 && MyShopID == 113 && MyShopID == 114 && MyShopID == 115) {
-                    sendMessage("You don't have enough Tokkul.");
-                    break;
-                }
-                if (TotPrice2 <= 1) {
-                    TotPrice2 = (int) Math.floor(GetItemShopValue(itemID, 0, fromSlot));
-                    TotPrice2 *= 1.66;
-                }
-                if (MyShopID != 99 && MyShopID != 113 && MyShopID != 114 && MyShopID != 115) {
-                    if (playerHasItem(995, TotPrice2) || TotPrice2 == 0) {
-                        if (freeSlots() > 0) {
-                            deleteItem2(ItemIDs.COINS, TotPrice2 * amount);
-                            addItem(itemID, 1);
-                            boughtAmount++;
-                            ShopHandler.ShopItemsN[MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[MyShopID]) {
-                                ShopHandler.ShopItems[MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            sendMessage("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        sendMessage("You don't have enough coins.");
-                        break;
-                    }
-                } else if (MyShopID == 99 && MyShopID != 113 && MyShopID != 114 && MyShopID != 115) {
-                    if (playerHasItem(6306, TotPrice2) || TotPrice2 == 0) {
-                        if (freeSlots() > 0) {
-                            deleteItem2(6306, TotPrice2 * amount);
-                            addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[MyShopID]) {
-                                ShopHandler.ShopItems[MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        sM("Not enough Trading ticks for this item.");
-                        break;
-                    }
-                } else if (MyShopID == 113 && MyShopID != 99) {
-                    if (playerHasItem(6529, TotPrice2) || TotPrice2 == 0) {
-                        if (freeSlots() > 0) {
-                            deleteItem2(6529, TotPrice2 * amount);
-                            addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[MyShopID]) {
-                                ShopHandler.ShopItems[MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        sM("Not enough Tokkul for this item.");
-                        break;
-                    }
-                } else if (MyShopID == 114 && MyShopID != 99) {
-                    if (playerHasItem(6529, TotPrice2) || TotPrice2 == 0) {
-                        if (freeSlots() > 0) {
-                            deleteItem2(6529, TotPrice2 * amount);
-                            addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[MyShopID]) {
-                                ShopHandler.ShopItems[MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        sM("Not enough Tokkul for this item.");
-                        break;
-                    }
-                } else if (MyShopID == 115 && MyShopID != 99) {
-                    if (playerHasItem(6529, TotPrice2) || TotPrice2 == 0) {
-                        if (freeSlots() > 0) {
-                            deleteItem2(6529, TotPrice2 * amount);
-                            addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[MyShopID]) {
-                                ShopHandler.ShopItems[MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        sM("Not enough Tokkul for this item.");
-                        break;
-                    }
-                }
-
-            }
-            getPA().resetItems(3823);
-            resetShop(MyShopID);
-            UpdatePlayerShop();
-            return true;
-        }
-        return false;
-    }
-
-    public void UpdatePlayerShop() {
-        for (int i = 1; i < PlayerHandler.maxPlayers; i++) {
-            if (PlayerHandler.players[i] != null) {
-                if (PlayerHandler.players[i].IsShopping
-                        && PlayerHandler.players[i].MyShopID == MyShopID
-                        && i != playerId) {
-                    PlayerHandler.players[i].UpdateShop = true;
-                }
-            }
-        }
-    }
-
-    public boolean addShopItem(int itemID, int amount) {
-        boolean Added = false;
-
-        if (amount <= 0) {
-            return false;
-        }
-        if (Item.itemIsNote[itemID]) {
-            itemID = itemID - 1;
-        }
-        for (int i = 0; i < ShopHandler.ShopItems.length; i++) {
-            if ((ShopHandler.ShopItems[MyShopID][i] - 1) == itemID) {
-                ShopHandler.ShopItemsN[MyShopID][i] += amount;
-                Added = true;
-            }
-        }
-        if (!Added) {
-            for (int i = 0; i < ShopHandler.ShopItems.length; i++) {
-                if (ShopHandler.ShopItems[MyShopID][i] == 0) {
-                    ShopHandler.ShopItems[MyShopID][i] = (itemID + 1);
-                    ShopHandler.ShopItemsN[MyShopID][i] = amount;
-                    ShopHandler.ShopItemsDelay[MyShopID][i] = 0;
-                    break;
-                }
-            }
-        }
-        return true;
-    }
 
     /* NPC Talking*/
     public void UpdateNPCChat() {
@@ -38193,7 +37868,9 @@ nated = Integer.parseInt(token2);
         // TODO Auto-generated method stub
 
     }
-
+    public ShopAssistant getShops() {
+        return shopAssistant;
+    }
     public boolean isWearingItem(int itemID) {
         for(int i = 0; i < 12; i++) {
             if(playerEquipment[i] == itemID) {
