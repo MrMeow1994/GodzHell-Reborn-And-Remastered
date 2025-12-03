@@ -467,6 +467,8 @@ public class ItemCacheDefinition {
         }
         this.description = ("Swap this note at any bank for " + s + " " + unnoted.name + ".").getBytes();
         this.stackable = true;
+
+        this.unnotedId = noted.certID;
     }
 
     ItemCacheDefinition()

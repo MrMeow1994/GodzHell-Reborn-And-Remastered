@@ -17736,7 +17736,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 withdrawNormal(def, fromSlot, amount, stackable);
                 return;
             }
-            int invId = notedId ;
+            int invId = notedId;
 
             // Stackable logic applies to notes too
             if (stackable) {
@@ -17770,14 +17770,23 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         int invId = bankId - 1; // inventory encoding
 
         if (stackable) {
-
-            if (addItem(invId, amount)) {
-                bankItemsN[fromSlot] -= amount;
-                if (bankItemsN[fromSlot] <= 0) {
+            if (bankItemsN[fromSlot] > amount) {
+                if (addItem(invId, amount)) {
+                    bankItemsN[fromSlot] -= amount;
+                    resetBank();
+                    if (bankItemsN[fromSlot] <= 0) {
+                        bankItems[fromSlot] = 0;
+                    }
+                }
+            } else {
+                if (addItem(invId,
+                        bankItemsN[fromSlot])) {
                     bankItems[fromSlot] = 0;
+                    bankItemsN[fromSlot] = 0;
+                    resetBank();
+                    getPA().resetItems(5064);
                 }
             }
-
         } else {
             int withdraw = amount;
 
@@ -27807,11 +27816,11 @@ nated = Integer.parseInt(token2);
                 if (testinterfaceId == 5064) { // remove from bag to bank
                     if (InBank == 1) {
                         if (ItemCacheDefinition.forID(removeID).isStackable()) {
-                            bankItem(playerItems[removeSlot], removeSlot,
-                                    playerItemsN[removeSlot]);
+                            bankItem(removeID, removeSlot,
+                                    getItemAmount(removeID));
                         } else {
-                            bankItem(playerItems[removeSlot], removeSlot,
-                                    itemAmount(playerItems[removeSlot]));
+                            bankItem(removeID, removeSlot,
+                                    getItemAmount(removeID));
                         }
                     } else if (InBank == 2) {
                         if (ItemCacheDefinition.forID(removeID).isStackable()) {
