@@ -17684,136 +17684,119 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
         return -1;
     }
-    public void fromBank(int itemID, int fromSlot, int amount) {
-        ItemCacheDefinition def = ItemCacheDefinition.forID(bankItems[fromSlot]);
-        if (amount > 0) {
-            if (bankItems[fromSlot] > 0) {
-                if (!takeAsNote) {
-                    if (def.isStackable()) {
-                        if (bankItemsN[fromSlot] > amount) {
-                            if (addItem((bankItems[fromSlot] - 1), amount)) {
-                                bankItemsN[fromSlot] -= amount;
-                                resetBank();
-                                getPA().resetItems(5064);
-                            }
-                        } else {
-                            if (addItem((bankItems[fromSlot] - 1),
-                                    bankItemsN[fromSlot])) {
-                                bankItems[fromSlot] = 0;
-                                bankItemsN[fromSlot] = 0;
-                                resetBank();
-                                getPA().resetItems(5064);
-                            }
-                        }
-                    } else {
-                        while (amount > 0) {
-                            if (bankItemsN[fromSlot] > 0) {
-                                if (addItem((bankItems[fromSlot] - 1), 1)) {
-                                    bankItemsN[fromSlot] += -1;
-                                    amount--;
-                                } else {
-                                    amount = 0;
-                                }
-                            } else {
-                                amount = 0;
-                            }
-                        }
-                        resetBank();
-                        getPA().resetItems(5064);
-                    }
-                } else if (takeAsNote && def.isNoted()) {
-                    // if (Item.itemStackable[bankItems[fromSlot]+1])
-                    // {
-                    if (bankItemsN[fromSlot] < amount) {
-                        amount = bankItemsN[fromSlot];
-                    }
-                    if ((bankItemsN[fromSlot] >= amount) && (bankItems[fromSlot] == 566)) {//commented the ones below
-                        bankItemsN[fromSlot] -= amount;
-                        addItem(bankItems[fromSlot] - 1, amount);
-                        resetBank();
-                        getPA().resetItems(5064);
-                    }
-                    if (bankItemsN[fromSlot] < amount) {
-                        amount = bankItemsN[fromSlot];
-                    }
-                    if ((bankItemsN[fromSlot] >= amount) && (bankItems[fromSlot] == 4068)) {//commented the ones below
-                        bankItemsN[fromSlot] -= amount;
-                        addItem(bankItems[fromSlot] - 1, amount);
-                        resetBank();
-                        getPA().resetItems(5064);
-                    } else if (bankItemsN[fromSlot] > amount) {
-                        if (addItem(bankItems[fromSlot], amount)) {
-                            bankItemsN[fromSlot] -= amount;
-                            resetBank();
-                            getPA().resetItems(5064);
-                        }
-                    } else {
+    public int getNotedId(int realId) {
+        ItemCacheDefinition def = ItemCacheDefinition.forID(realId);
 
-                        if (addItem(bankItems[fromSlot], bankItemsN[fromSlot])) {
-                            bankItems[fromSlot] = 0;
-                            bankItemsN[fromSlot] = 0;
-                            resetBank();
-                            getPA().resetItems(5064);
-                        }
-                    }
-                } else {
-                    sendMessage("Item can't be drawn as note.");
+        // Already noted? then just return itself
+        if (def.certID > 0) {
+            return realId;
+        }
 
-                    if (bankItemsN[fromSlot] < amount) {//so you cannot over withdrawl
-                        amount = bankItemsN[fromSlot];//^^
-                    }
-
-                    if ((bankItemsN[fromSlot] >= amount) && (bankItems[fromSlot] == 566)) {//only does it for item 566(the bank id of blood runes)
-                        bankItemsN[fromSlot] -= amount;
-                        addItem(bankItems[fromSlot] - 1, amount);//adds the item
-                        resetBank();
-                        getPA().resetItems(5064);
-                    }
-                    if (bankItemsN[fromSlot] < amount) {//so you cannot over withdrawl
-                        amount = bankItemsN[fromSlot];//^^
-                    }
-
-                    if ((bankItemsN[fromSlot] >= amount) && (bankItems[fromSlot] == 4068)) {//only does it for item 566(the bank id of blood runes)
-                        bankItemsN[fromSlot] -= amount;
-                        addItem(bankItems[fromSlot] - 1, amount);//adds the item
-                        resetBank();
-                        getPA().resetItems(5064);
-                    } else if (def.isStackable()) {
-                        if (bankItemsN[fromSlot] > amount) {
-                            if (addItem((bankItems[fromSlot] - 1), amount)) {
-                                bankItemsN[fromSlot] -= amount;
-                                resetBank();
-                                getPA().resetItems(5064);
-                            }
-                        } else {
-                            if (addItem((bankItems[fromSlot] - 1),
-                                    bankItemsN[fromSlot])) {
-                                bankItems[fromSlot] = 0;
-                                bankItemsN[fromSlot] = 0;
-                                resetBank();
-                                getPA().resetItems(5064);
-                            }
-                        }
-                    } else {
-                        while (amount > 0) {//this is what causes it to go slow-the while loop which is for items that are not noted.
-                            if (bankItemsN[fromSlot] > 0) {// ...lets you withdrawl for say an inventory of fish
-                                if (addItem((bankItems[fromSlot] - 1), 1)) {
-                                    bankItemsN[fromSlot] += -1;
-                                    amount--;
-                                } else {
-                                    amount = 0;
-                                }
-                            } else {
-                                amount = 0;
-                            }
-                        }
-                        resetBank();
-                        getPA().resetItems(5064);
-                    }
-                }
+        // Search the cache for an item whose certID == realId
+        for (int i = 0; i < ItemCacheDefinition.totalItems; i++) {
+            ItemCacheDefinition other = ItemCacheDefinition.forID(i);
+            if (other.certID == realId) {
+                return i; // Found the noted version
             }
         }
+
+        // No noted form exists
+        return -1;
     }
+
+    public void fromBank(int itemID, int fromSlot, int amount) {
+        if (fromSlot < 0 || fromSlot >= bankItems.length) return;
+        if (amount <= 0) return;
+
+        int bankId = bankItems[fromSlot];
+        int bankAmount = bankItemsN[fromSlot];
+
+        if (bankId <= 0 || bankAmount <= 0) return;
+
+        ItemCacheDefinition def = ItemCacheDefinition.forID(bankId);
+        if (def == null) return;
+
+        // Clamp amount
+        if (amount > bankAmount) amount = bankAmount;
+
+        boolean stackable = def.isStackable();
+
+        // --- CASE 1: Withdraw as un-noted ---
+        if (!takeAsNote) {
+            withdrawNormal(def, fromSlot, amount, stackable);
+            return;
+        }
+
+        // --- CASE 2: Withdraw as noted ---
+        if (takeAsNote) {
+
+            int notedId = getNotedId(bankId);
+            if (notedId == -1) {
+                sendMessage("Item can't be withdrawn as note.");
+                withdrawNormal(def, fromSlot, amount, stackable);
+                return;
+            }
+            int invId = notedId ;
+
+            // Stackable logic applies to notes too
+            if (stackable) {
+                if (addItem(invId, amount)) {
+                    bankItemsN[fromSlot] -= amount;
+                    if (bankItemsN[fromSlot] <= 0) {
+                        bankItems[fromSlot] = 0;
+                    }
+                }
+            } else {
+                int withdraw = amount;
+                while (withdraw > 0 && bankItemsN[fromSlot] > 0) {
+
+                    if (!addItem(invId, 1)) break;
+
+                    bankItemsN[fromSlot]--;
+                    withdraw--;
+                }
+
+                if (bankItemsN[fromSlot] <= 0) {
+                    bankItems[fromSlot] = 0;
+                }
+            }
+
+            resetBank();
+            getPA().resetItems(5064);
+        }
+    }
+    private void withdrawNormal(ItemCacheDefinition def, int fromSlot, int amount, boolean stackable) {
+        int bankId = bankItems[fromSlot];
+        int invId = bankId - 1; // inventory encoding
+
+        if (stackable) {
+
+            if (addItem(invId, amount)) {
+                bankItemsN[fromSlot] -= amount;
+                if (bankItemsN[fromSlot] <= 0) {
+                    bankItems[fromSlot] = 0;
+                }
+            }
+
+        } else {
+            int withdraw = amount;
+
+            while (withdraw > 0 && bankItemsN[fromSlot] > 0) {
+                if (!addItem(invId, 1)) break;
+
+                bankItemsN[fromSlot]--;
+                withdraw--;
+            }
+
+            if (bankItemsN[fromSlot] <= 0) {
+                bankItems[fromSlot] = 0;
+            }
+        }
+
+        resetBank();
+        getPA().resetItems(5064);
+    }
+
 
     public void fromBank2(int itemID, int fromSlot, int amount) {
         if (amount > 0) {
@@ -18204,29 +18187,25 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     }
 
     public boolean bankItem(int itemID, int fromSlot, int amount) {
-        // validate
         if (fromSlot < 0 || fromSlot >= playerItems.length) return false;
         if (playerItemsN[fromSlot] <= 0) return false;
 
         ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
-
-        // resolve actual bank ID (handles notes + certs)
-        int bankId = getRealBankId(def, itemID);
-        if (bankId == -1) {
-            sendMessage("Item not supported " + itemID);
-            return false;
-        }
-
-        // normalize amount
-        if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
-
+        if (def == null) return false;
+        if(def.isNoted()){
+        int invId = playerItems[fromSlot] - 1;  // inventory ID
+        // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
+        int bankId =  invId;
         boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
 
-        // find bank slot
-        int toBankSlot = findBankSlot(bankId);
-        boolean exists = toBankSlot != -1;
+        // Clamp amount
+        if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
 
-        if (!exists) {
+        // Find bank slot or empty
+        int toBankSlot = findBankSlot(bankId);
+        boolean alreadyInBank = toBankSlot != -1;
+
+        if (!alreadyInBank) {
             toBankSlot = findEmptyBankSlot();
             if (toBankSlot == -1) {
                 sendMessage("Bank full!");
@@ -18236,44 +18215,117 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             bankItemsN[toBankSlot] = 0;
         }
 
-        // apply
         if (stackable) {
             long total = (long) bankItemsN[toBankSlot] + amount;
             if (total > maxItemAmount) {
                 sendMessage("Bank full!");
                 return false;
             }
+            bankItems[toBankSlot] = bankId;
             bankItemsN[toBankSlot] += amount;
-            deleteItem(itemID, fromSlot, amount);
-
+            deleteItem(invId, fromSlot, amount);
         } else {
-            // non-stackable: loop each item
-            int moved = 0;
-            for (int i = 0; i < amount; i++) {
-                bankItemsN[toBankSlot]++;
-                deleteItem(itemID, fromSlot, 1);
-                moved++;
-                if (moved >= amount) break;
+            // Non-stackable: find inventory slots one by one
+            while (amount > 0) {
+                int slot = -1;
+                for (int i = 0; i < playerItems.length; i++) {
+                    if (playerItems[i] == invId) {
+                        slot = i;
+                        break;
+                    }
+                }
+                if (slot == -1) break; // no more items
+
+                int bankSlot = findBankSlot(bankId);
+                if (bankSlot == -1) bankSlot = findEmptyBankSlot();
+                if (bankSlot == -1) {
+                    sendMessage("Bank full!");
+                    break;
+                }
+
+                bankItems[bankSlot] = bankId;
+                bankItemsN[bankSlot]++;
+                deleteItem(itemID, slot, 1);
+                amount--;
+            }
+        }
+        } else {
+            int invId = playerItems[fromSlot];  // inventory ID
+            // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
+            int bankId =  invId;
+            boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
+
+            // Clamp amount
+            if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
+
+            // Find bank slot or empty
+            int toBankSlot = findBankSlot(bankId);
+            boolean alreadyInBank = toBankSlot != -1;
+
+            if (!alreadyInBank) {
+                toBankSlot = findEmptyBankSlot();
+                if (toBankSlot == -1) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItems[toBankSlot] = bankId;
+                bankItemsN[toBankSlot] = 0;
+            }
+
+            if (stackable) {
+                long total = (long) bankItemsN[toBankSlot] + amount;
+                if (total > maxItemAmount) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItemsN[toBankSlot] += amount;
+                deleteItem(itemID, fromSlot, amount);
+            } else {
+                // Non-stackable: find inventory slots one by one
+                while (amount > 0) {
+                    int slot = -1;
+                    for (int i = 0; i < playerItems.length; i++) {
+                        if (playerItems[i] == invId) {
+                            slot = i;
+                            break;
+                        }
+                    }
+                    if (slot == -1) break; // no more items
+
+                    int bankSlot = findBankSlot(bankId);
+                    if (bankSlot == -1) bankSlot = findEmptyBankSlot();
+                    if (bankSlot == -1) {
+                        sendMessage("Bank full!");
+                        break;
+                    }
+
+                    bankItems[bankSlot] = bankId;
+                    bankItemsN[bankSlot]++;
+                    deleteItem(itemID, slot, 1);
+                    amount--;
+                }
             }
         }
 
-        // refresh
         getPA().resetItems(5064);
         resetBank();
         return true;
     }
+
+
+
+
+
     private int getRealBankId(ItemCacheDefinition def, int invId) {
-        // Normal item with no cert: bank its ID
-        if (def.certID == -1)
-            return invId;
-
-        // Noted item linking to an unnoted item
-        ItemCacheDefinition real = ItemCacheDefinition.forID(def.certID);
-        if (real != null && real.certID == -1)
+        if (def == null) return -1;       // Safety check
+        if (def.isNoted() && def.certID > 0) {
+            // Noted item: return the real (unnoted) ID
             return def.certID;
-
-        return -1; // unsupported weird cert structure
+        }
+        // Normal item: return its own ID
+        return invId;
     }
+
 
     private int findBankSlot(int bankId) {
         for (int i = 0; i < playerBankSize; i++)
