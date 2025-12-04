@@ -42,10 +42,10 @@ public class Fillables  {
 
                 if(itemId == g.getEmptyId()) {
                     c.fillingWater = true;
-                    EventManager.getSingleton().addEvent(c, new Event() {
+                    CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
 
                         @Override
-                        public void execute(EventContainer container) {
+                        public void execute(CycleEventContainer container) {
                             if(c == null || c.disconnected) {
                                 stop();
                                 return;

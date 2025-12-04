@@ -1,5 +1,4 @@
 import java.io.*;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
@@ -928,8 +927,8 @@ public static final int bufferSize = 20000;
         TurnPlayerTo(objectX, objectY);
         isWalking = false;
         if (playerHasItem(1779)) {
-            EventManager.getSingleton().addEvent(this, new Event() {
-                public void execute(EventContainer container) {
+            CycleEventHandler.getSingleton().addEvent(this, new CycleEvent() {
+                public void execute(CycleEventContainer container) {
                     if (isWalking) {
                         spinningFlax = false;
                         container.stop();
@@ -2826,11 +2825,11 @@ public void setHouse(House house) {
        // server.getGlobalObjects().add(new GlobalObject(cutId, objX, objY, heightLevel, face, 10, respawnTime, originalId));
        // Region.getRegion(objX, objY).setClipToZero(objX, objY, heightLevel);
 
-        EventManager.getSingleton().addEvent(this, new Event() {
+        CycleEventHandler.getSingleton().addEvent(this, new CycleEvent() {
             int tick = 0;
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if (tick == 1) {
                     if (absX == objX && absY == objY - 1) {
                         movePlayer(objX, objY + 1, 0);
@@ -3446,29 +3445,29 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2488, 2281, 4697, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2489, 2282, 4694, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2490, 2262, 4693, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3300, 3306, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3301, 3306, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3302, 3306, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3303, 3306, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3306, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3305, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3304, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3303, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3300, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3299, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3298, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3297, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3296, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3295, 3303, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3301, 3296, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3302, 3296, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3296, 3296, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3295, 3296, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3294, 3296, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3293, 3296, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3298, 3309, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3301, 3309, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(362, 3302, 3309, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(2213, 3300, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(2213, 3301, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(2213, 3302, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(2213, 3303, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3306, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3305, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3304, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3303, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3300, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3299, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3298, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3297, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3296, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3295, 3303, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3301, 3296, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3302, 3296, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3296, 3296, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3295, 3296, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3294, 3296, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3293, 3296, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3298, 3309, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3301, 3309, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(362, 3302, 3309, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7319, 3092, 3503, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(11666, 3047, 9791, 0, 2, 10));
         server.getGlobalObjects().add(new GlobalObject(404, 3170, 6793, 0, -3, 10));
@@ -10982,13 +10981,13 @@ public void setHouse(House house) {
             } catch (Exception ignored) {}
 
             server.panel.removeEntity(playerName);
-            EventManager.getSingleton().stopEvents(this);
+            server.getEventHandler().stop(this);
+            CycleEventHandler.getSingleton().stopEvents(this);
 
             mySock = null;
             in = null;
             out = null;
             inStream = null;
-            outStream = null;
             buffer = null;
             isActive = false;
 
@@ -11589,10 +11588,10 @@ public void setHouse(House house) {
             if (rights.inherits(Rights.OWNER)) {
                 out.write( (byte)9);
             } else {// login response (1: wait 2seconds, 2=login successfull, 4=ban :-)
-                out.write(getRights().getValue()); // mod level
+                out.write((byte)getRights().getValue()); // mod level
             }
 
-            out.write(0); // no log
+            out.write((byte)0); // no log
             //if(returnCode == 2 && !playerName.equalsIgnoreCase("_"))
             //PlayerHandler.messageToAll = playerName+" has logged in! There is now "+PlayerHandler.getPlayerCount() + " players.";
         } catch (java.lang.Exception __ex) {
@@ -12503,10 +12502,10 @@ public void setHouse(House house) {
             teleportToX = 48;
             teleportToY = 48;
             heightLevel = playerId * 4;
-            EventManager.getSingleton().addEvent(p,new Event() {
+            CycleEventHandler.getSingleton().addEvent(p,new CycleEvent() {
 
                 @Override
-                public void execute(EventContainer container) {
+                public void execute(CycleEventContainer container) {
                     stop();
                     container.stop();
                 }
@@ -12516,7 +12515,7 @@ public void setHouse(House house) {
                     House.showHouse(p);
                 }
 
-            }, 1*600);
+            }, 1);
         }
         if(command.equalsIgnoreCase("broadcast") && (rights.isAdministrator())) {
             String[] arg = command.split(" ");
@@ -21695,9 +21694,9 @@ nated = Integer.parseInt(token2);
 
     }
     public void hourReward(){
-        EventManager.getSingleton().addEvent(this,new Event() {
+        CycleEventHandler.getSingleton().addEvent(this,new CycleEvent() {
 
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 addItem(6199, 1);
                 sendMessage("You have been rewarded a mbox for playing for 3 hours next one is in 3 hours");
 
@@ -21743,11 +21742,11 @@ nated = Integer.parseInt(token2);
         return runEnergy;
     }
     public void Serverbroadcast() {
-        EventManager.getSingleton().addEvent(this, new Event() {
+        CycleEventHandler.getSingleton().addEvent(this, new CycleEvent() {
             private int ticks = 0;
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 // Trigger every 120 ticks (1 minute if called every 500ms)
                 if (ticks++ >= 600) {
                     sendMessage("@blu@**********************************************************************************");
@@ -25612,19 +25611,11 @@ nated = Integer.parseInt(token2);
 
             // walkTo commands
             case 248: // map walk (has additional 14 bytes added to the end with some junk data)
-                packetSize -= 14; // ignore the junk
-                closeInterface();
-                resetAnimation();
             case 164:
             case 98: // Walking packets
                 if (isMorphed) return;
 
-                closeInterface();
-                resetAnimation();
 
-                // Clear skilling states
-                stopSkilling();
-                resetAllActions();
 
                 if (EntangleDelay >= 1) {
                     teleportToX = absX;
@@ -25632,23 +25623,19 @@ nated = Integer.parseInt(token2);
                     sendMessage("A magical force stops you from moving!");
                     return;
                 }
-
-                IsAttackingNPC = false;
-                attacknpc = -1;
-
-                // Defensive parsing
-                if (packetSize < 5) {
-                    System.out.println("Invalid walk packet size: " + packetSize);
-                    break;
+                closeInterface();
+                resetAnimation();
+                resetVariables();
+                // Clear skilling states
+                stopSkilling();
+                resetAllActions();
+                getPA().RemoveAllWindows();
+                if (packetType == 248) {
+                    packetSize -= 14;
                 }
-
                 int firstX = inStream.readSignedWordBigEndianA();
                 int steps = (packetSize - 5) / 2;
 
-                if (steps < 0 || steps > 25) {
-                    System.out.println("Invalid step count: " + steps);
-                    break;
-                }
 
                 int[][] path = new int[steps][2];
 
@@ -25679,9 +25666,6 @@ nated = Integer.parseInt(token2);
                 if (misc.distance(absX, absY, finalX, finalY) < 35) {
                     PathFinder.getPathFinder().findRoute(this, finalX, finalY, true, 0, 0);
                 }
-
-                resetVariables();
-                getPA().RemoveAllWindows();
                 break;
 
 
@@ -26743,9 +26727,9 @@ nated = Integer.parseInt(token2);
                 }
 
                 walkingToItem = true;
-                EventManager.getSingleton().addEvent(this,new Event() {
+                CycleEventHandler.getSingleton().addEvent(this,new CycleEvent() {
                     @Override
-                    public void execute(EventContainer container) {
+                    public void execute(CycleEventContainer container) {
                         if(!walkingToItem) {
                             container.stop();
                         }
@@ -26769,7 +26753,7 @@ nated = Integer.parseInt(token2);
                     public void stop() {
                         walkingToItem = false;
                     }
-                }, 1*600);
+                }, 1);
                 // }
                 break;
 
@@ -30648,10 +30632,10 @@ nated = Integer.parseInt(token2);
         return true;
     }
     public void repeatAnimation(final int tickAmount, final int anim, int duration) {
-        EventManager.getSingleton().addEvent(this, new Event() {
+        CycleEventHandler.getSingleton().addEvent(this, new CycleEvent() {
             int ticks = tickAmount;
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if (ticks > 0) {
                     ticks--;
                     startAnimation(anim);
@@ -36830,6 +36814,7 @@ nated = Integer.parseInt(token2);
     public void stopSkilling() {
         if (getSkilling().isSkilling()) getSkilling().stop();
         stopPlayerSkill = false;
+        server.getEventHandler().stop(this, "skilling");
         SkillHandler.resetPlayerSkillVariables(this);
     }
 

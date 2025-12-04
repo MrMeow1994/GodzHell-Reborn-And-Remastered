@@ -10,12 +10,12 @@ public class Skilling {
         this.player = player;
     }
 
-    public void add(Event event, int ticks) {
-        EventManager.getSingleton().addEvent(player,event, ticks);
+    public void add(CycleEvent event, int ticks) {
+        CycleEventHandler.getSingleton().addEvent(player,event, ticks*800);
     }
 
     public void stop() {
-        EventManager.getSingleton().stopEvents(player);
+        CycleEventHandler.getSingleton().stopEvents(player);
         skill = Optional.empty();
     }
 

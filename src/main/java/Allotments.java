@@ -413,9 +413,9 @@ public class Allotments {
         player.appearanceUpdateRequired = true;
 
 
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 diseaseChance[allotmentFieldsData.getAllotmentIndex()] *= WATERING_CHANCE;
                 farmingState[allotmentFieldsData.getAllotmentIndex()] = 1;
                 container.stop();
@@ -426,7 +426,7 @@ public class Allotments {
                 updateAllotmentsStates();
                 player.resetAnimation();
             }
-        }, AnimationLength.getFrameLength(FarmingConstants.WATERING_CAN_ANIM)*600);
+        }, AnimationLength.getFrameLength(FarmingConstants.WATERING_CAN_ANIM));
         return true;
     }
 
@@ -468,10 +468,10 @@ public class Allotments {
         player.animationUpdateRequired = true;
         player.updateRequired = true;
         player.appearanceUpdateRequired = true;
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 player.startAnimation(animation);
                 player.animationUpdateRequired = true;
                 player.updateRequired = true;
@@ -498,7 +498,7 @@ public class Allotments {
                 player.sendMessage("You clear the patch.");
                 player.resetAnimation();
             }
-        }, AnimationLength.getFrameLength(animation)*600);
+        }, AnimationLength.getFrameLength(animation));
         return true;
 
     }
@@ -538,9 +538,9 @@ public class Allotments {
         player.deleteItem(seedId, allotmentData.getSeedAmount());
 
        // player.setStopPacket(true);
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 farmingState[allotmentFieldsData.getAllotmentIndex()] = 0;
                 farmingSeeds[allotmentFieldsData.getAllotmentIndex()] = seedId;
                 farmingTimer[allotmentFieldsData.getAllotmentIndex()] = server.getMinutesCounter();
@@ -552,7 +552,7 @@ public class Allotments {
             public void stop() {
                 updateAllotmentsStates();
             }
-        }, AnimationLength.getFrameLength(FarmingConstants.SEED_DIBBING)*600);
+        }, AnimationLength.getFrameLength(FarmingConstants.SEED_DIBBING));
         return true;
     }
 
@@ -593,10 +593,10 @@ public class Allotments {
         player.startAnimation(FarmingConstants.SPADE_ANIM);
         player.updateRequired = true;
         player.appearanceUpdateRequired = true;
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
 
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if (farmingHarvest[allotmentFieldsData.getAllotmentIndex()] == 0) {
                     farmingHarvest[allotmentFieldsData.getAllotmentIndex()] = (int) (1 + (START_HARVEST_AMOUNT + misc.random(END_HARVEST_AMOUNT - START_HARVEST_AMOUNT)) * (player.playerHasItem(7409) ? 1.10 : 1));
                 }
@@ -625,7 +625,7 @@ public class Allotments {
                 updateAllotmentsStates();
                 player.resetAnimation();
             }
-        }, AnimationLength.getFrameLength(FarmingConstants.SPADE_ANIM)*600);
+        }, AnimationLength.getFrameLength(FarmingConstants.SPADE_ANIM));
 
         return true;
     }
@@ -658,9 +658,9 @@ public class Allotments {
         //player.getSkill().addExp(Skill.FARMING, itemId == 6034 ? Compost.SUPER_COMPOST_EXP_USE : Compost.COMPOST_EXP_USE);
 
         //player.setStopPacket(true);
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 diseaseChance[allotmentFieldsData.getAllotmentIndex()] *= itemId == 6032 ? COMPOST_CHANCE : SUPERCOMPOST_CHANCE;
                 farmingState[allotmentFieldsData.getAllotmentIndex()] = 5;
                 container.stop();
@@ -671,7 +671,7 @@ public class Allotments {
                 //player.setStopPacket(false);
                 player.resetAnimation();
             }
-        }, AnimationLength.getFrameLength(FarmingConstants.PUTTING_COMPOST)*600);
+        }, AnimationLength.getFrameLength(FarmingConstants.PUTTING_COMPOST));
         return true;
     }
 
@@ -706,9 +706,9 @@ public class Allotments {
             player.updateRequired = true;
             player.appearanceUpdateRequired = true;
             //player.setStopPacket(true);
-            EventManager.getSingleton().addEvent(player,new Event() {
+            CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
-                        public void execute(EventContainer container) {
+                        public void execute(CycleEventContainer container) {
                             if (farmingStages[allotmentFieldsData.getAllotmentIndex()] - 4 < inspectData.getMessages().length - 2) {
                                 //player.getDialogue().sendStatement(inspectData.getMessages()[farmingStages[allotmentFieldsData.getAllotmentIndex()] - 4]);
                             } else if (farmingStages[allotmentFieldsData.getAllotmentIndex()] < allotmentData.getEndingState() - allotmentData.getStartingState() + 2) {
@@ -819,9 +819,9 @@ public class Allotments {
         player.appearanceUpdateRequired = true;
         //player.setStopPacket(true);
         farmingState[allotmentFieldsData.getAllotmentIndex()] = 0;
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 player.sendMessage("You cure the plant with a plant cure.");
                 container.stop();
             }

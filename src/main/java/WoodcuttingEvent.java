@@ -1,7 +1,7 @@
 import java.util.Optional;
 import java.util.Random;
 
-public class WoodcuttingEvent implements Event {
+public class WoodcuttingEvent extends CycleEvent {
     public static final Random random25 = new Random();
     private client player;
     private Tree tree;
@@ -24,7 +24,7 @@ public class WoodcuttingEvent implements Event {
      *                  tick time etc.
      */
     @Override
-    public void execute (EventContainer container) {
+    public void execute (CycleEventContainer container) {
         if(player == null || player.disconnected || player.IsDead) {
             container.stop();
             return;
@@ -83,7 +83,7 @@ public class WoodcuttingEvent implements Event {
     }
 
     @Override
-    public void stop () {
+    public void onStopped() {
         if (player != null) {
             player.startAnimation(65535);
         }

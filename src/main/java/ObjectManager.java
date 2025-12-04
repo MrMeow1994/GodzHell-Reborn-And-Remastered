@@ -17,9 +17,9 @@ public class ObjectManager {
 		toRemove.clear();
 	}
 	public static void singleGateTicks(final client player, final int objectId, final int newObjectX, final int newObjectY, final int oldObjectX, final int oldObjectY, final int objectH, final int face, int ticks) {
-		EventManager.getSingleton().addEvent(player, new Event() {
+		CycleEventHandler.getSingleton().addEvent(player, new CycleEvent() {
 			@Override
-			public void execute(EventContainer container) {
+			public void execute(CycleEventContainer container) {
 				if (DoubleGates.gateAmount == 0) {
 					container.stop();
 					return;
@@ -39,9 +39,9 @@ public class ObjectManager {
 	}
 
 	public static void doubleGateTicks(final client player, final int objectId, final int newObjectX, final int newObjectY, final int oldObjectX, final int oldObjectY, final int oldObjectX2, final int oldObjectY2, final int objectH, final int face, int ticks) {
-		EventManager.getSingleton().addEvent(player, new Event() {
+		CycleEventHandler.getSingleton().addEvent(player, new CycleEvent() {
 			@Override
-			public void execute(EventContainer container) {
+			public void execute(CycleEventContainer container) {
 				if (DoubleGates.gateAmount == 0) {
 					container.stop();
 					return;

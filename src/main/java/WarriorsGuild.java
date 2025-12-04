@@ -28,12 +28,12 @@ public class WarriorsGuild {
     }
 
     public void cycle() {
-        EventManager.getSingleton().stopEvents(this);
+        CycleEventHandler.getSingleton().stopEvents(this);
         setActive(true);
-        EventManager.getSingleton().addEvent(this, new Event() {
+        CycleEventHandler.getSingleton().addEvent(this, new CycleEvent() {
 
             @Override
-            public void execute(EventContainer event) {
+            public void execute(CycleEventContainer event) {
                 if(player == null || player.disconnected) {
                     event.stop();
                     return;
@@ -63,7 +63,7 @@ public class WarriorsGuild {
 
     public void handleDoor() {
         if(player.absX == 2847 && player.absY == 3540 || player.absX == 2847 && player.absY == 3541) {
-            EventManager.getSingleton().stopEvents(this);
+            CycleEventHandler.getSingleton().stopEvents(this);
             player.movePlayer(player.absX - 1, player.absY, 2);
         } else if(player.absX == 2846 && player.absY == 3540 || player.absX == 2846 && player.absY == 3541 || Boundary.isIn(player, WAITING_ROOM_BOUNDARY)) {
             if(player.playerHasItem(8851, 100)) {

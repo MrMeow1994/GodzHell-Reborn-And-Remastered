@@ -27,8 +27,8 @@ object Spinning : CraftingData() {
             val after = element[1]
             val exp = element[2]
             val level = element[3]
-            EventManager.getSingleton().addEvent(player, object : Event {
-                override fun execute(container: EventContainer) {
+            CycleEventHandler.getSingleton().addEvent(player, object : CycleEvent() {
+                override fun execute(container: CycleEventContainer) {
                     if (player.isSpinning == true) {
                         if (player.playerHasItem(before)) {
                             if (player.playerLevel[player.playerCrafting] < level) {
@@ -53,12 +53,12 @@ object Spinning : CraftingData() {
                     }
                 }
 
-                override fun stop() {
+                fun stop() {
                     player.isSpinning = false
                     player.startAnimation(65535)
                     return
                 }
-            }, AnimationLength.getFrameLength(896) * 600)
+            }, AnimationLength.getFrameLength(896))
         }
     }
 }

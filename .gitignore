@@ -188,9 +188,9 @@
 /bin/DwarfMultiCannon$1.class
 /bin/DwarfMultiCannon$2.class
 /bin/DwarfMultiCannon.class
-/bin/Event.class
-/bin/EventContainer.class
-/bin/EventManager.class
+/bin/CycleEvent.class
+/bin/CycleEventContainer.class
+/bin/CycleEventHandler.class
 /bin/Farming$Farming_Data.class
 /bin/Farming.class
 /bin/Fire.class

@@ -29,8 +29,8 @@ public class Woodcutting {
         c.setAnimation(hatchet.getAnimation());
         c.sendSound(soundList.TREE_CUT_BEGIN, 100, 0);
         c.getSkilling().setSkill(Skill.WOODCUTTING);
-        Event woodcuttingEvent = new WoodcuttingEvent(c, tree, hatchet, objectId, x , y);
-        c.getSkilling().add(woodcuttingEvent, 1*600);
+        CycleEvent woodcuttingEvent = new WoodcuttingEvent(c, tree, hatchet, objectId, x , y);
+        c.getSkilling().add(woodcuttingEvent, 1);
     }
 
     public static Woodcutting getInstance() {

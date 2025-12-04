@@ -120,10 +120,10 @@ public class AnimatedArmour {
         player.deleteItem2(armour.getPlatelegsId(), 1);
         player.deleteItem2(armour.getHelmId(), 1);
         player.walkTo2(0, +3);
-        EventManager.getSingleton().addEvent(player, new Event() {
+        CycleEventHandler.getSingleton().addEvent(player, new CycleEvent() {
 
             @Override
-            public void execute(EventContainer event) {
+            public void execute(CycleEventContainer event) {
                 server.npcHandler.spawnNpc(player, armour.getNpcId(), animator_west ? SPAWN_X : 2857, SPAWN_Y, 0, 1,armour.getHealth(), armour.getMax(), armour.getAttack(), armour.getDefence(), true,
                         true);
                 player.sendMessage("An animated armour has spawned...", 255);
@@ -134,7 +134,7 @@ public class AnimatedArmour {
             public void stop() {
 
             }
-        }, 6*600);
+        }, 6);
     }
 
     public static void dropTokens(client player, int npcType, int x, int y) {

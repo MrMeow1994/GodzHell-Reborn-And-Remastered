@@ -75,10 +75,10 @@ public class Fishing  {
 				}
 
 				c.playerIsFishing = true;
-				EventManager.getSingleton().addEvent(c, new Event() {
+				CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
 
                     @Override
-                    public void execute(EventContainer container) {
+                    public void execute(CycleEventContainer container) {
 						if (c.fishingProp[5] > 0) {
 							if (c.playerLevel[c.playerFishing] >= c.fishingProp[6]) {
 								c.fishingProp[1] = c.fishingProp[misc.random(1) == 0 ? 7 : 5];
@@ -128,7 +128,7 @@ public class Fishing  {
 
 						resetFishing(c);
 					}
-				}, getTimer(0) + playerFishingLevel()*600);
+				}, getTimer(0) + playerFishingLevel());
 			}
 		}
 	}

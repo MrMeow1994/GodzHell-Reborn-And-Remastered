@@ -91,12 +91,12 @@ public class LeatherMaking extends CraftingData {
                     player.getPA().RemoveAllWindows();
                     player.isCrafting = true;
                     amount = l.getAmount(buttonId);
-                    EventManager.getSingleton().addEvent(player,
-                            new Event() {
+                    CycleEventHandler.getSingleton().addEvent(player,
+                            new CycleEvent() {
 
                                 @Override
                                 public void execute(
-                                        EventContainer container) {
+                                        CycleEventContainer container) {
                                     if (player.isCrafting) {
                                         if (!player
                                                 .playerHasItem(1734)) {

@@ -1,10 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
-import java.util.Objects;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.Ghreborn.jagcached.util.DeepTracer;
 import com.Ghreborn.jagcached.util.HyperTraceEngine;
@@ -136,11 +133,11 @@ public class PlayerHandler {
 // PlayerHandler.java
 
     public static void ServerStateHeartbeat30s(final PlayerHandler handler) {
-        EventManager.getSingleton().addEvent(null, new Event() {
+        CycleEventHandler.getSingleton().addEvent(null, new CycleEvent() {
             private long last = 0L;
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 long now = System.currentTimeMillis();
                 if (now - last < 30_000L) return; // every 30 seconds
                 last = now;

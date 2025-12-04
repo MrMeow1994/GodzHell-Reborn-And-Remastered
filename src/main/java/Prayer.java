@@ -53,9 +53,9 @@ public class Prayer {
                     c.startAnimation(827);
                     //c.getPacketSender().sendSound(SoundList.BONE_BURY, 100, 0);
                     c.sendMessage("You dig a hole in the ground...");
-                    EventManager.getSingleton().addEvent(c, new Event() {
+                    CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
                         @Override
-                        public void execute(EventContainer container) {
+                        public void execute(CycleEventContainer container) {
                             c.sendMessage("You bury the " + Item.getItemName(element[0]).toLowerCase() + ".");
                             c.sendSound(soundList.BONE_BURY, 100, 0);
                             container.stop();
@@ -64,7 +64,7 @@ public class Prayer {
                         public void stop() {
 
                         }
-                    }, 1*600);
+                    }, 1);
                 }
             }
         }

@@ -29,9 +29,9 @@ public class BowStringing extends StringingData {
                 }
                 c.playerIsfFetching = true;
                 c.startAnimation(g.getAnimation());
-                EventManager.getSingleton().addEvent(c,new Event() {
+                CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
                     @Override
-                    public void execute(EventContainer container) {
+                    public void execute(CycleEventContainer container) {
                         if(c == null || c.disconnected  || c.IsDead) {
                             container.stop();
                             return;
@@ -56,9 +56,9 @@ public class BowStringing extends StringingData {
                         c.playerIsfFetching = false;
                     }
                 }, AnimationLength.getFrameLength(g.getAnimation())+600);
-                EventManager.getSingleton().addEvent(c, new Event() {
+                CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
                     @Override
-                    public void execute(EventContainer container) {
+                    public void execute(CycleEventContainer container) {
                         if(c == null || c.disconnected  || c.IsDead) {
                             container.stop();
                             return;

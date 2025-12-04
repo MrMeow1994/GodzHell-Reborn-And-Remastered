@@ -53,7 +53,7 @@ class Mining {
         player.setAnimation(pickaxe.getAnimation());
         player.sendSound(2926, 7, 0);
         player.face(location.getX(), location.getY());
-        player.getSkilling().add(new MiningEvent(player, objectId, location, mineral, pickaxe), extractionTime+600);
+        server.getEventHandler().submit(new MiningEvent(player, objectId, location, mineral, pickaxe, extractionTime));
     }
 
     /**
@@ -87,6 +87,6 @@ class Mining {
         player.setAnimation(pickaxe.getAnimation());
         player.sendSound(432, 100, 0);
        // player.face(location.getX(), location.getY());
-        player.getSkilling().add(new MiningEvent(player, npc, location, mineral, pickaxe), extractionTime);
+        server.getEventHandler().submit(new MiningEvent(player, npc, location, mineral, pickaxe, extractionTime));
     }
 }

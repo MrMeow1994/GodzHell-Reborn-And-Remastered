@@ -78,10 +78,10 @@ public class GlassBlowing {
         if(!started) {
 
             started = true;
-            EventManager.getSingleton().addEvent(c, new Event() {
+            CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
                 int made = 0;
                 @Override
-                public void execute(EventContainer container) {
+                public void execute(CycleEventContainer container) {
                     if(!started) {
                         container.stop();
                     }

@@ -48,9 +48,9 @@ public class FlourMill {
             c.sendMessage(
                     "You operate the hopper. The grain slides down the chute.");
             c.startAnimation(832);
-            EventManager.getSingleton().addEvent(c, new Event() {
+            CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
                 @Override
-                public void execute(EventContainer container) {
+                public void execute(CycleEventContainer container) {
                     if (c.heightLevel == 2) {
                         return;
                     }

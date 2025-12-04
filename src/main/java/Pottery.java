@@ -57,10 +57,10 @@ public class Pottery {
             c.addSkillXP(xp* Config.CRAFTING_EXPERIENCE, c.playerCrafting);
             c.doAmount--;
         }
-        EventManager.getSingleton().addEvent(c, new Event() {
+        CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if (c.playerHasItem(softClay)
                         && c.playerLevel[12] >= level && !(c.doAmount <= 0)
                         && c.isPotCrafting) {
@@ -124,10 +124,10 @@ public class Pottery {
             player.sendMessage("You need an " + Item.getItemName(startId) + " to do this.");
         }
 
-        EventManager.getSingleton().addEvent(player, new Event() {
+        CycleEventHandler.getSingleton().addEvent(player, new CycleEvent() {
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if (player.playerHasItem(startId) && player.playerLevel[12] >= level && player.isPotCrafting && !(player.doAmount <= 0)) {
                     player.deleteItem(startId, 1);
                     player.addItem(finishId, 1);

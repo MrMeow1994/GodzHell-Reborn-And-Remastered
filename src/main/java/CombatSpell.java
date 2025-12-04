@@ -163,9 +163,9 @@ public enum CombatSpell {
         }
 
         if (endGfxId > 0 || impactSoundId > 0) {
-            EventManager.getSingleton().addEvent(c, new Event() {
+            CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
                 @Override
-                public void execute(EventContainer container) {
+                public void execute(CycleEventContainer container) {
                     boolean isBurstOrBarrage = spellId >= 12963 && spellId <= 13023;
                     int aoeRadius = (spellId >= 12975 || spellId == 12891) ? 2 : (spellId >= 12963 && spellId <= 13011) ? 1 : 0;
 

@@ -1,14 +1,11 @@
-import com.Ghreborn.jagcached.FileServer;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +54,7 @@ public class server implements Runnable {
     public static GlobalDrops GlobalDrops = null;
     public static Fishing Fishing = null;
     public static antilag antilag = null;
+    private static final EventHandler events = new EventHandler();
     public static itemspawnpoints itemspawnpoints = null;
     public static GraphicsHandler GraphicsHandler = null;
     public static ObjectHandler objectHandler = null;
@@ -108,11 +106,11 @@ public class server implements Runnable {
     }
 
     public static void ServerbroadcastGlobal() {
-        EventManager.getSingleton().addEvent(null, new Event() {
+        CycleEventHandler.getSingleton().addEvent(null, new CycleEvent() {
             private int ticks = 0;
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if (ticks++ >= 600) {
                     for (Player p : PlayerHandler.players) { // loop so it effects all players
                         if (p != null) {
@@ -133,7 +131,7 @@ public class server implements Runnable {
             public void stop() {
             }
 
-        }, 600);
+        }, 1);
     }
 
     public static long getTickCount() {
@@ -151,7 +149,6 @@ public class server implements Runnable {
 
     public static void startServer() {
         ServerbroadcastGlobal();
-        EventManager.initialise();
         NPCCacheDefinition.unpackConfig();
         ItemCacheDefinition.unpackConfig();
         AnimationLength.startup();
@@ -211,6 +208,8 @@ public class server implements Runnable {
             shopHandler.process();
              lottery.process();
                 globalObjects.pulse();
+                getEventHandler().process();
+                CycleEventHandler.getSingleton().process();
             objectManager.process();
             antilag.process();
             //GlobalDrops.process();
@@ -554,7 +553,6 @@ public class server implements Runnable {
                 executor.awaitTermination(5, TimeUnit.SECONDS);
             }
 
-            EventManager.getSingleton().shutdown();
             scheduler.terminate();
             if (playerHandler != null) {
                 playerHandler.destruct();
@@ -570,7 +568,9 @@ public class server implements Runnable {
         }
     }
 
-
+    public static EventHandler getEventHandler() {
+        return events;
+    }
 
 
 

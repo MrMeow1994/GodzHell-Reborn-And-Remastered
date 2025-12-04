@@ -318,8 +318,8 @@ class Smithing(private val c: client) {
             }
             c.isSmething = true
             c.getPA().RemoveAllWindows()
-            EventManager.getSingleton().addEvent(c,object : Event {
-                override fun execute(container: EventContainer) {
+            CycleEventHandler.getSingleton().addEvent(c,object : CycleEvent() {
+                override fun execute(container: CycleEventContainer) {
                     if (c.doAmount <= 0 || !c.isSmething) {
                         container.stop()
                     }
@@ -346,10 +346,10 @@ class Smithing(private val c: client) {
                     c.doAmount--
                 }
 
-                override fun stop() {
+                fun stop() {
                     c.isSmething = false
                 }
-            }, AnimationLength.getFrameLength(899)+2*600)
+            }, AnimationLength.getFrameLength(899)+2)
         }
     }
 
@@ -1215,8 +1215,8 @@ class Smithing(private val c: client) {
             }
             c.startAnimation(898)
             c.isSmething = true
-            EventManager.getSingleton().addEvent(c,object : Event {
-                override fun execute(container: EventContainer) {
+            CycleEventHandler.getSingleton().addEvent(c,object : CycleEvent() {
+                override fun execute(container: CycleEventContainer) {
                     if (c?.let { !it.disconnected && !it.IsDead } != true) {
                         container.stop()
                         return
@@ -1279,10 +1279,10 @@ class Smithing(private val c: client) {
                     c.makeTimes--
                 }
 
-                override fun stop() {
+                fun stop() {
                     c.makeTimes = 0
                 }
-            }, AnimationLength.getFrameLength(898) + 600)
+            }, AnimationLength.getFrameLength(898))
         }
 
         @JvmStatic

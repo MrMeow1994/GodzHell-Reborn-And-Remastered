@@ -295,9 +295,9 @@ public class Fletching extends SkillHandler {
                     final int addXP = l.getXP();
 
                     c.setAnimation(6702);
-                    EventManager.getSingleton().addEvent(c, new Event() {
+                    CycleEventHandler.getSingleton().addEvent(c, new CycleEvent() {
                         @Override
-                        public void execute(EventContainer container) {
+                        public void execute(CycleEventContainer container) {
                             if (c == null || c.disconnected  || c.IsDead) {
                                 container.stop();
                                 return;

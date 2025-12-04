@@ -82,11 +82,11 @@ public class PrayerAltar {
         lastAction.reset();
         lastAction.start();
         player.getSkilling().setSkill(Skill.PRAYER);
-        player.getSkilling().add(new Event() {
+        player.getSkilling().add(new CycleEvent() {
             int remaining = amount - 1;
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 if(player == null || player.disconnected || player.IsDead) {
                     container.stop();
                     return;
@@ -116,7 +116,7 @@ public class PrayerAltar {
 
             }
 
-        }, 3*600);
+        }, 3);
     }
 
     /**

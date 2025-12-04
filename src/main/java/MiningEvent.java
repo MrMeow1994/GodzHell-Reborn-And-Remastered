@@ -1,9 +1,6 @@
-import org.apache.commons.lang3.RandomUtils;
-
 import java.util.Optional;
-import java.util.Random;
 
-public class MiningEvent implements Event {
+public class MiningEvent extends Event<client> {
     /**
      * The amount of cycles that must pass before the animation is updated
      */
@@ -14,10 +11,6 @@ public class MiningEvent implements Event {
      */
     private int lastAnimation;
 
-    /**
-     * The player attempting to mine
-     */
-    private final client player;
 
     /**
      * The pickaxe being used to mine
@@ -57,8 +50,9 @@ public class MiningEvent implements Event {
      * @param mineral	the mineral being mined
      * @param pickaxe	the pickaxe being used to mine
      */
-    public MiningEvent(client player, int objectId, Location3D location, Mineral mineral, Pickaxe pickaxe) {
-        this.player = player;
+    public MiningEvent(client player, int objectId, Location3D location, Mineral mineral, Pickaxe pickaxe, int time) {
+        super("skilling", player, time);
+        this.plr = player;
         this.objectId = objectId;
         this.location = location;
         this.mineral = mineral;
@@ -73,8 +67,9 @@ public class MiningEvent implements Event {
      * @param mineral	the mineral being mined
      * @param pickaxe	the pickaxe being used to mine
      */
-    public MiningEvent(client player, NPC npc, Location3D location, Mineral mineral, Pickaxe pickaxe) {
-        this.player = player;
+    public MiningEvent(client player, NPC npc, Location3D location, Mineral mineral, Pickaxe pickaxe, int time) {
+        super("skilling", player, time);
+        this.plr = player;
         this.npc = npc;
         this.location = location;
         this.mineral = mineral;
@@ -84,61 +79,63 @@ public class MiningEvent implements Event {
     /**
      * Called when the event is executed.
      *
-     * @param container The event container, so the event can dynamically change the
+     * @param  The event container, so the event can dynamically change the
      *                  tick time etc.
      */
     @Override
-    public void execute (EventContainer container) {
-        if(player == null || player.disconnected || player.IsDead) {
-            container.stop();
+    public void update() {
+        if (plr == null || plr.disconnected || plr.IsDead) {
+            stop();
             return;
         }
-        if (!player.playerHasItem(pickaxe.getItemId())
-                && !player.isWearingItem(pickaxe.getItemId())) {
-            player.sendMessage("That is strange! The pickaxe could not be found.");
-            container.stop();
+        if (!plr.playerHasItem(pickaxe.getItemId())
+                && !plr.isWearingItem(pickaxe.getItemId())) {
+            plr.sendMessage("That is strange! The pickaxe could not be found.");
+            stop();
             return;
         }
-        if (player.freeSlots() == 0) {
-            player.sendMessage("You have no more free slots.");
-            container.stop();
+        if (plr.freeSlots() == 0) {
+            plr.sendMessage("You have no more free slots.");
+            stop();
             return;
         }
-		/*if (Misc.random(100) == 0 && player.getInterfaceEvent().isExecutable()) {
-			player.getInterfaceEvent().execute();
-			container.stop();
+		/*if (Misc.random(100) == 0 && plr.getInterfaceEvent().isExecutable()) {
+			plr.getInterfaceEvent().execute();
+			stop();
 			return;
 		}*/
         if (objectId > 0) {
             if (server.getGlobalObjects().exists(mineral.getDepleteObject(), location.getX(), location.getY(), location.getZ())) {
-                player.sendMessage("This vein contains no more minerals.");
-                player.resetAnimation();
-                container.stop();
+                plr.sendMessage("This vein contains no more minerals.");
+                plr.resetAnimation();
+                stop();
                 return;
             }
         } else {
             if (npc == null || npc.IsDead) {
-                player.sendMessage("This vein contains no more minerals.");
-                player.resetAnimation();
-                container.stop();
+                plr.sendMessage("This vein contains no more minerals.");
+                plr.resetAnimation();
+                stop();
                 return;
             }
         }
-        if (container.getTick() - lastAnimation > ANIMATION_CYCLE_DELAY) {
-            player.startAnimation(pickaxe.getAnimation());
-            player.sendSound(2926, 7, 0);
-            lastAnimation = container.getTick();
+        int ANIMATION_CYCLE_DELAY = 3;
+        if (super.getElapsedTicks() - lastAnimation > ANIMATION_CYCLE_DELAY) {
+            plr.startAnimation(pickaxe.getAnimation());
+            lastAnimation = super.getElapsedTicks();
         }
-
-        if(player == null || player.disconnected  || player.IsDead) {
-            container.stop();
+    }
+    @Override
+    public void execute() {
+        if (plr == null || plr.disconnected || plr.IsDead) {
+            stop();
             return;
         }
-        if(misc.random(35) == 0){
-            if(mineral.getBobleObject() != -1) {
+        if (misc.random(35) == 0) {
+            if (mineral.getBobleObject() != -1) {
                 server.getGlobalObjects().add(new GlobalObject(mineral.getBobleObject(), location.getX(), location.getY(),
                         location.getZ(), 0, 10, mineral.getRespawnRate(), objectId));
-                container.stop();
+                stop();
             }
         }
         if (mineral.isDepletable()) {
@@ -147,45 +144,49 @@ public class MiningEvent implements Event {
             if (worldObject.isPresent()) {
                 face = worldObject.get().getFace();
             }
-                if (objectId > 0) {
-                    server.getGlobalObjects().add(new GlobalObject(mineral.getDepleteObject(), location.getX(), location.getY(),
-                            location.getZ(), face, 10, mineral.getRespawnRate(), objectId));
-                } else {
-                    npc.IsDead = true;
-                    npc.actionTimer = 0;
-                    npc.NeedRespawn = false;
-                }
-        }
-        int chance20 = misc.random(3);
-       // player.face(location.getX(), location.getY());
-        if(mineral.equals(Mineral.ESSENCE)) {
-            if(player.playerLevel[player.playerMining] >= 30) {
-                player.addItem(7936, 1);
-            }else {
-                player.addItem(1436, 1);
+            if (objectId > 0) {
+                server.getGlobalObjects().add(new GlobalObject(mineral.getDepleteObject(), location.getX(), location.getY(),
+                        location.getZ(), face, 10, mineral.getRespawnRate(), objectId));
+            } else {
+                npc.IsDead = true;
+                npc.actionTimer = 0;
+                npc.NeedRespawn = false;
             }
         }
-        if(misc.random(50) == 0){
-            int randomgem = randomGems();
-            player.addItem(randomgem, 1);
-            player.sM("You find a "+Item.getItemName(randomgem)+".");
+        int chance20 = misc.random(3);
+        // plr.face(location.getX(), location.getY());
+        if (mineral.equals(Mineral.ESSENCE)) {
+            if (plr.playerLevel[plr.playerMining] >= 30) {
+                plr.addItem(7936, 1);
+            } else {
+                plr.addItem(1436, 1);
+            }
         }
-        player.addItem(mineral.getMineralReturn().generate(), 1);
+        if (misc.random(50) == 0) {
+            int randomgem = randomGems();
+            plr.addItem(randomgem, 1);
+            plr.sM("You find a " + Item.getItemName(randomgem) + ".");
+        }
+        plr.addItem(mineral.getMineralReturn().generate(), 1);
         int chance = misc.random(300);
-        //player.sendMessage("Your chance to get 100 platinum tokens from skilling was " + chance + " you needed 0.");
+        //plr.sendMessage("Your chance to get 100 platinum tokens from skilling was " + chance + " you needed 0.");
 		/*if (Misc.random(30) == 0) {
-			player.getPA().rewardPoints(3, "Congrats, You randomly got 3 PK Points from mining!");
+			plr.getPA().rewardPoints(3, "Congrats, You randomly got 3 PK Points from mining!");
 		}*/
-        //Achievements.increase(player, AchievementType.MINING, 1);
-        if (player.playerEquipment[player.playerHat] == 12013 && player.playerEquipment[player.playerChest] == 12014 && player.playerEquipment[player.playerLegs] == 12015 && player.playerEquipment[player.playerFeet] == 12016) {
-            player.addSkillXP(Config.MINING_EXPERIENCE * mineral.getExperience() * 1.2, Skill.MINING.id);
+        //Achievements.increase(plr, AchievementType.MINING, 1);
+        if (plr.playerEquipment[plr.playerHat] == 12013 && plr.playerEquipment[plr.playerChest] == 12014 && plr.playerEquipment[plr.playerLegs] == 12015 && plr.playerEquipment[plr.playerFeet] == 12016) {
+            plr.addSkillXP(Config.MINING_EXPERIENCE * mineral.getExperience() * 1.2, Skill.MINING.id);
         } else {
-            player.addSkillXP(Config.MINING_EXPERIENCE * mineral.getExperience(), Skill.MINING.id);
+            plr.addSkillXP(Config.MINING_EXPERIENCE * mineral.getExperience(), Skill.MINING.id);
         }
     }
 
     @Override
-    public void stop () {
-        player.resetAnimation();
+    public void stop() {
+        super.stop();
+        if (plr == null) {
+            return;
+        }
+        plr.resetAnimation();
     }
 }

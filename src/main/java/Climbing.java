@@ -11,9 +11,9 @@ public class Climbing {
         if (System.currentTimeMillis() - client.climbDelay < 1200) {
             return;
         }
-        EventManager.getSingleton().addEvent(client, new Event() {
+        CycleEventHandler.getSingleton().addEvent(client, new CycleEvent() {
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 processClimbing(client, objectID, objectX, objectY);
                 container.stop();
             }

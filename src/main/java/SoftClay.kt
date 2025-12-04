@@ -10,8 +10,8 @@ object SoftClay {
         }
         player.isSpinning = true
         player.doAmount = player.getItemAmount(CLAY)
-        EventManager.getSingleton().addEvent(player, object : Event {
-            override fun execute(container: EventContainer) {
+        CycleEventHandler.getSingleton().addEvent(player, object : CycleEvent() {
+            override fun execute(container: CycleEventContainer) {
                 if (player.playerHasItem(CLAY) && player.isSpinning) {
                     player.startAnimation(896)
                     player.deleteItem(CLAY, 1)
@@ -26,11 +26,11 @@ object SoftClay {
                 }
             }
 
-            override fun stop() {
+            fun stop() {
                 player.isSpinning = false
                 player.startAnimation(65535)
                 return
             }
-        }, 3 * 600)
+        }, 3)
     }
 }

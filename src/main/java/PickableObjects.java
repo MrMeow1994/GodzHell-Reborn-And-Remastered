@@ -5,8 +5,8 @@ public class PickableObjects {
 public static void pickupFlax(final client c, final int object, final int obX, final int obY) {
 
 
-                        EventManager.getSingleton().addEvent(c,new Event() {
-                                public void execute(EventContainer container) {
+                        CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
+                                public void execute(CycleEventContainer container) {
 										c.setAnimation(827);
 									int face = 0;
 									Optional<WorldObject2> worldObject = Region.getWorldObject(object, obX, obY, c.heightLevel);
@@ -20,15 +20,15 @@ public static void pickupFlax(final client c, final int object, final int obX, f
                                 public void stop() {
 
                                 }
-                        }, AnimationLength.getFrameLength(827)*600);
+                        }, AnimationLength.getFrameLength(827));
                 }
 
 public static void pickupCabbage(final client c, final int object, final int obX, final int obY) {
 
 	c.startAnimation(827);
 
-	EventManager.getSingleton().addEvent(c,new Event() {
-		public void execute(EventContainer container) {
+	CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
+		public void execute(CycleEventContainer container) {
 			int face = 0;
 			Optional<WorldObject2> worldObject = Region.getWorldObject(object, obX, obY, c.heightLevel);
 			if (worldObject.isPresent()) {
@@ -41,15 +41,15 @@ public static void pickupCabbage(final client c, final int object, final int obX
 		public void stop() {
 
 		}
-	}, AnimationLength.getFrameLength(827)*600);
+	}, AnimationLength.getFrameLength(827));
 }
 
 public static void pickupWheat(final client c, final int object, final int obX, final int obY) {
 
 	c.startAnimation(827);
 
-	EventManager.getSingleton().addEvent(c,new Event() {
-		public void execute(EventContainer container) {
+	CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
+		public void execute(CycleEventContainer container) {
 			int face = 0;
 			Optional<WorldObject2> worldObject = Region.getWorldObject(object, obX, obY, c.heightLevel);
 			if (worldObject.isPresent()) {
@@ -63,15 +63,15 @@ public static void pickupWheat(final client c, final int object, final int obX, 
 		public void stop() {
 
 		}
-	}, AnimationLength.getFrameLength(827)*600);
+	}, AnimationLength.getFrameLength(827));
 }
 
 public static void pickupPotato(final client c, final int object, final int obX, final int obY) {
 
 	c.startAnimation(827);
 
-	EventManager.getSingleton().addEvent(c,new Event() {
-		public void execute(EventContainer container) {
+	CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
+		public void execute(CycleEventContainer container) {
 			int face = 0;
 			Optional<WorldObject2> worldObject = Region.getWorldObject(object, obX, obY, c.heightLevel);
 			if (worldObject.isPresent()) {
@@ -85,15 +85,15 @@ public static void pickupPotato(final client c, final int object, final int obX,
 		public void stop() {
 
 		}
-	}, AnimationLength.getFrameLength(827)*600);
+	}, AnimationLength.getFrameLength(827));
 }
 
 public static void pickupOnion(final client c, final int object, final int obX, final int obY) {
 
 	c.startAnimation(827);
 
-	EventManager.getSingleton().addEvent(c,new Event() {
-		public void execute(EventContainer container) {
+	CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
+		public void execute(CycleEventContainer container) {
 			int face = 0;
 			Optional<WorldObject2> worldObject = Region.getWorldObject(object, obX, obY, c.heightLevel);
 			if (worldObject.isPresent()) {
@@ -107,14 +107,14 @@ public static void pickupOnion(final client c, final int object, final int obX, 
 		public void stop() {
 
 		}
-	}, AnimationLength.getFrameLength(827)*600);
+	}, AnimationLength.getFrameLength(827));
 }
 	public static void pickupPineapple(final client c, final int object, final int obX, final int obY) {
 
 		c.startAnimation(827);
 
-		EventManager.getSingleton().addEvent(c,new Event() {
-			public void execute(EventContainer container) {
+		CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
+			public void execute(CycleEventContainer container) {
 				int face = 0;
 				if(misc.random(3) == 1) {
 					Optional<WorldObject2> worldObject = Region.getWorldObject(object, obX, obY, c.heightLevel);
@@ -131,6 +131,6 @@ public static void pickupOnion(final client c, final int object, final int obX, 
 			public void stop() {
 
 			}
-		}, AnimationLength.getFrameLength(827)*600);
+		}, AnimationLength.getFrameLength(827));
 	}
 }

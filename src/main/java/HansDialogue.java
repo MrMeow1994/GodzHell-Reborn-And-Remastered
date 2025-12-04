@@ -44,11 +44,11 @@ public class HansDialogue extends Dialogue {
 // Mutable flee direction
                 final int[] fleeDir = {0, 0};
 
-                EventManager.getSingleton().addEvent(npc, new Event() {
+                CycleEventHandler.getSingleton().addEvent(npc, new CycleEvent() {
                     int steps = 0;
 
                     @Override
-                    public void execute(EventContainer container) {
+                    public void execute(CycleEventContainer container) {
                         if (npc == null || npc.IsDead || steps >= 10) {
                             container.stop();
                             return;

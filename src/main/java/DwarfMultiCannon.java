@@ -18,9 +18,9 @@ public class DwarfMultiCannon {
 	public void setUpCannon() {
 		if (canSetUpCannon() || inGoodArea())
 			return;
-		EventManager.getSingleton().addEvent(player,new Event() {
+		CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 			int time = 4;
-			public void execute(EventContainer setup) {
+			public void execute(CycleEventContainer setup) {
 				if (canSetUpCannon())
 					setup.stop();		
 				switch (time) {
@@ -140,8 +140,8 @@ public class DwarfMultiCannon {
 	
 	private void startFiringCannon(final Objects3 cannon) {
 		player.cannonIsShooting = true;
-		EventManager.getSingleton().addEvent(player,new Event() {
-			public void execute(EventContainer fire) {
+		CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
+			public void execute(CycleEventContainer fire) {
 				if (player.cannonBalls < 1) {
 					player.sendMessage("Your cannon has run out of ammo!");
 					player.cannonIsShooting = false;

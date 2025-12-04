@@ -62,9 +62,9 @@ private craftGems forGem(int id) {
     	craftGems gem = forGem(id);
     	if (gem != null) {
 			c.isCrafting = true;
-			EventManager.getSingleton().addEvent(c,new Event() {
+			CycleEventHandler.getSingleton().addEvent(c,new CycleEvent() {
 
-				public void execute(EventContainer container) {
+				public void execute(CycleEventContainer container) {
 					if (!c.playerHasItem(gem.getUncut(), 1)) {
 						container.stop();
 						return;
@@ -89,7 +89,7 @@ private craftGems forGem(int id) {
 				public void stop() {
 
 				}
-			}, AnimationLength.getFrameLength(gem.getAnimation())*600);
+			}, AnimationLength.getFrameLength(gem.getAnimation()));
 
     	}
     }

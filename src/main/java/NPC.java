@@ -333,10 +333,10 @@ public class NPC {
         requestTransform(newId);
         player.addItem(itemGiven, 1);
         player.sendMessage("You get some " + Item.getItemName(itemGiven).toLowerCase() + ".");
-        EventManager.getSingleton().addEvent(player,new Event() {
+        CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 requestTransform(currentId);
                 container.stop();
             }

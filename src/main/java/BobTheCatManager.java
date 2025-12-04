@@ -17,15 +17,15 @@ public class BobTheCatManager {
     private static final HashSet<String> visitedTiles = new HashSet<>();
 
     public static void init() {
-        EventManager.getSingleton().addEvent(null, new Event() {
+        CycleEventHandler.getSingleton().addEvent(null, new CycleEvent() {
             @Override
-            public void execute(EventContainer container) {
+            public void execute(CycleEventContainer container) {
                 spawnBob();
             }
 
             @Override
             public void stop() {}
-        }, 180_000); // Every 3 minutes
+        }, 3000); // Every 3 minutes
     }
 
     private static void spawnBob() {
@@ -51,9 +51,9 @@ public class BobTheCatManager {
     }
 
     private static void startRoaming(NPC bob) {
-        EventManager.getSingleton().addEvent(bob, new Event() {
+        CycleEventHandler.getSingleton().addEvent(bob, new CycleEvent() {
             @Override
-            public void execute(EventContainer c) {
+            public void execute(CycleEventContainer c) {
                 if (bob == null || bob.IsDead) {
                     c.stop();
                     return;
