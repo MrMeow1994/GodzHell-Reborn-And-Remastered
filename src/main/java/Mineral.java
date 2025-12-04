@@ -39,6 +39,12 @@ public enum Mineral {
     TIN_BIG_4(new int[] { 9714 }, 9723,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
     TIN_SMALL_4(new int[] { 9715 }, 9724,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
     TIN_MID_4(new int[] { 9716 }, 9725,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
+    COPPER_BIG_6(new int[] { 5779 }, 5763,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(436)),
+    COPPER_SMALL_6(new int[] { 5780 }, 5764,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(436)),
+    COPPER_MID_6(new int[] { 5781 }, 5765,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(436)),
+    TIN_BIG_6(new int[] { 5776 }, 5763,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
+    TIN_SMALL_6(new int[] { 5777 }, 5764,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
+    TIN_MID_6(new int[] { 5778 }, 5765,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
 
     TIN(new int[] { 7485 }, 450,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
     TIN_BIG(new int[] { 31077 }, 31059,-1,"bronze", 1, 18, 5, 5, 15, 15000, true, generateExclusive(438)),
@@ -58,11 +64,20 @@ public enum Mineral {
     IRON_BIG_3(new int[] { 9717 }, 9723,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
     IRON_SMALL_3(new int[] { 9718 }, 9724,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
     IRON_MID_3(new int[] { 9719 }, 9725,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
+    IRON_BIG_6(new int[] { 5773 }, 5763,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
+    IRON_SMALL_6(new int[] { 5774 }, 5764,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
+    IRON_MID_6(new int[] { 5775 }, 5765,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
+    IRON_BIG_7(new int[] { 32441 }, 33400,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
+    IRON_SMALL_7(new int[] { 32442 }, 33401,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
+    IRON_MID_7(new int[] { 32443 }, 33402,-1,"iron", 15, 35, 5, 8, 17, 14800, true, generateExclusive(440)),
 
     SILVER(new int[] { 7457 },450, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
     SILVER_BIG(new int[] { 11948 },11555, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
     SILVER_SMALL(new int[] { 11949 },11556, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
     SILVER_MID(new int[] { 11950 },11557, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
+    SILVER_BIG_2(new int[] { 29224 },29218, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
+    SILVER_SMALL_2(new int[] { 29225 },29219, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
+    SILVER_MID_2(new int[] { 29226 },29220, -1,"silver", 20, 40, 5, 8, 17, 14800, true, generateExclusive(442)),
     COAL(new int[] { 2096 }, 450,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
     COAL_BIG(new int[] { 11930}, 11552,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
     COAL_SMALL(new int[] { 11931}, 11553,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
@@ -70,6 +85,12 @@ public enum Mineral {
     COAL_BIG2(new int[] { 31068 }, 31059,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
     COAL_SMALL2(new int[] { 31069}, 31060,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
     COAL_MID2(new int[] { 31070}, 31061,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
+    COAL_BIG_6(new int[] { 5770 }, 5763,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
+    COAL_SMALL_6(new int[] { 5771 }, 5764,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
+    COAL_MID_6(new int[] { 5772 }, 5765,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
+    COAL_BIG_7(new int[] { 32426 }, 33400,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
+    COAL_SMALL_7(new int[] { 32427 }, 33401,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
+    COAL_MID_7(new int[] { 32428 }, 33402,-1,"none", 30, 50, 3, 15, 29, 14600, true, generateExclusive(453)),
 
     GOLD(new int[] { 2098 },450, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
     GOLD_BIG(new int[] { 31065 },31059, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
@@ -79,6 +100,13 @@ public enum Mineral {
     GOLD_SMALL_2(new int[] { 9721 }, 9724, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
     GOLD_MID_2(new int[] { 9722 }, 9725, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
 
+    GOLD_BIG_6(new int[] { 5768 }, 5763, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
+    GOLD_SMALL_6(new int[] { 5769 }, 5764, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
+
+    GOLD_BIG_7(new int[] { 32432 }, 33400, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
+    GOLD_SMALL_7(new int[] { 32433 }, 33401, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
+    GOLD_MID_7(new int[] { 32434 }, 33402, -1,"gold", 40, 65, 3, 25, 32, 14200, true, generateExclusive(444)),
+
 
     MITHRIL(new int[] { 7492 }, 450, -1,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
     MITHRIL_BIG(new int[] { 11942 }, 11552, 11927, "mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
@@ -87,16 +115,32 @@ public enum Mineral {
     MITHRIL_BIG2(new int[] { 31086 }, 31059, 11927, "mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
     MITHRIL_SMALL2(new int[] { 31087 }, 31060, 11928,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
     MITHRIL_MID2(new int[] { 31088 }, 31061, 11929,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+    MITHRIL_BIG_6(new int[] { 5784 }, 5763, -1, "mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+    MITHRIL_SMALL_6(new int[] { 5785 }, 5764, -1,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+    MITHRIL_MID_6(new int[] { 5786 }, 5765, -1,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+    MITHRIL_BIG_7(new int[] { 32438 }, 33400, -1, "mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+    MITHRIL_SMALL_7(new int[] { 32439 }, 33401, -1,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+    MITHRIL_MID_7(new int[] { 32440 }, 33402, -1,"mithril", 55, 80, 3, 40, 35, 13800, true, generateExclusive(447)),
+
 
     ADAMANT(new int[] { 7493 }, 450, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
     ADAMANT_BIG(new int[] { 11939 }, 11552, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
     ADAMANT_SMALL(new int[] { 11940 }, 11553, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
     ADAMANT_MID(new int[] { 11941 }, 11554, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
-    ADAMANT_BIG2(new int[] { 31083 }, 31059, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
-    ADAMANT_SMALL2(new int[] { 31084 }, 31060, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
-    ADAMANT_MID2(new int[] { 31085 }, 31061, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_BIG_2(new int[] { 31083 }, 31059, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_SMALL_2(new int[] { 31084 }, 31060, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_MID_2(new int[] { 31085 }, 31061, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_BIG_3(new int[] { 32435 }, 33400, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_SMALL_3(new int[] { 32436 }, 33401, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_MID_3(new int[] { 32437 }, 33402, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+
+    ADAMANT_BIG_6(new int[] { 5782 }, 5763, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
+    ADAMANT_MID_6(new int[] { 5783 }, 5765, -1,"adamant", 70, 95, 2, 50, 37, 13200, true, generateExclusive(449)),
 
     RUNE(new int[] { 14859 },450,  -1,"rune", 85, 125, 0, 100, 39, 12500, true, generateExclusive(451)),
+    RUNE_BIG_1(new int[] { 33078 },33400,  -1,"rune", 85, 125, 0, 100, 39, 12500, true, generateExclusive(451)),
+    RUNE_SMALL_1(new int[] { 33079 },33401,  -1,"rune", 85, 125, 0, 100, 39, 12500, true, generateExclusive(451)),
+
     ESSENCE(new int[] { 7471, 14912 }, 450, -1,"none", 1, 5, -1, -1, 5, 15000, false, generateExclusive(-1)),
     GEM(new int[] { 9030, 7464 }, 450, -1,"none", 40, 60, 20, 25, 20, 15000, true, new MineralReturn() {
 

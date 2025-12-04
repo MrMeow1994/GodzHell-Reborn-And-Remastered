@@ -3887,6 +3887,7 @@ public void setHouse(House house) {
         face(objectX, objectY);
         SingleGates.useSingleGate(this, objectID);
         DoubleGates.useDoubleGate(this, objectID);
+        ResourceDungeons.handleObjects(this, objectID);
         switch (objectID) {
             case 1408:
                 PickableObjects.pickupPineapple(this, objectID, objectX, objectY);
@@ -17791,15 +17792,22 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             int withdraw = amount;
 
             while (withdraw > 0 && bankItemsN[fromSlot] > 0) {
-                if (!addItem(invId, 1)) break;
+                boolean added = addItem(invId, 1); // try adding to inventory
+                if (!added) {
+                    sendMessage("Not enough space in your inventory!");
+                    break; // stop completely if inventory is full
+                }
 
-                bankItemsN[fromSlot]--;
-                withdraw--;
+                bankItemsN[fromSlot] -= 1;
+                withdraw -= 1;
             }
 
+// Clear the bank slot if empty
             if (bankItemsN[fromSlot] <= 0) {
                 bankItems[fromSlot] = 0;
+                bankItemsN[fromSlot] = 0; // make sure to reset count
             }
+
         }
 
         resetBank();
@@ -26110,6 +26118,7 @@ nated = Integer.parseInt(token2);
                         || Math.abs(getY() - objectY) > 25) {
                     resetWalkingQueue();
                 }
+
                 switch (objectID) {
                     case 2585:
                         objectXOffset = 1;
@@ -26355,6 +26364,7 @@ nated = Integer.parseInt(token2);
                         objectXOffset = 1;
                         objectYOffset = 1;
                         break;
+
                     case 5094:
                     case 5096:
                     case 5097:
@@ -26368,6 +26378,20 @@ nated = Integer.parseInt(token2);
                         objectXOffset = 0;
                         objectYOffset = 0;
                         break;
+                }
+                if (objectID >= ObjectIDs.MYSTERIOUS_ENTRANCE_2 &&
+                        objectID <= ObjectIDs.MYSTERIOUS_ENTRANCE_16) {
+
+                    objectDistance = 2;
+                    objectXOffset = objedtdef.sizeX;
+                    objectYOffset = objedtdef.sizeY;
+                }
+                if (objectID >= ObjectIDs.MYSTERIOUS_DOOR &&
+                        objectID <= ObjectIDs.MYSTERIOUS_DOOR_13) {
+
+                    objectDistance = 2;
+                    objectXOffset = objedtdef.sizeX;
+                    objectYOffset = objedtdef.sizeY;
                 }
                 if (GoodDistance(absX, absY, objectX+objectXOffset, objectY+objectYOffset, objectDistance)) {
                     viewTo(objectX, objectY);
@@ -27673,8 +27697,8 @@ nated = Integer.parseInt(token2);
                 break;
 
             case 117: // bank 5 items - sell 1 item
-                int interfaceId = inStream.readSignedWordBigEndianA();
-                int removeID2 = inStream.readSignedWordBigEndianA();
+                int interfaceId = inStream.readUnsignedWord();
+                int removeID2 = inStream.readUnsignedWord();
                 int removeSlot2 = inStream.readSignedWordBigEndian();
                 if (debugMessages) {
                     sendMessage("packet 117: interfaceid: " + interfaceId + ", removeSlot: " + removeSlot2 + ", removeID: " + removeID2);
@@ -27841,7 +27865,11 @@ nated = Integer.parseInt(token2);
                     }
                 } else if (testinterfaceId == 5382) { // remove from bank
                     if (InBank == 1) {
-                        fromBank(bankItems[removeSlot], removeSlot, bankItemsN[removeSlot]);
+                        if (!takeAsNote && !ItemCacheDefinition.forID(removeID).isStackable()) {
+                            fromBank(removeID, removeSlot, 28);
+                        } else {
+                            fromBank(removeID, removeSlot, bankItemsN[removeSlot]);
+                        }
                     } else if (InBank == 2) {
                         fromBank2(bankItems2[removeSlot], removeSlot, bankItemsN2[removeSlot]);
                     } else if (InBank == 3) {

@@ -76196,3 +76196,9 @@ time: 18.22.53 | sgsrocks: im back in
 
 time: 18.26.14 | sgsrocks: ya 
 
+time: 19.27.22 | sgsrocks: 0::food 
+
+time: 19.52.11 | sgsrocks:  ::bank 
+
+time: 13.11.39 | sgsrocks:  ::object 5785 
+

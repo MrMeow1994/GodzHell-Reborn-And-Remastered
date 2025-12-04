@@ -648,6 +648,9 @@ public abstract class Player {
 		if(Boundary.isIn((client) this, Boundary.rdleveloftrain)){
 			return true;
 		}
+		if(Boundary.isIn((client) this, Boundary.reousce_dung_one)){
+			return true;
+		}
 		if(Boundary.isIn((client) this, Boundary.SKILLZ)){
 			return true;
 		}

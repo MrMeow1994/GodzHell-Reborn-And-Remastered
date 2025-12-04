@@ -278,6 +278,7 @@ public class Boundary {
             new Boundary(2347, 5774, 2369, 5795),
             new Boundary(2357, 5751, 2369, 5773)
     };
+    public static final Boundary reousce_dung_one = new Boundary(1038, 4565, 1071, 4583);
     public static final Boundary[] GH_NONWILD = {
             new Boundary(3242, 3282, 3265, 3298),
             new Boundary(3244, 3278, 3265, 3281),

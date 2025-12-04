@@ -51,7 +51,7 @@ class Mining {
         }
         player.sendMessage("You swing your pickaxe at the rock.");
         player.setAnimation(pickaxe.getAnimation());
-        player.sendSound(soundList.MINING_ORE, 100, 0);
+        player.sendSound(2926, 7, 0);
         player.face(location.getX(), location.getY());
         player.getSkilling().add(new MiningEvent(player, objectId, location, mineral, pickaxe), extractionTime+600);
     }

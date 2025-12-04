@@ -349,7 +349,7 @@ class Smithing(private val c: client) {
                 override fun stop() {
                     c.isSmething = false
                 }
-            }, AnimationLength.getFrameLength(899)+2+600)
+            }, AnimationLength.getFrameLength(899)+2*600)
         }
     }
 

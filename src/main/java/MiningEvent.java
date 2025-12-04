@@ -126,7 +126,7 @@ public class MiningEvent implements Event {
         }
         if (container.getTick() - lastAnimation > ANIMATION_CYCLE_DELAY) {
             player.startAnimation(pickaxe.getAnimation());
-            player.sendSound(432, 100, 0);
+            player.sendSound(2926, 7, 0);
             lastAnimation = container.getTick();
         }
 
