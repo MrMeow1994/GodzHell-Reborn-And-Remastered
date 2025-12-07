@@ -41,7 +41,7 @@ public final class HttpRequestWorker extends RequestWorker<HttpRequest, Resource
 	}
 
 	private final Map<String, Deque<Long>> ipRequestBursts = new ConcurrentHashMap<>();
-	private static final int BURST_LIMIT = 25;
+	private static final int BURST_LIMIT = 10125;
 	private static final long BURST_WINDOW_MS = 500;
 
 	private boolean isRateLimited(String ip) {

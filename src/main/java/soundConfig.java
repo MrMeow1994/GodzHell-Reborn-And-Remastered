@@ -1,70 +1,7 @@
 public class soundConfig {
     public static int getPlayerBlockSounds(client c) {
 
-        int blockSound = 69;
-
-        if (c.playerEquipment[c.playerChest] == 2499
-                || c.playerEquipment[c.playerChest] == 2501
-                || c.playerEquipment[c.playerChest] == 2503
-                || c.playerEquipment[c.playerChest] == 4746
-                || c.playerEquipment[c.playerChest] == 4757
-                || c.playerEquipment[c.playerChest] == 10330) {// Dragonhide
-            // sound
-            blockSound = 24;
-        } else if (c.playerEquipment[c.playerChest] == 10551 || // Torso
-                c.playerEquipment[c.playerChest] == 10438) {// 3rd age
-            blockSound = 32;// Weird sound
-        } else if (c.playerEquipment[c.playerChest] == 10338 || // 3rd age
-                c.playerEquipment[c.playerChest] == 7399 || // Enchanted
-                c.playerEquipment[c.playerChest] == 6107 || // Ghostly
-                c.playerEquipment[c.playerChest] == 4091 || // Mystic
-                c.playerEquipment[c.playerChest] == 4101 || // Mystic
-                c.playerEquipment[c.playerChest] == 4111 || // Mystic
-                c.playerEquipment[c.playerChest] == 1035 || // Zamorak
-                c.playerEquipment[c.playerChest] == 12971) {// Combat
-            blockSound = 14;// Robe sound
-        } else if (c.playerEquipment[c.playerShield] == 4224) {// Crystal Shield
-            blockSound = 30;// Crystal sound
-        } else if (c.playerEquipment[c.playerChest] == 1101
-                || // Chains
-                c.playerEquipment[c.playerChest] == 1103
-                || c.playerEquipment[c.playerChest] == 1105
-                || c.playerEquipment[c.playerChest] == 1107
-                || c.playerEquipment[c.playerChest] == 1109
-                || c.playerEquipment[c.playerChest] == 1111
-                || c.playerEquipment[c.playerChest] == 1113
-                || c.playerEquipment[c.playerChest] == 1115
-                || // Plates
-                c.playerEquipment[c.playerChest] == 1117
-                || c.playerEquipment[c.playerChest] == 1119
-                || c.playerEquipment[c.playerChest] == 1121
-                || c.playerEquipment[c.playerChest] == 1123
-                || c.playerEquipment[c.playerChest] == 1125
-                || c.playerEquipment[c.playerChest] == 1127
-                || c.playerEquipment[c.playerChest] == 4720
-                || // Barrows armour
-                c.playerEquipment[c.playerChest] == 4728
-                || c.playerEquipment[c.playerChest] == 4749
-                || c.playerEquipment[c.playerChest] == 4712
-                || c.playerEquipment[c.playerChest] == 11720
-                || // Godwars armour
-                c.playerEquipment[c.playerChest] == 11724
-                || c.playerEquipment[c.playerChest] == 3140
-                || // Dragon
-                c.playerEquipment[c.playerChest] == 2615
-                || // Fancy
-                c.playerEquipment[c.playerChest] == 2653
-                || c.playerEquipment[c.playerChest] == 2661
-                || c.playerEquipment[c.playerChest] == 2669
-                || c.playerEquipment[c.playerChest] == 2623
-                || c.playerEquipment[c.playerChest] == 3841
-                || c.playerEquipment[c.playerChest] == 1127) {// Metal armour
-            // sound
-            blockSound = 791;
-        } else {
-            blockSound = 511;
-        }
-        return blockSound;
+        return 511;
     }
     public static int getWeaponSounds(client c) {
         if (c.playerEquipment[c.playerWeapon] <= 0) {
@@ -158,7 +95,7 @@ public class soundConfig {
             if (c.playerEquipment[c.playerWeapon] == 4718
                     || c.playerEquipment[c.playerWeapon] == 7808) { // Dharok
                 // GreatAxe
-                return 400;
+                return 1320;
             }
             if (c.playerEquipment[c.playerWeapon] == 6609
                     || c.playerEquipment[c.playerWeapon] == 1307
@@ -168,7 +105,7 @@ public class soundConfig {
                     || c.playerEquipment[c.playerWeapon] == 1315
                     || c.playerEquipment[c.playerWeapon] == 1317
                     || c.playerEquipment[c.playerWeapon] == 1319) { // 2h
-                return 425;
+                return 2502;
             }
             if (wep.contains("scimitar") || wep.contains("longsword")) {
                 return 2503;
@@ -208,9 +145,9 @@ public class soundConfig {
                     || c.playerEquipment[c.playerWeapon] == 1287
                     || c.playerEquipment[c.playerWeapon] == 1289) {
                 if (c.fightMode == 0)
-                    return 403;
+                    return 2547;
                 else
-                    return 396;
+                    return 2548;
             }
 
             if (c.playerEquipment[c.playerWeapon] == 9110) {
@@ -238,7 +175,7 @@ public class soundConfig {
                 return 2720;
             }
         }
-        return 398;
+        return 2566;
     }
 
     public static int specialSounds(int id) {

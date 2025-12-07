@@ -291,8 +291,7 @@ public class TradeSystem {
                     SendTrade = SendTrade + "\\n"
                             + c.getItemName((c.playerTItems[i] - 1));
                 }
-                if (Item.itemIsNote[(c.playerTItems[i] - 1)]
-                        || ItemCacheDefinition.forID(c.playerTItems[i] - 1).isStackable()) {
+                if (ItemCacheDefinition.forID(c.playerTItems[i] - 1).isStackable()) {
                     SendTrade = SendTrade + " x " + SendAmount;
                 }
                 Count++;
@@ -319,8 +318,7 @@ public class TradeSystem {
                     SendTrade = SendTrade + "\\n"
                             + c.getItemName((c.playerOTItems[i] - 1));
                 }
-                if (Item.itemIsNote[(c.playerOTItems[i] - 1)]
-                        || ItemCacheDefinition.forID(c.playerOTItems[i] - 1).isStackable()) {
+                if (ItemCacheDefinition.forID(c.playerOTItems[i] - 1).isStackable()) {
                     SendTrade = SendTrade + " x " + SendAmount;
                 }
                 Count++;
@@ -377,8 +375,7 @@ public class TradeSystem {
             boolean IsInTrade = false;
             for (int i = 0; i < c.playerTItems.length; i++) {
                 if (c.playerTItems[i] == c.playerItems[fromSlot]) {
-                    if (Item.itemStackable[(c.playerItems[fromSlot] - 1)]
-                            || Item.itemIsNote[(c.playerItems[fromSlot] - 1)]) {
+                    if (ItemCacheDefinition.forID(c.playerTItems[i] - 1).isStackable()) {
                         c.playerTItemsN[i] += amount;
                         getTradePartner().playerOTItemsN[i] += amount;
                         IsInTrade = true;

@@ -173,9 +173,6 @@ public class Item {
         // dagger			axe			mace			medium			sword			dart tips		nails				arrow heads		scimitar		long sword		full helmet		knives			square			warhammer		battle axe		chain			kite		claws				2-handed		skirt			legs			body				lantern/wire		studs
     };
     public static int SmithingItems[][] = new int[5][5];
-
-    public static boolean[] itemStackable = new boolean[Config.MAX_ITEMS];
-    public static boolean[] itemIsNote = new boolean[Config.MAX_ITEMS];
     public static boolean[] itemTwoHanded = new boolean[Config.MAX_ITEMS];
     public static boolean[] itemTradeable = new boolean[Config.MAX_ITEMS];
     public static boolean[] itemSellable = new boolean[Config.MAX_ITEMS];
@@ -183,56 +180,7 @@ public class Item {
         int counter = 0;
         int c;
 
-        try {
-            FileInputStream dataIn = new FileInputStream(
-                    new File("./Data/data/stackable.dat"));
 
-            while ((c = dataIn.read()) != -1) {
-               // System.out.println("Id: "+counter+", stackble: "+c);
-                if (c == 0) {
-                    itemStackable[counter] = true;
-                } else {
-                    itemStackable[counter] = false;
-                }
-                counter++;
-            }
-            dataIn.close();
-
-itemStackable[12163] = true;
-itemStackable[12159] = true;
-        } catch (IOException e) {
-            System.out.println(
-                    "Critical error while loading stackabledata! Trace:");
-            e.printStackTrace();
-        }
-
-        counter = 0;
-        try {
-            FileInputStream dataIn = new FileInputStream(
-                    new File("./Data/data/notes.dat"));
-
-            while ((c = dataIn.read()) != -1) {
-                if (c == 0) {
-                    itemIsNote[counter] = true;
-                } else {
-                    itemIsNote[counter] = false;
-                }
-                counter++;
-            }
-            dataIn.close();
-            itemIsNote[ItemIDs.BRONZE_PICKAXE] = false;
-            itemIsNote[ItemIDs.IRON_PICKAXE] = false;
-            itemIsNote[ItemIDs.STEEL_PICKAXE] = false;
-            itemIsNote[ItemIDs.MITHRIL_PICKAXE] = false;
-            itemIsNote[ItemIDs.ADAMANT_PICKAXE] = false;
-            itemIsNote[ItemIDs.RUNE_PICKAXE] = false;
-            itemIsNote[ItemIDs.DRAGON_PICKAXE] = false;
-        } catch (IOException e) {
-            System.out.println("Critical error while loading notedata! Trace:");
-            e.printStackTrace();
-        }
-
-        counter = 0;
         try {
             FileInputStream dataIn = new FileInputStream(
                     new File("./Data/data/twohanded.dat"));

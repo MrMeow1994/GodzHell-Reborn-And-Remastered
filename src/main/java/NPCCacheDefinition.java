@@ -45,8 +45,8 @@ public class NPCCacheDefinition {
      */
     public static final void unpackConfig() {
         try {
-            npcData = new stream(FileUtils.readFileToByteArray(new File("./Data/fs/npc.dat")));
-            stream indexStream = new stream(FileUtils.readFileToByteArray(new File("./Data/fs/npc.idx")));
+            npcData = new stream(FileUtils.readFileToByteArray(new File("./Data/configs/npc.dat")));
+            stream indexStream = new stream(FileUtils.readFileToByteArray(new File("./Data/configs/npc.idx")));
             totalNpcs = indexStream.readUnsignedWord();
             newTotalNpcs = 15505;
             streamIndices = new int[totalNpcs];

@@ -1088,7 +1088,7 @@ public class Region {
         try {
             ObjectDef.loadConfig();
 
-            File file = new File("./Data/world/map_index");
+            File file = new File("./Data/world/661map_index");
             if (!file.exists()) {
                 System.err.println("Missing map_index file.");
                 return;
@@ -1149,8 +1149,8 @@ public class Region {
     }
     private static void loadMap(RegionData regionData) {
         try {
-            byte[] file1 = getBuffer(new File("./Data/world/map/" + regionData.getObjects() + ".Gz"));
-            byte[] file2 = getBuffer(new File("./Data/world/map/" + regionData.getLandscape() + ".Gz"));
+            byte[] file1 = getBuffer(new File("./Data/world/661index4/" + regionData.getObjects() + ".Gz"));
+            byte[] file2 = getBuffer(new File("./Data/world/661index4/" + regionData.getLandscape() + ".Gz"));
             if (file1 == null || file2 == null) {
                 return;
             }

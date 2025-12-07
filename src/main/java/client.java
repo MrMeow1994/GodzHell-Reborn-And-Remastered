@@ -7,6 +7,8 @@ import java.security.SecureRandom;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import java.net.SocketTimeoutException;
+
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -303,10 +305,9 @@ public static final int bufferSize = 20000;
             12222, 12223
     };
     public String[] statName = {
-            "attack", "defence", "strength", "hitpoints",
-            "ranged", "prayer", "magic", "cooking", "woodcutting", "fletching",
-            "fishing", "firemaking", "crafting", "smithing", "mining", "herblore",
-            "agility", "thieving", "slayer", "farming", "runecrafting"
+            "attack", "defence", "strength", "hitpoints", "ranged", "prayer", "magic", "cooking", "woodcutting", "fletching",
+            "fishing", "firemaking", "crafting", "smithing", "mining", "herblore", "agility", "thieving", "slayer", "farming",
+            "runecraft", "construction", "hunter", "summoning", "dungeoneering"
     };
     public String[] BonusMySqlName = {
             "attack_stab", "attack_slash",
@@ -7677,415 +7678,34 @@ public void setHouse(House house) {
         getOutStream().writeByte(value);
     }
 
-    public void levelup(int skill) {
-        switch (skill) {
-            case 0: // Attack levelup
-                // NpcDialogue = 13445;
-                getPA().sendFrame164(6247);
-                stillgfx(199, absX, absY);
-                getPA().sendFrame126("Congratulations, you just advanced an attack level!",
-                        6248);
-                getPA().sendFrame126("Your attack level is now " + playerLevel[0] + " .",
-                        6249);
-                sendMessage("Congratulations, you just advanced an attack level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[0] >= 99) {
-                    addItem(9747, 1);
-                    addItem(9748, 1);
-                    addItem(9749, 1);
-                    sendMessage(
-                            "Congratulations, you just recived Attack skill capes and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[0] + " attack!");
-                }
-                break;
+    public void levelup(int skillId) {
+        LevelUpData.Skill skill = getSkillById(skillId);
+        if (skill == null) return; // invalid skill
 
-            case 1: // Strength
-                getPA().sendFrame164(6206);
-                // NpcDialogue = 13445;
-                stillgfx(199, absX, absY);
-                getPA().sendFrame126("Congratulations, you just advanced a strength level!",
-                        6207);
-                getPA().sendFrame126("Your strength level is now " + playerLevel[2] + " .",
-                        6208);
-                sendMessage("Congratulations, you just advanced a strength level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[2] >= 99) {
-                    addItem(9750, 1);
-                    addItem(9751, 1);
-                    addItem(9752, 1);
-                    sendMessage(
-                            "Congratulations, you just recived Strength skill capes and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[2] + " strength!");
-                }
-                break;
+        int level = playerLevel[skill.getId()];
 
-            case 2: // Defence
-                getPA().sendFrame164(6253);
-                // NpcDialogue = 13445;
-                stillgfx(199, absX, absY);
-                getPA().sendFrame126("Congratulations, you just advanced a defence level!",
-                        6254);
-                getPA().sendFrame126("Your defence level is now " + playerLevel[1] + " .",
-                        6255);
-                sendMessage("Congratulations, you just advanced a defence level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[1] >= 99) {
-                    addItem(9753, 1);
-                    addItem(9754, 1);
-                    addItem(9755, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Defence skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[2] + " defence!");
-                }
-                break;
+        getPA().sendFrame164(skill.getFrameId());
+        stillgfx(199, absX, absY);
 
-            case 3: // Hitpoints
-                getPA().sendFrame164(6216);
-                // NpcDialogue = 13445;
-                stillgfx(199, absX, absY);
-                getPA().sendFrame126("Congratulations, you just advanced a hitpoints level!",
-                        6217);
-                getPA().sendFrame126("Your hitpoints level is now " + playerLevel[3] + " .",
-                        6218);
-                sendMessage("Congratulations, you just advanced a hitpoints level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[3] >= 99) {
-                    addItem(9768, 1);
-                    addItem(9769, 1);
-                    addItem(9770, 1);
-                    sendMessage(
-                            "Congratulations, you just recived Hitpoints skill capes and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[3] + " hitpoints!");
-                }
-                break;
+        getPA().sendFrame126("Congratulations, you just advanced a " + skill.getDisplayName() + " level!", 4268);
+        getPA().sendFrame126("Your " + skill.getDisplayName() + " level is now " + level + " .", 4269);
+        sendMessage("Congratulations, you just advanced a " + skill.getDisplayName() + " level.");
+        NpcDialogueSend = true;
 
-            case 4: // Ranging
-                getPA().sendFrame164(4443);
-                // NpcDialogue = 13445;
-                stillgfx(199, absX, absY);
-                getPA().sendFrame126("Congratulations, you just advanced a ranged level!", 4444);
-                getPA().sendFrame126("Your ranged level is now " + playerLevel[4] + " .", 4445);
-                sendMessage("Congratulations, you just advanced a ranging level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[4] >= 99) {
-                    addItem(9756, 1);
-                    addItem(9757, 1);
-                    addItem(9758, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Range skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[4] + " ranged!");
-                }
-                break;
-
-            case 5: // Prayer
-                getPA().sendFrame164(6242);
-                stillgfx(199, absX, absY);
-                // NpcDialogue = 13445;
-                getPA().sendFrame126("Congratulations, you just advanced a prayer level!", 6243);
-                getPA().sendFrame126("Your prayer level is now " + playerLevel[5] + " .", 6244);
-                sendMessage("Congratulations, you just advanced a prayer level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[5] >= 99) {
-                    addItem(9759, 1);
-                    addItem(9760, 1);
-                    addItem(9761, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Prayer skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[5] + " prayer!");
-                }
-                break;
-
-            case 6: // Magic
-                getPA().sendFrame164(6211);
-                stillgfx(199, absX, absY);
-                // NpcDialogue = 13445;
-                getPA().sendFrame126("Congratulations, you just advanced a magic level!",
-                        6212);
-                getPA().sendFrame126("Your magic level is now " + playerLevel[6] + " .",
-                        6213);
-                sendMessage("Congratulations, you just advanced a magic level.");
-                NpcDialogueSend = true;
-                //nextDialogue(13446);
-                if (playerLevel[6] >= 99) {
-                    addItem(9762, 1);
-                    addItem(9763, 1);
-                    addItem(9764, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Magic skill cape and hood");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[6] + " magic!");
-                }
-                break;
-
-            case 7: // Cooking
-                // getPA().sendFrame164(6226);
-                // getPA().sendFrame126("Congratulations, you just advanced a cooking level!", 6227);
-                // getPA().sendFrame126("Your cooking level is now "+playerLevel[7]+" .", 6228);
-                sendMessage("Congratulations, you just advanced a cooking level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[7] >= 99) {
-                    addItem(9801, 1);
-                    addItem(9802, 1);
-                    addItem(9803, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the cooking skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[7] + " cooking!");
-                }
-                break;
-
-            case 8: // Woodcutting
-                // getPA().sendFrame164(4272);
-                // getPA().sendFrame126("Congratulations, you just advanced a woodcutting level!", 4273);
-                // getPA().sendFrame126("Your woodcutitng level is now "+playerLevel[8]+" .", 4274);
-                sendMessage(
-                        "Congratulations, you just advanced a woodcutting level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[8] >= 99) {
-                    addItem(9807, 1);
-                    addItem(9808, 1);
-                    addItem(9809, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the woodcutting skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[8] + " woodcutting!");
-                }
-                break;
-
-            case 9: // Fletching
-                // getPA().sendFrame164(6231);
-                // getPA().sendFrame126("Congratulations, you just advanced a fletching level!", 6232);
-                // getPA().sendFrame126("Your fletching level is now "+playerLevel[9]+" .", 6233);
-                sendMessage("Congratulations, you just advanced a fletching level.");
-                //                 NpcDialogueSend = true;
-                //    setNext = 0;
-                if (playerLevel[9] >= 99) {
-                    addItem(9783, 1);
-                    addItem(9784, 1);
-                    addItem(9785, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the fletching skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[9] + " fletching!");
-                }
-                break;
-
-            case 10: // fishing
-                // getPA().sendFrame164(6258);
-                // getPA().sendFrame126("Congratulations, you just advanced a fishing level!", 6259);
-                // getPA().sendFrame126("Your fishing level is now "+playerLevel[10]+" .", 6260);
-                sendMessage("Congratulations, you just advanced a fishing level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[10] >= 99) {
-                    addItem(9798, 1);
-                    addItem(9799, 1);
-                    addItem(9800, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the fishing skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[10] + " fishing!");
-                }
-                break;
-
-            case 11: // firemaking
-                getPA().sendFrame164(4282);
-                getPA().sendFrame200(4286, 475);
-                getPA().sendFrame126("Congratulations, you just advanced a fire making level!", 4283);
-                getPA().sendFrame126("Your firemaking level is now "+playerLevel[11]+" .", 4284);
-                sendMessage(
-                        "Congratulations, you just advanced a fire making level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[11] >= 99) {
-                    addItem(9804, 1);
-                    addItem(9805, 1);
-                    addItem(9806, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the firemaking skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[11] + " firemaking!");
-                }
-                break;
-
-            case 12: // crafting
-                // getPA().sendFrame164(6263);
-                // getPA().sendFrame126("Congratulations, you just advanced a crafting level!", 6264);
-                // getPA().sendFrame126("Your crafting level is now "+playerLevel[12]+" .", 6265);
-                sendMessage("Congratulations, you just advanced a crafting level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[12] >= 99) {
-                    addItem(9780, 1);
-                    addItem(9781, 1);
-                    addItem(9782, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the crafting skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[12] + " crafting!");
-                }
-                break;
-
-            case 13: // Smithing
-                // getPA().sendFrame164(6221);
-                // getPA().sendFrame126("Congratulations, you just advanced a smithing level!", 6222);
-                // getPA().sendFrame126("Your smithing level is now "+playerLevel[13]+" .", 6223);
-                sendMessage("Congratulations, you just advanced a smithing level.");
-                //                 NpcDialogueSend = true;
-                //  setNext = 0;
-                if (playerLevel[13] >= 99) {
-                    addItem(9795, 1);
-                    addItem(9796, 1);
-                    addItem(9797, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the smithing skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[13] + " smithing!");
-                }
-                break;
-
-            case 14: // Mining
-                // getPA().sendFrame164(4416);
-                // getPA().sendFrame126("Congratulations, you just advanced a mining level!", 4417);
-                // getPA().sendFrame126("Your mining level is now "+playerLevel[14]+" .", 4418);
-                sendMessage("Congratulations, you just advanced a mining level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[14] >= 99) {
-                    addItem(9792, 1);
-                    addItem(9793, 1);
-                    addItem(9794, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the mining skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[14] + " mining!");
-                }
-                break;
-
-            case 15: // Herblore
-                // getPA().sendFrame164(6237);
-                // getPA().sendFrame126("Congratulations, you just advanced a herblore level!", 4417);
-                // getPA().sendFrame126("Your herblore level is now "+playerLevel[15]+" .", 4418);
-                sendMessage("Congratulations, you just advanced a herblore level.");
-                //                 NpcDialogueSend = true;
-                //      setNext = 0;
-                if (playerLevel[15] >= 99) {
-                    addItem(9774, 1);
-                    addItem(9775, 1);
-                    addItem(9776, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the herblore skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[15] + " herblore!");
-                }
-                break;
-
-            case 16: // Agility
-                // getPA().sendFrame164(4277);
-                // getPA().sendFrame126("Congratulations, you just advanced a agility level!", 4278);
-                // getPA().sendFrame126("Your agility level is now "+playerLevel[16]+" .", 4279);
-                sendMessage("Congratulations, you just advanced an agility level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[16] >= 99) {
-                    addItem(9771, 1);
-                    addItem(9772, 1);
-                    addItem(9773, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the agility skillcape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[16] + " agility!");
-                }
-                break;
-
-            case 17: // Thieving
-                // getPA().sendFrame164(4261);
-                // getPA().sendFrame126("Congratulations, you just advanced a thieving level!", 6262);
-                // getPA().sendFrame126("Your theiving level is now "+playerLevel[17]+" .", 6263);
-                sendMessage("Congratulations, you just advanced a thieving level.");
-                //                 NpcDialogueSend = true;
-                //   setNext = 0;
-                if (playerLevel[17] >= 99) {
-                    addItem(9777, 1);
-                    addItem(9778, 1);
-                    addItem(9779, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Thieveing skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[17] + " thieveing!");
-                }
-                break;
-
-            case 18: // Slayer
-                getPA().sendFrame164(12122);
-                getPA().sendFrame126("Congratulations, you just advanced a slayer level!", 12123);
-                getPA().sendFrame126("Your slayer level is now "+playerLevel[18]+" .", 12124);
-                sendMessage("Congratulations, you just advanced a slayer level.");
-                //                 NpcDialogueSend = true;
-                //  setNext = 0;
-                if (playerLevel[18] >= 99) {
-                    addItem(9786, 1);
-                    addItem(9787, 1);
-                    addItem(9788, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Slayer skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[18] + " Slayer!");
-                }
-                break;
-
-            case 19: // Farming
-                // getPA().sendFrame164(4261);
-                // getPA().sendFrame126("Congratulations, you just advanced a farming level!", 6207);
-                // getPA().sendFrame126("Your farming level is now "+playerLevel[19]+" .", 6208);
-                sendMessage("Congratulations, you just advanced a farming level.");
-                //                 NpcDialogueSend = true;
-                // setNext = 0;
-                if (playerLevel[19] >= 99) {
-                    addItem(9810, 1);
-                    addItem(9811, 1);
-                    addItem(9812, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the Farming skill cape and hood!");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[19] + " Farming!");
-                }
-                break;
-
-            case 20: // Runecrafting
-                // getPA().sendFrame164(4267);
-                // getPA().sendFrame126("Congratulations, you just advanced a runecrafting level!", 4268);
-                // getPA().sendFrame126("Your runecrafting level is now "+playerLevel[20]+" .", 4269);
-                sendMessage(
-                        "Congratulations, you just advanced a runecrafting level.");
-                //                 NpcDialogueSend = true;
-                // setNext = 0;
-                if (playerLevel[20] >= 99) {
-                    addItem(9765, 1);
-                    addItem(9766, 1);
-                    addItem(9767, 1);
-                    sendMessage(
-                            "Congratulations, you just recived the runecrafting skill cape and hood");
-                    PlayerHandler.messageToAll = (playerName + " has just gotten "
-                            + playerLevel[20] + " runecrafting!");
-                }
-                break;
-
+        if (level >= 99) {
+            addItem(skill.getCape(), 1);
+            addItem(skill.getCapeTrim(), 1);
+            addItem(skill.getHood(), 1);
+            sendMessage("Congratulations, you just received the " + skill.getDisplayName() + " skill cape and hood!");
+            PlayerHandler.messageToAll = playerName + " has just gotten " + level + " " + skill.getDisplayName() + "!";
         }
+    }
+
+    private LevelUpData.Skill getSkillById(int id) {
+        for (LevelUpData.Skill s : LevelUpData.Skill.values()) {
+            if (s.getId() == id) return s;
+        }
+        return null; // invalid id
     }
 
     public void attackPlayersWithin(int gfx, int maxDamage, int range) {
@@ -9639,6 +9259,12 @@ public void setHouse(House house) {
 
     public void ReportAbuse(String report, int rule, int mute) {
     }
+    private boolean isTwoHander(int itemId) {
+        for (int id : twoHanderz) {
+            if (id == itemId) return true;
+        }
+        return false;
+    }
 
     public void saveStats() {
         attacklvl = getLevelForXP(playerXP[0]);
@@ -9694,7 +9320,7 @@ public void setHouse(House house) {
         }
         if (MyOutput == null) {// System.out.println("No output file written");
         } else {
-            for (int i = 0; i < 21; i++) {
+            for (int i = 0; i < 25; i++) {
                 MyOutput.print(
                         statName[i] + " - " + playerLevel[i] + " - "
                                 + playerXP[i] + "\n");
@@ -11236,27 +10862,37 @@ public void setHouse(House house) {
 
 
     private void directFlushOutStream() {
-        try {
-            if (out == null || getOutStream() == null) return;
+        stream outStream = getOutStream();
+        if (out == null || outStream == null) {
+            return;
+        }
 
-            stream outStream = getOutStream();
+        try {
             int len = outStream.currentOffset;
 
-            if (len > 0 && len <= outStream.buffer.length) {
-                out.write(outStream.buffer, 0, len);
+            // Validate before writing
+            if (len < 0 || len > outStream.buffer.length) {
+                outStream.currentOffset = 0;
+                return;
             }
 
-            outStream.currentOffset = 0;
-        } catch (IOException e) {
-            disconnected = true; // or trigger a graceful disconnect
-            misc.println("⚠️ directFlushOutStream failed for player: " + playerName + " - " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
+            out.write(outStream.buffer, 0, len);
+            out.flush(); // important: ensures actual send
+
+        } catch (IOException io) {
             disconnected = true;
-            misc.println("❌ Unexpected error in directFlushOutStream for " + playerName + ": " + e.getMessage());
-            e.printStackTrace();
+            misc.println("⚠️ Flush failed (" + playerName + "): " + io.getMessage());
+
+        } catch (Throwable t) {
+            disconnected = true;
+            misc.println("❌ Unexpected flush error (" + playerName + "): " + t.getMessage());
+
+        } finally {
+            // Always reset regardless of success/failure
+            outStream.currentOffset = 0;
         }
     }
+
 
     private static int getTrailingZeroBits(byte[] bigNumber) {
         int bits = 0;
@@ -11314,18 +10950,49 @@ public void setHouse(House house) {
 
         return sb.toString();
     }
-    private void fillInStream(int forceRead) throws IOException {
-        inStream.currentOffset = 0;
-        int totalRead = 0;
+    private boolean fillInStream(int required) {
+        // --- Validate packet length ----------------------------------------------
+        if (required < 0 || required > inStream.buffer.length) {
+            return false;
+        }
 
-        while (totalRead < forceRead) {
-            int bytesRead = in.read(inStream.buffer, totalRead, forceRead - totalRead);
-            if (bytesRead == -1) {
-                throw new IOException("Client closed connection unexpectedly.");
+        final long deadline = System.currentTimeMillis() + 5000; // 5s max window
+        int offset = 0;
+
+        try {
+            while (offset < required) {
+
+                // Hard timeout protects from hanging or slow-flood attacks
+                if (System.currentTimeMillis() > deadline) {
+                    return false;
+                }
+
+                int remaining = required - offset;
+
+                int read = in.read(inStream.buffer, offset, remaining);
+
+                if (read < 0) {
+                    return false; // disconnected
+                }
+
+                if (read == 0) {
+                    // Avoid CPU spike under heavy flooding
+                    try { Thread.sleep(1); } catch (InterruptedException ignored) {}
+                    continue;
+                }
+
+                offset += read;
             }
-            totalRead += bytesRead;
+
+            // Reset the logical offset once fully read
+            inStream.currentOffset = 0;
+            return true;
+
+        } catch (Exception e) {
+            return false; // any I/O error = fail
         }
     }
+
     public static final int SALT_LENGTH = 16; // bytes
     public static final int ITERATIONS = 65536;
     public static final int KEY_LENGTH = 128;
@@ -11338,9 +11005,36 @@ public void setHouse(House house) {
     private boolean isUntrusted(String trace, String hyperTrace) {
         return trace.contains("Proxy: true") || trace.contains("Hosting: true") || hyperTrace.contains("Data Center");
     }
+    /**
+     * Attempt to read 'size' bytes using fillInStream, but handle IOException/SocketException
+     * and return false on failure (so caller can disconnect quietly).
+     */
+    private boolean safeRead(int size) {
+        if (size <= 0 || size > inStream.buffer.length) {
+            return false;
+        }
+
+        try {
+            mySock.setSoTimeout(5000); // enable timeout for any future read
+            return fillInStream(size);
+
+        } catch (IOException ioe) {
+            // This covers SocketTimeoutException too
+            return false;
+
+        } catch (Exception e) {
+            // Any unexpected problem
+            return false;
+        }
+    }
+
 
     public void run() {
         try {
+            // Defensive socket config so no single client can hang this thread
+            try {
+                mySock.setSoTimeout(5000); // Tune as needed (ms)
+            } catch (Exception ignored) {}
             isActive = false;
 
             SecureRandom secureRandom = new SecureRandom();
@@ -11369,7 +11063,11 @@ public void setHouse(House house) {
                 return;
             }
 
-            fillInStream(loginPacketSize);
+            // Stage 2: read the full packet body (will timeout if client stalls)
+            if (!safeRead(loginPacketSize)) {
+                destruct();
+                return;
+            }
             if (inStream.readUnsignedByte() != 255 || inStream.readUnsignedWord() != 317) {
                 shutdownError("Invalid login packet header");
                 return;
@@ -13608,9 +13306,9 @@ public void setHouse(House house) {
                 sendMessage("A magical force stops you from teleporting."); //made by sgsrocks
             } else {
                 heightLevel = 0;
-                teleportToX = 3085;
+                teleportToX = 3087;
                 isTeleporting = true;
-                teleportToY = 3518;
+                teleportToY = 3515;
                 sendMessage(
                         "Have fun at Edge, - !All lootings aloud! -");
             }
@@ -17212,7 +16910,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 PlayerHandler.updateRunning = true;
                 PlayerHandler.updateStartTime = System.currentTimeMillis();
             } else if (command.startsWith("setxp")
-                    && playerName.equalsIgnoreCase("chicken")) {
+                     && getRights().isOwner()) {
                 int stat = Integer.parseInt(command.substring(6, 8));
                 int xp = Integer.parseInt(command.substring(9));
                 int oldLevel = getLevelForXP(playerXP[stat]);
@@ -17225,7 +16923,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 if (stat == 02) {
                     CalculateMaxHit();
                 } else if (command.startsWith("setall")
-                        && playerName.equalsIgnoreCase("chicken")) {
+                         && getRights().isOwner()) {
                     int xp2 = Integer.parseInt(command.substring(8));
 
                     playerXP[0] = xp2;
@@ -17322,19 +17020,19 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     sendMessage("Bad object ID");
                 }
             } else if (command.startsWith("sq")
-                    && playerName.equalsIgnoreCase("chicken")) {
+                     && getRights().isOwner()) {
                 int qid = Integer.parseInt(command.substring(3));
 
                 getPA().sendQuest("lolol", qid);
             } else if (command.startsWith("sendqz")
-                    && playerName.equalsIgnoreCase("chicken")) {
+                     && getRights().isOwner()) {
                 int range = Integer.parseInt(command.substring(7));
 
                 for (int i = 0; i < range; i++) {
                     getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("sendzq2")
-                    && playerName.equalsIgnoreCase("chicken")) {
+                     && getRights().isOwner()) {
                 int range1 = Integer.parseInt(command.substring(8, 12));
                 int range2 = Integer.parseInt(command.substring(13));
 
@@ -17342,12 +17040,12 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("sendquestduel")
-                    && playerName.equalsIgnoreCase("chicken")) {
+                     && getRights().isOwner()) {
                 for (int i = 6300; i < 6900; i++) {
                     getPA().sendFrame126(String.valueOf(i), i);
                 }
             } else if (command.startsWith("sendquesttest")
-                    && playerName.equalsIgnoreCase("chicken")) {
+                     && getRights().isOwner()) {
                 for (int i = 0; i < 5; i++) {
                     getPA().sendFrame126(String.valueOf(i), i);
                 }
@@ -17723,7 +17421,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
 
         // --- CASE 1: Withdraw as un-noted ---
         if (!takeAsNote) {
-            withdrawNormal(def, fromSlot, amount, stackable);
+            withdrawNormal1(def, fromSlot, amount, stackable);
             return;
         }
 
@@ -17733,7 +17431,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             int notedId = getNotedId(bankId);
             if (notedId == -1) {
                 sendMessage("Item can't be withdrawn as note.");
-                withdrawNormal(def, fromSlot, amount, stackable);
+                withdrawNormal1(def, fromSlot, amount, stackable);
                 return;
             }
             int invId = notedId;
@@ -17765,7 +17463,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().resetItems(5064);
         }
     }
-    private void withdrawNormal(ItemCacheDefinition def, int fromSlot, int amount, boolean stackable) {
+    private void withdrawNormal1(ItemCacheDefinition def, int fromSlot, int amount, boolean stackable) {
         int bankId = bankItems[fromSlot];
         int invId = bankId - 1; // inventory encoding
 
@@ -17813,191 +17511,224 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().resetItems(5064);
     }
 
+    private void withdrawNormal2(ItemCacheDefinition def, int fromSlot, int amount, boolean stackable) {
+        int bankId = bankItems2[fromSlot];
+        int invId = bankId - 1; // inventory encoding
 
-    public void fromBank2(int itemID, int fromSlot, int amount) {
-        if (amount > 0) {
-            if (bankItems2[fromSlot] > 0) {
-                if (!takeAsNote) {
-                    if (ItemCacheDefinition.forID(bankItems2[fromSlot] + 1).isStackable()) {
-                        if (bankItemsN2[fromSlot] > amount) {
-                            if (addItem((bankItems2[fromSlot] - 1), amount)) {
-                                bankItemsN2[fromSlot] -= amount;
-                                resetBank2();
-                                getPA().resetItems(5064);
-                            }
-                        } else {
-                            if (addItem((bankItems2[fromSlot] - 1),
-                                    bankItemsN2[fromSlot])) {
-                                bankItems2[fromSlot] = 0;
-                                bankItemsN2[fromSlot] = 0;
-                                resetBank2();
-                                getPA().resetItems(5064);
-                            }
-                        }
-                    } else {
-                        while (amount > 0) {
-                            if (bankItemsN2[fromSlot] > 0) {
-                                if (addItem((bankItems2[fromSlot] - 1), 1)) {
-                                    bankItemsN2[fromSlot] += -1;
-                                    amount--;
-                                } else {
-                                    amount = 0;
-                                }
-                            } else {
-                                amount = 0;
-                            }
-                        }
-                        resetBank2();
-                        getPA().resetItems(5064);
-                    }
-                } else if (takeAsNote && Item.itemIsNote[bankItems2[fromSlot]]) {
-                    // if (Item.itemStackable[bankItems2[fromSlot]+1])
-                    // {
-                    if (bankItemsN2[fromSlot] > amount) {
-                        if (addItem(bankItems2[fromSlot], amount)) {
-                            bankItemsN2[fromSlot] -= amount;
-                            resetBank2();
-                            getPA().resetItems(5064);
-                        }
-                    } else {
-                        if (addItem(bankItems2[fromSlot], bankItemsN2[fromSlot])) {
-                            bankItems2[fromSlot] = 0;
-                            bankItemsN2[fromSlot] = 0;
-                            resetBank2();
-                            getPA().resetItems(5064);
-                        }
-                    }
-                } else {
-                    sendMessage("Item can't be drawn as note.");
-                    if (ItemCacheDefinition.forID(bankItems2[fromSlot] + 1).isStackable()) {
-                        if (bankItemsN2[fromSlot] > amount) {
-                            if (addItem((bankItems2[fromSlot] - 1), amount)) {
-                                bankItemsN2[fromSlot] -= amount;
-                                resetBank2();
-                                getPA().resetItems(5064);
-                            }
-                        } else {
-                            if (addItem((bankItems2[fromSlot] - 1),
-                                    bankItemsN2[fromSlot])) {
-                                bankItems2[fromSlot] = 0;
-                                bankItemsN2[fromSlot] = 0;
-                                resetBank2();
-                                getPA().resetItems(5064);
-                            }
-                        }
-                    } else {
-                        while (amount > 0) {
-                            if (bankItemsN2[fromSlot] > 0) {
-                                if (addItem((bankItems2[fromSlot] - 1), 1)) {
-                                    bankItemsN2[fromSlot] += -1;
-                                    amount--;
-                                } else {
-                                    amount = 0;
-                                }
-                            } else {
-                                amount = 0;
-                            }
-                        }
-                        resetBank2();
-                        getPA().resetItems(5064);
+        if (stackable) {
+            if (bankItemsN2[fromSlot] > amount) {
+                if (addItem(invId, amount)) {
+                    bankItemsN2[fromSlot] -= amount;
+                    resetBank();
+                    if (bankItemsN2[fromSlot] <= 0) {
+                        bankItems2[fromSlot] = 0;
                     }
                 }
+            } else {
+                if (addItem(invId,
+                        bankItemsN2[fromSlot])) {
+                    bankItems2[fromSlot] = 0;
+                    bankItemsN2[fromSlot] = 0;
+                    resetBank();
+                    getPA().resetItems(5064);
+                }
             }
+        } else {
+            int withdraw = amount;
+
+            while (withdraw > 0 && bankItemsN2[fromSlot] > 0) {
+                boolean added = addItem(invId, 1); // try adding to inventory
+                if (!added) {
+                    sendMessage("Not enough space in your inventory!");
+                    break; // stop completely if inventory is full
+                }
+
+                bankItemsN2[fromSlot] -= 1;
+                withdraw -= 1;
+            }
+
+// Clear the bank slot if empty
+            if (bankItemsN2[fromSlot] <= 0) {
+                bankItems2[fromSlot] = 0;
+                bankItemsN2[fromSlot] = 0; // make sure to reset count
+            }
+
+        }
+
+        resetBank();
+        getPA().resetItems(5064);
+    }
+    private void withdrawNormal3(ItemCacheDefinition def, int fromSlot, int amount, boolean stackable) {
+        int bankId = bankItems3[fromSlot];
+        int invId = bankId - 1; // inventory encoding
+
+        if (stackable) {
+            if (bankItemsN3[fromSlot] > amount) {
+                if (addItem(invId, amount)) {
+                    bankItemsN3[fromSlot] -= amount;
+                    resetBank();
+                    if (bankItemsN3[fromSlot] <= 0) {
+                        bankItems3[fromSlot] = 0;
+                    }
+                }
+            } else {
+                if (addItem(invId,
+                        bankItemsN3[fromSlot])) {
+                    bankItems3[fromSlot] = 0;
+                    bankItemsN3[fromSlot] = 0;
+                    resetBank();
+                    getPA().resetItems(5064);
+                }
+            }
+        } else {
+            int withdraw = amount;
+
+            while (withdraw > 0 && bankItemsN3[fromSlot] > 0) {
+                boolean added = addItem(invId, 1); // try adding to inventory
+                if (!added) {
+                    sendMessage("Not enough space in your inventory!");
+                    break; // stop completely if inventory is full
+                }
+
+                bankItemsN3[fromSlot] -= 1;
+                withdraw -= 1;
+            }
+
+// Clear the bank slot if empty
+            if (bankItemsN3[fromSlot] <= 0) {
+                bankItems3[fromSlot] = 0;
+                bankItemsN3[fromSlot] = 0; // make sure to reset count
+            }
+
+        }
+
+        resetBank();
+        getPA().resetItems(5064);
+    }
+
+    public void fromBank2(int itemID, int fromSlot, int amount) {
+        if (fromSlot < 0 || fromSlot >= bankItems2.length) return;
+        if (amount <= 0) return;
+
+        int bankId = bankItems2[fromSlot];
+        int bankAmount = bankItemsN2[fromSlot];
+
+        if (bankId <= 0 || bankAmount <= 0) return;
+
+        ItemCacheDefinition def = ItemCacheDefinition.forID(bankId);
+        if (def == null) return;
+
+        // Clamp amount
+        if (amount > bankAmount) amount = bankAmount;
+
+        boolean stackable = def.isStackable();
+
+        // --- CASE 1: Withdraw as un-noted ---
+        if (!takeAsNote) {
+            withdrawNormal2(def, fromSlot, amount, stackable);
+            return;
+        }
+
+        // --- CASE 2: Withdraw as noted ---
+        if (takeAsNote) {
+
+            int notedId = getNotedId(bankId);
+            if (notedId == -1) {
+                sendMessage("Item can't be withdrawn as note.");
+                withdrawNormal2(def, fromSlot, amount, stackable);
+                return;
+            }
+            int invId = notedId;
+
+            // Stackable logic applies to notes too
+            if (stackable) {
+                if (addItem(invId, amount)) {
+                    bankItemsN2[fromSlot] -= amount;
+                    if (bankItemsN2[fromSlot] <= 0) {
+                        bankItems2[fromSlot] = 0;
+                    }
+                }
+            } else {
+                int withdraw = amount;
+                while (withdraw > 0 && bankItemsN2[fromSlot] > 0) {
+
+                    if (!addItem(invId, 1)) break;
+
+                    bankItemsN2[fromSlot]--;
+                    withdraw--;
+                }
+
+                if (bankItemsN2[fromSlot] <= 0) {
+                    bankItems2[fromSlot] = 0;
+                }
+            }
+
+            resetBank();
+            getPA().resetItems(5064);
         }
     }
 
     public void fromBank3(int itemID, int fromSlot, int amount) {
-        if (amount > 0) {
-            if (bankItems3[fromSlot] > 0) {
-                if (!takeAsNote) {
-                    if (ItemCacheDefinition.forID(bankItems3[fromSlot] + 1).isStackable()) {
-                        if (bankItemsN3[fromSlot] > amount) {
-                            if (addItem((bankItems3[fromSlot] - 1), amount)) {
-                                bankItemsN3[fromSlot] -= amount;
-                                resetBank3();
-                                getPA().resetItems(5064);
-                            }
-                        } else {
-                            if (addItem((bankItems3[fromSlot] - 1),
-                                    bankItemsN3[fromSlot])) {
-                                bankItems3[fromSlot] = 0;
-                                bankItemsN3[fromSlot] = 0;
-                                resetBank3();
-                                getPA().resetItems(5064);
-                            }
-                        }
-                    } else {
-                        while (amount > 0) {
-                            if (bankItemsN3[fromSlot] > 0) {
-                                if (addItem((bankItems3[fromSlot] - 1), 1)) {
-                                    bankItemsN3[fromSlot] += -1;
-                                    amount--;
-                                } else {
-                                    amount = 0;
-                                }
-                            } else {
-                                amount = 0;
-                            }
-                        }
-                        resetBank3();
-                        getPA().resetItems(5064);
-                    }
-                } else if (takeAsNote && Item.itemIsNote[bankItems3[fromSlot]]) {
-                    // if (Item.itemStackable[bankItems3[fromSlot]+1])
-                    // {
-                    if (bankItemsN3[fromSlot] > amount) {
-                        if (addItem(bankItems3[fromSlot], amount)) {
-                            bankItemsN3[fromSlot] -= amount;
-                            resetBank3();
-                            getPA().resetItems(5064);
-                        }
-                    } else {
-                        if (addItem(bankItems3[fromSlot], bankItemsN3[fromSlot])) {
-                            bankItems3[fromSlot] = 0;
-                            bankItemsN3[fromSlot] = 0;
-                            resetBank3();
-                            getPA().resetItems(5064);
-                        }
-                    }
-                } else {
-                    sendMessage("Item can't be drawn as note.");
-                    if (ItemCacheDefinition.forID(bankItems3[fromSlot] + 1).isStackable()) {
-                        if (bankItemsN3[fromSlot] > amount) {
-                            if (addItem((bankItems3[fromSlot] - 1), amount)) {
-                                bankItemsN3[fromSlot] -= amount;
-                                resetBank3();
-                                getPA().resetItems(5064);
-                            }
-                        } else {
-                            if (addItem((bankItems3[fromSlot] - 1),
-                                    bankItemsN3[fromSlot])) {
-                                bankItems3[fromSlot] = 0;
-                                bankItemsN3[fromSlot] = 0;
-                                resetBank3();
-                                getPA().resetItems(5064);
-                            }
-                        }
-                    } else {
-                        while (amount > 0) {
-                            if (bankItemsN3[fromSlot] > 0) {
-                                if (addItem((bankItems3[fromSlot] - 1), 1)) {
-                                    bankItemsN3[fromSlot] += -1;
-                                    amount--;
-                                } else {
-                                    amount = 0;
-                                }
-                            } else {
-                                amount = 0;
-                            }
-                        }
-                        resetBank3();
-                        getPA().resetItems(5064);
+        if (fromSlot < 0 || fromSlot >= bankItems2.length) return;
+        if (amount <= 0) return;
+
+        int bankId = bankItems3[fromSlot];
+        int bankAmount = bankItemsN3[fromSlot];
+
+        if (bankId <= 0 || bankAmount <= 0) return;
+
+        ItemCacheDefinition def = ItemCacheDefinition.forID(bankId);
+        if (def == null) return;
+
+        // Clamp amount
+        if (amount > bankAmount) amount = bankAmount;
+
+        boolean stackable = def.isStackable();
+
+        // --- CASE 1: Withdraw as un-noted ---
+        if (!takeAsNote) {
+            withdrawNormal3(def, fromSlot, amount, stackable);
+            return;
+        }
+
+        // --- CASE 2: Withdraw as noted ---
+        if (takeAsNote) {
+
+            int notedId = getNotedId(bankId);
+            if (notedId == -1) {
+                sendMessage("Item can't be withdrawn as note.");
+                withdrawNormal2(def, fromSlot, amount, stackable);
+                return;
+            }
+            int invId = notedId;
+
+            // Stackable logic applies to notes too
+            if (stackable) {
+                if (addItem(invId, amount)) {
+                    bankItemsN3[fromSlot] -= amount;
+                    if (bankItemsN3[fromSlot] <= 0) {
+                        bankItems3[fromSlot] = 0;
                     }
                 }
+            } else {
+                int withdraw = amount;
+                while (withdraw > 0 && bankItemsN3[fromSlot] > 0) {
+
+                    if (!addItem(invId, 1)) break;
+
+                    bankItemsN3[fromSlot]--;
+                    withdraw--;
+                }
+
+                if (bankItemsN3[fromSlot] <= 0) {
+                    bankItems3[fromSlot] = 0;
+                }
             }
+
+            resetBank();
+            getPA().resetItems(5064);
         }
     }
-
     public int getXPForLevel(int level) {
         int points = 0;
         int output = 0;
@@ -18013,194 +17744,70 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         return 0;
     }
 
-    public int getLevelForXP(int exp) {
-        int points = 0;
-        int output = 0;
+    public int getLevelForXP(int experience) {
+        int[] expTable = SkillExperience.INSTANCE.EXP_ARRAY;
+        int maxLevel = 99; // default max level
 
-        for (int lvl = 1; lvl <= 99; lvl++) {
-            points += Math.floor(
-                    (double) lvl + 150.0 * Math.pow(2.0, (double) lvl / 7.0));
-            output = (int) Math.floor(points / 4);
-            if (output >= exp) {
+
+        // If XP is higher than max, return max
+        if (experience >= expTable[maxLevel]) {
+            return maxLevel;
+        }
+
+        // Loop from maxLevel down to 1
+        for (int lvl = maxLevel; lvl >= 1; lvl--) {
+            if (expTable[lvl] <= experience) {
                 return lvl;
             }
         }
-        return 99;
+
+        return 1; // fallback
     }
 
     public boolean addSkillXP(double exp, int skill) {
-        int Attack = getLevelForXP(playerXP[0]);
-        int Defence = getLevelForXP(playerXP[1]);
-        int Strength = getLevelForXP(playerXP[2]);
-        int Hitpoints = getLevelForXP(playerXP[3]);
-        int Ranging = getLevelForXP(playerXP[4]);
-        int Prayer = getLevelForXP(playerXP[5]);
-        int Magic = getLevelForXP(playerXP[6]);
-        int Cooking = getLevelForXP(playerXP[7]);
-        int Woodcutting = getLevelForXP(playerXP[8]);
-        int Fletching = getLevelForXP(playerXP[9]);
-        int Fishing = getLevelForXP(playerXP[10]);
-        int Firemaking = getLevelForXP(playerXP[11]);
-        int Crafting = getLevelForXP(playerXP[12]);
-        int Smithing = getLevelForXP(playerXP[13]);
-        int Mining = getLevelForXP(playerXP[14]);
-        int Herblore = getLevelForXP(playerXP[15]);
-        int Agility = getLevelForXP(playerXP[16]);
-        int Thieving = getLevelForXP(playerXP[17]);
-        int Slayer = getLevelForXP(playerXP[18]);
-        int Farming = getLevelForXP(playerXP[19]);
-        int Runecrafting = getLevelForXP(playerXP[20]);
-        int construction = getLevelForXP(playerXP[21]);
-        int hunter = getLevelForXP(playerXP[22]);
-        if ((exp + playerXP[skill]) < 0 || playerXP[skill] > 2000000000) {
-            if(debugMessages) {
+
+        // XP overflow protection
+        if ((exp + playerXP[skill]) < 0 || playerXP[skill] > 2_000_000_000) {
+            if (debugMessages) {
                 sendMessage("Max XP value reached");
             }
             return false;
         }
 
         int oldLevel = getLevelForXP(playerXP[skill]);
-
         playerXP[skill] += exp;
-        if (oldLevel < getLevelForXP(playerXP[skill])) {
-            if (Attack < getLevelForXP(playerXP[0])) {
-                playerLevel[0] = getLevelForXP(playerXP[0]);
-                levelup(0);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Defence < getLevelForXP(playerXP[1])) {
-                playerLevel[1] = getLevelForXP(playerXP[1]);
-                levelup(2);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Strength < getLevelForXP(playerXP[2])) {
-                playerLevel[2] = getLevelForXP(playerXP[2]);
-                levelup(1);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Hitpoints < getLevelForXP(playerXP[3])) {
-                playerLevel[3] = getLevelForXP(playerXP[3]);
-                levelup(3);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Ranging < getLevelForXP(playerXP[4])) {
-                playerLevel[4] = getLevelForXP(playerXP[4]);
-                levelup(4);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Prayer < getLevelForXP(playerXP[5])) {
-                playerLevel[5] = getLevelForXP(playerXP[5]);
-                levelup(5);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Magic < getLevelForXP(playerXP[6])) {
-                playerLevel[6] = getLevelForXP(playerXP[6]);
-                levelup(6);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Cooking < getLevelForXP(playerXP[7])) {
-                playerLevel[7] = getLevelForXP(playerXP[7]);
-                levelup(7);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Woodcutting < getLevelForXP(playerXP[8])) {
-                playerLevel[8] = getLevelForXP(playerXP[8]);
-                levelup(8);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Fletching < getLevelForXP(playerXP[9])) {
-                playerLevel[9] = getLevelForXP(playerXP[9]);
-                levelup(9);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Fishing < getLevelForXP(playerXP[10])) {
-                playerLevel[10] = getLevelForXP(playerXP[10]);
-                levelup(10);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Firemaking < getLevelForXP(playerXP[11])) {
-                playerLevel[11] = getLevelForXP(playerXP[11]);
-                levelup(11);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Crafting < getLevelForXP(playerXP[12])) {
-                playerLevel[12] = getLevelForXP(playerXP[12]);
-                levelup(12);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Smithing < getLevelForXP(playerXP[13])) {
-                playerLevel[13] = getLevelForXP(playerXP[13]);
-                levelup(13);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Mining < getLevelForXP(playerXP[14])) {
-                playerLevel[14] = getLevelForXP(playerXP[14]);
-                levelup(14);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Herblore < getLevelForXP(playerXP[15])) {
-                playerLevel[15] = getLevelForXP(playerXP[15]);
-                levelup(15);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Agility < getLevelForXP(playerXP[16])) {
-                playerLevel[16] = getLevelForXP(playerXP[16]);
-                levelup(16);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Thieving < getLevelForXP(playerXP[17])) {
-                playerLevel[17] = getLevelForXP(playerXP[17]);
-                levelup(17);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Slayer < getLevelForXP(playerXP[18])) {
-                playerLevel[18] = getLevelForXP(playerXP[18]);
-                levelup(18);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Farming < getLevelForXP(playerXP[19])) {
-                playerLevel[19] = getLevelForXP(playerXP[19]);
-                levelup(19);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-            }
-            if (Runecrafting < getLevelForXP(playerXP[20])) {
-                playerLevel[20] = getLevelForXP(playerXP[20]);
-                levelup(20);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
+
+        int newLevel = getLevelForXP(playerXP[skill]);
+
+        // Only check level-ups if this skill actually gained a level
+        if (newLevel > oldLevel) {
+
+            // Loop through all skills and update any that levelled up
+            for (int i = 0; i < playerXP.length; i++) {
+                int before = getLevelForXP((int) (playerXP[i] - exp)); // previous level
+                int after  = getLevelForXP(playerXP[i]);       // new level
+
+                if (after > before) {
+                    playerLevel[i] = after;
+                    levelup(i);
+                    updateRequired = true;
+                    appearanceUpdateRequired = true;
+                }
             }
 
-            playerLevel[skill] = getLevelForXP(playerXP[skill]);
             requestUpdates();
         }
+
         setSkillLevel(skill, playerLevel[skill], playerXP[skill]);
         refreshSkills();
+
         if (skill == 2) {
             CalculateMaxHit();
         }
-        return true;
 
+        return true;
     }
+
 
     public boolean bankItem(int itemID, int fromSlot, int amount) {
         if (fromSlot < 0 || fromSlot >= playerItems.length) return false;
@@ -18356,554 +17963,282 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 return i;
         return -1;
     }
+    private int findBankSlot2(int bankId) {
+        for (int i = 0; i < playerBankSize2; i++)
+            if (bankItems2[i] == bankId)
+                return i;
+        return -1;
+    }
 
+    private int findEmptyBankSlot2() {
+        for (int i = 0; i < playerBankSize2; i++)
+            if (bankItems2[i] <= 0)
+                return i;
+        return -1;
+    }
+    private int findBankSlot3(int bankId) {
+        for (int i = 0; i < playerBankSize3; i++)
+            if (bankItems3[i] == bankId)
+                return i;
+        return -1;
+    }
 
+    private int findEmptyBankSlot3() {
+        for (int i = 0; i < playerBankSize3; i++)
+            if (bankItems3[i] <= 0)
+                return i;
+        return -1;
+    }
     public boolean bankItem2(int itemID, int fromSlot, int amount) {
-        if (playerItemsN[fromSlot] <= 0) {
-            return false;
-        }
-        if (!Item.itemIsNote[playerItems[fromSlot] - 1]) {
-            if (playerItems[fromSlot] <= 0) {
-                return false;
-            }
-            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
-                    || playerItemsN[fromSlot] > 1) {
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
+        if (fromSlot < 0 || fromSlot >= playerItems.length) return false;
+        if (playerItemsN[fromSlot] <= 0) return false;
 
-                for (int i = 0; i < playerBankSize2; i++) {
-                    if (bankItems2[i] == playerItems[fromSlot]) {
-                        if (playerItemsN[fromSlot] < amount) {
-                            amount = playerItemsN[fromSlot];
-                        }
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize2 + 1;
-                    }
-                }
+        ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
+        if (def == null) return false;
+        if(def.isNoted()){
+            int invId = playerItems[fromSlot] - 1;  // inventory ID
+            // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
+            int bankId =  invId;
+            boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
 
-                if (!alreadyInBank && freeBankSlots2() > 0) {
-                    for (int i = 0; i < playerBankSize2; i++) {
-                        if (bankItems2[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize2 + 1;
-                        }
-                    }
-                    bankItems2[toBankSlot] = playerItems[fromSlot];
-                    if (playerItemsN[fromSlot] < amount) {
-                        amount = playerItemsN[fromSlot];
-                    }
-                    if ((bankItemsN2[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN2[toBankSlot] + amount) > -1) {
-                        bankItemsN2[toBankSlot] += amount;
-                    } else {
-                        sendMessage("Bank full!");
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else if (alreadyInBank) {
-                    if ((bankItemsN2[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN2[toBankSlot] + amount) > -1) {
-                        bankItemsN2[toBankSlot] += amount;
-                    } else {
-                        sendMessage("Bank full!");
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else {
+            // Clamp amount
+            if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
+
+            // Find bank slot or empty
+            int toBankSlot = findBankSlot2(bankId);
+            boolean alreadyInBank = toBankSlot != -1;
+
+            if (!alreadyInBank) {
+                toBankSlot = findEmptyBankSlot2();
+                if (toBankSlot == -1) {
                     sendMessage("Bank full!");
                     return false;
                 }
+                bankItems2[toBankSlot] = bankId;
+                bankItemsN2[toBankSlot] = 0;
+            }
+
+            if (stackable) {
+                long total = (long) bankItemsN2[toBankSlot] + amount;
+                if (total > maxItemAmount) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItems2[toBankSlot] = bankId;
+                bankItemsN2[toBankSlot] += amount;
+                deleteItem(invId, fromSlot, amount);
             } else {
-                itemID = playerItems[fromSlot];
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
+                // Non-stackable: find inventory slots one by one
+                while (amount > 0) {
+                    int slot = -1;
+                    for (int i = 0; i < playerItems.length; i++) {
+                        if (playerItems[i] == invId) {
+                            slot = i;
+                            break;
+                        }
+                    }
+                    if (slot == -1) break; // no more items
 
-                for (int i = 0; i < playerBankSize2; i++) {
-                    if (bankItems2[i] == playerItems[fromSlot]) {
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize + 1;
+                    int bankSlot = findBankSlot2(bankId);
+                    if (bankSlot == -1) bankSlot = findEmptyBankSlot2();
+                    if (bankSlot == -1) {
+                        sendMessage("Bank full!");
+                        break;
                     }
-                }
-                if (!alreadyInBank && freeBankSlots2() > 0) {
-                    for (int i = 0; i < playerBankSize2; i++) {
-                        if (bankItems2[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize2 + 1;
-                        }
-                    }
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
 
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItems2[toBankSlot] = playerItems[firstPossibleSlot];
-                            bankItemsN2[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else if (alreadyInBank) {
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItemsN2[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            }
-        } else if (Item.itemIsNote[playerItems[fromSlot] - 1]
-                && !Item.itemIsNote[playerItems[fromSlot] - 2]) {
-            if (playerItems[fromSlot] <= 0) {
-                return false;
-            }
-            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
-                    || playerItemsN[fromSlot] > 1) {
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
-
-                for (int i = 0; i < playerBankSize2; i++) {
-                    if (bankItems2[i] == (playerItems[fromSlot] - 1)) {
-                        if (playerItemsN[fromSlot] < amount) {
-                            amount = playerItemsN[fromSlot];
-                        }
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize2 + 1;
-                    }
-                }
-
-                if (!alreadyInBank && freeBankSlots2() > 0) {
-                    for (int i = 0; i < playerBankSize2; i++) {
-                        if (bankItems2[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize2 + 1;
-                        }
-                    }
-                    bankItems2[toBankSlot] = (playerItems[fromSlot] - 1);
-                    if (playerItemsN[fromSlot] < amount) {
-                        amount = playerItemsN[fromSlot];
-                    }
-                    if ((bankItemsN2[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN2[toBankSlot] + amount) > -1) {
-                        bankItemsN2[toBankSlot] += amount;
-                    } else {
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else if (alreadyInBank) {
-                    if ((bankItemsN2[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN2[toBankSlot] + amount) > -1) {
-                        bankItemsN2[toBankSlot] += amount;
-                    } else {
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            } else {
-                itemID = playerItems[fromSlot];
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
-
-                for (int i = 0; i < playerBankSize2; i++) {
-                    if (bankItems2[i] == (playerItems[fromSlot] - 1)) {
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize2 + 1;
-                    }
-                }
-                if (!alreadyInBank && freeBankSlots2() > 0) {
-                    for (int i = 0; i < playerBankSize2; i++) {
-                        if (bankItems2[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize2 + 1;
-                        }
-                    }
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItems2[toBankSlot] = (playerItems[firstPossibleSlot]
-                                    - 1);
-                            bankItemsN2[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else if (alreadyInBank) {
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItemsN2[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
+                    bankItems2[bankSlot] = bankId;
+                    bankItemsN2[bankSlot]++;
+                    deleteItem(itemID, slot, 1);
+                    amount--;
                 }
             }
         } else {
-            sendMessage("Item not supported " + (playerItems[fromSlot] - 1));
-            return false;
+            int invId = playerItems[fromSlot];  // inventory ID
+            // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
+            int bankId =  invId;
+            boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
+
+            // Clamp amount
+            if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
+
+            // Find bank slot or empty
+            int toBankSlot = findBankSlot2(bankId);
+            boolean alreadyInBank = toBankSlot != -1;
+
+            if (!alreadyInBank) {
+                toBankSlot = findEmptyBankSlot2();
+                if (toBankSlot == -1) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItems2[toBankSlot] = bankId;
+                bankItemsN2[toBankSlot] = 0;
+            }
+
+            if (stackable) {
+                long total = (long) bankItemsN2[toBankSlot] + amount;
+                if (total > maxItemAmount) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItemsN2[toBankSlot] += amount;
+                deleteItem(itemID, fromSlot, amount);
+            } else {
+                // Non-stackable: find inventory slots one by one
+                while (amount > 0) {
+                    int slot = -1;
+                    for (int i = 0; i < playerItems.length; i++) {
+                        if (playerItems[i] == invId) {
+                            slot = i;
+                            break;
+                        }
+                    }
+                    if (slot == -1) break; // no more items
+
+                    int bankSlot = findBankSlot2(bankId);
+                    if (bankSlot == -1) bankSlot = findEmptyBankSlot2();
+                    if (bankSlot == -1) {
+                        sendMessage("Bank full!");
+                        break;
+                    }
+
+                    bankItems2[bankSlot] = bankId;
+                    bankItemsN2[bankSlot]++;
+                    deleteItem(itemID, slot, 1);
+                    amount--;
+                }
+            }
         }
+
+        getPA().resetItems(5064);
+        resetBank();
+        return true;
     }
 
     public boolean bankItem3(int itemID, int fromSlot, int amount) {
-        if (playerItemsN[fromSlot] <= 0) {
-            return false;
-        }
-        if (!Item.itemIsNote[playerItems[fromSlot] - 1]) {
-            if (playerItems[fromSlot] <= 0) {
-                return false;
-            }
-            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
-                    || playerItemsN[fromSlot] > 1) {
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
+        if (fromSlot < 0 || fromSlot >= playerItems.length) return false;
+        if (playerItemsN[fromSlot] <= 0) return false;
 
-                for (int i = 0; i < playerBankSize3; i++) {
-                    if (bankItems3[i] == playerItems[fromSlot]) {
-                        if (playerItemsN[fromSlot] < amount) {
-                            amount = playerItemsN[fromSlot];
-                        }
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize3 + 1;
-                    }
-                }
+        ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
+        if (def == null) return false;
+        if(def.isNoted()){
+            int invId = playerItems[fromSlot] - 1;  // inventory ID
+            // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
+            int bankId =  invId;
+            boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
 
-                if (!alreadyInBank && freeBankSlots3() > 0) {
-                    for (int i = 0; i < playerBankSize3; i++) {
-                        if (bankItems3[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize3 + 1;
-                        }
-                    }
-                    bankItems3[toBankSlot] = playerItems[fromSlot];
-                    if (playerItemsN[fromSlot] < amount) {
-                        amount = playerItemsN[fromSlot];
-                    }
-                    if ((bankItemsN3[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN3[toBankSlot] + amount) > -1) {
-                        bankItemsN3[toBankSlot] += amount;
-                    } else {
-                        sendMessage("Bank full!");
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank3();
-                    return true;
-                } else if (alreadyInBank) {
-                    if ((bankItemsN3[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN3[toBankSlot] + amount) > -1) {
-                        bankItemsN3[toBankSlot] += amount;
-                    } else {
-                        sendMessage("Bank full!");
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank3();
-                    return true;
-                } else {
+            // Clamp amount
+            if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
+
+            // Find bank slot or empty
+            int toBankSlot = findBankSlot3(bankId);
+            boolean alreadyInBank = toBankSlot != -1;
+
+            if (!alreadyInBank) {
+                toBankSlot = findEmptyBankSlot3();
+                if (toBankSlot == -1) {
                     sendMessage("Bank full!");
                     return false;
                 }
+                bankItems3[toBankSlot] = bankId;
+                bankItemsN3[toBankSlot] = 0;
+            }
+
+            if (stackable) {
+                long total = (long) bankItemsN3[toBankSlot] + amount;
+                if (total > maxItemAmount) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItems3[toBankSlot] = bankId;
+                bankItemsN3[toBankSlot] += amount;
+                deleteItem(invId, fromSlot, amount);
             } else {
-                itemID = playerItems[fromSlot];
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
+                // Non-stackable: find inventory slots one by one
+                while (amount > 0) {
+                    int slot = -1;
+                    for (int i = 0; i < playerItems.length; i++) {
+                        if (playerItems[i] == invId) {
+                            slot = i;
+                            break;
+                        }
+                    }
+                    if (slot == -1) break; // no more items
 
-                for (int i = 0; i < playerBankSize3; i++) {
-                    if (bankItems3[i] == playerItems[fromSlot]) {
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize3 + 1;
+                    int bankSlot = findBankSlot3(bankId);
+                    if (bankSlot == -1) bankSlot = findEmptyBankSlot3();
+                    if (bankSlot == -1) {
+                        sendMessage("Bank full!");
+                        break;
                     }
-                }
-                if (!alreadyInBank && freeBankSlots3() > 0) {
-                    for (int i = 0; i < playerBankSize3; i++) {
-                        if (bankItems3[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize3 + 1;
-                        }
-                    }
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
 
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItems3[toBankSlot] = playerItems[firstPossibleSlot];
-                            bankItemsN3[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank3();
-                    return true;
-                } else if (alreadyInBank) {
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItemsN3[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank3();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            }
-        } else if (Item.itemIsNote[playerItems[fromSlot] - 1]
-                && !Item.itemIsNote[playerItems[fromSlot] - 2]) {
-            if (playerItems[fromSlot] <= 0) {
-                return false;
-            }
-            if (ItemCacheDefinition.forID(playerItems[fromSlot] + 1).isStackable()
-                    || playerItemsN[fromSlot] > 1) {
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
-
-                for (int i = 0; i < playerBankSize3; i++) {
-                    if (bankItems3[i] == (playerItems[fromSlot] - 1)) {
-                        if (playerItemsN[fromSlot] < amount) {
-                            amount = playerItemsN[fromSlot];
-                        }
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize3 + 1;
-                    }
-                }
-
-                if (!alreadyInBank && freeBankSlots3() > 0) {
-                    for (int i = 0; i < playerBankSize3; i++) {
-                        if (bankItems2[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize3 + 1;
-                        }
-                    }
-                    bankItems3[toBankSlot] = (playerItems[fromSlot] - 1);
-                    if (playerItemsN[fromSlot] < amount) {
-                        amount = playerItemsN[fromSlot];
-                    }
-                    if ((bankItemsN3[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN3[toBankSlot] + amount) > -1) {
-                        bankItemsN3[toBankSlot] += amount;
-                    } else {
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank3();
-                    return true;
-                } else if (alreadyInBank) {
-                    if ((bankItemsN3[toBankSlot] + amount) <= maxItemAmount
-                            && (bankItemsN3[toBankSlot] + amount) > -1) {
-                        bankItemsN3[toBankSlot] += amount;
-                    } else {
-                        return false;
-                    }
-                    deleteItem((playerItems[fromSlot] - 1), fromSlot, amount);
-                    getPA().resetItems(5064);
-                    resetBank3();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-            } else {
-                itemID = playerItems[fromSlot];
-                int toBankSlot = 0;
-                boolean alreadyInBank = false;
-
-                for (int i = 0; i < playerBankSize3; i++) {
-                    if (bankItems3[i] == (playerItems[fromSlot] - 1)) {
-                        alreadyInBank = true;
-                        toBankSlot = i;
-                        i = playerBankSize3 + 1;
-                    }
-                }
-                if (!alreadyInBank && freeBankSlots3() > 0) {
-                    for (int i = 0; i < playerBankSize3; i++) {
-                        if (bankItems3[i] <= 0) {
-                            toBankSlot = i;
-                            i = playerBankSize3 + 1;
-                        }
-                    }
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItems3[toBankSlot] = (playerItems[firstPossibleSlot]
-                                    - 1);
-                            bankItemsN3[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else if (alreadyInBank) {
-                    int firstPossibleSlot = 0;
-                    boolean itemExists = false;
-
-                    while (amount > 0) {
-                        itemExists = false;
-                        for (int i = firstPossibleSlot; i < playerItems.length; i++) {
-                            if ((playerItems[i]) == itemID) {
-                                firstPossibleSlot = i;
-                                itemExists = true;
-                                i = 30;
-                            }
-                        }
-                        if (itemExists) {
-                            bankItemsN3[toBankSlot] += 1;
-                            deleteItem((playerItems[firstPossibleSlot] - 1),
-                                    firstPossibleSlot, 1);
-                            amount--;
-                        } else {
-                            amount = 0;
-                        }
-                    }
-                    getPA().resetItems(5064);
-                    resetBank2();
-                    return true;
-                } else {
-                    sendMessage("Bank full!");
-                    return false;
+                    bankItems3[bankSlot] = bankId;
+                    bankItemsN3[bankSlot]++;
+                    deleteItem(itemID, slot, 1);
+                    amount--;
                 }
             }
         } else {
-            sendMessage("Item not supported " + (playerItems[fromSlot] - 1));
-            return false;
+            int invId = playerItems[fromSlot];  // inventory ID
+            // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
+            int bankId =  invId;
+            boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
+
+            // Clamp amount
+            if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
+
+            // Find bank slot or empty
+            int toBankSlot = findBankSlot3(bankId);
+            boolean alreadyInBank = toBankSlot != -1;
+
+            if (!alreadyInBank) {
+                toBankSlot = findEmptyBankSlot3();
+                if (toBankSlot == -1) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItems3[toBankSlot] = bankId;
+                bankItemsN3[toBankSlot] = 0;
+            }
+
+            if (stackable) {
+                long total = (long) bankItemsN3[toBankSlot] + amount;
+                if (total > maxItemAmount) {
+                    sendMessage("Bank full!");
+                    return false;
+                }
+                bankItemsN3[toBankSlot] += amount;
+                deleteItem(itemID, fromSlot, amount);
+            } else {
+                // Non-stackable: find inventory slots one by one
+                while (amount > 0) {
+                    int slot = -1;
+                    for (int i = 0; i < playerItems.length; i++) {
+                        if (playerItems[i] == invId) {
+                            slot = i;
+                            break;
+                        }
+                    }
+                    if (slot == -1) break; // no more items
+
+                    int bankSlot = findBankSlot3(bankId);
+                    if (bankSlot == -1) bankSlot = findEmptyBankSlot3();
+                    if (bankSlot == -1) {
+                        sendMessage("Bank full!");
+                        break;
+                    }
+
+                    bankItems3[bankSlot] = bankId;
+                    bankItemsN3[bankSlot]++;
+                    deleteItem(itemID, slot, 1);
+                    amount--;
+                }
+            }
         }
+
+        getPA().resetItems(5064);
+        resetBank();
+        return true;
     }
 
     public void createItem(int newItemID) {
@@ -18991,6 +18326,45 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         WeaponName2 = WeaponName2.replaceAll("Dragon", "");
         WeaponName2 = WeaponName2.replaceAll("Crystal", "");
         WeaponName2 = WeaponName2.trim();
+        int mag = (int)(getLevelForXP(playerXP[4]) * 1.5);
+        int ran = (int)(getLevelForXP(playerXP[6]) * 1.5);
+        int attstr = getLevelForXP(playerXP[0]) + getLevelForXP(playerXP[2]);
+
+        int def = getLevelForXP(playerXP[1]);
+        int hp  = getLevelForXP(playerXP[3]);
+        int pray = getLevelForXP(playerXP[5]);
+        int summ = getLevelForXP(playerXP[24]); // ✔ summoning (id 24)
+
+        int combatLevel;
+
+        if (ran > attstr) {
+            combatLevel = (int)(
+                    def * 0.25 +
+                            hp * 0.25 +
+                            pray * 0.125 +
+                            summ * 0.125 +          // ✔ summoning added
+                            getLevelForXP(playerXP[6]) * 0.4875
+            );
+        } else if (mag > attstr) {
+            combatLevel = (int)(
+                    def * 0.25 +
+                            hp * 0.25 +
+                            pray * 0.125 +
+                            summ * 0.125 +          // ✔ summoning added
+                            getLevelForXP(playerXP[4]) * 0.4875
+            );
+        } else {
+            combatLevel = (int)(
+                    def * 0.25 +
+                            hp * 0.25 +
+                            pray * 0.125 +
+                            summ * 0.125 +          // ✔ summoning added
+                            getLevelForXP(playerXP[0]) * 0.325 +
+                            getLevelForXP(playerXP[2]) * 0.325
+            );
+        }
+
+
         if (WeaponName.equals("Unarmed") || playerEquipment[playerWeapon] == -1) {
             getPA().setSidebarInterface(0, 5855); // punch, kick, block
             getPA().sendFrame126(WeaponName, 5857);
@@ -19028,9 +18402,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().sendFrame246(2277, 200, Weapon);
             getPA().sendFrame126(WeaponName, 2279);
         } else if (WeaponName2.startsWith("pickaxe")) {
-            getPA().setSidebarInterface(0, 5570); // spike, impale, smash, block
-            getPA().sendFrame246(5571, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 5573);
+            getPA().setSidebarInterface(0, 19708); // chop, slash, lunge, block
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19710);
+            getPA().sendFrame126(WeaponName, 19709);
         } else if (WeaponName2.startsWith("axe")
                 || WeaponName2.startsWith("battleaxe")) {
             getPA().setSidebarInterface(0, 1698); // chop, hack, smash, block
@@ -19048,7 +18422,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().setSidebarInterface(0, 7762); // chop, slash, lunge, block
             getPA().sendFrame246(7763, 200, Weapon);
             getPA().sendFrame126(WeaponName, 7763);
-        } else {
+        }else {
             getPA().setSidebarInterface(0, 2423); // chop, slash, lunge, block
             getPA().sendFrame246(2424, 200, Weapon);
             getPA().sendFrame126(WeaponName, 2426);
@@ -19761,6 +19135,23 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         appearanceUpdateRequired = true;
     }
 
+    public void sendEquipmentUpdate(int interfaceId, int slot, int itemId, int amount) {
+        if (itemId < 0) itemId = 0;
+        if (amount < 0) amount = 0;
+
+        getOutStream().createFrameVarSizeWord(34);
+        getOutStream().writeWord(interfaceId);  // 1688 or 19041
+        getOutStream().writeByte(slot);
+        getOutStream().writeWord(itemId + 1);   // client uses +1 ids
+
+        if (amount > 254) {
+            getOutStream().writeByte(255);
+            getOutStream().writeDWord(amount);
+        } else {
+            getOutStream().writeByte(amount);
+        }
+        getOutStream().endFrameVarSizeWord();
+    }
 
     public boolean wearItem(int wearID, int slot) {
         int targetSlot = 0;
@@ -19790,113 +19181,39 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             } else {
                 targetSlot = 3;
             }
-            int CLAttack = GetCLAttack(wearID);
-            int CLPrayer = GetCLPrayer(wearID);
-            int CLFletching = GetCLFletching(wearID);
-            int CLWoodcutting = GetCLWoodcutting(wearID);
-            int CLCooking = GetCLCooking(wearID);
-            int CLFishing = GetCLFishing(wearID);
-            int CLThieving = GetCLThieving(wearID);
-            int CLHitpoints = GetCLHitpoints(wearID);
-            int CLAgility = GetCLFarming(wearID);
-            int CLSlayer = GetCLSlayer(wearID);
-            int CLDefence = GetCLDefence(wearID);
-            int CLStrength = GetCLStrength(wearID);
-            int CLMagic = GetCLMagic(wearID);
-            int CLRanged = GetCLRanged(wearID);
+
+            List<EquipRequirement> reqs = new ArrayList<>();
+
+            reqs.add(new EquipRequirement(GetCLAttack(wearID), playerAttack, statName[playerAttack]));
+            reqs.add(new EquipRequirement(GetCLPrayer(wearID), playerPrayer, statName[playerPrayer]));
+            reqs.add(new EquipRequirement(GetCLFletching(wearID), playerFletching, statName[playerFletching]));
+            reqs.add(new EquipRequirement(GetCLWoodcutting(wearID), playerWoodcutting, statName[playerWoodcutting]));
+            reqs.add(new EquipRequirement(GetCLCooking(wearID), playerCooking, statName[playerCooking]));
+            reqs.add(new EquipRequirement(GetCLFishing(wearID), playerFishing, statName[playerFishing]));
+            reqs.add(new EquipRequirement(GetCLThieving(wearID), playerThieving, statName[playerThieving]));
+            reqs.add(new EquipRequirement(GetCLHitpoints(wearID), playerHitpoints, statName[playerHitpoints]));
+            reqs.add(new EquipRequirement(GetCLFarming(wearID), playerFarming, statName[playerFarming]));
+            reqs.add(new EquipRequirement(GetCLSlayer(wearID), playerSlayer, statName[playerSlayer]));
+            reqs.add(new EquipRequirement(GetCLDefence(wearID), playerDefence, statName[playerDefence]));
+            reqs.add(new EquipRequirement(GetCLStrength(wearID), playerStrength, statName[playerStrength]));
+            reqs.add(new EquipRequirement(GetCLMagic(wearID), playerMagic, statName[playerMagic]));
+            reqs.add(new EquipRequirement(GetCLRanged(wearID), playerRanged, statName[playerRanged]));
+            reqs.add(new EquipRequirement(GetGLCLConstruction(wearID), playerConstruction, statName[playerConstruction]));
+            reqs.add(new EquipRequirement(GetGLCLHunter(wearID), playerHunter, statName[playerHunter]));
+            reqs.add(new EquipRequirement(GetGLCSummoning(wearID), playerSummoning, statName[playerSummoning]));
+            reqs.add(new EquipRequirement(GetGLCDungeering(wearID), playerDungeoneering, statName[playerDungeoneering]));
+
+// Run one check and fail once
+            for (EquipRequirement r : reqs) {
+                if (playerLevel[r.skill] < r.required) {
+                    sendMessage("You need " + r.required + " " + r.name + " to equip this item.");
+                    return false;
+                }
+            }
             String weaponName = Item.getItemName(wearID).toLowerCase();
             if(weaponName.equals(null)){
                 return false;
             }
-
-            if (playerLevel[playerAttack] - CLAttack < 0) {
-                sendMessage(
-                        "You need " + CLAttack + " " + statName[playerAttack]
-                                + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerPrayer] - CLPrayer < 0) {
-                sendMessage(
-                        "You need " + CLPrayer + " " + statName[playerPrayer]
-                                + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerFletching] - CLFletching < 0) {
-                sendMessage(
-                        "You need " + CLFletching + " "
-                                + statName[playerFletching] + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerWoodcutting] - CLWoodcutting < 0) {
-                sendMessage(
-                        "You need " + CLWoodcutting + " "
-                                + statName[playerWoodcutting] + " to equip this item.");
-
-                return false;
-            }
-            if (playerLevel[playerCooking] - CLCooking < 0) {
-                sendMessage(
-                        "You need " + CLCooking + " " + statName[playerCooking]
-                                + " to equip this item.");
-
-                return false;
-            }
-            if (playerLevel[playerFishing] - CLFishing < 0) {
-                sendMessage(
-                        "You need " + CLFishing + " " + statName[playerFishing]
-                                + " to equip this item.");
-
-                return false;
-            }
-            if (playerLevel[playerThieving] - CLThieving < 0) {
-                sendMessage(
-                        "You need " + CLThieving + " "
-                                + statName[playerThieving] + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerHitpoints] - CLHitpoints < 0) {
-                sendMessage(
-                        "You need " + CLHitpoints + " "
-                                + statName[playerHitpoints] + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerFarming] - CLAgility < 0) {
-                sendMessage(
-                        "You need " + CLAgility + " " + statName[playerFarming]
-                                + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerSlayer] - CLSlayer < 0) {
-                sendMessage(
-                        "You need " + CLSlayer + " " + statName[playerSlayer]
-                                + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerDefence] - CLDefence < 0) {
-                sendMessage(
-                        "You need " + CLDefence + " " + statName[playerDefence]
-                                + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerStrength] - CLStrength < 0) {
-                sendMessage(
-                        "You need " + CLStrength + " "
-                                + statName[playerStrength] + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerMagic] - CLMagic < 0) {
-                sendMessage(
-                        "You need " + CLMagic + " " + statName[playerMagic]
-                                + " to equip this item.");
-                return false;
-            }
-            if (playerLevel[playerRanged] - CLRanged < 0) {
-                sendMessage(
-                        "You need " + CLRanged + " " + statName[playerRanged]
-                                + " to equip this item.");
-                return false;
-            }
-
             int wearAmount = playerItemsN[slot];
             if (wearAmount < 1) {
                 return false;
@@ -19915,30 +19232,40 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 }
             }
             sendSound(equipSounds.getSoundForItem(playerEquipment[targetSlot]), 5, 0);
+// -------- Update Regular Equipment Tab (1688) ----------
             getOutStream().createFrameVarSizeWord(34);
             getOutStream().writeWord(1688);
             getOutStream().writeByte(targetSlot);
             getOutStream().writeWord(wearID + 1);
+
             if (wearAmount > 254) {
                 getOutStream().writeByte(255);
                 getOutStream().writeDWord(wearAmount);
             } else {
-                getOutStream().writeByte(wearAmount); //amount
+                getOutStream().writeByte(wearAmount);
             }
             getOutStream().endFrameVarSizeWord();
+
+
+// -------- Update Custom Equipment Interface (19041) ----------
             getOutStream().createFrameVarSizeWord(34);
-            getOutStream().writeWord(19041);
+            getOutStream().writeWord(19041);  // your interface opcode
             getOutStream().writeByte(targetSlot);
             getOutStream().writeWord(wearID + 1);
+
             if (wearAmount > 254) {
                 getOutStream().writeByte(255);
                 getOutStream().writeDWord(wearAmount);
             } else {
-                getOutStream().writeByte(wearAmount); //amount
+                getOutStream().writeByte(wearAmount);
             }
             getOutStream().endFrameVarSizeWord();
+
+
+// -------- Server-side equip update ----------
             playerEquipment[targetSlot] = wearID;
             playerEquipmentN[targetSlot] = wearAmount;
+
             if (targetSlot == playerWeapon && playerEquipment[playerShield] != -1 && (Item.itemTwoHanded[wearID] || item2handed(wearID))) {
                 remove(playerEquipment[playerShield], playerShield, 1688);
             }
@@ -20122,7 +19449,27 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     }
 
     public void refreshSkills() {
+        for (int skill = 0; skill < SKILL_FRAMES.length; skill++) {
+            int level = playerLevel[skill];
+            int xp = playerXP[skill];
+
+            int[] frames = SKILL_FRAMES[skill];
+
+            // Update sidebar UI
+            getPA().sendFrame126(String.valueOf(level), frames[0]);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(xp)), frames[1]);
+
+            // Send skill update packet
+            if (getOutStream() != null) {
+                getOutStream().createFrame(134);
+                getOutStream().writeByte(skill);
+                getOutStream().writeDWord_v1(xp);
+                getOutStream().writeByte(level);
+            }
+        }
     }
+
+
 
     // upon connection of a new client all the info has to be sent to client prior to starting the regular communication
     public void initialize() {
@@ -26338,6 +25685,11 @@ nated = Integer.parseInt(token2);
                         objectXOffset = 2;
                         objectYOffset = 2;
                         break;
+                    case 38755:
+                        objectDistance = 2;
+                        objectXOffset = objedtdef.sizeX;
+                        objectYOffset = objedtdef.sizeY;
+                        break;
                     case 36773:
                     case 36774:
                     case 36777:
@@ -27521,24 +26873,29 @@ nated = Integer.parseInt(token2);
 
                 break;
 
-            case 41: // wearItem item
+            case 41: // wearItem
                 int wearID = inStream.readUnsignedWord();
                 int wearSlot = inStream.readUnsignedWordA();
-
                 testinterfaceId = inStream.readUnsignedWordA();
-                for (int I = 0; I < twoHanderz.length; I++) {
-                    if (wearSlot == 5 && is2Hander()) {
-                        sendMessage(
-                                "Two handed item = You cant equip a 2hander with a shield");
-                    } else if (playerEquipment[playerShield] != -1
-                            && wearID == twoHanderz[I]) {
-                        sendMessage("You cant equip a 2hander with a shield");
-                    } else {
-                        wearItem(wearID, wearSlot);
-                    }
+
+                boolean isTwoHander = isTwoHander(wearID);
+
+                // if trying to equip a 2h weapon in weapon slot while shield equipped
+                if (wearSlot == 5 && isTwoHander && playerEquipment[playerShield] != -1) {
+                    sendMessage("You cannot equip a two-handed weapon while wearing a shield.");
+                    break;
                 }
+
+                // if trying to equip a shield while wielding a 2h weapon
+                if (wearSlot == playerShield && isTwoHander(playerEquipment[playerWeapon])) {
+                    sendMessage("You cannot wear a shield while wielding a two-handed weapon.");
+                    break;
+                }
+
+                wearItem(wearID, wearSlot);
                 flushOutStream();
                 break;
+
 
             case 145: // remove item (opposite for wearing) - bank 1 item - value of item
                 testinterfaceId = inStream.readUnsignedWordA();
@@ -29130,100 +28487,50 @@ nated = Integer.parseInt(token2);
         }
         return true;
     }
+    private static final int[][] SKILL_FRAMES = {
+            /* 0  */ {4004, 4005},
+            /* 1  */ {4008, 4009},
+            /* 2  */ {4006, 4007},
+            /* 3  */ {4016, 4017},
+            /* 4  */ {4010, 4011},
+            /* 5  */ {4012, 4013},
+            /* 6  */ {4014, 4015},
+            /* 7  */ {4034, 4035},
+            /* 8  */ {4038, 4039},
+            /* 9  */ {4026, 4027},
+            /* 10 */ {4032, 4033},
+            /* 11 */ {4036, 4037},
+            /* 12 */ {4024, 4025},
+            /* 13 */ {4030, 4031},
+            /* 14 */ {4028, 4029},
+            /* 15 */ {4020, 4021},
+            /* 16 */ {4018, 4019},
+            /* 17 */ {4022, 4023},
+            /* 18 */ {12166, 12167},
+            /* 19 */ {13926, 13927},
+            /* 20 */ {4152, 4153},
+            /* 21 */ {36001, 36002},
+            /* 22 */ { 36003, 36004 },
+            /* 23 */ { 36005, 36006 },
+            /* 24 */ { 36007, 36008 }
+    };
+
 
     public void setSkillLevel(int skillNum, int currentLevel, int XP) {
-        if (skillNum == 0) {
-            getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[0])), 4005);
+        if (skillNum >= 0 && skillNum < SKILL_FRAMES.length) {
+            int[] frames = SKILL_FRAMES[skillNum];
+            getPA().sendFrame126(String.valueOf(playerLevel[skillNum]), frames[0]);
+            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[skillNum])), frames[1]);
         }
-        if (skillNum == 2) {
-            getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[2])), 4007);
-        }
-        if (skillNum == 1) {
-            getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[1])), 4009);
-        }
-        if (skillNum == 4) {
-            getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[4])), 4011);
-        }
-        if (skillNum == 5) {
-            getPA().sendFrame126(String.valueOf(playerLevel[5]), 4012);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[5])), 4013);
-        }
-        if (skillNum == 6) {
-            getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[6])), 4015);
-        }
-        if (skillNum == 3) {
-            getPA().sendFrame126(String.valueOf(playerLevel[3]), 4016);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[3])), 4017);
-        }
-        if (skillNum == 16) {
-            getPA().sendFrame126(String.valueOf(playerLevel[16]), 4018);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[16])), 4019);
-        }
-        if (skillNum == 15) {
-            getPA().sendFrame126(String.valueOf(playerLevel[15]), 4020);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[15])), 4021);
-        }
-        if (skillNum == 17) {
-            getPA().sendFrame126(String.valueOf(playerLevel[17]), 4022);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[17])), 4023);
-        }
-        if (skillNum == 12) {
-            getPA().sendFrame126(String.valueOf(playerLevel[12]), 4024);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[12])), 4025);
-        }
-        if (skillNum == 9) {
-            getPA().sendFrame126(String.valueOf(playerLevel[9]), 4026);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[9])), 4027);
-        }
-        if (skillNum == 14) {
-            getPA().sendFrame126(String.valueOf(playerLevel[14]), 4028);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[14])), 4029);
-        }
-        if (skillNum == 13) {
-            getPA().sendFrame126(String.valueOf(playerLevel[13]), 4030);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[13])), 4031);
-        }
-        if (skillNum == 10) {
-            getPA().sendFrame126(String.valueOf(playerLevel[10]), 4032);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[10])), 4033);
-        }
-        if (skillNum == 7) {
-            getPA().sendFrame126(String.valueOf(playerLevel[7]), 4034);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[7])), 4035);
-        }
-        if (skillNum == 11) {
-            getPA().sendFrame126(String.valueOf(playerLevel[11]), 4036);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[11])), 4037);
-        }
-        if (skillNum == 8) {
-            getPA().sendFrame126(String.valueOf(playerLevel[8]), 4038);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[8])), 4039);
-        }
-        if (skillNum == 20) {
-            getPA().sendFrame126(String.valueOf(playerLevel[20]), 4152);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[20])), 4153);
-        }
-        if (skillNum == 18) {
-            getPA().sendFrame126(String.valueOf(playerLevel[18]), 12166);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[18])), 12167);
-        }
-        if (skillNum == 19) {
-            getPA().sendFrame126(String.valueOf(playerLevel[19]), 13926);
-            getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[19])), 13927);
-        } else {
-            if(getOutStream() != null) {
-                getOutStream().createFrame(134);
-                getOutStream().writeByte(skillNum);
-                getOutStream().writeDWord_v1(XP);
-                getOutStream().writeByte(currentLevel);
-            }
+
+        if (getOutStream() != null) {
+            getOutStream().createFrame(134);
+            getOutStream().writeByte(skillNum);
+            getOutStream().writeDWord_v1(XP);
+            getOutStream().writeByte(currentLevel);
         }
     }
+
 
     public void resetKeepItem() {
         keepItem = 0;
@@ -30700,7 +30007,7 @@ nated = Integer.parseInt(token2);
         }
         if (weaponName.contains("scimitar")) // whip
         {
-            return 451;
+            return 15071;
         }
         if (weaponName.contains("cross") && !weaponName.contains("karil") || weaponName.contains("c'bow") && !weaponName.contains("karil")) {
             return 4230;
@@ -30738,7 +30045,7 @@ nated = Integer.parseInt(token2);
         }
         if (playerEquipment[playerWeapon] == 1305) // d long
         {
-            return 451;
+            return 12033;
         }
         if (playerEquipment[playerWeapon] == ItemIDs.BANDOS_GODSWORD
                 || playerEquipment[playerWeapon] == ItemIDs.ZAMORAK_GODSWORD
@@ -32721,7 +32028,7 @@ nated = Integer.parseInt(token2);
                         addSkillXP((int) (TotalExp), playerHitpoints);
                         refreshSkill(3);
                         actionTimer = 7;
-                       sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 5, 0);
+                       sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 4, 0);
                         NPCHandler.npcs[attacknpc].animNumber = server.npcHandler.GetNPCBlockAnim(
                                 NPCHandler.npcs[attacknpc].npcType);
                     } else if (UseBow) {
@@ -34948,6 +34255,21 @@ nated = Integer.parseInt(token2);
         if (ItemID == 667) {
             return 80;
         }
+        if (ItemID == ItemIDs.STEEL_DEFENDER) {
+            return 5;
+        }
+        if (ItemID == ItemIDs.BLACK_DEFENDER) {
+            return 10;
+        }
+        if (ItemID == ItemIDs.MITHRIL_DEFENDER) {
+            return 20;
+        }
+        if (ItemID == ItemIDs.ADAMANT_DEFENDER) {
+            return 30;
+        }
+        if (ItemID == ItemIDs.RUNE_DEFENDER) {
+            return 40;
+        }
         if (ItemID == 35) {
             return 1;
         }
@@ -35284,6 +34606,22 @@ nated = Integer.parseInt(token2);
         if (ItemID == ItemIDs.RED_DHIDE_CHAPS) {
             return 40;
         }
+        if (ItemID == ItemIDs.STEEL_DEFENDER) {
+            return 5;
+        }
+        if (ItemID == ItemIDs.BLACK_DEFENDER) {
+            return 10;
+        }
+        if (ItemID == ItemIDs.MITHRIL_DEFENDER) {
+            return 20;
+        }
+        if (ItemID == ItemIDs.ADAMANT_DEFENDER) {
+            return 30;
+        }
+
+        if (ItemID == ItemIDs.RUNE_DEFENDER) {
+            return 40;
+        }
         if (ItemID == ItemIDs.RED_DHIDE_VAMBRACES) {
             return 40;
         }
@@ -35544,7 +34882,60 @@ nated = Integer.parseInt(token2);
         }
         return 1;
     }
-
+public int GetGLCLConstruction(int ItemID) {
+        if(ItemID == ItemIDs.CONSTRUCT_CAPE){
+            return 99;
+        }
+    if(ItemID == ItemIDs.CONSTRUCT_CAPE_T){
+        return 99;
+    }
+    if(ItemID == ItemIDs.CONSTRUCT_HOOD){
+        return 99;
+    }
+    return 1;
+}
+    public int GetGLCLHunter(int ItemID) {
+        if(ItemID == ItemIDs.HUNTER_CAPE){
+            return 99;
+        }
+        if(ItemID == ItemIDs.HUNTER_CAPE_T){
+            return 99;
+        }
+        if(ItemID == ItemIDs.HUNTER_HOOD){
+            return 99;
+        }
+        return 1;
+    }
+    public int GetGLCSummoning(int ItemID) {
+        if(ItemID == ItemIDs.SUMMONING_CAPE){
+            return 99;
+        }
+        if(ItemID == ItemIDs.SUMMONING_CAPE_T){
+            return 99;
+        }
+        if(ItemID == ItemIDs.SUMMONING_HOOD){
+            return 99;
+        }
+        return 1;
+    }
+    public int GetGLCDungeering(int ItemID) {
+        if(ItemID == ItemIDs.DUNGEONEERING_CAPE_2){
+            return 99;
+        }
+        if(ItemID == ItemIDs.DUNGEONEERING_CAPE_T){
+            return 99;
+        }
+        if(ItemID == ItemIDs.DUNGEONEERING_HOOD){
+            return 99;
+        }
+        if(ItemID == ItemIDs.DUNGEONEERING_MASTER_CAPE){
+            return 99;
+        }
+        if(ItemID == ItemIDs.DUNGEONEERING_MASTER_CAPE_2){
+            return 99;
+        }
+        return 1;
+    }
     public int GetCLRanged(int ItemID) {
         if (ItemID == ItemIDs.RANGING_CAPE) {
             return 99;
@@ -37876,6 +37267,10 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[20])), 4153);
                 getPA().sendFrame126(String.valueOf(playerXP[20]), 4157);
                 getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[20]) + 1)), 4158);
+                break;
+            case 21:
+                getPA().sendFrame126(String.valueOf(playerLevel[21]), 18165);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[21])), 18169);
                 break;
         }
     }

@@ -223,6 +223,10 @@ public class Boundary {
     /**
      * Hunter
      */
+
+    public static final Boundary HOME = new Boundary(2432, 3136, 2495, 3199);
+    public static final Boundary gh_shop_zone = new Boundary(3328, 3328, 3391, 3391);
+    public static final Boundary gh_train = new Boundary(3091, 9814, 3133, 9855);
     public static final Boundary HUNTER_JUNGLE = new Boundary(1486, 3392, 1685, 3520);
     public static final Boundary HUNTER_LOVAK = new Boundary(1468, 3840, 1511, 3890);
     public static final Boundary HUNTER_DONATOR = new Boundary(2124, 4917, 2157, 4946);

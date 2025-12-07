@@ -2,7 +2,6 @@
 
 import org.python.compiler.ClassFile.fixName
 import java.util.*
-import kotlin.math.abs
 
 
 class Smithing(private val c: client) {
@@ -14,17 +13,19 @@ class Smithing(private val c: client) {
         var xp: Int,
         var itemRequired1: Int,
         var itemRequired2: Int,
+        var firstItemAmount: Int,
         var secondItemAmount: Int,
         var product: Int
     ) {
-        BRONZE_BAR(1, 1, 6, 436, 438, -1, 2349),
-        IRON_BAR(2, 15, 12, 440, -1, -1, 2351),
-        STEEL_BAR(3, 20, 17, 440, 453, 2, 2353),
-        MITHRIL_BAR(4, 50, 30, 447, 453, 4, 2359),
-        ADAMANANT_BAR(5, 70, 37, 449, 453, 6, 2361),
-        RUNE_BAR(6, 85, 50, 451, 453, 8, 2363),
-        SILVER_BAR(7, 20, 13, 442, -1, -1, 2355),
-        GOLD_BAR(8, 40, 22, 444, -1, -1, 2357);
+
+        BRONZE_BAR(1, 1, 6, 436, 438, 1, 1, 2349),
+        IRON_BAR(2, 15, 12, 440, -1, 1, -1, 2351),
+        STEEL_BAR(3, 20, 17, 440, 453, 1, 2, 2353),
+        MITHRIL_BAR(4, 50, 30, 447, 453, 1, 4, 2359),
+        ADAMANANT_BAR(5, 70, 37, 449, 453, 1, 6, 2361),
+        RUNE_BAR(6, 85, 50, 451, 453, 1, 8, 2363),
+        SILVER_BAR(7, 20, 13, 442, -1, 1, -1, 2355),
+        GOLD_BAR(8, 40, 22, 444, -1, 1, -1, 2357);
 
         companion object {
             fun forId(id: Int): BarData {
@@ -108,17 +109,39 @@ class Smithing(private val c: client) {
         smeltBar(c, bartype)
     }
     private fun hasItems(c: client, bar: BarData): Boolean {
-        if (bar.itemRequired1 > 0 && bar.itemRequired2 > 0) {
-            if (!c.playerHasItem(bar.itemRequired1) || !c.playerHasItem(bar.itemRequired2)) {
-                val name: String = c.getItemName(bar.itemRequired1).lowercase(Locale.getDefault())
-                val item2name: String = c.getItemName(bar.itemRequired2).lowercase(Locale.getDefault())
-                if (bar.secondItemAmount == -1) c.sendMessage("You need " + name + " and " + fixName(item2name) + " to make this bar.") else c.sendMessage(
-                    "You need " + name + " and " + abs(bar.secondItemAmount.toDouble()) + " " + item2name + " to make this bar."
-                )
+
+        val item1 = bar.itemRequired1
+        val item2 = bar.itemRequired2
+        val amount2 = bar.secondItemAmount
+
+        // If both items are required
+        if (item1 > 0 && item2 > 0) {
+
+            val hasItem1 = c.playerHasItem(item1)
+            val hasItem2 = if (amount2 > 0) {
+                c.playerHasItem(item2, amount2)   // Correctly checks amounts
+            } else {
+                c.playerHasItem(item2)
+            }
+
+            if (!hasItem1 || !hasItem2) {
+
+                val name1 = c.getItemName(item1)
+                val name2 = c.getItemName(item2)
+
+                val msg = if (amount2 <= 1) {
+                    "You need $name1 and $name2 to make this bar."
+                } else {
+                    "You need $name1 and $amount2 × $name2 to make this bar."
+                }
+
+                c.sendMessage(msg)
                 c.getPA().RemoveAllWindows()
+
                 return false
             }
         }
+
         return true
     }
 
@@ -149,209 +172,149 @@ class Smithing(private val c: client) {
     /**
      * Gets the index from DATA for which bar to smelt
      */
-    fun getBar(c: client, i: Int) {
-        when (i) {
-            15147 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 1)
-            }
+    fun getBar(c: client?, buttonId: Int) {
+        // Map button -> (barId, preset list)
 
-            15146 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 1)
-            }
+        val presets: MutableMap<Int, BarPreset> = HashMap<Int, BarPreset>()
 
-            10247 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 1)
-            }
+        // Bronze (barId = 1)
+        presets.put(15147, BarPreset(1, intArrayOf(1, 5, 10, 28)))
+        presets.put(15146, BarPreset(1, intArrayOf(5, 10, 28)))
+        presets.put(10247, BarPreset(1, intArrayOf(10, 28)))
+        presets.put(9110, BarPreset(1, intArrayOf(28)))
 
-            9110 -> doAmount(c, 28, 1)
-            15151 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 2)
-            }
+        // Iron (barId = 2)
+        presets.put(15151, BarPreset(2, intArrayOf(1, 5, 10, 28)))
+        presets.put(15150, BarPreset(2, intArrayOf(5, 10, 28)))
+        presets.put(15149, BarPreset(2, intArrayOf(10, 28)))
+        presets.put(15148, BarPreset(2, intArrayOf(28)))
 
-            15150 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 2)
-            }
+        // Steel (barId = 3)
+        presets.put(15159, BarPreset(3, intArrayOf(1, 5, 10, 28)))
+        presets.put(15158, BarPreset(3, intArrayOf(5, 10, 28)))
+        presets.put(15157, BarPreset(3, intArrayOf(10, 28)))
+        presets.put(15156, BarPreset(3, intArrayOf(28)))
 
-            15149 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 2)
-            }
+        // Mithril (barId = 4)
+        presets.put(29017, BarPreset(4, intArrayOf(1, 5, 10, 28)))
+        presets.put(29016, BarPreset(4, intArrayOf(5, 10, 28)))
+        presets.put(24253, BarPreset(4, intArrayOf(10, 28)))
+        presets.put(16062, BarPreset(4, intArrayOf(28)))
 
-            15148 -> doAmount(c, 28, 2)
-            15159 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 3)
-            }
+        // Adamant (barId = 5)
+        presets.put(29022, BarPreset(5, intArrayOf(1, 5, 10, 28)))
+        presets.put(29020, BarPreset(5, intArrayOf(5, 10, 28)))
+        presets.put(29019, BarPreset(5, intArrayOf(10, 28)))
+        presets.put(29018, BarPreset(5, intArrayOf(28)))
 
-            15158 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 3)
-            }
+        // Rune (barId = 6)
+        presets.put(29026, BarPreset(6, intArrayOf(1, 5, 10, 28)))
+        presets.put(29025, BarPreset(6, intArrayOf(5, 10, 28)))
+        presets.put(29024, BarPreset(6, intArrayOf(10, 28)))
+        presets.put(29023, BarPreset(6, intArrayOf(28)))
 
-            15157 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 3)
-            }
+        // Silver (barId = 7)
+        presets.put(15155, BarPreset(7, intArrayOf(1, 5, 10, 28)))
+        presets.put(15154, BarPreset(7, intArrayOf(5, 10, 28)))
+        presets.put(15153, BarPreset(7, intArrayOf(10, 28)))
+        presets.put(15152, BarPreset(7, intArrayOf(28)))
 
-            15156 -> doAmount(c, 28, 3)
-            29017 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 4)
-            }
+        // Gold (barId = 8)
+        presets.put(15163, BarPreset(8, intArrayOf(1, 5, 10, 28)))
+        presets.put(15162, BarPreset(8, intArrayOf(5, 10, 28)))
+        presets.put(15161, BarPreset(8, intArrayOf(10, 28)))
+        presets.put(15160, BarPreset(8, intArrayOf(28)))
 
-            29016 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 4)
-            }
+        // Lookup
+        val preset: BarPreset = presets[buttonId] ?: return
 
-            24253 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 4)
+        // Execute the smelting amounts
+        for (amount in preset.amounts) {
+            if (c != null) {
+                doAmount(c, amount, preset.barId)
             }
-
-            16062 -> doAmount(c, 28, 4)
-            29022 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 5)
-            }
-
-            29020 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 5)
-            }
-
-            29019 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 5)
-            }
-
-            29018 -> doAmount(c, 28, 5)
-            29026 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 6)
-            }
-
-            29025 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 6)
-            }
-
-            29024 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 6)
-            }
-
-            29023 -> doAmount(c, 28, 6)
-            15155 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 7)
-            }
-
-            15154 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 7)
-            }
-
-            15153 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 7)
-            }
-
-            15152 -> doAmount(c, 28, 7)
-            15163 -> {
-                doAmount(c, 1, 8)
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 8)
-            }
-
-            15162 -> {
-                doAmount(c, 5, 8)
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 8)
-            }
-
-            15161 -> {
-                doAmount(c, 10, 8)
-                doAmount(c, 28, 8)
-            }
-
-            15160 -> doAmount(c, 28, 8)
         }
     }
+
+
     private fun smeltBar(c: client, bartype: Int) {
-        val bar = BarData.forId(bartype)
-        bar?.let {
-            if (c.playerLevel[13] < bar.level) {
-                c
-                    .sM(("You need a smithing level of at least " + bar.level) + " in order smelt this bar.")
-                return
-            }
-            if (c.isSmething || !hasItems(c, bar) || !hasCoalAmount(c, bar) || !hasItem(c, bar)) {
-                return
-            }
-            c.isSmething = true
-            c.getPA().RemoveAllWindows()
-            CycleEventHandler.getSingleton().addEvent(c,object : CycleEvent() {
+        val bar = BarData.forId(bartype) ?: return
+
+        // Level check
+        if (c.playerLevel[13] < bar.level) {
+            c.sM("You need a smithing level of at least ${bar.level} to smelt this bar.")
+            return
+        }
+
+        // Already smelting OR missing ingredients
+        if (c.isSmething || !hasItems(c, bar) || !hasCoalAmount(c, bar)) {
+            return
+        }
+
+        c.isSmething = true
+        c.getPA().RemoveAllWindows()
+
+        CycleEventHandler.getSingleton().addEvent(
+            c,
+            object : CycleEvent() {
+
                 override fun execute(container: CycleEventContainer) {
+
+                    // Completed?
                     if (c.doAmount <= 0 || !c.isSmething) {
                         container.stop()
+                        return
                     }
-                    if (c.playerHasItem(bar.itemRequired1) && (bar.secondItemAmount == -1)) {
-                        c.deleteItem(bar.itemRequired1, 1)
-                        c.deleteItem(bar.itemRequired2, 1)
-                    } else if (c.playerHasItem(bar.itemRequired2, bar.secondItemAmount)) {
-                        c.deleteItem(bar.itemRequired1, 1)
-                        c.deleteItem2(bar.itemRequired2, bar.secondItemAmount)
+
+// First ore (always need at least 1, often more)
+                    val hasItem1 = c.playerHasItem(bar.itemRequired1, bar.firstItemAmount)
+
+// Second ore (only check if required)
+                    val hasItem2 = if (bar.itemRequired2 > 0) {
+                        c.playerHasItem(bar.itemRequired2, bar.secondItemAmount)
                     } else {
-                        container.stop()
+                        true
                     }
+
+                    if (!hasItem1 || !hasItem2) {
+
+                    c.sendMessage("You don't have enough ores to continue!")
+                        container.stop()
+                        return
+                    }
+                    if (bar.firstItemAmount <= 1) {
+                        // Simple 1 + 1 recipe
+                        c.deleteItem2(bar.itemRequired1, 1)
+                    } else {
+                        c.deleteItem2(bar.itemRequired1, bar.firstItemAmount)
+                    }
+                    if (bar.secondItemAmount <= 1) {
+                        // Simple 1 + 1 recipe
+                        c.deleteItem2(bar.itemRequired2, 1)
+                    } else {
+                        // Multi-amount recipe
+                        c.deleteItem2(bar.itemRequired2, bar.firstItemAmount)
+                    }
+
+                    // Animation + XP + product
                     c.setAnimation(899)
-                    c.sendMessage("You smelt " + fixName(c.getItemName(bar.product).lowercase(Locale.getDefault())) + ".")
-                    c.sendSound(soundList.SMELTING_ORE, 100, 0)
+                    c.sendMessage("You smelt ${fixName(c.getItemName(bar.product))}.")
+                    c.sendSound(2725, 10, 0)
                     c.addSkillXP((bar.xp * Config.SMITHING_EXPERIENCE).toDouble(), 13)
                     c.addItem(bar.product, 1)
-                    if (!c.playerHasItem(bar.itemRequired1) || !c
-                            .playerHasItem(bar.itemRequired2, bar.secondItemAmount)
-                    ) {
-                        c.sendMessage("You don't have enough ores to continue!")
-                        container.stop()
-                    }
+
                     c.doAmount--
                 }
 
-                fun stop() {
+                override fun onStopped() {
                     c.isSmething = false
                 }
-            }, AnimationLength.getFrameLength(899)+2)
-        }
+
+            },
+            AnimationLength.getFrameLength(899) + 2
+        )
     }
+
 
     companion object {
         var item = 0
@@ -1279,7 +1242,7 @@ class Smithing(private val c: client) {
                     c.makeTimes--
                 }
 
-                fun stop() {
+                override fun onStopped() {
                     c.makeTimes = 0
                 }
             }, AnimationLength.getFrameLength(898))

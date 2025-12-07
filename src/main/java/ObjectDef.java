@@ -115,6 +115,8 @@ public final class ObjectDef
                 }
             } else if (j == 2) {
                 name = stream.readNewString();
+            } else if (j == 3) {
+                description = stream.readBytes();
             } else if (j == 5) {
                 int len = stream.readUnsignedByte();
                 if (len > 0) {
@@ -153,9 +155,9 @@ public final class ObjectDef
             } else if (j == 28) {
                 anInt775 = stream.readUnsignedByte();
             } else if (j == 29) {
-                stream.readSignedByte();
+                aByte737 = stream.readSignedByte();
             } else if (j == 39) {
-                stream.readSignedByte();
+                aByte742 = (byte) (stream.readSignedByte() * 25);
             } else if (j >= 30 && j < 35) {
                 if (actions == null)
                     actions = new String[10];
@@ -286,7 +288,7 @@ public final class ObjectDef
             }
 
         }
-        if (flag == -1 && name != "null" && name != null) {
+        if (name != null && !name.equals("null")) {
             hasActions = anIntArray773 != null && (anIntArray776 == null || anIntArray776[0] == 10);
             if (actions != null)
                 hasActions = true;
@@ -355,6 +357,8 @@ public final class ObjectDef
     public int anInt749;
     public static boolean lowMem;
     public int type;
+    public byte aByte737;
+    public byte aByte742;
     public boolean aBoolean757;
     public int anInt758;
     public int childrenIDs[];

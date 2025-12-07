@@ -840,6 +840,16 @@ public class NPCHandler {
                 continue;
 
             client player = (client) p;
+            // 👉 NEW: Do not aggro if player is in the home boundary
+            if (Boundary.isIn(player, Boundary.HOME)) {
+                continue;
+            }
+            if (Boundary.isIn(player, Boundary.gh_train)) {
+                continue;
+            }
+            if (Boundary.isIn(player, Boundary.gh_shop_zone)) {
+                continue;
+            }
             if (player.distanceToPoint(npc.absX, npc.absY) > getDistanceForNpc(npc))
                 continue;
 
@@ -3949,7 +3959,7 @@ public class NPCHandler {
             return 818; // Female NPC block
         }
 
-        return 791; // Fallback block sound
+        return 511; // Fallback block sound
     }
 
     public int GetNPCBlockAnim(int id) {

@@ -53,7 +53,7 @@ object Spinning : CraftingData() {
                     }
                 }
 
-                fun stop() {
+                override fun onStopped() {
                     player.isSpinning = false
                     player.startAnimation(65535)
                     return

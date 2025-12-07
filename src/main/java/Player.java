@@ -651,6 +651,64 @@ public abstract class Player {
 		if(Boundary.isIn((client) this, Boundary.reousce_dung_one)){
 			return true;
 		}
+		if(Boundary.isIn((client) this, Boundary.VARROCK_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.ARDOUGNE_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.ARDOUGNE_ZOO_BRIDGE_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.FALADOR_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.CRAFTING_GUILD_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.TAVERLY_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.TZHAAR_CITY_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.LUMRIDGE_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.DRAYNOR_DUNGEON_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.AL_KHARID_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.DRAYNOR_MANOR_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.DRAYNOR_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.KARAMJA_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.BRIMHAVEN_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.BRIMHAVEN_DUNGEON_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.CATHERBY_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.CANIFIS_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.SEERS_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.RELLEKKA_BOUNDARY)){
+			return true;
+		}
+
 		if(Boundary.isIn((client) this, Boundary.SKILLZ)){
 			return true;
 		}
@@ -872,7 +930,10 @@ public abstract class Player {
 	public int playerSlayer = 18;
 	public int playerFarming = 19;
 	public int playerRunecrafting = 20;
-
+	public int playerConstruction = 21;
+	public int playerHunter = 22;
+	public int playerSummoning = 23;
+	public int playerDungeoneering = 24;
 	public int i = 0;
 
 	public int[] playerLevel = new int[25];
@@ -1467,20 +1528,46 @@ public abstract class Player {
  	}*/
 
 
-		int mag = (int)((double)(getLevelForXP(playerXP[4])) * 1.5);
-		int ran = (int)((double)(getLevelForXP(playerXP[6])) * 1.5);
-		int attstr = (int)((double)(getLevelForXP(playerXP[0])) + (double)(getLevelForXP(playerXP[2])));
+		int mag = (int)(getLevelForXP(playerXP[4]) * 1.5);
+		int ran = (int)(getLevelForXP(playerXP[6]) * 1.5);
+		int attstr = getLevelForXP(playerXP[0]) + getLevelForXP(playerXP[2]);
 
-		int combatLevel = 0;
+		int def = getLevelForXP(playerXP[1]);
+		int hp  = getLevelForXP(playerXP[3]);
+		int pray = getLevelForXP(playerXP[5]);
+		int summ = getLevelForXP(playerXP[24]); // ✔ summoning (id 24)
+
+		int combatLevel;
+
 		if (ran > attstr) {
-			combatLevel = (int)(((double)(getLevelForXP(playerXP[1])) * 0.25) + ((double)(getLevelForXP(playerXP[3])) * 0.25) + ((double)(getLevelForXP(playerXP[5])) * 0.125) + ((double)(getLevelForXP(playerXP[6])) * 0.4875));
+			combatLevel = (int)(
+					def * 0.25 +
+							hp * 0.25 +
+							pray * 0.125 +
+							summ * 0.125 +          // ✔ summoning added
+							getLevelForXP(playerXP[6]) * 0.4875
+			);
 		} else if (mag > attstr) {
-			combatLevel = (int)(((double)(getLevelForXP(playerXP[1])) * 0.25) + ((double)(getLevelForXP(playerXP[3])) * 0.25) + ((double)(getLevelForXP(playerXP[5])) * 0.125) + ((double)(getLevelForXP(playerXP[4])) * 0.4875));
+			combatLevel = (int)(
+					def * 0.25 +
+							hp * 0.25 +
+							pray * 0.125 +
+							summ * 0.125 +          // ✔ summoning added
+							getLevelForXP(playerXP[4]) * 0.4875
+			);
 		} else {
-			combatLevel = (int)(((double)(getLevelForXP(playerXP[1])) * 0.25) + ((double)(getLevelForXP(playerXP[3])) * 0.25) + ((double)(getLevelForXP(playerXP[5])) * 0.125) + ((double)(getLevelForXP(playerXP[0])) * 0.325) + ((double)(getLevelForXP(playerXP[2])) * 0.325));
+			combatLevel = (int)(
+					def * 0.25 +
+							hp * 0.25 +
+							pray * 0.125 +
+							summ * 0.125 +          // ✔ summoning added
+							getLevelForXP(playerXP[0]) * 0.325 +
+							getLevelForXP(playerXP[2]) * 0.325
+			);
 		}
 
 		combat = combatLevel;
+
 		playerProps.writeByte(combatLevel);		// combat level
 		playerProps.writeWord(loyaltyRank);			// incase != 0, writes skill-%d
 		playerProps.writeWord(0);

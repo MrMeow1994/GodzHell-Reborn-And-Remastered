@@ -2,11 +2,11 @@ public class ResourceDungeons {
 
     public static boolean handleObjects(final client player, int objectId) {
         if (objectId == 52859) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 85) {
+            if (player.playerLevel[player.playerDungeoneering] >= 85) {
                 Magic.resourcesTeleport(player, 1297, 4510, 0);
-           // } else {
-             //   player.sM("You need a dungeoneering level of 85 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 85 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52875) {
@@ -14,11 +14,11 @@ public class ResourceDungeons {
             return true;
         }
         if (objectId == 52855) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 15) {
+                if (player.playerLevel[player.playerDungeoneering] >= 15) {
                 Magic.resourcesTeleport(player, 1041, 4575, 0);
-          //  } else {
-           //     player.sM("You need a dungeoneering level of 15 to unlock this resource dungeon.");
-         //   }
+            } else {
+                player.sM("You need a dungeoneering level of 15 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52864) {
@@ -26,11 +26,11 @@ public class ResourceDungeons {
             return true;
         }
         if (objectId == 52860) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 75) {
+            if (player.playerLevel[player.playerDungeoneering] >= 75) {
                 Magic.resourcesTeleport(player, 1182, 4515, 0);
-           // } else {
-           //     player.sM("You need a dungeoneering level of 75 to unlock this resource dungeon.");
-           // }
+            } else {
+                player.sM("You need a dungeoneering level of 75 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52872) {
@@ -39,11 +39,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52849) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 10) {
+            if (player.playerLevel[player.playerDungeoneering] >= 10) {
                 Magic.resourcesTeleport(player, 991, 4585, 0);
-            //} else {
-               // player.sM("You need a dungeoneering level of 10 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 10 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52867) {
@@ -52,11 +52,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52853) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 20) {
+            if (player.playerLevel[player.playerDungeoneering] >= 20) {
                 Magic.resourcesTeleport(player, 1134, 4589, 0);
-           // } else {
-          //      player.sM("You need a dungeoneering level of 20 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 20 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52868) {
@@ -65,11 +65,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52850) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 25) {
+            if (player.playerLevel[player.playerDungeoneering] >= 25) {
                 Magic.resourcesTeleport(player, 1186, 4598, 0);
-           // } else {
-            //    player.sM("You need a dungeoneering level of 25 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 25 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52869) {
@@ -78,11 +78,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52861) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 30) {
+            if (player.playerLevel[player.playerDungeoneering] >= 30) {
                 Magic.resourcesTeleport(player, 3498, 3633, 0);
-         //   } else {
-           //     player.sM("You need a dungeoneering level of 30 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 30 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52862) {
@@ -91,11 +91,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52857) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 35) {
+            if (player.playerLevel[player.playerDungeoneering] >= 35) {
                 Magic.resourcesTeleport(player, 1256, 4592, 0);
-           // } else {
-          //      player.sM("You need a dungeoneering level of 35 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 35 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52873) {
@@ -104,11 +104,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52856) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >=45) {
+            if (player.playerLevel[player.playerDungeoneering] >=45) {
                 Magic.resourcesTeleport(player, 1052, 4521, 0);
-          //  } else {
-          // //     player.sM("You need a dungeoneering level of 45 to unlock this resource dungeon");
-           // }
+            } else {
+                player.sM("You need a dungeoneering level of 45 to unlock this resource dungeon");
+            }
             return true;
         }
         if (objectId == 52866) {
@@ -117,11 +117,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52851) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 55) {
+            if (player.playerLevel[player.playerDungeoneering] >= 55) {
                 Magic.resourcesTeleport(player, 1394, 4588, 0);
-           // } else {
-             //   player.sM("You need a dungeoneering level of 55 to unlock this resource dungeon.");
-         //   }
+            } else {
+                player.sM("You need a dungeoneering level of 55 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52870) {
@@ -130,11 +130,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52852) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 60) {
+            if (player.playerLevel[player.playerDungeoneering] >= 60) {
                 Magic.resourcesTeleport(player, 1000, 4522, 0);
-           // } else {
-            //    player.sM("You need a dungeoneering level of 60 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 60 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52865) {
@@ -143,11 +143,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52863) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 65) {
+            if (player.playerLevel[player.playerDungeoneering] >= 65) {
                 Magic.resourcesTeleport(player, 1312, 4590, 0);
-           // } else {
-          ////      player.sM("You need a dungeoneering level of 65 to unlock this resource dungeon.");
-          //  }
+            } else {
+                player.sM("You need a dungeoneering level of 65 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52876) {
@@ -156,11 +156,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 52858) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 70) {
+            if (player.playerLevel[player.playerDungeoneering] >= 70) {
                 Magic.resourcesTeleport(player, 1238, 4524, 0);
-        //    } else {
-          //      player.sM("You need a dungeoneering level of 70 to unlock this resource dungeon.");
-        //    }
+            } else {
+                player.sM("You need a dungeoneering level of 70 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 52874) {
@@ -169,11 +169,11 @@ public class ResourceDungeons {
         }
 
         if (objectId == 77579) {
-   //         if (player.getSkills().getLevel(Skills.DUNGEONEERING) >= 80) {
+            if (player.playerLevel[player.playerDungeoneering] >= 80) {
                 Magic.resourcesTeleport(player, 1140, 4499, 0);
-          //  } else {
-         //       player.sM("You need a dungeoneering level of 80 to unlock this resource dungeon.");
-         //   }
+            } else {
+                player.sM("You need a dungeoneering level of 80 to unlock this resource dungeon.");
+            }
             return true;
         }
         if (objectId == 77580) {

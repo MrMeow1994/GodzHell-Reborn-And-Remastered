@@ -23,7 +23,9 @@ enum class Skill(@JvmField val id: Int) {
     FARMING(19),
     RUNECRAFTING(20),
     CONSTRUCTION(21),
-    HUNTER(22);
+    HUNTER(22),
+    SUMMONING(23),
+    DUNGEONEERING(24);
 
     override fun toString(): String {
         val name = name.lowercase(Locale.getDefault())

@@ -5,3 +5,8 @@ c-24-18-138-224.hsd1.wa.comcast.net
 c-24-18-138-224.hsd1.wa.comcast.net
 c-24-18-138-224.hsd1.wa.comcast.net
 c-24-18-138-224.hsd1.wa.comcast.net
+kubernetes.docker.internal
+kubernetes.docker.internal
+kubernetes.docker.internal
+kubernetes.docker.internal
+kubernetes.docker.internal

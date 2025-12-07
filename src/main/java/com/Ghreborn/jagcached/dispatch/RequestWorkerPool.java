@@ -58,12 +58,13 @@ public final class RequestWorkerPool {
 	 */
 	public void start() throws Exception {
 		File base = new File(Constants.FILE_SYSTEM_DIR);
-
+		//IndexedFileSystem fs = new IndexedFileSystem(base, true);
+		//fs.packCrcAndVersion(6, "sound");
 		for (int i = 0; i < THREADS_PER_REQUEST_TYPE; i++) {
-			IndexedFileSystem fs = new IndexedFileSystem(base, true);
-			workers.add(new JagGrabRequestWorker(fs));
-			workers.add(new OnDemandRequestWorker(fs));
-			workers.add(new HttpRequestWorker(fs));
+			IndexedFileSystem fs2 = new IndexedFileSystem(base, true);
+			workers.add(new JagGrabRequestWorker(fs2));
+			workers.add(new OnDemandRequestWorker(fs2));
+			workers.add(new HttpRequestWorker(fs2));
 		}
 
 		for (RequestWorker<?, ?> worker : workers) {
