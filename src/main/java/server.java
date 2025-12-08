@@ -65,6 +65,7 @@ public class server implements Runnable {
     public static boolean ShutDown = false;
     public static int ShutDownCounter = 0;
     public static ClanManager clanManager = null;
+    public static NPCStatLoader npcStatLoader = new NPCStatLoader();
     private static int waitFails;
     public static long minutesCounter;
     // TODO: yet to figure out proper value for timing, but 500 seems good
@@ -154,6 +155,7 @@ public class server implements Runnable {
         AnimationLength.startup();
         BobTheCatManager.init();
         lottery.loadLists();
+        npcStatLoader.init();
        // server.lottery.loadLists();
         Region.init();
         textHandler = new TextHandler();

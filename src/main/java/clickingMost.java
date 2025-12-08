@@ -1512,6 +1512,7 @@ public class clickingMost {
                 break;
 
             case 9125: // Accurate
+            case 77022:
             case 22228: // punch (unarmed)
             case 48010: // flick (whip)
             case 21200: // spike (pickaxe)
@@ -1520,11 +1521,13 @@ public class clickingMost {
             case 6236: // accurate (long bow)
             case 17102: // accurate (darts)
             case 8234: // stab (dagger)
+                c.sendMessage("Accurate");
                 c.FightType = 1;
                 c.SkillID = 0;
                 break;
 
             case 9126: // Defensive
+            case 77025:
             case 22229: // block (unarmed)
             case 21201: // block (pickaxe)
             case 1078: // focus - block (staff)
@@ -1532,11 +1535,13 @@ public class clickingMost {
             case 33019: // fend (hally)
             case 18078: // block (spear)
             case 8235: // block (dagger)
+                c.sendMessage("Defensive");
                 c.FightType = 4;
                 c.SkillID = 1;
                 break;
 
             case 9127: // Controlled
+            case 77024:
             case 48009: // lash (whip)
             case 33018: // jab (hally)
             case 6234: // longrange (long bow)
@@ -1544,11 +1549,12 @@ public class clickingMost {
             case 18080: // swipe (spear)
             case 18079: // pound (spear)
             case 17100: // longrange (darts)
+                c.sendMessage("Controlled");
                 c.FightType = 3;
-                c.SkillID = 3;
                 break;
 
             case 9128: // Aggressive
+            case 77023:
             case 22230: // kick (unarmed)
             case 21203: // impale (pickaxe)
             case 21202: // smash (pickaxe)
@@ -1560,6 +1566,7 @@ public class clickingMost {
             case 17101: // repid (darts)
             case 8237: // lunge (dagger)
             case 8236: // slash (dagger)
+                c.sendMessage("Aggressive");
                 c.FightType = 2;
                 c.SkillID = 2;
                 break;

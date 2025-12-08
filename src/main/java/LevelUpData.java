@@ -1,8 +1,8 @@
 public class LevelUpData {
     public enum Skill {
         ATTACK(0, 6247, 9747, 9748, 9749, "attack"),
-        STRENGTH(1, 6206, 9750, 9751, 9752, "strength"),
-        DEFENCE(2, 6253, 9753, 9754, 9755, "defence"),
+        DEFENCE(1, 6253, 9753, 9754, 9755, "defence"),
+        STRENGTH(2, 6206, 9750, 9751, 9752, "strength"),
         HITPOINTS(3, 6216, 9768, 9769, 9770, "hitpoints"),
         RANGED(4, 4443, 9756, 9757, 9758, "ranged"),
         PRAYER(5, 6242, 9759, 9760, 9761, "prayer"),

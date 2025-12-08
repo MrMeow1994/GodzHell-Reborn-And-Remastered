@@ -1,0 +1,1 @@
+class BarPreset(val barId: Int, val amounts: IntArray)

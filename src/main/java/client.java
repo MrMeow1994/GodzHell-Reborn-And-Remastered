@@ -473,7 +473,7 @@ public static final int bufferSize = 20000;
      */
     public int[] EssenceMineRX = {3253, 3105, 2681, 2591};
     public int[] EssenceMineRY = {3401, 9571, 3325, 3086};
-    public int[] twoHanderz = {ItemIDs.DRAGON_2H_SWORD, 1319, 6528, 14915};
+
     public int lnew = 0;
     public int otherpkps = 0;
     public int otherkillc = 0;
@@ -9260,7 +9260,7 @@ public void setHouse(House house) {
     public void ReportAbuse(String report, int rule, int mute) {
     }
     private boolean isTwoHander(int itemId) {
-        for (int id : twoHanderz) {
+        for (int id : Config.twoHanderz) {
             if (id == itemId) return true;
         }
         return false;
@@ -18405,6 +18405,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().setSidebarInterface(0, 19708); // chop, slash, lunge, block
             getPA().sendFrame126("Combat Lvl: "+combatLevel, 19710);
             getPA().sendFrame126(WeaponName, 19709);
+        } else if (isTwoHander(Weapon)) {
+            getPA().setSidebarInterface(0, 19770); // chop, slash, lunge, block
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19797 );
+            getPA().sendFrame126(WeaponName, 19771);
         } else if (WeaponName2.startsWith("axe")
                 || WeaponName2.startsWith("battleaxe")) {
             getPA().setSidebarInterface(0, 1698); // chop, hack, smash, block
@@ -18423,9 +18427,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().sendFrame246(7763, 200, Weapon);
             getPA().sendFrame126(WeaponName, 7763);
         }else {
-            getPA().setSidebarInterface(0, 2423); // chop, slash, lunge, block
-            getPA().sendFrame246(2424, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 2426);
+            getPA().setSidebarInterface(0, 19731); // chop, slash, lunge, block
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19758);
+            getPA().sendFrame126(WeaponName, 19732);
         }
     }
 
@@ -19513,7 +19517,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     if (playerMagicBook == 2) {
         getPA().setSidebarInterface(6, 29999);
     }
-        getPA().setSidebarInterface(7, 18128);
+        getPA().setSidebarInterface(7, 28128);
         getPA().setSidebarInterface(8, 5065);
         getPA().setSidebarInterface(9, 5715);
         getPA().setSidebarInterface(10, 2449);
@@ -27654,8 +27658,8 @@ nated = Integer.parseInt(token2);
     }
 
     public boolean is2Hander() {
-        for (int I = 0; I < twoHanderz.length; I++) {
-            if (playerEquipment[playerWeapon] == twoHanderz[i]) {
+        for (int I = 0; I < Config.twoHanderz.length; I++) {
+            if (playerEquipment[playerWeapon] == Config.twoHanderz[i]) {
                 return true;
             }
         }
@@ -31986,51 +31990,40 @@ nated = Integer.parseInt(token2);
                         NPCHandler.npcs[attacknpc].Killing[playerId] += hitDiff;
                         NPCHandler.npcs[attacknpc].updateRequired = true;
                         NPCHandler.npcs[attacknpc].hitUpdateRequired = true;
-                        double TotalExp = 0;
 
                         inCombat();
-                        if (FightType == 1) // Accurate
-                        {
-                            TotalExp = Config.EXP_RATE * hitDiff;
-                            TotalExp = TotalExp * CombatExpRate;
-                            addSkillXP((int) (TotalExp), playerAttack);
-                            refreshSkill(FightType);
-                            refreshSkill(3);
-                        } else if (FightType == 2) // Agressive
-                        {
-                            TotalExp = Config.EXP_RATE * hitDiff;
-                            TotalExp = TotalExp * CombatExpRate;
-                            addSkillXP((int) (TotalExp), playerStrength);
-                            refreshSkill(FightType);
-                            refreshSkill(3);
-                        } else if (FightType == 4) // Defensive
-                        {
-                            TotalExp = Config.EXP_RATE * hitDiff;
-                            TotalExp = TotalExp * CombatExpRate;
-                            addSkillXP((int) (TotalExp), playerDefence);
-                            refreshSkill(FightType);
-                            refreshSkill(3);
-                        } else if (FightType == 3) // Controlled
-                        {
-                            TotalExp = Config.EXP_RATE * hitDiff;
-                            TotalExp = TotalExp * CombatExpRate;
-                            addSkillXP((TotalExp), 3);
-                            addSkillXP((TotalExp), 0);
-                            addSkillXP((TotalExp), 1);
-                            addSkillXP((TotalExp), 2);
-                            refreshSkill(0);
-                            refreshSkill(1);
-                            refreshSkill(2);
-                            refreshSkill(3);
+                        double TotalExp = Config.EXP_RATE * hitDiff * CombatExpRate;
+
+                        switch(FightType) {
+                            case 1: // Accurate
+                            case 2: // Aggressive
+                            case 4: // Defensive
+                                addSkillXP((int) TotalExp, SkillID); // primary combat skill
+                                break;
+                            case 3: // Controlled
+                                double splitExp = TotalExp / 3; // divide XP among melee skills
+                                addSkillXP((int) splitExp, 0); // Attack
+                                addSkillXP((int) splitExp, 2); // Strength
+                                addSkillXP((int) splitExp, 1); // Defence
+                                break;
                         }
-                        TotalExp = Config.EXP_RATE * hitDiff;
-                        TotalExp = TotalExp * CombatExpRate;
-                        addSkillXP((int) (TotalExp), playerHitpoints);
+
+// Hitpoints always gets XP
+                        addSkillXP((int) TotalExp, playerHitpoints);
+
+// Refresh skills
+                        refreshSkill(0);
+                        refreshSkill(1);
+                        refreshSkill(2);
                         refreshSkill(3);
+
                         actionTimer = 7;
-                       sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 4, 0);
+
+// Play block sound and animation
+                        sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 4, 0);
                         NPCHandler.npcs[attacknpc].animNumber = server.npcHandler.GetNPCBlockAnim(
                                 NPCHandler.npcs[attacknpc].npcType);
+
                     } else if (UseBow) {
                         if (!HasArrows) {
                             sendMessage("There's no arrows left in your quiver");

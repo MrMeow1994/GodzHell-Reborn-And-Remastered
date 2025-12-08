@@ -93,6 +93,8 @@ public class NPC {
     public int hansWalkTimer = 0;
     public int hansWaypointIndex = 0;
     public int attackType = 0; // -1 = unknown, 0 = melee, 1 = range, 2 = magic, etc.
+    public NPCStatLoader.NPCStats stats;
+
     public Queue<int[]> walkingQueue = new LinkedList<>();
     public NPC(int _npcId, int _npcType) {
         npcId = _npcId;

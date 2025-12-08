@@ -4493,10 +4493,80 @@ public class NPCHandler {
                 break;
         }
     }
+    private int getPlayerDefense(client player, int npcAttackType) {
+        int baseDef = 10; // everyone has a minimum defense
+
+        int bonus;
+        switch (npcAttackType) {
+            case 0: // Melee
+                bonus = player.playerBonus[5]; // melee defense
+                break;
+            case 1: // Ranged
+                bonus = player.playerBonus[6]; // ranged defense
+                break;
+            case 2: // Magic
+                bonus = player.playerBonus[7]; // magic defense
+                break;
+            default:
+                bonus = 0;
+        }
+
+        // Optional: add a proxy defense level if Allstar tracks it
+        int defLevel = player.playerLevel[1]; // Defense level
+
+        return bonus + defLevel + baseDef;
+    }
 
     private int calculateHit(NPC npc, client player) {
-        return misc.random(npc.MaxHit);
+        // Load NPC stats
+        NPCStatLoader.NPCStats stats = server.npcStatLoader.getStats(npc.npcType);
+        if (stats == null) {
+            stats = new NPCStatLoader.NPCStats();
+            stats.maxHit = npc.MaxHit; // fallback
+            stats.attack = 1;
+            stats.strength = 1;
+        }
+
+        int maxHit = stats.maxHit > 0 ? stats.maxHit : 1;
+
+        // --- ACCURACY CHECK ---
+        // NPC attack level + bonus vs player defense + bonus
+        int npcAttackLevel = stats.attack;
+        int npcAttackBonus = stats.attack; // optionally, use separate bonus if available
+
+        int playerDefLevel = player.playerLevel[1]; // Defense level
+        int playerArmorBonus = player.playerBonus[getBonusIndex(npc.attackType)];
+
+        // Simple OSRS-style formula for hit chance
+        int hitChance = (npcAttackLevel + npcAttackBonus) * 2;
+        int defenseChance = (playerDefLevel + playerArmorBonus);
+
+        boolean hits = misc.random(hitChance) > misc.random(defenseChance);
+        if (!hits) return 0;
+
+        // --- DAMAGE CALCULATION ---
+        int strength = stats.strength;
+        int baseDamage = misc.random(maxHit); // Max hit is usually precomputed based on strength
+
+        // --- PRAYER REDUCTION ---
+      //  if (player.prayerActive[18] && npc.attackType == 0) baseDamage /= 4; // melee
+      //  if (player.prayerActive[17] && npc.attackType == 1) baseDamage /= 4; // ranged
+      //  if (player.prayerActive[16] && npc.attackType == 2) baseDamage /= 4; // magic
+
+        // --- LIMIT TO CURRENT HP ---
+        return Math.min(baseDamage, player.NewHP);
     }
+
+    /** Helper: get correct bonus index based on attack type */
+    private int getBonusIndex(int attackType) {
+        return switch (attackType) {
+            case 0 -> 0; // Melee defense bonus index (stab)
+            case 1 -> 1; // Ranged defense bonus
+            case 2 -> 2; // Magic defense bonus
+            default -> 0;
+        };
+    }
+
 
     private void playAttackEffects(NPC npc, client player) {
         player.sendSound(getNpcAttackSound(npc.npcType), 4, 0);
