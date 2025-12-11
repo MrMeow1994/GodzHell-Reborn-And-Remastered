@@ -261,24 +261,26 @@ public final class IndexedFileSystem implements Closeable {
 	public ByteBuffer getFile(FileDescriptor fd) throws IOException {
 		Index index = getIndex(fd);
 		ByteBuffer buffer = ByteBuffer.allocate(index.getSize());
-
+		int chunkLength = fd.getFile() <= 0xffff ? 512 : 510;
+		int headerLength = fd.getFile() <= 0xffff ? 8 : 10;
+		int BLOCK_SIZE = headerLength + chunkLength;
 		// calculate some initial values
-		long ptr = (long) index.getBlock() * (long) FileSystemConstants.BLOCK_SIZE;
+		long ptr = (long) index.getBlock() * (long) BLOCK_SIZE;
 		int read = 0;
 		int size = index.getSize(); // This is now safely handling large file sizes
-		int blocks = (int) Math.ceil((double) size / FileSystemConstants.CHUNK_SIZE); // Ensuring proper handling of large sizes
+		int blocks = (int) Math.ceil((double) size / chunkLength); // Ensuring proper handling of large sizes
 
 		for (int i = 0; i < blocks; i++) {
 
 			// read header
-			byte[] header = new byte[FileSystemConstants.HEADER_SIZE];
+			byte[] header = new byte[headerLength];
 			synchronized (data) {
 				data.seek(ptr);
 				data.readFully(header);
 			}
 
 			// increment pointers
-			ptr += FileSystemConstants.HEADER_SIZE;
+			ptr += headerLength;
 
 			int nextFile;
 			int curChunk;
@@ -305,8 +307,8 @@ public final class IndexedFileSystem implements Closeable {
 
 			// Calculate how much we can read
 			int chunkSize = size - read;
-			if (chunkSize > FileSystemConstants.CHUNK_SIZE) {
-				chunkSize = FileSystemConstants.CHUNK_SIZE;
+			if (chunkSize > chunkLength) {
+				chunkSize = chunkLength;
 			}
 
 			// Read the next chunk and put it in the buffer
@@ -319,7 +321,7 @@ public final class IndexedFileSystem implements Closeable {
 
 			// Increment pointers
 			read += chunkSize;
-			ptr = (long) nextBlock * (long) FileSystemConstants.BLOCK_SIZE;
+			ptr = (long) nextBlock * (long) BLOCK_SIZE;
 
 			// If we still have more data to read, check the validity of the header
 			if (size > read) {

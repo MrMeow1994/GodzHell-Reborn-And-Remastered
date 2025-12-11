@@ -151,11 +151,11 @@ case 11730:
 		switch(weapon) {
 
 			case 18353:
-			setTurnIndexes(client.playerId, 13219, 13221, 13223, 13222);
+			setTurnIndexes(client.index, 13219, 13221, 13223, 13222);
 			break;
 			
 						case 4151:
-			setTurnIndexes(client.playerId, 11966, 11966, 11967, 820);
+			setTurnIndexes(client.index, 11966, 11966, 11967, 820);
 			break;
 
 
@@ -164,11 +164,11 @@ case 11696:
 case 11698:
 case 11700:
 case 11730:
-			setTurnIndexes(client.playerId, 7043, 7044, 7045, 7046);
+			setTurnIndexes(client.index, 7043, 7044, 7045, 7046);
 			break;
 
 			default:
-				setTurnIndexes(client.playerId, 820, 823, 822, 821);
+				setTurnIndexes(client.index, 820, 823, 822, 821);
 				break;
 		}
 	}

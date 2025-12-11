@@ -1,3 +1,4 @@
+import java.util.Map;
 import java.util.Optional;
 
 public class PlayerData {
@@ -34,6 +35,8 @@ public class PlayerData {
     private int playerGameTime;
     private int playerGameCount;
     private int prestigeLevel;
+    private int autoRet;
+    private Map<Integer, int[]> colorMeta;
 
     // Slayer data
     private Optional<SlayerTask> slayerTask = Optional.empty(); // Optional field for SlayerTask
@@ -108,6 +111,7 @@ public class PlayerData {
         data.witchspot = plr.witchspot;
         data.pirateTreasure = plr.pirateTreasure;
         data.desertTreasure = plr.desertTreasure;
+        data.autoRet = plr.autoRet;
         client target = (client) plr;
         data.slayerTask = target.getSlayer().getTask();
         data.slayerTaskAmount = target.getSlayer().getTaskAmount();
@@ -146,6 +150,7 @@ public class PlayerData {
         data.bankItemsN3 = plr.bankItemsN3;
         data.friends = plr.friends;
         data.ignores = plr.ignores;
+        data.colorMeta = plr.getColorManager().getItems();
 
         return data;
     }
@@ -770,6 +775,19 @@ public class PlayerData {
 
     public void setDesertTreasure(int desertTreasure) {
         this.desertTreasure = desertTreasure;
+    }
+public int getAutoRet(){
+        return autoRet;
+}
+public void setAutoRet(int autoRet){
+        this.autoRet = autoRet;
+}
+    public Map<Integer, int[]> getColorMeta() {
+        return colorMeta;
+    }
+
+    public void setColorMeta(Map<Integer, int[]> colorMeta) {
+        this.colorMeta = colorMeta;
     }
 
 }

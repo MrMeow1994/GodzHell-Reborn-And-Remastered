@@ -158,7 +158,7 @@ public class ItemHandler {
 		for (Player p : server.playerHandler.players) {
 			if (p instanceof client) {
 				client person = (client) p;
-				if (person.playerName != null && person.playerId != itemController) {
+				if (person.playerName != null && person.index != itemController) {
 					if (person.distanceToPoint(itemX, itemY) <= 60) {
 						person.createGroundItem(itemID, itemX, itemY, itemAmount);
 					}

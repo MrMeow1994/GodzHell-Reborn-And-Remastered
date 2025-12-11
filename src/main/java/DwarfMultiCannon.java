@@ -265,18 +265,18 @@ public class DwarfMultiCannon {
 				n.hitDiff = damage;
 				n.HP -= damage;
 				n.hitUpdateRequired = true;
-				n.killerId = players.playerId;
-				n.facePlayer(players.playerId);
+				n.killerId = players.index;
+				n.facePlayer(players.index);
 				n.forceChat("im hit, multi");
 			} else {
-				if (n.underAttackBy > 0 && n.underAttackBy != players.playerId)
+				if (n.underAttackBy > 0 && n.underAttackBy != players.index)
 					return;
 				startCannonballProjectile(players, players.oldCannon, n);
 				n.hitDiff = damage;
 				n.HP -= damage;
 				n.hitUpdateRequired = true;
-				n.killerId = players.playerId;
-				n.facePlayer(players.playerId);
+				n.killerId = players.index;
+				n.facePlayer(players.index);
 				n.forceChat("im hit, single");
 			}
 			players.cannonBalls--;

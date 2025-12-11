@@ -140,7 +140,7 @@ public class AnimatedArmour {
     public static void dropTokens(client player, int npcType, int x, int y) {
         Armour npc = getArmourForNpcId(npcType);
         if (npc != null) {
-            server.itemHandler.addItem(8851, x, y, npc.getAmountOfTokens(), player.playerId, false);
+            server.itemHandler.addItem(8851, x, y, npc.getAmountOfTokens(), player.index, false);
             player.isAnimatedArmourSpawned = false;
         }
     }

@@ -157,7 +157,7 @@ public class WarriorsGuild {
             int current = currentDefender();
             int item = current == -1 ? DEFENDER_DATA[0][0] : nextDefender();
             if (misc.random(chance) == 0) {
-                server.itemHandler.addItem(item, x, y,  1, player.playerId, false);
+                server.itemHandler.addItem(item, x, y,  1, player.index, false);
                 player.sendMessage("The cyclops dropped a "+player.getItemName(item)+" on the ground.", 600000);
                 //	player.sendMessage("Rolled:"+chance / chance());
             }

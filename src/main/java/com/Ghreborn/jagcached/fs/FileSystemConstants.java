@@ -20,21 +20,6 @@ public final class FileSystemConstants {
 	 * The size of an index.
 	 */
 	public static final int INDEX_SIZE = 6;
-	
-	/**
-	 * The size of a header.
-	 */
-	public static final int HEADER_SIZE = 8;
-	
-	/**
-	 * The size of a chunk.
-	 */
-	public static final int CHUNK_SIZE = 512;
-	
-	/**
-	 * The size of a block.
-	 */
-	public static final int BLOCK_SIZE = HEADER_SIZE + CHUNK_SIZE;
 
 	/**
 	 * Default private constructor to prevent instantiation.

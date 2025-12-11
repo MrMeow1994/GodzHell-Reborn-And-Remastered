@@ -301,7 +301,7 @@ public class ShopAssistant {
             if (PlayerHandler.players[i] != null) {
                 if (PlayerHandler.players[i].IsShopping
                         && PlayerHandler.players[i].MyShopID == c.MyShopID
-                        && i != c.playerId) {
+                        && i != c.index) {
                     PlayerHandler.players[i].UpdateShop = true;
                 }
             }

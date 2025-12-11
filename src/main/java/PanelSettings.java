@@ -98,7 +98,7 @@ public class PanelSettings {
     public int getEntity(String name) {
         client c = getPlayer(name);
         if(c != null)
-            return c.playerId;
+            return c.index;
         return -1;
     }
 

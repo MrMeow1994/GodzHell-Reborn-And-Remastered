@@ -204,7 +204,7 @@ public enum CombatSpell {
                                     hit[0] = npc.HP;
                                 }
                                 c.stillgfx2(endGfxId, npc.absY, npc.absX);
-                                npc.StartKilling = c.playerId;
+                                npc.StartKilling = c.index;
                                 npc.randomWalk = false;
                                 npc.IsUnderAttack = true;
                                 npc.hitDiff = hit[0];

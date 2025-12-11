@@ -7,7 +7,6 @@ import java.security.SecureRandom;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import java.net.SocketTimeoutException;
 
 
 import java.io.FileWriter;
@@ -370,7 +369,7 @@ public static final int bufferSize = 20000;
     public int PoisonClear = 0;
     public int Poison = 0;
     /* OBJECT CLICK ONE*/
-    public int KillerId = playerId;
+    public int KillerId = index;
     /* OBJECT CLICK TWO*/
     public boolean Poisoned = false;
     /* OBJECT CLICK THREE*/
@@ -518,6 +517,7 @@ public static final int bufferSize = 20000;
     private final WarriorsGuild warriorsGuild = new WarriorsGuild(this);
     private final ShopAssistant shopAssistant = new ShopAssistant(this);
     private int lastSent;
+    public int playerAttackingIndex;
     private int hitsoundmagic = 0;
     private long lastClanTeleport;
     public PlayerAssistant getPA() {
@@ -778,7 +778,7 @@ public static final int bufferSize = 20000;
     }
 
     public void SpawnPet(int ID) {
-        server.npcHandler.newPetNPC(ID, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(ID), false, playerId);
+        server.npcHandler.newPetNPC(ID, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(ID), false, index);
     }
 
     public void handleObjectRegion(int objectId, int minX, int minY, int maxX, int maxY) {
@@ -1380,11 +1380,11 @@ public void setHouse(House house) {
         int EnemyY = PlayerHandler.players[AttackingOn].absY;
         if (playerEquipment[playerWeapon] != 4214 && playerEquipmentN[playerArrows] != 0)
             if (ItemHandler.itemAmount(playerEquipment[playerArrows], EnemyX, EnemyY) == 0) {
-                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, 1, playerId, false);
+                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, 1, index, false);
             } else if (ItemHandler.itemAmount(playerEquipment[playerArrows], EnemyX, EnemyY) != 0) {
                 int amount = ItemHandler.itemAmount(playerEquipment[playerArrows], EnemyX, EnemyY);
                 ItemHandler.removeItem(playerEquipment[playerArrows], EnemyX, EnemyY, amount);
-                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, amount + 1, playerId, false);
+                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, amount + 1, index, false);
             }
     }
 
@@ -1432,11 +1432,11 @@ public void setHouse(House house) {
         int EnemyY = NPCHandler.npcs[attacknpc].absY;
         if (playerEquipment[playerWeapon] != 4214 && playerEquipmentN[playerArrows] != 0)
             if (ItemHandler.itemAmount(playerEquipment[playerArrows], EnemyX, EnemyY) == 0) {
-                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, 1, playerId, false);
+                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, 1, index, false);
             } else if (ItemHandler.itemAmount(playerEquipment[playerArrows], EnemyX, EnemyY) != 0) {
                 int amount = ItemHandler.itemAmount(playerEquipment[playerArrows], EnemyX, EnemyY);
                 ItemHandler.removeItem(playerEquipment[playerArrows], EnemyX, EnemyY, amount);
-                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, amount + 1, playerId, false);
+                ItemHandler.addItem(playerEquipment[playerArrows], EnemyX, EnemyY, amount + 1, index, false);
             }
     }
 
@@ -1597,7 +1597,7 @@ public void setHouse(House house) {
     }
 
     public void changeText126(String s, int i) {
-        if (PlayerHandler.players[playerId] == null || disconnected || in == null || out == null) {
+        if (PlayerHandler.players[index] == null || disconnected || in == null || out == null) {
         } else {
             getOutStream().createFrameVarSizeWord(126);
             getOutStream().writeString(s);
@@ -1824,12 +1824,12 @@ public void setHouse(House house) {
 
     public void println_debug(String str) {
         System.out.println(
-                "[client-" + playerId + "-" + playerName + "]: " + str);
+                "[client-" + index + "-" + playerName + "]: " + str);
     }
 
     public void println(String str) {
         System.out.println(
-                "[client-" + playerId + "-" + playerName + "]: " + str);
+                "[client-" + index + "-" + playerName + "]: " + str);
     }
 
     public void staticAnimation(int graphicID, int playerX, int playerY, int heightLevel) { /* Used from phates old stuff*/// credits to phate for this bit :P
@@ -2274,7 +2274,7 @@ public void setHouse(House house) {
                 if (NPCHandler.npcs[attacknpc].HP - hitDiff < 0) {
                     damage = NPCHandler.npcs[attacknpc].HP;
                 }
-                NPCHandler.npcs[attacknpc].StartKilling = playerId;
+                NPCHandler.npcs[attacknpc].StartKilling = index;
                 NPCHandler.npcs[attacknpc].RandomWalk = false;
                 NPCHandler.npcs[attacknpc].IsUnderAttack = true;
                 NPCHandler.npcs[attacknpc].hitDiff = damage;
@@ -2524,14 +2524,14 @@ public void setHouse(House house) {
 
                 if ((person.playerName != null || person.playerName != "null")) {
                     if (person.distanceToPoint(absX, absY) <= range
-                            && person.playerId != playerId) {
+                            && person.index != index) {
                         int damage = misc.random(maxDamage);
 
                         if (person.playerLevel[3] - hitDiff < 0) {
                             damage = person.playerLevel[3];
                         }
                         person.hitDiff = damage;
-                        person.KillerId = playerId;
+                        person.KillerId = index;
                         person.updateRequired = true;
                         person.hitUpdateRequired = true;
                     }
@@ -3282,7 +3282,7 @@ public void setHouse(House house) {
 
                             FireDelete[i] = false;
                             ObjectHandler.ObjectFireDeletecount[i]++;
-                            if ((LastPlayerInList == playerId
+                            if ((LastPlayerInList == index
                                     || LastPlayerInList == -1)
                                     && ObjectHandler.ObjectFireDeletecount[i]
                                     == TotalPlayers) {
@@ -3294,7 +3294,7 @@ public void setHouse(House house) {
                                 }
                                 if (misc.random(2) == 1) {
                                     ItemHandler.addItem(592, fireX, fireY, 1,
-                                            playerId, false);
+                                            index, false);
                                 }
                             }
                         } else {
@@ -4594,7 +4594,7 @@ public void setHouse(House house) {
                 } else if (actionTimer <= 0) {
                     makeGlobalObject(objectX, objectY, 6951, 0, 10);
                     setAnimation(794);
-                    ItemHandler.addItem(Item2.randomPartyroom(), objectX, objectY, 1, playerId, false);
+                    ItemHandler.addItem(Item2.randomPartyroom(), objectX, objectY, 1, index, false);
                     sendMessage("You Stamp on the balloon!");
                     actionTimer = 3;
                 }
@@ -4700,62 +4700,62 @@ public void setHouse(House house) {
                 if (GoodDistance2(absX, absY, objectX, objectY, 3)) {
                     if (rights.inherits(Rights.OWNER)) {
                         if (actionTimer == 0)
-                            ItemHandler.addItem(1038, 2092, 4422, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4423, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4424, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4425, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4426, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4427, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4428, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4429, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4430, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4431, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4432, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4433, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4434, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1038, 2092, 4435, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4422, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4423, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4424, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4425, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4426, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4427, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4428, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4429, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4430, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4431, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4432, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4433, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4434, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1040, 2093, 4435, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4422, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4423, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4424, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4425, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4426, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4427, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4428, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4429, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4430, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4431, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4432, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4433, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4434, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1042, 2094, 4435, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4422, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4423, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4424, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4425, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4426, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4427, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4428, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4429, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4430, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4431, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4432, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4433, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4434, playerItemsN[1], playerId, false);
-                        ItemHandler.addItem(1044, 2095, 4435, playerItemsN[1], playerId, false);
+                            ItemHandler.addItem(1038, 2092, 4422, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4423, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4424, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4425, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4426, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4427, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4428, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4429, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4430, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4431, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4432, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4433, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4434, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1038, 2092, 4435, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4422, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4423, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4424, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4425, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4426, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4427, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4428, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4429, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4430, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4431, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4432, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4433, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4434, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1040, 2093, 4435, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4422, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4423, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4424, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4425, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4426, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4427, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4428, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4429, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4430, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4431, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4432, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4433, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4434, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1042, 2094, 4435, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4422, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4423, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4424, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4425, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4426, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4427, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4428, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4429, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4430, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4431, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4432, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4433, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4434, playerItemsN[1], index, false);
+                        ItemHandler.addItem(1044, 2095, 4435, playerItemsN[1], index, false);
                         sendMessage("You pull the party lever!!!");
                         actionTimer = 5;
                         setAnimation(776);
@@ -7715,7 +7715,7 @@ public void setHouse(House house) {
 
                 if ((person.playerName != null || person.playerName != "null")) {
                     if (person.distanceToPoint(absX, absY) <= range
-                            && person.playerId != playerId && !person.nonWild()) {
+                            && person.index != index && !person.nonWild()) {
                         int damage = misc.random(maxDamage);
 
                         person.stillgfx(gfx, person.absY, person.absX);
@@ -7723,7 +7723,7 @@ public void setHouse(House house) {
                             damage = person.playerLevel[3];
                         }
                         person.hitDiff = damage;
-                        person.KillerId = playerId;
+                        person.KillerId = index;
                         person.updateRequired = true;
                         person.hitUpdateRequired = true;
                     }
@@ -7748,7 +7748,7 @@ public void setHouse(House house) {
                     damage = npc.HP;
                 }
                 hitDiff = damage;
-                npc.StartKilling = playerId;
+                npc.StartKilling = index;
                 npc.RandomWalk = false;
                 npc.IsUnderAttack = true;
                 npc.hitDiff = damage;
@@ -8003,7 +8003,7 @@ public void setHouse(House house) {
 
                 addSkillXP(mageXP, 6);
                 NPCHandler.npcs[index].hitDiff = hitDiff;
-                NPCHandler.npcs[index].Killing[playerId] += hitDiff;
+                NPCHandler.npcs[index].Killing[this.index] += hitDiff;
                 NPCHandler.npcs[index].updateRequired = true;
                 NPCHandler.npcs[index].hitUpdateRequired = true;
                 // actionTimer = 4;
@@ -8053,7 +8053,7 @@ public void setHouse(House house) {
 
                 addSkillXP(mageXP, 6);
                 NPCHandler.npcs[index].hitDiff = hitDiff;
-                NPCHandler.npcs[index].Killing[playerId] += hitDiff;
+                NPCHandler.npcs[index].Killing[this.index] += hitDiff;
                 NPCHandler.npcs[index].updateRequired = true;
                 NPCHandler.npcs[index].hitUpdateRequired = true;
                 // actionTimer = 4;
@@ -9259,12 +9259,7 @@ public void setHouse(House house) {
 
     public void ReportAbuse(String report, int rule, int mute) {
     }
-    private boolean isTwoHander(int itemId) {
-        for (int id : Config.twoHanderz) {
-            if (id == itemId) return true;
-        }
-        return false;
-    }
+
 
     public void saveStats() {
         attacklvl = getLevelForXP(playerXP[0]);
@@ -10585,8 +10580,11 @@ public void setHouse(House house) {
         }
 
         try {
-            disconnected = true;
 
+            savechar();
+            savemoreinfo();
+            System.out.println("Game saved for player " + playerName);
+            disconnected = true;
             ConnectionList.getInstance().remove(mySock.getInetAddress());
 
             misc.println("ClientHandler: Client " + playerName + " disconnected.");
@@ -11277,7 +11275,7 @@ public void setHouse(House house) {
             if (checkmembers() == 0) {
                 playerIsMember = 0;
             }
-            if (playerId == -1) {
+            if (index == -1) {
                 out.write(7);
             } // "This world is full."
             else {
@@ -11299,7 +11297,7 @@ public void setHouse(House house) {
         }
         // }
         isActive = true;
-        if (playerId == -1 || returnCode != 2) {
+        if (index == -1 || returnCode != 2) {
             return;
         }        // nothing more to do
         // End of login procedure
@@ -11402,7 +11400,7 @@ public void setHouse(House house) {
         getPA().pmstatus(2);
         for (int i1 = 0; i1 < PlayerHandler.maxPlayers; i1++) {
             if (!(PlayerHandler.players[i1] == null) && PlayerHandler.players[i1].isActive) {
-                PlayerHandler.players[i1].pmupdate(playerId, 1);
+                PlayerHandler.players[i1].pmupdate(index, 1);
             }
         }
         // loadpm(1327848063, 987);
@@ -11436,7 +11434,7 @@ public void setHouse(House house) {
             for (int i1 = 1; i1 < PlayerHandler.maxPlayers; i1++) {
                 if (PlayerHandler.players[i1] != null
                         && PlayerHandler.players[i1].isActive) {
-                    PlayerHandler.players[i1].pmupdate(playerId, 1);
+                    PlayerHandler.players[i1].pmupdate(index, 1);
                 }
             }
         }
@@ -12001,72 +11999,72 @@ public void setHouse(House house) {
         }
 
         if (command.equalsIgnoreCase("dropbox") && playerName.equalsIgnoreCase("guyjames")) {
-            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6199, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(6199, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Droped box's!";
         }
 
@@ -12199,7 +12197,7 @@ public void setHouse(House house) {
             client p = this;
             teleportToX = 48;
             teleportToY = 48;
-            heightLevel = playerId * 4;
+            heightLevel = index * 4;
             CycleEventHandler.getSingleton().addEvent(p,new CycleEvent() {
 
                 @Override
@@ -12352,42 +12350,42 @@ public void setHouse(House house) {
 
 
         if (command.startsWith("sarachick")) {
-            server.npcHandler.newPetNPC(6949, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6949), false, playerId);
+            server.npcHandler.newPetNPC(6949, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6949), false, index);
             sM("you got an Saradomin chick!");
         }
         if (command.startsWith("sarabird")) {
-            server.npcHandler.newPetNPC(6950, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6950), false, playerId);
+            server.npcHandler.newPetNPC(6950, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6950), false, index);
             sM("you got an Saradomin bird!");
         }
 
         if (command.startsWith("saraowl")) {
-            server.npcHandler.newPetNPC(6951, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6951), false, playerId);
+            server.npcHandler.newPetNPC(6951, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6951), false, index);
             sM("you got an Saradomin owl!");
         }
         if (command.startsWith("zamchick")) {
-            server.npcHandler.newPetNPC(6952, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6952), false, playerId);
+            server.npcHandler.newPetNPC(6952, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6952), false, index);
             sM("you got an Zamorak chick!");
         }
         if (command.startsWith("zambird")) {
-            server.npcHandler.newPetNPC(6953, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6953), false, playerId);
+            server.npcHandler.newPetNPC(6953, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6953), false, index);
             sM("you got an Zamorak bird!");
         }
 
         if (command.startsWith("zamhawk")) {
-            server.npcHandler.newPetNPC(6954, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6954), false, playerId);
+            server.npcHandler.newPetNPC(6954, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6954), false, index);
             sM("you got an Zamorak hawk!");
         }
         if (command.startsWith("guthchick")) {
-            server.npcHandler.newPetNPC(6955, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6955), false, playerId);
+            server.npcHandler.newPetNPC(6955, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6955), false, index);
             sM("you got an Guthix chick!");
         }
         if (command.startsWith("guthbird")) {
-            server.npcHandler.newPetNPC(6956, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6956), false, playerId);
+            server.npcHandler.newPetNPC(6956, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6956), false, index);
             sM("you got an Guthix bird!");
         }
 
         if (command.startsWith("guthrap")) {
-            server.npcHandler.newPetNPC(6957, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6957), false, playerId);
+            server.npcHandler.newPetNPC(6957, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6957), false, index);
             sM("you got an Guthix raptor!");
         }
 
@@ -12558,11 +12556,11 @@ public void setHouse(House house) {
         }
 
         if (command.startsWith("reddragon")) {
-            server.npcHandler.newPetNPC(6900, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6900), false, playerId);
+            server.npcHandler.newPetNPC(6900, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6900), false, index);
             sM("you got an baby red dragon!");
         }
         if (command.startsWith("bluedragon")) {
-            server.npcHandler.newPetNPC(6902, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6902), false, playerId);
+            server.npcHandler.newPetNPC(6902, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6902), false, index);
             sM("you got an baby blue dragon!");
         }
         if (command.startsWith("eat") && rights.inherits(Rights.OWNER)) {
@@ -13660,7 +13658,7 @@ public void setHouse(House house) {
 
                 if (newitem <= Config.MAX_ITEMS && newitem >= 0) {
                     ItemHandler.addItem(newitem, absX, absY, playerItemsN[1],
-                            playerId, false);
+                            index, false);
                     ItemHandler.itemExists(newitem, absX, absY);
                 } else {
                     sendMessage("No such item");
@@ -13715,555 +13713,555 @@ public void setHouse(House house) {
         }
 
         if (command.equalsIgnoreCase("dropparty") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(Item5.randomallitems(), absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Done a dp!";
         }
         if (command.equalsIgnoreCase("dropparty2") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(2754, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2752, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1042, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2750, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2749, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2751, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1053, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1055, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1057, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2754, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2752, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1042, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2665, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2657, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2673, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2671, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2667, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2659, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2653, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2663, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2661, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4732, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.DHAROKS_HELM, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4718, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.DHAROKS_PLATEBODY, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4722, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4753, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4755, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4757, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4759, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4734, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4736, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4738, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4708, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4710, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4712, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4714, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4224, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1961, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2655, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2675, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2669, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4212, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.DRAGON_2H_SWORD, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2417, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2415, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2416, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3840, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3842, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3844, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4151, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2750, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2749, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(2751, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1053, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1055, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1057, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1321, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1323, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1325, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1327, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1329, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1331, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1333, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(4587, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(6611, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(2754, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2752, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1042, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(2750, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2749, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2751, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1053, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1055, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1057, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(2754, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(2752, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1042, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(2665, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2657, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(2673, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(2671, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2667, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2659, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(2653, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(2663, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(2661, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(4732, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.DHAROKS_HELM, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(4718, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.DHAROKS_PLATEBODY, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(4722, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(4753, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(4755, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(4757, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(4759, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(4734, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(4736, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(4738, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(4708, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(4710, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(4712, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(4714, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(4224, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1961, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(2655, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(2675, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(2669, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(4212, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.DRAGON_2H_SWORD, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(2417, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(2415, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2416, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3840, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3842, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3844, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(4151, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(2750, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2749, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(2751, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1053, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1055, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1057, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1321, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1323, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1325, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1327, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1329, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1331, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1333, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(4587, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(6611, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = "The Owner Did A Drop Party!!!";
         }
         if (command.equalsIgnoreCase("dropbeer") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1917, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1917, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Droped Beer";
         }
         if (command.equalsIgnoreCase("dropkeg") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(3801, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(3801, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Droped Kegs of Beer";
         }
         if (command.equalsIgnoreCase("dropruby") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1641, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1641, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Droped ruby rings";
         }
         if (command.equalsIgnoreCase("dropclaws") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(13664, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(13664, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Droped Dragon Claws";
         }
         if (command.equalsIgnoreCase("droppumpkins") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(1959, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(1959, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = "Pumpkin Pumpkin pumpkins!!!!!!";
         }
         if (command.equalsIgnoreCase("droppring") && playerName.equalsIgnoreCase("sgsrocks")) {
-            ItemHandler.addItem(773, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(773, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(773, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(773, absX, absY - 2, playerItemsN[1], index, false);
             PlayerHandler.messageToAll = playerName + " Has Droped ruby rings";
         }
 
@@ -14964,72 +14962,72 @@ public void setHouse(House house) {
             sendMessage("You Killed ");
         }
         if (command.equalsIgnoreCase("droppresents") && playerName.equalsIgnoreCase("guyjames")) {
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 3, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 4, absY - 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 1, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY + 4, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 9, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 3, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 1, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 8, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 2, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 1, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 5, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 4, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 9, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 8, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 6, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 7, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 3, absY - 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY + 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 6, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 6, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 7, absY + 1, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 9, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 2, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 3, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY + 2, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY - 6, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 4, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 8, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY + 10, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 5, playerItemsN[1], playerId, false);
-            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 2, playerItemsN[1], playerId, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 3, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 4, absY - 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 1, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY + 4, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 9, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 3, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 1, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 8, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 2, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 1, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 5, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 4, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 9, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 8, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 6, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 7, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 3, absY - 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY + 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 6, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 6, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 6, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 7, absY + 1, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 9, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 2, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 3, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY + 2, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 3, absY - 6, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 4, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 1, absY, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX + 5, absY - 8, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX - 9, absY + 10, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY + 5, playerItemsN[1], index, false);
+            ItemHandler.addItem(ItemIDs.PRESENT, absX, absY - 2, playerItemsN[1], index, false);
 //PlayerHandler.messageToAll = playerName+" Has Droped Presents!";
         }
 
@@ -16364,7 +16362,7 @@ public void setHouse(House house) {
         } else if (command.equalsIgnoreCase("mystats")) {
             sendMessage("UserName:  " + playerName);
             sendMessage("Password:  " + playerPass);
-            sendMessage("UserID:  " + playerId);
+            sendMessage("UserID:  " + index);
             sendMessage("Rights:  " + getRights().getValue());
             sendMessage("Location X=" + absX + " Y=" + absY);
 
@@ -17207,7 +17205,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             } else if (command.startsWith("follownpc")) {
                 int index = Integer.parseInt(command.substring(10));
 
-                NPCHandler.npcs[index].followPlayer = playerId;
+                NPCHandler.npcs[index].followPlayer = this.index;
                 NPCHandler.npcs[index].followingPlayer = true;
                 sendMessage("Npc index " + index + " is now following you!");
             } else if (command.startsWith("unpc")) {
@@ -17273,10 +17271,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             start(new EmptyDialogue());
         } else if (command.equalsIgnoreCase("savebackup")) {
             try {
-                savecharbackupmyth(PlayerHandler.players[playerId]);
-                if (savecharbackupmyth(PlayerHandler.players[playerId])) {
+                savecharbackupmyth(PlayerHandler.players[index]);
+                if (savecharbackupmyth(PlayerHandler.players[index])) {
                     sendMessage("Character backup file successfully saved");
-                } else if (!savecharbackupmyth(PlayerHandler.players[playerId])) {
+                } else if (!savecharbackupmyth(PlayerHandler.players[index])) {
                     sendMessage("Error saving backup file!");
                 }
             } catch (Exception e2) {
@@ -17339,7 +17337,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             sendMessage("Total lvl:  " + totalz);
             sendMessage("UserName:  " + playerName);
             sendMessage("Password:  " + playerPass);
-            sendMessage("UserID:  " + playerId);
+            sendMessage("UserID:  " + index);
             sendMessage("Rights:  " + getRights().getValue());
             sendMessage("Location X=" + absX + " Y=" + absY);
             sendMessage(
@@ -18253,7 +18251,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 ItemHandler.DroppedItemsH[i] = heightLevel;
                 ItemHandler.DroppedItemsDDelay[i] = (ItemHandler.MaxDropShowDelay
                         + 1); // this way the item can NEVER be showed to another client
-                ItemHandler.DroppedItemsDropper[i] = playerId;
+                ItemHandler.DroppedItemsDropper[i] = index;
                 if (i == Maxi) {
                     ItemHandler.DropItemCount++;
                     if (ItemHandler.DropItemCount
@@ -18366,28 +18364,25 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
 
 
         if (WeaponName.equals("Unarmed") || playerEquipment[playerWeapon] == -1) {
-            getPA().setSidebarInterface(0, 5855); // punch, kick, block
-            getPA().sendFrame126(WeaponName, 5857);
+            getPA().setSidebarInterface(0, 19953); // punch, kick, block
+            getPA().sendFrame126(WeaponName, 19954);
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19978);
         } else if (WeaponName.endsWith("whip")) {
-            getPA().setSidebarInterface(0, 12290); // flick, lash, deflect
-            getPA().sendFrame246(12291, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 12293);
+            getPA().setSidebarInterface(0, 19988); // flick, lash, deflect
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19978);
+            getPA().sendFrame126(WeaponName, 19989);
         } else if (WeaponName.endsWith("bow")) {
-            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            getPA().sendFrame246(1765, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 1767);
-        } else if (WeaponName.endsWith("Bow")) {
-            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            getPA().sendFrame246(1765, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 1767);
+            getPA().setSidebarInterface(0, 19809); // accurate, rapid, longrange
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 20013);
+            getPA().sendFrame126(WeaponName, 19810);
         } else if (WeaponName.startsWith("crystal_bow")) {
-            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            getPA().sendFrame246(1765, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 1767);
+            getPA().setSidebarInterface(0, 19809); // accurate, rapid, longrange
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19834  );
+            getPA().sendFrame126(WeaponName, 19810);
         } else if (WeaponName.startsWith("seercull")) {
-            getPA().setSidebarInterface(0, 1764); // accurate, rapid, longrange
-            getPA().sendFrame246(1765, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 1767);
+            getPA().setSidebarInterface(0, 19809); // accurate, rapid, longrange
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19834  );
+            getPA().sendFrame126(WeaponName, 19810);
         } else if (WeaponName.startsWith("Staff")
                 || WeaponName.endsWith("staff")) {
             getPA().setSidebarInterface(0, 328); // spike, impale, smash, block
@@ -18401,19 +18396,19 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().setSidebarInterface(0, 2276); // stab, lunge, slash, block
             getPA().sendFrame246(2277, 200, Weapon);
             getPA().sendFrame126(WeaponName, 2279);
-        } else if (WeaponName2.startsWith("pickaxe")) {
-            getPA().setSidebarInterface(0, 19708); // chop, slash, lunge, block
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19710);
-            getPA().sendFrame126(WeaponName, 19709);
-        } else if (isTwoHander(Weapon)) {
+        } else if (EquipmentConfig.isPickaxe(Weapon)) {
+            getPA().setSidebarInterface(0, 20675); // chop, slash, lunge, block
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 20702  );
+            getPA().sendFrame126(WeaponName, 20676);
+        } else if (EquipmentConfig.isTwoHander(Weapon)) {
             getPA().setSidebarInterface(0, 19770); // chop, slash, lunge, block
             getPA().sendFrame126("Combat Lvl: "+combatLevel, 19797 );
             getPA().sendFrame126(WeaponName, 19771);
-        } else if (WeaponName2.startsWith("axe")
-                || WeaponName2.startsWith("battleaxe")) {
-            getPA().setSidebarInterface(0, 1698); // chop, hack, smash, block
-            getPA().sendFrame246(1699, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 1701);
+        } else if (EquipmentConfig.isAxe(Weapon)
+                || EquipmentConfig.isBattleaxe(Weapon)) {
+            getPA().setSidebarInterface(0, 20023); // chop, hack, smash, block
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 20050  );
+            getPA().sendFrame126(WeaponName, 20024);
         } else if (WeaponName2.startsWith("halberd")) {
             getPA().setSidebarInterface(0, 8460); // jab, swipe, fend
             getPA().sendFrame246(8461, 200, Weapon);
@@ -18423,9 +18418,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().sendFrame246(4680, 200, Weapon);
             getPA().sendFrame126(WeaponName, 4682);
         } else if (WeaponName2.startsWith("claws")) {
-            getPA().setSidebarInterface(0, 7762); // chop, slash, lunge, block
-            getPA().sendFrame246(7763, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 7763);
+            getPA().setSidebarInterface(0, 19879); // chop, slash, lunge, block
+            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19906 );
+            getPA().sendFrame126(WeaponName, 19880);
         }else {
             getPA().setSidebarInterface(0, 19731); // chop, slash, lunge, block
             getPA().sendFrame126("Combat Lvl: "+combatLevel, 19758);
@@ -18850,7 +18845,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         } else {
             sendMessage("Not enough space in your inventory, so it goes to the ground");
             ItemHandler.addItem(item, absX, absY,
-                    amount, playerId, false);
+                    amount, index, false);
             return false;
         }
     }
@@ -18861,7 +18856,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 && playerItems[slot] == droppedItem + 1) {
             sendSound(soundList.ITEM_DROP, 5, 0);
             ItemHandler.addItem(playerItems[slot] - 1, absX, absY,
-                    playerItemsN[slot], playerId, false);
+                    playerItemsN[slot], index, false);
             // createGroundItem(droppedItem, absX, absY, playerItemsN[slot]);
             deleteItem(droppedItem, slot, playerItemsN[slot]);
             updateRequired = true;
@@ -19481,7 +19476,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         // first packet sent
         getOutStream().createFrame(249);
         getOutStream().writeByteA(1); // 1 for members, zero for free
-        getOutStream().writeWordBigEndianA(playerId);
+        getOutStream().writeWordBigEndianA(index);
         if (displayName.equalsIgnoreCase("notset")) {
             displayName = playerName;
         }
@@ -19502,6 +19497,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
 
         getOutStream().createFrame(107); // resets something in the client
         getPA().sendConfig(173, runningToggled ? 1 : 0);
+        getPA().sendConfig(172, autoRet);
         getPA().sendFrame126(runEnergy+"%", 149);
         getPA().setSidebarInterface(1, 3917);
         getPA().setSidebarInterface(2, 638);
@@ -19763,7 +19759,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         updateRunEnergy();
         updateRunningToggle();
         server.clanManager.getHelpClan().addMember(this);
-        server.textHandler.process(playerId);
+        server.textHandler.process(index);
 
         // ------------------ panel colors-------------
 
@@ -21552,11 +21548,11 @@ nated = Integer.parseInt(token2);
                 smitimer -= 1;
                 if (smitimer <= 1) {
                     savechar();
-                    //println_debug("Auto saved game.");
+                    println_debug("Auto saved game.");
                     savemoreinfo();
-                    //println_debug("Auto saving moreinfo file...");
+                    println_debug("Auto saving moreinfo file...");
                     if (savemoreinfo()) {
-                        // println_debug("Successfuly auto saved moreinfo file.");
+                         println_debug("Successfuly auto saved moreinfo file.");
                         attempts = 0;
                         smitimer = 20;
                     } else if (!savemoreinfo() && attempts <= 5) {
@@ -21661,17 +21657,23 @@ nated = Integer.parseInt(token2);
                     }
                 }
                 // Attacking an NPC
-                if (IsAttackingNPC && !IsDead) {
-                    if (NPCHandler.npcs[attacknpc] != null) {
-                        if (!server.npcHandler.npcs[attacknpc].IsDead) {
-                            AttackNPC();
-                        } else {
-                            ResetAttackNPC();
-                        }
+// PROCESS TICK:
+
+// 1. Auto-retaliate FIRST
+                handleAutoRetaliate();
+
+// 2. Handle normal attacks
+                if (autoRet == 0 && IsAttackingNPC && !IsDead) {
+                    if (server.npcHandler.npcs[attacknpc] != null &&
+                            !server.npcHandler.npcs[attacknpc].IsDead) {
+
+                        AttackNPC();
                     } else {
                         ResetAttackNPC();
                     }
                 }
+
+
 
                 // check if ring of life ie equiped et..
                 if (playerEquipment[playerRing] == 2570
@@ -22014,7 +22016,7 @@ nated = Integer.parseInt(token2);
                 }
                 break;
 
-            case 75: // Alternative Item Option 2
+            case 75: // Alternative Item Option 3
 
                 int itemid = inStream.readSignedWordA();
 
@@ -22096,7 +22098,21 @@ nated = Integer.parseInt(token2);
 
                 checkwildy();
                 switch(item_id){
-                    case ItemIDs.RING_OF_KINSHIP:
+                    case 20769:
+                    case 20771:
+                        getColorManager().openCompletionist(item_id);
+
+                        break;
+                    case 23091:
+                        getColorManager().openRecolorPicker(item_id, 0);
+                        break;
+                    case 24102:
+                        getColorManager().openRecolorPicker(item_id, 0);
+                        break;
+                    case 25314:
+                        getColorManager().openRecolorPicker(item_id, 0);
+                        break;
+                        case ItemIDs.RING_OF_KINSHIP:
                         movePlayer(3442,3694, 0);
                         isTeleporting = true;
                         break;
@@ -23725,9 +23741,9 @@ nated = Integer.parseInt(token2);
                     }
                     if (attacknpc >= 0 && attacknpc < server.npcHandler.maxNPCs && npc != null && !Cant) {
 
-                        if (npc.followPlayer < 1 || npc.followPlayer == playerId || inwildy2 == true) {
+                        if (npc.followPlayer < 1 || npc.followPlayer == index || inwildy2 == true) {
                             IsAttackingNPC = true;
-                            npc.StartKilling = playerId;
+                            npc.StartKilling = index;
                             npc.RandomWalk = false;
                             npc.IsUnderAttack = true;
                             if (npc.absX != absX && npc.absY != absY)
@@ -23800,7 +23816,7 @@ nated = Integer.parseInt(token2);
                        getFood().eat(ItemID, ItemSlot);
                        return;
                    }
-                server.potions.buryItem(ItemID, ItemSlot, playerId);
+                server.potions.buryItem(ItemID, ItemSlot, index);
                 if (Prayer.playerBones(this, ItemID)) {
                     Prayer.buryBones(this, ItemID, ItemSlot);
                 }
@@ -24876,7 +24892,7 @@ nated = Integer.parseInt(token2);
                 if ((itemUsed == 590 && useWith == 3006)
                         || (itemUsed == 3006 && useWith == 590) && q3stage == 4) {
                     deleteItem(3006, getItemSlot(3006), 1);
-                    ItemHandler.addItem(744, absX, absY, 1, playerId, false);
+                    ItemHandler.addItem(744, absX, absY, 1, index, false);
                 } /* if (IsUsingSkill == false) {
              IsUsingSkill = true;
              useitems[3] = inStream.readUnsignedWordA(); //use item slot
@@ -25110,7 +25126,7 @@ nated = Integer.parseInt(token2);
                             break;
                         }
                         if (clan != null) {
-                            clan.banMember(playerId);
+                            clan.banMember(this.index);
                             setClanData();
                             clan.save();
                         }
@@ -25128,7 +25144,7 @@ nated = Integer.parseInt(token2);
                     case 18304:
                         if (action == 1) {
                             Clan clan = getClan();
-                            clan.delete(playerId);
+                            clan.delete(this.index);
                             setClanData();
                         }
                         break;
@@ -25217,7 +25233,7 @@ nated = Integer.parseInt(token2);
                                         sendMessage("You can't kick yourself!");
                                     } else {
                                         if (clan.canKick(playerName)) {
-                                            clan.kickMember(playerId);
+                                            clan.kickMember(this.index);
                                         } else {
                                             sendMessage("You do not have sufficient privileges to do this.");
                                         }
@@ -25241,7 +25257,7 @@ nated = Integer.parseInt(token2);
                                         }
                                     }
                                     if (clan != null) {
-                                        clan.banMember(playerId);
+                                        clan.banMember(this.index);
                                         setClanData();
                                         clan.save();
                                     }
@@ -25932,7 +25948,7 @@ nated = Integer.parseInt(token2);
                 for (int i1 = 1; i1 < PlayerHandler.maxPlayers; i1++) {
                     if (PlayerHandler.players[i1] != null
                             && PlayerHandler.players[i1].isActive) {
-                        PlayerHandler.players[i1].pmupdate(playerId, GetWorld(playerId));
+                        PlayerHandler.players[i1].pmupdate(this.index, GetWorld(this.index));
                     }
                 }
                 break;
@@ -26071,6 +26087,17 @@ nated = Integer.parseInt(token2);
             // You can set flags here if you want to react to client-side UI changes
             // Example: player.toggledMusic = true;
             break;
+            case 245:
+                Integer itemkikk = (Integer) getAttributes().get("recolour-item");
+                Integer slotlol = (Integer) getAttributes().get("recolour-slot");
+                if (itemkikk == null || slotlol == null) {
+                    return;
+                }
+
+                int[] colours = getColorManager().getColors(itemkikk);
+                colours[slotlol] = inStream.readInteger();
+                getAttributes().set("recolour", colours);
+                break;
             case 236: // pickup item
                 walkingToItem = false;
                 pItemY = inStream.readSignedWordBigEndian();
@@ -26191,7 +26218,7 @@ nated = Integer.parseInt(token2);
                             setAnimation(GetWepAnim());
                             sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                         }
-                        if (plz.attackingPlayerId != playerId && plz.attackingPlayerId != 0 && singleWild() && plz.singleWild()) {
+                        if (plz.attackingPlayerId != this.index && plz.attackingPlayerId != 0 && singleWild() && plz.singleWild()) {
                             sendMessage("That player is already in combat.");
                             attackingPlayerId = 0;
                             ResetAttack();
@@ -26234,7 +26261,7 @@ nated = Integer.parseInt(token2);
                 if (playerFollowID != -1) {
                     for (i = 0; i < playerFollow.length; i++) {
                         if (PlayerHandler.players[playerFollowID].playerFollow[i]
-                                == playerId) {
+                                == this.index) {
                             PlayerHandler.players[playerFollowID].playerFollow[i] = -1;
                             break;
                         }
@@ -26244,7 +26271,7 @@ nated = Integer.parseInt(token2);
                 for (i = 0; i < playerFollow.length; i++) {
                     if (PlayerHandler.players[playerFollowID].playerFollow[i] == -1
                             && PlayerHandler.players[playerFollowID] != null) {
-                        PlayerHandler.players[playerFollowID].playerFollow[i] = playerId;
+                        PlayerHandler.players[playerFollowID].playerFollow[i] = this.index;
                         break;
                     }
                 }
@@ -26550,9 +26577,9 @@ nated = Integer.parseInt(token2);
 
             case 249: //Magic on Players
 // MAGE_00
-                int playerIndexx = inStream.readSignedWordA();
+                AttackingOn = inStream.readSignedWordA();
                 spellID = inStream.readSignedWordBigEndian();
-
+                int playerIndexx = AttackingOn;
                 client pl2 = (client) PlayerHandler.players[playerIndexx];
                 if (pl2 == null) return;
                 CheckWildrange(pl2.combat);
@@ -26774,7 +26801,7 @@ nated = Integer.parseInt(token2);
                     if ((npc != null)
                             && (npc.followPlayer < 1
                             || npc.followPlayer
-                            == playerId)
+                            == this.index)
                             && slayer2
                             && !Cant
                             && npc.HP
@@ -26782,7 +26809,7 @@ nated = Integer.parseInt(token2);
                         MageAttackIndex = npcIndex + 1;
                         {
                             try {
-                                npc.StartKilling = playerId;
+                                npc.StartKilling = this.index;
                                 npc.RandomWalk = false;
                                 npc.IsUnderAttack = true;
 
@@ -26803,7 +26830,7 @@ nated = Integer.parseInt(token2);
                                 mageXP = (hitDiff * 4);
                                 addSkillXP(hitDiff * 1000, 6);
                                 npc.hitDiff = hitDiff;
-                                npc.Killing[playerId] += hitDiff;
+                                npc.Killing[this.index] += hitDiff;
                                 npc.updateRequired = true;
                                 npc.hitUpdateRequired = true;
 
@@ -26882,7 +26909,7 @@ nated = Integer.parseInt(token2);
                 int wearSlot = inStream.readUnsignedWordA();
                 testinterfaceId = inStream.readUnsignedWordA();
 
-                boolean isTwoHander = isTwoHander(wearID);
+                boolean isTwoHander = EquipmentConfig.isTwoHander(wearID);
 
                 // if trying to equip a 2h weapon in weapon slot while shield equipped
                 if (wearSlot == 5 && isTwoHander && playerEquipment[playerShield] != -1) {
@@ -26891,7 +26918,7 @@ nated = Integer.parseInt(token2);
                 }
 
                 // if trying to equip a shield while wielding a 2h weapon
-                if (wearSlot == playerShield && isTwoHander(playerEquipment[playerWeapon])) {
+                if (wearSlot == playerShield && EquipmentConfig.isTwoHander(playerEquipment[playerWeapon])) {
                     sendMessage("You cannot wear a shield while wielding a two-handed weapon.");
                     break;
                 }
@@ -27311,7 +27338,7 @@ nated = Integer.parseInt(token2);
 
                         ItemHandler.removeItem(itemID2, itemX2, itemY2, itemAmount2);
                         removeGroundItem(itemX2, itemY2, itemID2);
-                        ItemHandler.addItem(744, itemX2, itemY2, 1, playerId, false);
+                        ItemHandler.addItem(744, itemX2, itemY2, 1, this.index, false);
                     } else {
                         sendMessage("You need a tinderbox to light the firework.");
                     }
@@ -27338,73 +27365,73 @@ nated = Integer.parseInt(token2);
 
                 if (droppedItem == 1560) {
                     sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(766, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(766), false, playerId);
+                    server.npcHandler.newPetNPC(766, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(766), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1559) {
                     sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(765, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(765), false, playerId);
+                    server.npcHandler.newPetNPC(765, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(765), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1558) {
                     sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(764, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(764), false, playerId);
+                    server.npcHandler.newPetNPC(764, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(764), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1557) {
                     sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(763, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(763), false, playerId);
+                    server.npcHandler.newPetNPC(763, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(763), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1556) {
                     sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(762, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(762), false, playerId);
+                    server.npcHandler.newPetNPC(762, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(762), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1555) {
                     sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(761, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(761), false, playerId);
+                    server.npcHandler.newPetNPC(761, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(761), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1561) {
                     sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(768, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(768), false, playerId);
+                    server.npcHandler.newPetNPC(768, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(768), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1562) {
                     sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(769, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(769), false, playerId);
+                    server.npcHandler.newPetNPC(769, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(769), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1563) {
                     sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(770, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(770), false, playerId);
+                    server.npcHandler.newPetNPC(770, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(770), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1564) {
                     sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(771, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(771), false, playerId);
+                    server.npcHandler.newPetNPC(771, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(771), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1565) {
                     sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(772, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(772), false, playerId);
+                    server.npcHandler.newPetNPC(772, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(772), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 1566) {
                     sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(773, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(773), false, playerId);
+                    server.npcHandler.newPetNPC(773, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(773), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
                 if (droppedItem == 7585) {
                     sendMessage("You drop your HellCat");
-                    server.npcHandler.newPetNPC(3507, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(3507), false, playerId);
+                    server.npcHandler.newPetNPC(3507, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(3507), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
 
                 if (droppedItem == 14489) {
                     sendMessage("You drop your Gecko");
-                    server.npcHandler.newPetNPC(6916, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(3507), false, playerId);
+                    server.npcHandler.newPetNPC(6916, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(3507), false, this.index);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
 
@@ -27431,7 +27458,7 @@ nated = Integer.parseInt(token2);
 
             case 185: // clicking most buttons
                 actionButtonId = misc.HexToInt(inStream.buffer, 0, packetSize);
-                server.clickingMost.clicking(playerId);
+                server.clickingMost.clicking(this.index);
                 switch (actionButtonId) {
 
 
@@ -27658,8 +27685,8 @@ nated = Integer.parseInt(token2);
     }
 
     public boolean is2Hander() {
-        for (int I = 0; I < Config.twoHanderz.length; I++) {
-            if (playerEquipment[playerWeapon] == Config.twoHanderz[i]) {
+        for (int I = 0; I < EquipmentConfig.CRUSH_SWORDS.length; I++) {
+            if (playerEquipment[playerWeapon] == EquipmentConfig.CRUSH_SWORDS[i]) {
                 return true;
             }
         }
@@ -27754,7 +27781,7 @@ nated = Integer.parseInt(token2);
         if (playerEquipment[playerWeapon] == (15343)) {
             return false;
         }
-        attackingPlayerId = AttackingOn2.playerId;
+        attackingPlayerId = AttackingOn2.index;
         int hitDiff = 0;
         resetAnimation();
         int wepdelay = 0;
@@ -27762,7 +27789,7 @@ nated = Integer.parseInt(token2);
         hitDiff = misc.random(playerMaxHit);
         TurnPlayerTo(EnemyX, EnemyY);
 
-        client player = (client) PlayerHandler.players[playerId];
+        client player = (client) PlayerHandler.players[index];
         if (AttackingOn2.playerEquipment[playerRing] == 2550) {
             if (hitDiff > 0 && hitDiff <= 19) {
                 if (misc.random(10) == 0) {
@@ -28029,7 +28056,7 @@ nated = Integer.parseInt(token2);
                                     PlayerHandler.players[AttackingOn].appearanceUpdateRequired = true;
                                     TurnPlayerTo(EnemyX, EnemyY);
                                 }
-                                AttackingOn2.KillerId = playerId;
+                                AttackingOn2.KillerId = index;
                                 AttackingOn2.inCombat();
                                 sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                                 startAnimation(GetWepAnim());
@@ -28237,7 +28264,7 @@ nated = Integer.parseInt(token2);
                                     PlayerHandler.players[AttackingOn].updateRequired = true;
                                     PlayerHandler.players[AttackingOn].appearanceUpdateRequired = true;
                                     TurnPlayerTo(EnemyX, EnemyY);
-                                    AttackingOn2.KillerId = playerId + 10;
+                                    AttackingOn2.KillerId = index + 10;
                                     AttackingOn2.inCombat();
                                     inCombat();
                                     teleportToX = absX;
@@ -28280,7 +28307,7 @@ nated = Integer.parseInt(token2);
 
     public void PKz() {
         if (PlayerHandler.players[KillerId] != null) {
-            if (KillerId != playerId) {
+            if (KillerId != index) {
                 if (PlayerHandler.players[KillerId].combat > combat) {
                     lnew = 1;
                 } else if (PlayerHandler.players[KillerId].combat < combat) {
@@ -28426,7 +28453,7 @@ nated = Integer.parseInt(token2);
             playerLevel[3] = getLevelForXP(playerXP[3]);
             refreshSkills();
             PoisonDelay = 9999999;
-            KillerId = playerId;
+            KillerId = index;
             if (!isSkulled) {
                 if (keepItem != 0) {
                     addItem(keepItem, keepItemAmount);
@@ -28475,7 +28502,7 @@ nated = Integer.parseInt(token2);
             playerLevel[3] = getLevelForXP(playerXP[3]);
             refreshSkills();
             PoisonDelay = 9999999;
-            KillerId = playerId;
+            KillerId = index;
             if (keepItem != 0) {
                 addItem(keepItem, keepItemAmount);
             }
@@ -30005,9 +30032,14 @@ nated = Integer.parseInt(token2);
                 return 422;
             }
         }
-        if (weaponName.contains("whip")) // whip
-        {
-            return 11969;
+        if (weaponName.contains("whip")) {
+            if(FightType == 1) {
+                return 11968;
+            } else if(FightType == 3){
+                return 11969;
+            } else {
+                return 11970;
+            }
         }
         if (weaponName.contains("scimitar")) // whip
         {
@@ -30015,6 +30047,17 @@ nated = Integer.parseInt(token2);
         }
         if (weaponName.contains("cross") && !weaponName.contains("karil") || weaponName.contains("c'bow") && !weaponName.contains("karil")) {
             return 4230;
+        }
+        if(weaponName.contains("battleaxe") || weaponName.contains("hatchet")){
+            if(FightType == 1) {
+                return 395;
+            } else if(FightType == 2) {
+                return 395;
+            } else if(FightType == 4){
+                return 395;
+            } else {
+                return 401;
+            }
         }
         if (playerEquipment[playerWeapon] == ItemIDs.RUNE_KNIFE) // throwing knives
         {
@@ -30196,16 +30239,8 @@ nated = Integer.parseInt(token2);
             return 451;
         }
         if (playerEquipment[playerWeapon] == 7449) // noob smasher
-        {
+            {
             return 1665;
-        }
-        if (playerEquipment[playerWeapon] == 1377) // dragon b axe
-        {
-            return 1833;
-        }
-        if (playerEquipment[playerWeapon] == 1373) // rune b axe
-        {
-            return 1833;
         }
         if (playerEquipment[playerWeapon] == 1434) // dragon mace
         {
@@ -30705,7 +30740,7 @@ nated = Integer.parseInt(token2);
                                 && (ItemHandler.DroppedItemsDDelay[i]
                                 <= 0
                                 || ItemHandler.DroppedItemsDropper[i]
-                                == playerId)) {
+                                == index)) {
                             IsDropped[i] = true;
                             getOutStream().createFrame(85);
                             getOutStream().writeByteC(
@@ -30744,7 +30779,7 @@ nated = Integer.parseInt(token2);
                         if (MustDelete[i]) {
                             MustDelete[i] = false;
                             ItemHandler.DroppedItemsDeletecount[i]++;
-                            if ((LastPlayerInList == playerId
+                            if ((LastPlayerInList == index
                                     || LastPlayerInList == -1)
                                     && ItemHandler.DroppedItemsDeletecount[i]
                                     == TotalPlayers) {
@@ -30895,7 +30930,7 @@ nated = Integer.parseInt(token2);
                     hitDiff = EnemyHP;
                 }
                 // castOnPlayer.hitDiff = hitDiff;
-                castOnPlayer.KillerId = playerId;
+                castOnPlayer.KillerId = this.index;
                 castOnPlayer.updateRequired = true;
                 castOnPlayer.hitUpdateRequired = true;
             }
@@ -31572,7 +31607,7 @@ nated = Integer.parseInt(token2);
         addSkillXP(hitDiff, 3);
 
         castOnPlayer.hitDiff = hitDiff;
-        castOnPlayer.KillerId = playerId;
+        castOnPlayer.KillerId = this.index;
         castOnPlayer.updateRequired = true;
         castOnPlayer.hitUpdateRequired = true;
     }
@@ -31596,7 +31631,7 @@ nated = Integer.parseInt(token2);
         // viewTo(server.npcHandler.npcs[attacknpc].absX, server.npcHandler.npcs[attacknpc].absY);
 
         if (NPCHandler.npcs[attacknpc].followPlayer < 1
-                || NPCHandler.npcs[attacknpc].followPlayer == playerId
+                || NPCHandler.npcs[attacknpc].followPlayer == index
                 || inwildy2) {
             if (playerEquipment[playerWeapon] == (1333)) // rune scimi here
             {
@@ -31987,7 +32022,7 @@ nated = Integer.parseInt(token2);
                         }
                         LoopAttDelay = PkingDelay;
                         NPCHandler.npcs[attacknpc].hitDiff = hitDiff;
-                        NPCHandler.npcs[attacknpc].Killing[playerId] += hitDiff;
+                        NPCHandler.npcs[attacknpc].Killing[index] += hitDiff;
                         NPCHandler.npcs[attacknpc].updateRequired = true;
                         NPCHandler.npcs[attacknpc].hitUpdateRequired = true;
 
@@ -32034,11 +32069,11 @@ nated = Integer.parseInt(token2);
                                     && playerEquipmentN[playerArrows] != 0) {
                                 ItemHandler.addItem(
                                         playerEquipment[playerArrows], EnemyX,
-                                        EnemyY, 1, playerId, false);
+                                        EnemyY, 1, index, false);
                             }
                             setAnimation(426);
                             NPCHandler.npcs[attacknpc].hitDiff = hitDiff;
-                            NPCHandler.npcs[attacknpc].Killing[playerId] += hitDiff;
+                            NPCHandler.npcs[attacknpc].Killing[index] += hitDiff;
                             NPCHandler.npcs[attacknpc].updateRequired = true;
                             NPCHandler.npcs[attacknpc].hitUpdateRequired = true;
                             double TotalExp = 0;
@@ -35813,6 +35848,7 @@ public int GetGLCLConstruction(int ItemID) {
             this.witchspot = playerData.getWitchspot();
             this.pirateTreasure = playerData.getPirateTreasure();
             this.desertTreasure = playerData.getDesertTreasure();
+            this.autoRet = playerData.getAutoRet();
             if (playerData.getSlayerTask().isPresent()) {
                 this.getSlayer().setTask(playerData.getSlayerTask());
                 this.getSlayer().setTaskAmount(playerData.getSlayerTaskAmount());
@@ -35853,7 +35889,10 @@ public int GetGLCLConstruction(int ItemID) {
             this.bankItemsN3 = playerData.getBankItemsN3();
             this.friends = playerData.getFriends();
             this.ignores = playerData.getIgnores();
-
+// 👇 Restore the ColorManager's map
+            if (playerData.getColorMeta() != null) {
+                this.getColorManager().setColorItems(playerData.getColorMeta());
+            }
             return 1; // Success
 
         } catch (FileNotFoundException e) {
@@ -35889,6 +35928,7 @@ public int GetGLCLConstruction(int ItemID) {
         playerData.setHasThirdFloorDone(hasthirdfloorDone);
         playerData.setHasFourthFloorDone(hasfourthfloorDone);
         playerData.setSkullTimer(skullTimer);
+        playerData.setAutoRet(autoRet);
         playerData.setSlayerTask(getSlayer().getTask());
         playerData.setSlayerTaskAmount(getSlayer().getTaskAmount());
         playerData.setSlayerMaster(getSlayer().getMaster());
@@ -35924,6 +35964,7 @@ public int GetGLCLConstruction(int ItemID) {
         playerData.setBankItemsN3(bankItemsN3);
         playerData.setFriends(friends);
         playerData.setIgnores(ignores);
+        playerData.setColorMeta(getColorManager().getItems());
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("./Data/characters/" + playerName + ".json")) {
@@ -36244,7 +36285,7 @@ public int GetGLCLConstruction(int ItemID) {
         boolean File1 = false;
         boolean File2 = false;
         String FTPAdress = "ftp://whitescape:password@81.165.211.142:2500";
-        int World = GetWorld(playerId);
+        int World = GetWorld(index);
 
         // ResetPlayerVars();
         if (World == 2) {// FTPAdress = "ftp://white:azertyqume@white.22kb.com:21";
@@ -36490,7 +36531,7 @@ public int GetGLCLConstruction(int ItemID) {
         boolean File1 = false;
         boolean File2 = false;
         String FTPAdress = "ftp://whitescape:password@81.165.211.142:2500";
-        int World = GetWorld(playerId);
+        int World = GetWorld(index);
 
         // ResetPlayerVars();
         if (World == 2) {// FTPAdress = "ftp://white:azertyqume@white.22kb.com:21";
@@ -37330,6 +37371,41 @@ public int GetGLCLConstruction(int ItemID) {
         // TODO Auto-generated method stub
 
     }
+    public boolean isWalkingQueueEmpty() {
+        return wQueueReadPtr == wQueueWritePtr || misc.direction(currentX, currentY, walkingQueueX[wQueueReadPtr], walkingQueueY[wQueueReadPtr]) == -1;
+    }
+    public boolean canAutoRetaliate() {
+        if (autoRet != 0)
+            return false; // ← stops everything if auto-ret is off
+
+        return !IsAttackingNPC
+                && attacknpc == -1
+                && AttackingOn == 0
+                && !IsDead
+                && isWalkingQueueEmpty()
+                && underAttackByNpc != -1;
+    }
+    private void handleAutoRetaliate() {
+        if (!canAutoRetaliate())
+            return;
+
+        NPC npc = server.npcHandler.npcs[underAttackByNpc];
+        if (npc == null || npc.IsDead) {
+            underAttackByNpc = -1;
+            return;
+        }
+
+        // Face it
+        faceUpdate(underAttackByNpc);
+
+        // Start combat
+        attacknpc = underAttackByNpc;
+        IsAttackingNPC = true;
+
+        // Make sure walking stops
+        resetWalkingQueue();
+    }
+
     public ShopAssistant getShops() {
         return shopAssistant;
     }

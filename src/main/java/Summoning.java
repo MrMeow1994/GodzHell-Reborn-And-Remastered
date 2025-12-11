@@ -19,7 +19,7 @@ public class Summoning {
 		for(int i = 0; i < NPCHandler.maxNPCs; i++){
 			if(NPCHandler.npcs[i] != null){
 				if(NPCHandler.npcs[i].npcType == Type){
-					if(NPCHandler.npcs[i].spawnedBy == c.playerId && NPCHandler.npcs[i].spawnedBy > 0){
+					if(NPCHandler.npcs[i].spawnedBy == c.index && NPCHandler.npcs[i].spawnedBy > 0){
 						NPCHandler.npcs[i].absX = 0;
 						NPCHandler.npcs[i].absY = 0;
 						NPCHandler.npcs[i] = null;

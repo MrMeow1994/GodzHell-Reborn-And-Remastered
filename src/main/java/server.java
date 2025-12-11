@@ -154,6 +154,7 @@ public class server implements Runnable {
         ItemCacheDefinition.unpackConfig();
         AnimationLength.startup();
         BobTheCatManager.init();
+        ColorManager.init();
         lottery.loadLists();
         npcStatLoader.init();
        // server.lottery.loadLists();

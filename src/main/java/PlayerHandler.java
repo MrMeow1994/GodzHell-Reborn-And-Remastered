@@ -475,7 +475,7 @@ public class PlayerHandler {
         try {
             // Kill followers
             for (int i = 0; i < NPCHandler.maxNPCs; i++) {
-                if (NPCHandler.npcs[i] != null && NPCHandler.npcs[i].followPlayer == p.playerId) {
+                if (NPCHandler.npcs[i] != null && NPCHandler.npcs[i].followPlayer == p.index) {
                     NPCHandler.npcs[i].IsDead = true;
                 }
             }
@@ -501,7 +501,7 @@ public class PlayerHandler {
                     Player other = players[i];
                     if (other == null || !other.isActive) continue;
                     // pmupdate must be null-safe; see step 5
-                    other.pmupdate(p.playerId, 0);
+                    other.pmupdate(p.index, 0);
                 }
             }
 
@@ -569,7 +569,7 @@ public class PlayerHandler {
     public void handleDisconnect(Player p) {
         // Kill any NPCs following this player
         for (int i = 0; i < NPCHandler.maxNPCs; i++) {
-            if (NPCHandler.npcs[i] != null && NPCHandler.npcs[i].followPlayer == p.playerId) {
+            if (NPCHandler.npcs[i] != null && NPCHandler.npcs[i].followPlayer == p.index) {
                 NPCHandler.npcs[i].IsDead = true;
             }
         }
@@ -591,7 +591,7 @@ public class PlayerHandler {
         playerByUsername.remove(p.playerName.toLowerCase().replaceAll("_", " "));
 
         // Remove from players[] and release slot
-        int slot = p.playerId;
+        int slot = p.index;
         releaseSlot(slot);
 
         // Run final player cleanup
@@ -680,7 +680,7 @@ public class PlayerHandler {
                 plr.playerList[i].appendPlayerUpdateBlock(updateBlock);
                 plr.playerList[plr.playerListSize++] = plr.playerList[i];
             } else {
-                int id = plr.playerList[i].playerId;
+                int id = plr.playerList[i].index;
                 plr.playerInListBitmap[id >> 3] &= ~(1 << (id & 7));
                 str.writeBits(1, 1);
                 str.writeBits(2, 3);
@@ -733,7 +733,7 @@ public class PlayerHandler {
                 if (players[i] == null || !players[i].isActive) {
                     continue;
                 }
-                players[i].pmupdate(plr.playerId, 0);
+                players[i].pmupdate(plr.index, 0);
             }
         }
         // anything can be done here like unlinking this player structure from

@@ -6,7 +6,7 @@ public class Firemaking {
     // add a fire to the list
     public static void addFire(client c, int logID) {
         if (c.playerLevel[11] >= findLvl(logID)) {
-            fires.add(new Fire(findTime(logID), ((int) (findTime(logID) + (c.getLevelForXP(c.playerXP[11]) * .42))), c.absX, c.absY, c.playerId));
+            fires.add(new Fire(findTime(logID), ((int) (findTime(logID) + (c.getLevelForXP(c.playerXP[11]) * .42))), c.absX, c.absY, c.index));
             c.addSkillXP(findXP(logID), 11);
             fire(2732, fires.size() - 1);
             c.sendMessage("You light the " + c.getItemName(logID) + ".");

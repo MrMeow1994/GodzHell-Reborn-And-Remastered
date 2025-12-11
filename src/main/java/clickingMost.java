@@ -1371,7 +1371,21 @@ public class clickingMost {
                     c.setAnimation(0x84F); //goblin bow emote
                 }
                 break;
+            case 2116:
+                Integer item = (Integer) c.getAttributes().get("recolour-item");
+                int[] colour = (int[]) c.getAttributes().get("recolour");
+                if (item == null || colour == null) {
+                    return;
+                }
 
+                c.getColorManager().recolor(item, colour);
+
+                if (item == 20771 || item == 20769) {
+                    c.getColorManager().openCompletionist(item);
+                } else {
+                    c.getPA().RemoveAllWindows();
+                }
+                break;
             case 52072:
                 if (c.commandEmotes) {
                 }
@@ -1379,7 +1393,30 @@ public class clickingMost {
                     c.setAnimation(0x850); //goblin dance emote
                 }
                 break;
+            case 84016:
+            case 84021:
+            case 84026:
+            case 84031:
+                 item = (Integer) c.getAttributes().get("recolour-item");
+                if (item == null) {
+                    return;
+                }
 
+                c.getColorManager().openRecolorPicker(item, c.actionButtonId == 84016 ? 0 : c.actionButtonId == 84021 ? 1 : c.actionButtonId == 84026 ? 3 : 2);
+
+                break;
+            case 84005:
+            case 84002:
+                c.getPA().RemoveAllWindows();
+                break;
+            case 84008:
+            case 2121:
+                item = (Integer) c.getAttributes().get("recolour-item");
+                if (item == null) {
+                    return;
+                }
+                c.getColorManager().reset(item);
+                break;
             case 72032:
                 if (c.commandEmotes) {
                 }
@@ -1513,12 +1550,13 @@ public class clickingMost {
 
             case 9125: // Accurate
             case 77022:
-            case 22228: // punch (unarmed)
-            case 48010: // flick (whip)
-            case 21200: // spike (pickaxe)
+            case 77061:
+            case 77244: // punch (unarmed)
+            case 78023: // flick (whip)
+            case 80198: // spike (pickaxe)
             case 1080: // bash (staff)
-            case 6168: // chop (axe)
-            case 6236: // accurate (long bow)
+            case 78058: // chop (axe)
+            case 77100: // accurate (long bow)
             case 17102: // accurate (darts)
             case 8234: // stab (dagger)
                 c.sendMessage("Accurate");
@@ -1528,10 +1566,12 @@ public class clickingMost {
 
             case 9126: // Defensive
             case 77025:
-            case 22229: // block (unarmed)
-            case 21201: // block (pickaxe)
+            case 77064:
+            case 78025:
+            case 77246: // block (unarmed)
+            case 80201: // block (pickaxe)
             case 1078: // focus - block (staff)
-            case 6169: // block (axe)
+            case 78059: // block (axe)
             case 33019: // fend (hally)
             case 18078: // block (spear)
             case 8235: // block (dagger)
@@ -1542,9 +1582,9 @@ public class clickingMost {
 
             case 9127: // Controlled
             case 77024:
-            case 48009: // lash (whip)
+            case 78024: // lash (whip)
             case 33018: // jab (hally)
-            case 6234: // longrange (long bow)
+            case 77101: // longrange (long bow)
             case 18077: // lunge (spear)
             case 18080: // swipe (spear)
             case 18079: // pound (spear)
@@ -1552,17 +1592,33 @@ public class clickingMost {
                 c.sendMessage("Controlled");
                 c.FightType = 3;
                 break;
-
+            case 77195:
+            case 78011:
+            case 77086:
+            case 78046:
+            case 77123:
+            case 78083:
+            case 77047:
+            case 80223:
+                if (c.autoRet == 0) {
+                    c.autoRet = 1;
+                } else {
+                    c.autoRet = 0;
+                }
+                c.getPA().sendConfig(172, c.autoRet);
+                break;
             case 9128: // Aggressive
             case 77023:
-            case 22230: // kick (unarmed)
-            case 21203: // impale (pickaxe)
-            case 21202: // smash (pickaxe)
+            case 77062:
+            case 77063:
+            case 77245: // kick (unarmed)
+            case 80199: // impale (pickaxe)
+            case 80200: // smash (pickaxe)
             case 1079: // pound (staff)
-            case 6171: // hack (axe)
-            case 6170: // smash (axe)
+            case 78061: // hack (axe)
+            case 78060: // smash (axe)
             case 33020: // swipe (hally)
-            case 6235: // rapid (long bow)
+            case 77102: // rapid (long bow)
             case 17101: // repid (darts)
             case 8237: // lunge (dagger)
             case 8236: // slash (dagger)

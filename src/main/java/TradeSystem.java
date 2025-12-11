@@ -119,7 +119,7 @@ public class TradeSystem {
                             return;
                         c.tradeWith = c.WanneTradeWith;
                         c.tradeWaitingTime = 40;
-                        getTradePartner().tradeRequest = c.playerId;
+                        getTradePartner().tradeRequest = c.index;
                         c.sendMessage("Sending trade request...");
                     } else if (tt1 <= 0
                             && tt2 <= 0
@@ -143,7 +143,7 @@ public class TradeSystem {
                     if (c.GoodDistance2(c.absX, c.absY,
                             PlayerHandler.players[c.WanneTradeWith].absX,
                             PlayerHandler.players[c.WanneTradeWith].absY, 1)) {
-                        if (PlayerHandler.players[c.WanneTradeWith].tradeWith == c.playerId
+                        if (PlayerHandler.players[c.WanneTradeWith].tradeWith == c.index
                                 && PlayerHandler.players[c.WanneTradeWith].tradeWaitingTime > 0) {
                             if(c.macAddress == PlayerHandler.players[c.WanneTradeWith].macAddress) {
                                 c.sendMessage("You can not trade your self");
@@ -159,7 +159,7 @@ public class TradeSystem {
                             }
                             c.tradeWith = c.WanneTradeWith;
                             c.tradeWaitingTime = 40;
-                            getTradePartner().tradeRequest = c.playerId;
+                            getTradePartner().tradeRequest = c.index;
                             c.sendMessage("Sending trade request...");
                         }
                         c.WanneTrade = 0;

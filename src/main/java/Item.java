@@ -977,7 +977,7 @@ public static int[] targetSlots = new int[Config.MAX_ITEMS];
 		boolean item1 = false;
 		for (String element : data) {
 			if ((item.endsWith(element) || item.contains(element))
-					&& itemId != 4214) {
+					&& !item.toLowerCase().contains("hatchet")) {
 				item1 = true;
 			}
 		}

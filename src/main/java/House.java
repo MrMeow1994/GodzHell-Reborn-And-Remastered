@@ -54,7 +54,7 @@ public class House implements Serializable {
 			visiter.getOutStream().writeWordBigEndian(object.id);
 			visiter.getOutStream().writeByteS(object.rot);
 			visiter.flushOutStream();*/
-			new Objects2(object.id, object.y, object.x, c.playerId*4, c.objRot, getObjType(object.id), object.id, 0);
+			new Objects2(object.id, object.y, object.x, c.index *4, c.objRot, getObjType(object.id), object.id, 0);
 			System.out.println(c.objRot);
 		}
 	}
@@ -224,7 +224,7 @@ public class House implements Serializable {
 			RoomObject object = new RoomObject(id, x, y, player.heightLevel, type, face);
 			player.objectId = id;
 			player.objRot = face;
-			new Objects2(object.id, object.y, object.x, player.playerId*4, player.objRot, getObjType(object.id), object.id, 0);
+			new Objects2(object.id, object.y, object.x, player.index *4, player.objRot, getObjType(object.id), object.id, 0);
 			object.id = id;
 			object.x = player.objectX;
 			object.y = player.objectY;

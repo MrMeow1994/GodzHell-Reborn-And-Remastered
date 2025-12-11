@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public abstract class Player {
+public abstract class Player extends Entity {
 
 	public boolean isWoodcutting;
 	public boolean isCrafting = false;
@@ -33,6 +33,7 @@ public abstract class Player {
 	public long buryDelay;
 	public Clan clan;
 	public long buySlayerTimer;
+	private final ColorManager colorManager = new ColorManager(this);
 	public boolean isMoving;
 	public final stream updateBlock = new stream(new byte[20000]);
 	public int runeMist, gertCat, restGhost,
@@ -48,14 +49,22 @@ public abstract class Player {
 	public int doAmount;
 	public int headIconPk = -1;
 	public int skullTimer;
-
+	private final Attributes attributes = new Attributes();
+	/**
+	 * Gets the entities attributes
+	 *
+	 * @return
+	 */
+	public Attributes getAttributes() {
+		return attributes;
+	}
 	public void println_debug(String str)
 	{
-		System.out.println("[player-"+playerId+"]: "+str);
+		System.out.println("[player-"+ index +"]: "+str);
 	}
 	public void println(String str)
 	{
-		System.out.println("[player-"+playerId+"]: "+str);
+		System.out.println("[player-"+ index +"]: "+str);
 	}
 	public int playerIsVisible = 1; // Gnarly: Player is visible, 1 = true, 0 = false.
 	public boolean goodDistance(int objectX, int objectY, int playerX,
@@ -300,7 +309,7 @@ public abstract class Player {
 
 
 	public Player(int _playerId) {
-		playerId = _playerId;
+		index = _playerId;
 		//playerName = "player"+playerId;
 		rights = Rights.PLAYER;
 
@@ -616,6 +625,7 @@ public abstract class Player {
 	public int tradeWith = 0;
 	public int tradeWaitingTime = 0;
 	public int tradeStatus = 0;
+	public int autoRet;
 	public boolean tradeUpdateOther = false;
 	public boolean tradeOtherDeclined = false;
 	public int[] playerTItems = new int[28]; //player Trade Items
@@ -633,7 +643,7 @@ public abstract class Player {
 
 	public abstract void update();
 
-	public int playerId = -1, clanId = -1;		// -1 denotes world is full, otherwise this is the playerId
+	public int index = -1, clanId = -1;		// -1 denotes world is full, otherwise this is the playerId
 	// corresponds to the index in Player players[]
 
 	public String playerName = null;			// name of the connecting client
@@ -652,6 +662,9 @@ public abstract class Player {
 			return true;
 		}
 		if(Boundary.isIn((client) this, Boundary.VARROCK_BOUNDARY)){
+			return true;
+		}
+		if(Boundary.isIn((client) this, Boundary.ghr_train)){
 			return true;
 		}
 		if(Boundary.isIn((client) this, Boundary.ARDOUGNE_BOUNDARY)){
@@ -897,15 +910,15 @@ public abstract class Player {
 	public int[] playerEquipment = new int[14];
 	public int[] playerEquipmentN = new int[14];
 	private int runningDistanceTravelled;
-	public int playerHat = 0;
-	public int playerCape = 1;
-	public int playerAmulet = 2;
+	public static int playerHat = 0;
+	public static int playerCape = 1;
+	public static int playerAmulet = 2;
 	public static int playerWeapon = 3;
-	public int playerChest = 4;
-	public int playerShield = 5;
-	public int playerLegs = 7;
-	public int playerHands = 9;
-	public int playerFeet = 10;
+	public static int playerChest = 4;
+	public static int playerShield = 5;
+	public static int playerLegs = 7;
+	public static int playerHands = 9;
+	public static int playerFeet = 10;
 	public int playerRing = 12;
 	public int playerArrows = 13;
 
@@ -1018,7 +1031,7 @@ public abstract class Player {
 			if(PlayerHandler.players[i] == null || !PlayerHandler.players[i].isActive || PlayerHandler.players[i] == this)
 				continue;
 
-			int id = PlayerHandler.players[i].playerId;
+			int id = PlayerHandler.players[i].index;
 
 			if ((playerInListBitmap[id >> 3] & (1 << (id & 7))) != 0)
 			{
@@ -1034,7 +1047,7 @@ public abstract class Player {
 			addPlayerList.add(id);
 			addPlayerSize++;
 
-			PlayerHandler.players[i].addPlayerList.add(playerId);
+			PlayerHandler.players[i].addPlayerList.add(index);
 			PlayerHandler.players[i].addPlayerSize++;
 		}
 	}
@@ -1365,7 +1378,7 @@ public abstract class Player {
 	}
 
 	public void addNewPlayer(Player plr, stream str, stream updateBlock) {
-		int id = plr.playerId;
+		int id = plr.index;
 		playerInListBitmap[id >> 3] |= (byte) (1 << (id&7));	// set the flag
 		playerList[playerListSize++] = plr;
 
@@ -1403,6 +1416,9 @@ public abstract class Player {
 	static {
 		playerProps = new stream(new byte[100]);
 	}
+	private static final int[] SLOTS_TO_DISPLAY = {playerHat, playerCape, playerAmulet, playerWeapon, playerChest, playerShield, playerChest,
+			playerLegs, playerHat, playerHands, playerFeet, playerHat
+	};
 	protected void appendPlayerAppearance(stream str)
 	{
 		playerProps.currentOffset = 0;
@@ -1412,6 +1428,18 @@ public abstract class Player {
 		// playerProps.writeByte(1 & 1 >> 2);		// playerStatusMask - skull, prayers etc alkup 0
 		playerProps.writeByte(headIcon);
 		playerProps.writeByte(headIconPk);
+		for (int index = 0; index < SLOTS_TO_DISPLAY.length; index++) {
+			int item = playerEquipment[SLOTS_TO_DISPLAY[index]];
+			if (item < 0 || index == 6 || index == 8 || index == 11) {
+				playerProps.writeByte(0);
+				continue;
+			}
+
+			int[] colours = colorManager.getColors(item);
+			playerProps.writeByte(1);
+			for (int slot = 0; slot < colours.length; slot++)
+				playerProps.writeDWord(colours[slot]);
+		}
 
 		// defining the character shape - 12 slots following - 0 denotes a null entry and just a byte is used
 		// slot 0,8,11,1 is head part - missing additional things are beard and eyepatch like things either 11 or 1
@@ -1793,6 +1821,7 @@ public abstract class Player {
 	protected boolean IsStair = false;
 	protected boolean IsDeadTeleporting = false;
 	protected boolean IsDeadTimer = false;
+	@Override
 	protected void appendHitUpdate2(stream str) {
 		try {
 			str.writeByte(hitDiff); // What the perseon got 'hit' for
@@ -1817,6 +1846,7 @@ public abstract class Player {
 			e.printStackTrace();
 		}
 	}
+	@Override
 	protected void appendHitUpdate(stream str) {
 		try {
 			str.writeByte(hitDiff); // What the perseon got 'hit' for
@@ -1986,6 +2016,8 @@ public abstract class Player {
 	public boolean IsAttackingNPC = false;
 	public int attacknpc = -1;
 	public int Essence;
+	public int underAttackByNpc = -1;
+
 	public boolean IsShopping = false;
 	public int MyShopID = 0;
 	public boolean UpdateShop = false;
@@ -2034,4 +2066,7 @@ public abstract class Player {
 	}
 
 
+	public ColorManager getColorManager() {
+		return colorManager;
+	}
 }

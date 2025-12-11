@@ -439,21 +439,21 @@ public class NPCHandler {
         //newNPC.maxHit = maxHit;
         //newNPC.attack = attack;
         //newNPC.defence = defence;
-        newNPC.spawnedBy = c.playerId;
+        newNPC.spawnedBy = c.index;
         newNPC.IsUnderAttack = true;
-        newNPC.faceplayer(c.playerId);
+        newNPC.faceplayer(c.index);
         if (headIcon)
             c.drawHeadicon(1, slot);
         if (summonFollow) {
             newNPC.summoner = true;
-            newNPC.summonedBy = c.playerId;
+            newNPC.summonedBy = c.index;
             c.summonId = npcType;
             c.hasNpc = true;
         }
         if (attackPlayer) {
             newNPC.IsUnderAttack = true;
             if (c != null) {
-                newNPC.StartKilling = c.playerId;
+                newNPC.StartKilling = c.index;
             }
         }
         npcs[slot] = newNPC;
@@ -488,13 +488,13 @@ public class NPCHandler {
         newNPC.MaxHP = HP;
         newNPC.MaxHit = maxHit;
         newNPC.attack = attack;
-        newNPC.spawnedBy = c.playerId;
+        newNPC.spawnedBy = c.index;
         if (headIcon)
             c.drawHeadicon(1, slot);
         if (attackPlayer) {
             newNPC.IsUnderAttack = true;
             if (c != null) {
-                newNPC.StartKilling = c.playerId;
+                newNPC.StartKilling = c.index;
             }
         }
         npcs[slot] = newNPC;
@@ -613,7 +613,7 @@ public class NPCHandler {
         if (c != null) {
             if (NPCDrops.constantDrops.get(npcs[i].npcType) != null) {
                 for (int item : NPCDrops.constantDrops.get(npcs[i].npcType)) {
-                    ItemHandler.addItem(item, npcs[i].absX, npcs[i].absY, 1, c.playerId, false);
+                    ItemHandler.addItem(item, npcs[i].absX, npcs[i].absY, 1, c.index, false);
                     // if (c.clanId >= 0)
                     // Server.clanChat.handleLootShare(c, item, 1);
                 }
@@ -623,7 +623,7 @@ public class NPCHandler {
                 if (rareDrops(i)) {
                     int random = misc.random(NPCDrops.rareDrops
                             .get(npcs[i].npcType).length - 1);
-                    ItemHandler.addItem(NPCDrops.rareDrops.get(npcs[i].npcType)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.rareDrops.get(npcs[i].npcType)[random][1], c.playerId, false);
+                    ItemHandler.addItem(NPCDrops.rareDrops.get(npcs[i].npcType)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.rareDrops.get(npcs[i].npcType)[random][1], c.index, false);
                     //if (c.clanId >= 0)
                     //Server.clanChat
                     //.handleLootShare(
@@ -633,7 +633,7 @@ public class NPCHandler {
                 } else {
                     int random = misc.random(NPCDrops.normalDrops
                             .get(npcs[i].npcType).length - 1);
-                    ItemHandler.addItem(NPCDrops.normalDrops.get(npcs[i].npcType)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.normalDrops.get(npcs[i].npcType)[random][1], c.playerId, false);
+                    ItemHandler.addItem(NPCDrops.normalDrops.get(npcs[i].npcType)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.normalDrops.get(npcs[i].npcType)[random][1], c.index, false);
                     // Server.clanChat.handleLootShare(c,
                     //NPCDrops.normalDrops.get(npcs[i].npcType)[random][0],
                     //NPCDrops.normalDrops.get(npcs[i].npcType)[random][1]);
@@ -847,6 +847,9 @@ public class NPCHandler {
             if (Boundary.isIn(player, Boundary.gh_train)) {
                 continue;
             }
+            if (Boundary.isIn(player, Boundary.ghr_train)) {
+                continue;
+            }
             if (Boundary.isIn(player, Boundary.gh_shop_zone)) {
                 continue;
             }
@@ -873,9 +876,11 @@ public class NPCHandler {
             }
 
             if (canAggro) {
-                npc.StartKilling = player.playerId;
+                npc.StartKilling = player.index;
                 npc.IsUnderAttack = true;
                 npc.RandomWalk = false;
+                player.underAttackByNpc = npcId;
+
                 attackPlayer(npcId);
                 return true;
             }
@@ -4451,7 +4456,7 @@ public class NPCHandler {
     }
 
     private void handleFacing(NPC npc, client player) {
-        npc.faceplayer(player.playerId);
+        npc.faceplayer(player.index);
         npc.enemyX = player.absX;
         npc.enemyY = player.absY;
 
@@ -4461,10 +4466,8 @@ public class NPCHandler {
 
         player.face = npc.npcId;
         player.faceUpdateRequired = true;
-        player.attacknpc = npc.npcId;
-        player.IsAttackingNPC = true;
 
-        FollowPlayerCB(npc.npcId, player.playerId);
+        FollowPlayerCB(npc.npcId, player.index);
         handleClipping(npc.npcId);
     }
 
@@ -4598,7 +4601,7 @@ public class NPCHandler {
                 npc.projectileId,
                 getProjectileStartHeight(npc.npcId, npc.projectileId),
                 getProjectileEndHeight(npc.npcId, npc.projectileId),
-                -player.playerId - 1, 65
+                -player.index - 1, 65
         );
     }
 
