@@ -1465,64 +1465,41 @@ public class clickingMost {
                 break;
 
             case 4140: //varrock
-                if (c.teleblock) { //Made Traxxas
-                    c.sendMessage("A magical force stops you from teleporting.");
-                } else {
-                    if(c.actionTimer == 0) {
-                        c.addSkillXP((50 * c.playerLevel[6]), 6);
-                        c.teleportToX = 3209;
-                        c.teleportToY = 3423;
-                        c.heightLevel = 0;
-                        c.sendMessage("You Teleport To Varrock");
-                    }
+                if(c.actionTimer == 0) {
+                    c.TeleTo("Varrock", 25, ItemIDs.AIR_RUNE, 3, ItemIDs.FIRE_RUNE, 1, ItemIDs.LAW_RUNE, 1);
+                    c.actionTimer = 7;
                 }
                 break;
 
             case 4143: //1st ancient tele
-                if (c.teleblock) { //Made by Traxxas
-                    c.sendMessage("A magical force stops you from teleporting.");
-                } else {
-                    if(c.actionTimer == 0) {
-                        c.addSkillXP((75 * c.playerLevel[6]), 6);
-                        c.teleportToX = 3221;
-                        c.teleportToY = 3219;
-                        c.heightLevel = 0;
-                        c.actionTimer = 3;
-                        c.sendMessage("You Teleport To lumby");
-                    }
+                if(c.actionTimer == 0) {
+                c.TeleTo("Lumby", 31, ItemIDs.AIR_RUNE, 3, ItemIDs.EARTH_RUNE, 1, ItemIDs.LAW_RUNE, 1);
+                    c.actionTimer = 7;
                 }
-                break;
+            break;
 
             case 4146: //1st ancient tele
-                if (c.teleblock) { //Made by Traxxas
-                    c.sendMessage("A magical force stops you from teleporting.");
-                } else {
-                    if(c.actionTimer == 0) {
-                        c.addSkillXP((100 * c.playerLevel[6]), 6);
-                        c.teleportToX = 2964;
-                        c.teleportToY = 3378;
-                        c.heightLevel = 0;
-                        c.actionTimer = 3;
-                        c.sendMessage("You Teleport To falador");
-                    }
+                if(c.actionTimer == 0) {
+                c.TeleTo("Falador", 37, ItemIDs.AIR_RUNE, 3, ItemIDs.WATER_RUNE, 1, ItemIDs.LAW_RUNE, 1);
+                    c.actionTimer = 7;
                 }
                 break;
 
             case 4150: //1st ancient tele
-                if (c.teleblock) { //Made Traxxas
-                    c.sendMessage("A magical force stops you from teleporting.");
-                } else {
-                    if(c.actionTimer == 0) {
-                        c.addSkillXP((200 * c.playerLevel[6]), 6);
-                        c.teleportToX = 2757;
-                        c.teleportToY = 3479;
-                        c.heightLevel = 0;
-                        c.actionTimer = 3;
-                        c.sendMessage("You Teleport To Camelot");
-                    }
+                if(c.actionTimer == 0) {
+                c.TeleTo("Camelot", 45, ItemIDs.AIR_RUNE, 5, ItemIDs.LAW_RUNE, 1);
+                    c.actionTimer = 7;
                 }
+
                 break;
 
+            case 6004:
+              //  c.TeleTo("Ardougne", 51);
+                break;
+
+            case 6005:
+               // c.TeleTo("Watchtower", 58);
+                break;
             case 49022: //1st ancient tele
                 if (c.teleblock) { //Made Traxxas
                     c.sendMessage("A magical force stops you from teleporting.");

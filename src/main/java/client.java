@@ -4,9 +4,14 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
+import org.jetbrains.kotlin.com.google.gson.JsonArray;
+import org.jetbrains.kotlin.com.google.gson.JsonObject;
+
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.jetbrains.kotlin.com.google.gson.JsonParser;
 
 
 import java.io.FileWriter;
@@ -8132,136 +8137,203 @@ public void setHouse(House house) {
             }
         }
     }
+    public int[] findOpenTile(int x, int y, int height) {
+        int radius = 5;
 
-    public void TeleTo(String s, int level) {
+        // Collect all candidate tiles
+        List<int[]> tiles = new ArrayList<>();
+
+        for (int r = 0; r <= radius; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dy = -r; dy <= r; dy++) {
+                    tiles.add(new int[]{ x + dx, y + dy });
+                }
+            }
+        }
+
+        // Randomize order
+        Collections.shuffle(tiles);
+
+        // Return the first free one
+        for (int[] t : tiles) {
+            if (isTileFree(t[0], t[1], height)) {
+                return t;
+            }
+        }
+
+        // fallback if none found
+        return new int[]{ x, y };
+    }
+
+    public boolean isTileFree(int x, int y, int height) {
+        return !Region.isTileBlockedByObject(x, y, height);
+    }
+    public int[] teleportitems;      // item IDs
+    public int[] teleportamounts;    // corresponding amounts
+
+    public void TeleTo(String s, int level, int... itemPairs) {
         teleX = absX;
         teleY = absY;
         newheightLevel = heightLevel;
-        checkwildy();
-        if (!teleblock && actionTimer <= 7) {
-            if (s == "Varrock") {
-                teleX = 3210;
-                teleY = 3424;
-                addSkillXP((20 * playerLevel[6]), 6);
-                newheightLevel = 0;
-            }
+        int pairCount = itemPairs.length / 2;
+        teleportitems = new int[pairCount];
+        teleportamounts = new int[pairCount];
 
-            if (s == "Falador") {
-                teleX = 2964;
-                teleY = 3378;
-                addSkillXP((30 * playerLevel[6]), 6);
-                newheightLevel = 0;
-
-            }
-
-            if (s == "Lumby") {
-                teleX = 3222;
-                teleY = 3218;
-                addSkillXP((40 * playerLevel[6]), 6);
-                newheightLevel = 0;
-            }
-
-            if (s == "Camelot") {
-                teleX = 2757;
-                teleY = 3477;
-                addSkillXP((50 * playerLevel[6]), 6);
-                newheightLevel = 0;
-            }
-
-            if (s == "Ardougne") {
-                teleX = 2662;
-                teleY = 3305;
-                addSkillXP((120 * playerLevel[6]), 6);
-                newheightLevel = 0;
-
-            }
-
-            if (s == "Watchtower") {
-                teleX = 2549;
-                teleY = 3113;
-                addSkillXP((150 * playerLevel[6]), 6);
-                newheightLevel = 0;
-
-            }
-
-            if (s == "Trollheim") {
-                teleX = 2480;
-                teleY = 5174;
-                addSkillXP((400 * playerLevel[6]), 6);
-                newheightLevel = 0;
-            }
-
-            if (s == "Ape") {
-                teleX = 2761;
-                teleY = 2784;
-                addSkillXP((400 * playerLevel[6]), 6);
-                newheightLevel = 1;
-            }
-            if (s == "Paddewwa") {
-
-                teleX = 3131;
-                teleY = 9912;
-                addSkillXP((150 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            if (s == "Senntisten") {
-
-                teleX = 3312;
-                teleY = 3376;
-                addSkillXP((200 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            if (s == "Kharyrll") {
-
-                teleX = 3493;
-                teleY = 3485;
-                addSkillXP((25 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            if (s == "Lasaar") {
-
-                teleX = 3007;
-                teleY = 3477;
-                addSkillXP((350 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            if (s == "Carrallangar") {
-
-                teleX = 3161;
-                teleY = 3671;
-                addSkillXP((400 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            if (s == "Annakarl") {
-
-                teleX = 3288;
-                teleY = 3886;
-                addSkillXP((550 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            if (s == "Ghorrock") {
-
-                teleX = 3091;
-                teleY = 3963;
-                addSkillXP((650 * playerLevel[playerMagic]), playerMagic);
-                newheightLevel = 0;
-            }
-            getPA().RemoveAllWindows();
-            closeInterface();
-            teleport();
-            actionTimer = 10;
-        } else if (teleblock) {
-            sendMessage("A magical force stops you from teleporting.");
-        } else if (playerLevel[6] < level) {
-            sendMessage(
-                    "You need a magic level of " + level
-                            + " to cast this spell.");
-        } else if (inwildy) {
-            sendMessage("You cannot teleport above level 20 wilderness.");
+        for (int i = 0; i < pairCount; i++) {
+            teleportitems[i] = itemPairs[i * 2];
+            teleportamounts[i] = itemPairs[i * 2 + 1];
         }
+        for (int i = 0; i < teleportitems.length; i++) {
+            int itemId = teleportitems[i];
+            int amount = teleportamounts[i];
 
-        updateRequired = true;
-        appearanceUpdateRequired = true;
+            checkwildy();
+            if (playerHasItem(itemId, amount)) {
+                deleteItem2(itemId, amount);
+            } else {
+                sendMessage("You do not have the required runes to cast this spell.");
+                return;
+            }
+        }
+            if (!teleblock && actionTimer <= 7) {
+                if (s == "Varrock") {
+                    int[] safe = findOpenTile(3210, 3424, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((20 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+                }
+
+                if (s == "Falador") {
+                    int[] safe = findOpenTile(2964, 3378, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((30 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+
+                }
+
+                if (s == "Lumby") {
+                    int[] safe = findOpenTile(3222, 3218, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((40 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+                }
+
+                if (s == "Camelot") {
+                    int[] safe = findOpenTile(2757, 3477, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((50 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+                }
+
+                if (s == "Ardougne") {
+                    int[] safe = findOpenTile(2662, 3305, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((120 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+
+                }
+
+                if (s == "Watchtower") {
+                    int[] safe = findOpenTile(2549, 3113, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((150 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+
+                }
+
+                if (s == "Trollheim") {
+                    int[] safe = findOpenTile(2480, 5174, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((400 * playerLevel[6]), 6);
+                    newheightLevel = 0;
+                }
+
+                if (s == "Ape") {
+                    int[] safe = findOpenTile(2761, 2784, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((400 * playerLevel[6]), 6);
+                    newheightLevel = 1;
+                }
+                if (s == "Paddewwa") {
+                    int[] safe = findOpenTile(3131, 9912, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((150 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                if (s == "Senntisten") {
+                    int[] safe = findOpenTile(3312, 3376, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((200 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                if (s == "Kharyrll") {
+                    int[] safe = findOpenTile(3493, 3485, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((25 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                if (s == "Lasaar") {
+                    int[] safe = findOpenTile(3007, 3477, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((350 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                if (s == "Carrallangar") {
+                    int[] safe = findOpenTile(3161, 3671, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((400 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                if (s == "Annakarl") {
+                    int[] safe = findOpenTile(3288, 3886, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+
+                    addSkillXP((550 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                if (s == "Ghorrock") {
+                    int[] safe = findOpenTile(3091, 3963, newheightLevel);
+                    teleX = safe[0];
+                    teleY = safe[1];
+                    addSkillXP((650 * playerLevel[playerMagic]), playerMagic);
+                    newheightLevel = 0;
+                }
+                getPA().RemoveAllWindows();
+                closeInterface();
+                teleport();
+                actionTimer = 10;
+            } else if (teleblock) {
+                sendMessage("A magical force stops you from teleporting.");
+            } else if (playerLevel[6] < level) {
+                sendMessage(
+                        "You need a magic level of " + level
+                                + " to cast this spell.");
+            } else if (inwildy) {
+                sendMessage("You cannot teleport above level 20 wilderness.");
+            }
+
+            updateRequired = true;
+            appearanceUpdateRequired = true;
     }
 
     public boolean HasItemAmount(int itemID, int itemAmount) {
@@ -20039,8 +20111,9 @@ nated = Integer.parseInt(token2);
             stillgfx(392, absY, absX);
             teletimer = 12;
         } else  {
-            setAnimation(714);
-            stillgfx(308, absY, absX);
+            startAnimation(8939);
+            lowGFX(1576, 0);
+            sendSound(200, 7, 0);
             teletimer = 5;
         }
     }
@@ -21504,6 +21577,19 @@ nated = Integer.parseInt(token2);
                 teletimer -= 1;
                 mageTimer -= 1;
 
+
+                if (teleport == true && teletimer <= 0) {
+                    startAnimation(8941);
+                    sendSound(201, 7, 0);
+                    teleportToX = teleX;
+                    teleportToY = teleY;
+                    heightLevel = newheightLevel;
+                    teleport = false;
+                    teleX = 0;
+                    teleY = 0;
+                    newheightLevel = 0;
+                    lowGFX(1577, 0);
+                }
 
                 PrayerTimer -= 1;
 
@@ -35155,543 +35241,161 @@ public int GetGLCLConstruction(int ItemID) {
     }
 
     public int loadmoreinfo() {
-        String line = "";
-        String token = "";
-        String token2 = "";
-        String[] token3 = new String[3];
-        boolean EndOfFile = false;
-        int ReadMode = 0;
-        BufferedReader characterfile = null;
-        BufferedReader characterfile2 = null;
-        boolean File1 = false;
-        boolean File2 = false;
+        File file = new File("./Data/moreinfo/" + playerName + ".json");
 
-        try {
-            characterfile = new BufferedReader(
-                    new FileReader("./Data/moreinfo/" + playerName + ".txt"));
-            File1 = true;
-        } catch (FileNotFoundException fileex1) {
-        }
-        if (File1 && File2) {
-            File myfile1 = new File("./Data/moreinfo/" + playerName + ".txt");
-            File myfile2 = new File("./Data/moreinfo/" + playerName + ".txt");
-
-            if (myfile1.lastModified() < myfile2.lastModified()) {
-                characterfile = characterfile2;
-            }
-        } else if (!File1 && File2) {
-            characterfile = characterfile2;
-        } else if (!File1 && !File2) {
-            misc.println(playerName + ": moreinfo file not found.");
+        if (!file.exists()) {
             IsSnowing = randomWeather();
             savemoreinfo();
             return 3;
         }
-        try {
-            line = characterfile.readLine();
-        } catch (IOException ioexception) {
-            misc.println(playerName + ": error loading file.");
-        }
-        while (!EndOfFile && line != null) {
-            line = line.trim();
-            int spot = line.indexOf("=");
 
-            if (spot > -1) {
-                token = line.substring(0, spot);
-                token = token.trim();
-                token2 = line.substring(spot + 1);
-                token2 = token2.trim();
-                token3 = token2.split("\t");
-                switch (ReadMode) {
-                    case 1:
-                        if (token.equals("character-clueid")) {
-                            clueid = Integer.parseInt(token2);
-                        } else if (token.equals("character-cluelevel")) {
-                            cluelevel = Integer.parseInt(token2);
-                        } else if (token.equals("character-cluestage")) {
-                            cluestage = Integer.parseInt(token2);
-                        } else if (token.equals("character-lastlogin")) {
-                            playerLastConnect = (token2);
-                        } else if (token.equals("character-lastlogintime")) {
-                            lastlogintime = Integer.parseInt(token2);
-                        } else if (token.equals("character-reputation")) {
-                            reputation = Integer.parseInt(token2);
-                        } else if (token.equals("character-ancients")) {
-                            playerMagicBook = Integer.parseInt(token2);
-                        } else if (token.equals("character-starter")) {
-                            starter = Integer.parseInt(token2);
-                        } else if (token.equals("character-rangestarter")) {
-                            rangestarter = Integer.parseInt(token2);
-                        } else if (token.equals("character-magestarter")) {
-                            magestarter = Integer.parseInt(token2);
-                        } else if (token.equals("character-hasegg")) {
-                            hasegg = Integer.parseInt(token2);
-                        } else if (token.equals("character-hasset")) {
-                            hasset = Integer.parseInt(token2);
-                        } else if (token.equals("bankPin")) {
-                            bankPin = token2;
-                        } else if (token.equals("character-loyaltyRank")) {
-                            loyaltyRank = Integer.parseInt(token2);
-                        } else if (token.equals("setPin")) {
-                            setPin = Boolean.parseBoolean(token2);
-                        } else if (token.equals("character-pkpoints")) {
-                            pkpoints = Integer.parseInt(token2);
-                        } else if (token.equals("character-spawnpoints")) {
-                            spawnpoints = Integer.parseInt(token2);
-                        } else if (token.equals("character-killcount")) {
-                            killcount = Integer.parseInt(token2);
-                        } else if (token.equals("character-deathcount")) {
-                            deathcount = Integer.parseInt(token2);
-                        } else if (token.equals("character-mutedate")) {
-                            mutedate = Integer.parseInt(token2);
-                        } else if (token.equals("character-Dhkills")) {
-                            Dhkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Varcekills")) {
-                            Varcekills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Zombiekills")) {
-                            Zombiekills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Toragkills")) {
-                            Toragkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Ahrimkills")) {
-                            Ahrimkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Guthankills")) {
-                            Guthankills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Karilkills")) {
-                            Karilkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Chaoskills")) {
-                            Chaoskills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Giantkills")) {
-                            Giantkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Ghostkills")) {
-                            Ghostkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Druidkills")) {
-                            Druidkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Demonkills")) {
-                            Demonkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-JDemonkills")) {
-                            JDemonkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-Generalkills")) {
-                            Generalkills = Integer.parseInt(token2);
-                        } else if (token.equals("character-height")) {
-                            heightLevel = Integer.parseInt(token2);
-                        }
-                        break;
+        try (Reader reader = new FileReader(file)) {
+            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
 
-                    case 2:
-                        if (token.equals("character-questpoints")) {
-                            totalqp = Integer.parseInt(token2);
-                        } else if (token.equals("character-quest_1")) {
-                            q1stage = Integer.parseInt(token2);
-                        } else if (token.equals("character-quest_2")) {
-                            q2stage = Integer.parseInt(token2);
-                        } else if (token.equals("character-quest_3")) {
-                            q3stage = Integer.parseInt(token2);
-                        }
-                        break;
+            // ======= MOREINFO =======
+            JsonObject m = root.getAsJsonObject("moreinfo");
+            setPin = m.get("setPin").getAsBoolean();
+            bankPin = m.get("bankPin").getAsString();
+            clueid = m.get("clueid").getAsInt();
+            loyaltyRank = m.get("loyaltyRank").getAsInt();
+            cluelevel = m.get("cluelevel").getAsInt();
+            cluestage = m.get("cluestage").getAsInt();
+            Giantkills = m.get("Giantkills").getAsInt();
+            Ghostkills = m.get("Ghostkills").getAsInt();
+            Druidkills = m.get("Druidkills").getAsInt();
+            Demonkills = m.get("Demonkills").getAsInt();
+            JDemonkills = m.get("JDemonkills").getAsInt();
+            Generalkills = m.get("Generalkills").getAsInt();
+            Zombiekills = m.get("Zombiekills").getAsInt();
+            connectedFrom = m.get("connectedFrom").getAsString();
+            playerLastLogin = m.get("playerLastLogin").getAsInt();
+            reputation = m.get("reputation").getAsInt();
+            playerMagicBook = m.get("playerMagicBook").getAsInt();
+            starter = m.get("starter").getAsInt();
+            rangestarter = m.get("rangestarter").getAsInt();
+            magestarter = m.get("magestarter").getAsInt();
+            hasegg = m.get("hasegg").getAsInt();
+            hasset = m.get("hasset").getAsInt();
+            pkpoints = m.get("pkpoints").getAsInt();
+            spawnpoints = m.get("spawnpoints").getAsInt();
+            killcount = m.get("killcount").getAsInt();
+            deathcount = m.get("deathcount").getAsInt();
+            mutedate = m.get("mutedate").getAsInt();
+            heightLevel = m.get("heightLevel").getAsInt();
 
-                    case 3:
-                        if (token.equals("character-look")) {
-                            playerAppearance[Integer.parseInt(token3[0])] = Integer.parseInt(
-                                    token3[1]);
-                        }
-                        if (token.equals("character-color")) {
-                            playerColor[Integer.parseInt(token3[0])] = Integer.parseInt(
-                                    token3[1]);
-                        }
-                        if (token.equals("character-head")) {
-                            pHead = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-torso")) {
-                            pTorso = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-arms")) {
-                            pArms = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-hands")) {
-                            pHands = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-legs")) {
-                            pLegs = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-feet")) {
-                            pFeet = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-beard")) {
-                            pBeard = Integer.parseInt(token2);
-                        }
-                        break;
+            // ======= QUESTS =======
+            JsonObject q = root.getAsJsonObject("quests");
+            totalqp = q.get("totalqp").getAsInt();
+            q1stage = q.get("q1stage").getAsInt();
+            q2stage = q.get("q2stage").getAsInt();
+            q3stage = q.get("q3stage").getAsInt();
 
-                    case 4:
-                        if (token.equals("character-friend")) {
-                            friends[Integer.parseInt(token3[0])] = Long.parseLong(
-                                    token3[1]);
-                            friendslot = Integer.parseInt(token3[0]);
-                            friend64 = Long.parseLong(token3[1]);
-                            // System.out.println("Friends: "+friends);
-                            // System.out.println("Loaded: "+Long.parseLong(token3[1]));
-                            // System.out.println("Loaded: "+Integer.parseInt(token3[0]));
-                        }
-                        break;
-
-                    case 5:
-                        if (token.equals("character-ignore")) {
-                            ignores[Integer.parseInt(token3[0])] = Long.parseLong(
-                                    token3[1]);
-                        }
-                        break;
-
-                    case 6:
-                        if (token.equals("character-points")) {
-                            hiddenPoints = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[1]")) {
-                            foundz[1] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[2]")) {
-                            foundz[2] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[3]")) {
-                            foundz[3] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[4]")) {
-                            foundz[4] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[5]")) {
-                            foundz[5] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[6]")) {
-                            foundz[6] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[7]")) {
-                            foundz[7] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[8]")) {
-                            foundz[8] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[9]")) {
-                            foundz[9] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[10]")) {
-                            foundz[10] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[11]")) {
-                            foundz[11] = Integer.parseInt(token2);
-                        }
-                        if (token.equals("character-foundz[12]")) {
-                            foundz[12] = Integer.parseInt(token2);
-                        }
-                        break;
-                }
-            } else {
-                if (line.equals("[MOREINFO]")) {
-                    ReadMode = 1;
-                } else if (line.equals("[QUESTS]")) {
-                    ReadMode = 2;
-                } else if (line.equals("[LOOK]")) {
-                    ReadMode = 3;
-                } else if (line.equals("[FRIENDS]")) {
-                    ReadMode = 4;
-                } else if (line.equals("[IGNORES]")) {
-                    ReadMode = 5;
-                } else if (line.equals("[HIDDEN]")) {
-                    ReadMode = 6;
-                } else if (line.equals("[EOF]")) {
-                    try {
-                        characterfile.close();
-                    } catch (IOException ioexception) {
-                    }
-                    return 1;
-                }
+            // ======= LOOK =======
+            JsonObject l = root.getAsJsonObject("look");
+            JsonArray appearanceArr = l.getAsJsonArray("appearance");
+            for (int i = 0; i < appearanceArr.size(); i++) {
+                playerAppearance[i] = appearanceArr.get(i).getAsInt();
             }
-            try {
-                line = characterfile.readLine();
-            } catch (IOException ioexception1) {
-                EndOfFile = true;
+
+            pHead = l.get("head").getAsInt();
+            pTorso = l.get("torso").getAsInt();
+            pArms = l.get("arms").getAsInt();
+            pHands = l.get("hands").getAsInt();
+            pLegs = l.get("legs").getAsInt();
+            pFeet = l.get("feet").getAsInt();
+            pBeard = l.get("beard").getAsInt();
+
+            // ======= FRIENDS =======
+            JsonArray f = root.getAsJsonArray("friends");
+            for (int i = 0; i < f.size(); i++) {
+                friends[i] = f.get(i).getAsLong();
             }
+
+            // ======= IGNORES =======
+            JsonArray ig = root.getAsJsonArray("ignores");
+            for (int i = 0; i < ig.size(); i++) {
+                ignores[i] = ig.get(i).getAsLong();
+            }
+
+            // ======= HIDDEN =======
+            JsonObject h = root.getAsJsonObject("hidden");
+            hiddenPoints = h.get("points").getAsInt();
+
+            JsonArray fz = h.getAsJsonArray("foundz");
+            for (int i = 0; i < fz.size(); i++) {
+                foundz[i] = fz.get(i).getAsInt();
+            }
+
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
-        try {
-            characterfile.close();
-        } catch (IOException ioexception) {
-        }
-        return 0;
     }
 
+
     public boolean savemoreinfo() {
-        BufferedWriter characterfile = null;
+        try (Writer writer = new FileWriter("./Data/moreinfo/" + playerName + ".json")) {
 
-        try {
-            characterfile = new BufferedWriter(
-                    new FileWriter("./Data/moreinfo/" + playerName + ".txt"));
-            characterfile.write("[MOREINFO]", 0, 10);
-            characterfile.newLine();
-            characterfile.write("setPin = ", 0, 9);
-            characterfile.write(Boolean.toString(setPin), 0, Boolean.toString(setPin).length());
-            characterfile.newLine();
-            characterfile.write("bankPin = ", 0, 10);
-            characterfile.write(bankPin, 0, bankPin.length());
-            characterfile.newLine();
-            characterfile.write("character-clueid = ", 0, 19);
-            characterfile.write(Integer.toString(clueid), 0,
-                    Integer.toString(clueid).length());
-            characterfile.newLine();
-            characterfile.write("character-loyaltyRank = ", 0, 24);
-            characterfile.write(Integer.toString(loyaltyRank), 0, Integer.toString(loyaltyRank).length());
-            characterfile.newLine();
-            characterfile.write("character-loyaltyRank = ", 0, 24);
-            characterfile.write(Integer.toString(loyaltyRank), 0, Integer.toString(loyaltyRank).length());
-            characterfile.newLine();
-            characterfile.write("character-cluelevel = ", 0, 22);
-            characterfile.write(Integer.toString(cluelevel), 0,
-                    Integer.toString(cluelevel).length());
-            characterfile.newLine();
-            characterfile.write("character-cluestage = ", 0, 22);
-            characterfile.write(Integer.toString(cluestage), 0,
-                    Integer.toString(cluestage).length());
-            characterfile.newLine();
-            characterfile.write("character-Giantkills = ", 0, 22);
-            characterfile.write(Integer.toString(Giantkills), 0,
-                    Integer.toString(Giantkills).length());
-            characterfile.newLine();
-            characterfile.write("character-Ghostkills = ", 0, 22);
-            characterfile.write(Integer.toString(Ghostkills), 0,
-                    Integer.toString(Ghostkills).length());
-            characterfile.newLine();
-            characterfile.write("character-Druidkills = ", 0, 22);
-            characterfile.write(Integer.toString(Druidkills), 0,
-                    Integer.toString(Druidkills).length());
-            characterfile.newLine();
-            characterfile.write("character-Demonkills = ", 0, 22);
-            characterfile.write(Integer.toString(Demonkills), 0,
-                    Integer.toString(Demonkills).length());
-            characterfile.newLine();
-            characterfile.write("character-JDemonkills = ", 0, 22);
-            characterfile.write(Integer.toString(JDemonkills), 0,
-                    Integer.toString(JDemonkills).length());
-            characterfile.newLine();
-            characterfile.write("character-Generalkills = ", 0, 22);
-            characterfile.write(Integer.toString(Generalkills), 0,
-                    Integer.toString(Generalkills).length());
-            characterfile.newLine();
-            characterfile.write("character-Zombiekills = ", 0, 22);
-            characterfile.write(Integer.toString(Zombiekills), 0,
-                    Integer.toString(Zombiekills).length());
-            characterfile.newLine();
-            characterfile.write("character-lastlogin = ", 0, 22);
-            characterfile.write(connectedFrom, 0, connectedFrom.length());
-            characterfile.newLine();
-            characterfile.write("character-lastlogintime = ", 0, 26);
-            characterfile.write(Integer.toString(playerLastLogin), 0,
-                    Integer.toString(playerLastLogin).length());
-            characterfile.newLine();
-            characterfile.write("character-reputation = ", 0, 23);
-            characterfile.write(Integer.toString(reputation), 0,
-                    Integer.toString(reputation).length());
-            characterfile.newLine();
-            characterfile.write("character-ancients = ", 0, 21);
-            characterfile.write(Integer.toString(playerMagicBook), 0,
-                    Integer.toString(playerMagicBook).length());
-            characterfile.newLine();
-            characterfile.write("character-starter = ", 0, 20);
-            characterfile.write(Integer.toString(starter), 0,
-                    Integer.toString(starter).length());
-            characterfile.newLine();
-            characterfile.write("character-rangestarter = ", 0, 25);
-            characterfile.write(Integer.toString(rangestarter), 0,
-                    Integer.toString(rangestarter).length());
-            characterfile.newLine();
-            characterfile.write("character-magestarter = ", 0, 24);
-            characterfile.write(Integer.toString(magestarter), 0,
-                    Integer.toString(magestarter).length());
-            characterfile.newLine();
-            characterfile.write("character-hasegg = ", 0, 19);
-            characterfile.write(Integer.toString(hasegg), 0,
-                    Integer.toString(hasegg).length());
-            characterfile.newLine();
-            characterfile.write("character-hasset = ", 0, 19);
-            characterfile.write(Integer.toString(hasset), 0,
-                    Integer.toString(hasset).length());
-            characterfile.newLine();
-            characterfile.write("character-pkpoints = ", 0, 21);
-            characterfile.write(Integer.toString(pkpoints), 0,
-                    Integer.toString(pkpoints).length());
-            characterfile.newLine();
-            characterfile.write("character-spawnpoints = ", 0, 24);
-            characterfile.write(Integer.toString(spawnpoints), 0,
-                    Integer.toString(spawnpoints).length());
-            characterfile.newLine();
-            characterfile.write("character-killcount = ", 0, 22);
-            characterfile.write(Integer.toString(killcount), 0,
-                    Integer.toString(killcount).length());
-            characterfile.newLine();
-            characterfile.write("character-deathcount = ", 0, 23);
-            characterfile.write(Integer.toString(deathcount), 0,
-                    Integer.toString(deathcount).length());
-            characterfile.newLine();
-            characterfile.write("character-mutedate = ", 0, 21);
-            characterfile.write(Integer.toString(mutedate), 0,
-                    Integer.toString(mutedate).length());
-            characterfile.newLine();
-            characterfile.write("character-height = ", 0, 19);
-            characterfile.write(Integer.toString(heightLevel), 0,
-                    Integer.toString(heightLevel).length());
-            characterfile.newLine();
-            characterfile.newLine();
-            characterfile.write("[QUESTS]", 0, 8);
-            characterfile.newLine();
-            characterfile.write("character-questpoints = ", 0, 24);
-            characterfile.write(Integer.toString(totalqp), 0,
-                    Integer.toString(totalqp).length());
-            characterfile.newLine();
-            characterfile.write("character-quest_1 = ", 0, 20);
-            characterfile.write(Integer.toString(q1stage), 0,
-                    Integer.toString(q1stage).length());
-            characterfile.newLine();
-            characterfile.write("character-quest_2 = ", 0, 20);
-            characterfile.write(Integer.toString(q2stage), 0,
-                    Integer.toString(q2stage).length());
-            characterfile.newLine();
-            characterfile.write("character-quest_3 = ", 0, 20);
-            characterfile.write(Integer.toString(q3stage), 0,
-                    Integer.toString(q3stage).length());
-            characterfile.newLine();
-            characterfile.newLine();
+            PlayerMoreInfo info = new PlayerMoreInfo();
 
-            characterfile.write("[LOOK]", 0, 6);
-            characterfile.newLine();
-            for (int i = 0; i < playerAppearance.length; i++) {
-                characterfile.write("character-look = ", 0, 17);
-                characterfile.write(Integer.toString(i), 0,
-                        Integer.toString(i).length());
-                characterfile.write("	", 0, 1);
-                characterfile.write(Integer.toString(playerAppearance[i]), 0,
-                        Integer.toString(playerAppearance[i]).length());
-                characterfile.newLine();
+            info.setPin = setPin;
+            info.bankPin = bankPin;
+            info.clueId = clueid;
+            info.loyaltyRank = loyaltyRank;
+            info.clueLevel = cluelevel;
+            info.clueStage = cluestage;
 
-                characterfile.write("character-head = ", 0, 17);
-                characterfile.write(Integer.toString(pHead), 0,
-                        Integer.toString(pHead).length());
-                characterfile.newLine();
-                characterfile.write("character-torso = ", 0, 18);
-                characterfile.write(Integer.toString(pTorso), 0,
-                        Integer.toString(pTorso).length());
-                characterfile.newLine();
-                characterfile.write("character-arms = ", 0, 17);
-                characterfile.write(Integer.toString(pArms), 0,
-                        Integer.toString(pArms).length());
-                characterfile.newLine();
-                characterfile.write("character-hands = ", 0, 18);
-                characterfile.write(Integer.toString(pHands), 0,
-                        Integer.toString(pHands).length());
-                characterfile.newLine();
-                characterfile.write("character-legs = ", 0, 17);
-                characterfile.write(Integer.toString(pLegs), 0,
-                        Integer.toString(pLegs).length());
-                characterfile.newLine();
-                characterfile.write("character-feet = ", 0, 17);
-                characterfile.write(Integer.toString(pFeet), 0,
-                        Integer.toString(pFeet).length());
-                characterfile.newLine();
-                characterfile.write("character-beard = ", 0, 18);
-                characterfile.write(Integer.toString(pBeard), 0,
-                        Integer.toString(pBeard).length());
-                characterfile.newLine();
-                characterfile.newLine();
+            info.giantKills = Giantkills;
+            info.ghostKills = Ghostkills;
+            info.druidKills = Druidkills;
+            info.demonKills = Demonkills;
+            info.jDemonKills = JDemonkills;
+            info.generalKills = Generalkills;
+            info.zombieKills = Zombiekills;
 
-            }
-            characterfile.newLine();
-            characterfile.write("[FRIENDS]", 0, 9);
-            characterfile.newLine();
-            for (int i = 0; i < friends.length; i++) {
-                if (friends[i] > 0) {
-                    characterfile.write("character-friend = ", 0, 19);
-                    characterfile.write(Integer.toString(i), 0,
-                            Integer.toString(i).length());
-                    characterfile.write("	", 0, 1);
-                    characterfile.write(Long.toString(friends[i]), 0,
-                            Long.toString(friends[i]).length());
-                    characterfile.newLine();
-                }
-            }
-            characterfile.newLine();
-            characterfile.write("[IGNORES]", 0, 9);
-            characterfile.newLine();
-            for (int i = 0; i < ignores.length; i++) {
-                if (ignores[i] > 0) {
-                    characterfile.write("character-ignore = ", 0, 19);
-                    characterfile.write(Integer.toString(i), 0,
-                            Integer.toString(i).length());
-                    characterfile.write("	", 0, 1);
-                    characterfile.write(Long.toString(ignores[i]), 0,
-                            Long.toString(ignores[i]).length());
-                    characterfile.newLine();
-                }
-            }
-            characterfile.newLine();
-            characterfile.write("[HIDDEN]", 0, 8);
-            characterfile.newLine();
-            characterfile.write("character-points = ", 0, 19);
-            characterfile.write(Integer.toString(hiddenPoints), 0,
-                    Integer.toString(hiddenPoints).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[1] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[1]), 0,
-                    Integer.toString(foundz[1]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[2] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[2]), 0,
-                    Integer.toString(foundz[2]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[3] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[3]), 0,
-                    Integer.toString(foundz[3]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[4] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[4]), 0,
-                    Integer.toString(foundz[4]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[5] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[5]), 0,
-                    Integer.toString(foundz[5]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[6] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[6]), 0,
-                    Integer.toString(foundz[6]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[7] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[7]), 0,
-                    Integer.toString(foundz[7]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[8] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[8]), 0,
-                    Integer.toString(foundz[8]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[9] = ", 0, 22);
-            characterfile.write(Integer.toString(foundz[9]), 0,
-                    Integer.toString(foundz[9]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[10] = ", 0, 23);
-            characterfile.write(Integer.toString(foundz[10]), 0,
-                    Integer.toString(foundz[10]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[11] = ", 0, 23);
-            characterfile.write(Integer.toString(foundz[11]), 0,
-                    Integer.toString(foundz[11]).length());
-            characterfile.newLine();
-            characterfile.write("character-foundz[12] = ", 0, 23);
-            characterfile.write(Integer.toString(foundz[12]), 0,
-                    Integer.toString(foundz[12]).length());
-            characterfile.newLine();
-            characterfile.newLine();
-            characterfile.write("[EOF]", 0, 5);
-            characterfile.newLine();
-            characterfile.newLine();
-            characterfile.close();
-        } catch (IOException ioexception) {
+            info.lastLoginIP = connectedFrom;
+            info.lastLoginTime = playerLastLogin;
+
+            info.reputation = reputation;
+            info.magicBook = playerMagicBook;
+            info.starter = starter;
+            info.rangeStarter = rangestarter;
+            info.mageStarter = magestarter;
+
+            info.hasEgg = hasegg;
+            info.hasSet = hasset;
+
+            info.pkPoints = pkpoints;
+            info.spawnPoints = spawnpoints;
+            info.killCount = killcount;
+            info.deathCount = deathcount;
+
+            info.muteDate = mutedate;
+            info.height = heightLevel;
+
+            info.totalQP = totalqp;
+            info.q1 = q1stage;
+            info.q2 = q2stage;
+            info.q3 = q3stage;
+
+            info.appearance = playerAppearance;
+            info.friends = friends;
+            info.ignores = ignores;
+
+            info.hiddenPoints = hiddenPoints;
+            info.hiddenFoundZ = foundz;
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(info, writer);
+
+            return true;
+        } catch (IOException e) {
             misc.println(playerName + ": error writing file.");
             return false;
         }
-        return true;
     }
+
 
     public int loadweather() {
         String line = "";

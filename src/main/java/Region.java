@@ -435,6 +435,19 @@ public class Region {
                 .findFirst();
         return exists.isPresent();
     }
+    public static boolean isTileBlockedByObject(int x, int y, int height) {
+        Region region = getRegion(x, y);
+        if (region == null) {
+            return false;
+        }
+
+        Collection<WorldObject2> regionObjects = worldObjects.get(region.id);
+        if (regionObjects == null) {
+            return false;
+        }
+        return regionObjects.stream()
+                .anyMatch(obj -> obj.x == x && obj.y == y && obj.height == height);
+    }
 
     public static Optional<WorldObject2> getWorldObject(int id, int x, int y, int height) {
         Region region = getRegion(x, y);
