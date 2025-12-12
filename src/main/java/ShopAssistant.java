@@ -77,6 +77,11 @@ public class ShopAssistant {
                     return false;
                 }
             }
+            if(c.MyShopID == 240) {
+                c.sendMessage(
+                        "You cannot sell items in this store.");
+                return false;
+            }
             if (!def.istradable()) {
                 c.sendMessage("I cannot sell " + c.GetItemName(itemID) + ".");
                 return false;
@@ -147,154 +152,129 @@ public class ShopAssistant {
         }
         return true;
     }
+    /**
+     * Returns the price in points for a given item in Shop 240.
+     * @param itemID The ID of the item.
+     * @return The price in points, or 0 if the item cannot be bought with points.
+     */
+    public int getPrestigePointPrice(int itemID) {
+        switch (itemID) {
+            case 24090:
+                return 50;
+            case 24091:
+                return 50;
+            case 24092:
+                return 50;
+            case 24093:
+                return 50;
+            case 24094:
+                return 50;
+            case 24095:
+                return 50;
+            // Add more items here
+            default:
+                return 0; // Items with no price cannot be bought
+        }
+    }
 
     public boolean buyItem(int itemID, int fromSlot, int amount) {
-        ItemCacheDefinition def = ItemCacheDefinition.forID(itemID);
-        if (amount > 0) {
-            if (fromSlot >= ShopHandler.ShopItemsN[c.MyShopID].length) {
-                c.sendMessage("There was a problem buying that item, please report it to staff!");
-                return false;
-            }
-            if (amount > ShopHandler.ShopItemsN[c.MyShopID][fromSlot]) {
-                amount = ShopHandler.ShopItemsN[c.MyShopID][fromSlot];
-            }
-            double ShopValue;
-            double TotPrice;
-            int TotPrice2;
-            int Overstock;
-            int Slot = 0;
-            int Slot1 = 0;
-            int Slot2 = 0;
+        if (amount <= 0) return false;
 
-            int boughtAmount = 0;
-            for (int i = amount; i > 0; i--) {
-                TotPrice2 = (int) Math.floor(
-                        c.GetItemShopValue(itemID, 0, fromSlot));
-                Slot = c.GetItemSlot(ItemIDs.COINS);
-                Slot1 = c.GetItemSlot(6306);
-                Slot2 = c.GetItemSlot(6529);
-                if (Slot == -1 && c.MyShopID != 99 && c.MyShopID != 113 && c.MyShopID != 114 && c.MyShopID != 115) {
-                    c.sendMessage("You don't have enough coins.");
-                    break;
-                }
-                if (Slot1 == -1 && c.MyShopID == 99 && c.MyShopID != 113 && c.MyShopID != 114 && c.MyShopID != 115) {
-                    c.sendMessage("You don't have enough Trading Sticks.");
-                    break;
-                }
-                if (Slot2 == -1 && c.MyShopID != 99 && c.MyShopID == 113 && c.MyShopID == 114 && c.MyShopID == 115) {
-                    c.sendMessage("You don't have enough Tokkul.");
-                    break;
-                }
-                if (TotPrice2 <= 1) {
-                    TotPrice2 = (int) Math.floor(c.GetItemShopValue(itemID, 0, fromSlot));
-                    TotPrice2 *= 1.66;
-                }
-                if (c.MyShopID != 99 && c.MyShopID != 113 && c.MyShopID != 114 && c.MyShopID != 115) {
-                    if (c.playerHasItem(995, TotPrice2) || TotPrice2 == 0) {
-                        if (c.freeSlots() > 0) {
-                            c.deleteItem2(ItemIDs.COINS, TotPrice2 * amount);
-                            c.addItem(itemID, 1);
-                            boughtAmount++;
-                            ShopHandler.ShopItemsN[c.MyShopID][fromSlot]--; // decrement by 1
-                            ShopHandler.ShopItemsDelay[c.MyShopID][fromSlot] = 0;
-                            // remove from shop if empty
-                            if (ShopHandler.ShopItemsN[c.MyShopID][fromSlot] <= 0) {
-                                ShopHandler.ShopItems[c.MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            c.sendMessage("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        c.sendMessage("You don't have enough coins.");
-                        break;
-                    }
-                } else if (c.MyShopID == 99 && c.MyShopID != 113 && c.MyShopID != 114 && c.MyShopID != 115) {
-                    if (c.playerHasItem(6306, TotPrice2) || TotPrice2 == 0) {
-                        if (c.freeSlots() > 0) {
-                            c.deleteItem2(6306, TotPrice2 * amount);
-                            c.addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[c.MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[c.MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[c.MyShopID]) {
-                                ShopHandler.ShopItems[c.MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            c.sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        c.sM("Not enough Trading ticks for this item.");
-                        break;
-                    }
-                } else if (c.MyShopID == 113 && c.MyShopID != 99) {
-                    if (c.playerHasItem(6529, TotPrice2) || TotPrice2 == 0) {
-                        if (c.freeSlots() > 0) {
-                            c.deleteItem2(6529, TotPrice2 * amount);
-                            c.addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[c.MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[c.MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[c.MyShopID]) {
-                                ShopHandler.ShopItems[c.MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            c.sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        c.sM("Not enough Tokkul for this item.");
-                        break;
-                    }
-                } else if (c.MyShopID == 114 && c.MyShopID != 99) {
-                    if (c.playerHasItem(6529, TotPrice2) || TotPrice2 == 0) {
-                        if (c.freeSlots() > 0) {
-                            c.deleteItem2(6529, TotPrice2 * amount);
-                            c.addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[c.MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[c.MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[c.MyShopID]) {
-                                ShopHandler.ShopItems[c.MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            c.sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        c.sM("Not enough Tokkul for this item.");
-                        break;
-                    }
-                } else if (c.MyShopID == 115 && c.MyShopID != 99) {
-                    if (c.playerHasItem(6529, TotPrice2) || TotPrice2 == 0) {
-                        if (c.freeSlots() > 0) {
-                            c.deleteItem2(6529, TotPrice2 * amount);
-                            c.addItem(itemID, amount);
-                            ShopHandler.ShopItemsN[c.MyShopID][fromSlot] -= 1;
-                            ShopHandler.ShopItemsDelay[c.MyShopID][fromSlot] = 0;
-                            if ((fromSlot + 1)
-                                    > ShopHandler.ShopItemsStandard[c.MyShopID]) {
-                                ShopHandler.ShopItems[c.MyShopID][fromSlot] = 0;
-                            }
-                        } else {
-                            c.sM("Not enough space in your inventory.");
-                            break;
-                        }
-                    } else {
-                        c.sM("Not enough Tokkul for this item.");
-                        break;
-                    }
-                }
-
-            }
-            c.getPA().resetItems(3823);
-            resetShop(c.MyShopID);
-            UpdatePlayerShop();
-            return true;
+        // Validate slot
+        if (fromSlot >= ShopHandler.ShopItemsN[c.MyShopID].length) {
+            c.sendMessage("There was a problem buying that item, please report it to staff!");
+            return false;
         }
-        return false;
+
+        // Limit amount to available stock
+        if (amount > ShopHandler.ShopItemsN[c.MyShopID][fromSlot]) {
+            amount = ShopHandler.ShopItemsN[c.MyShopID][fromSlot];
+        }
+
+        int boughtAmount = 0;
+        int TotPrice2 = 0;
+
+        for (int i = 0; i < amount; i++) {
+            int price = 0;
+            int currencyItemID = 0;
+
+            // Determine price and currency based on shop
+            switch (c.MyShopID) {
+                case 99: // Trading Stick shop
+                    currencyItemID = 6306;
+                    price = TotPrice2 = (int) Math.floor(c.GetItemShopValue(itemID, 0, fromSlot));
+                    break;
+
+                case 113: // Tokkul shop
+                case 114:
+                case 115:
+                    currencyItemID = 6529;
+                    price = TotPrice2 = (int) Math.floor(c.GetItemShopValue(itemID, 0, fromSlot));
+                    break;
+
+                case 240: // Prestige points shop
+                    currencyItemID = -1; // flag to indicate prestigePoints
+                    price = TotPrice2 = getPrestigePointPrice(itemID);
+                    if (price <= 0) {
+                        c.sM("This item cannot be purchased with prestige points.");
+                        return false;
+                    }
+                    break;
+
+                default: // Normal coin shop
+                    currencyItemID = 995; // Coins
+                    price = TotPrice2 = (int) Math.floor(c.GetItemShopValue(itemID, 0, fromSlot));
+                    if (price <= 1) price = (int) (price * 1.66);
+                    break;
+            }
+
+            // Check if player has enough currency
+            boolean hasCurrency;
+            if (currencyItemID == -1) { // prestigePoints shop
+                hasCurrency = c.prestigePoints >= TotPrice2;
+            } else {
+                hasCurrency = c.playerHasItem(currencyItemID, TotPrice2);
+            }
+
+            if (!hasCurrency) {
+                String currencyName = currencyItemID == 995 ? "coins" :
+                        currencyItemID == 6306 ? "Trading Sticks" :
+                                currencyItemID == 6529 ? "Tokkul" : "prestige points";
+                c.sM("You don't have enough " + currencyName + ".");
+                break;
+            }
+
+            // Check for inventory space
+            if (c.freeSlots() <= 0) {
+                c.sM("Not enough space in your inventory.");
+                break;
+            }
+
+            // Deduct currency and give item
+            if (currencyItemID == -1) { // prestigePoints
+                c.prestigePoints -= TotPrice2;
+            } else {
+                c.deleteItem2(currencyItemID, TotPrice2);
+            }
+            c.addItem(itemID, 1);
+            boughtAmount++;
+
+            // Update shop stock
+            ShopHandler.ShopItemsN[c.MyShopID][fromSlot]--;
+            ShopHandler.ShopItemsDelay[c.MyShopID][fromSlot] = 0;
+            if (ShopHandler.ShopItemsN[c.MyShopID][fromSlot] <= 0) {
+                ShopHandler.ShopItems[c.MyShopID][fromSlot] = 0;
+            }
+        }
+
+        // Update shop interface
+        c.getPA().resetItems(3823);
+        resetShop(c.MyShopID);
+        UpdatePlayerShop();
+
+        return boughtAmount > 0;
     }
+
 
     public void UpdatePlayerShop() {
         for (int i = 1; i < PlayerHandler.maxPlayers; i++) {

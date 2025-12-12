@@ -1997,6 +1997,7 @@ public abstract class Player extends Entity {
 
 	public int playerIsMember;
 	public int prestigeLevel;
+	public int prestigePoints;
 	public int playerHasDonated;
 	public int playerMessages;
 	public String playerLastConnect;

@@ -35,6 +35,7 @@ public class PlayerData {
     private int playerGameTime;
     private int playerGameCount;
     private int prestigeLevel;
+    private int prestigePoints;
     private int autoRet;
     private Map<Integer, int[]> colorMeta;
 
@@ -133,7 +134,7 @@ public class PlayerData {
         data.playerGameCount = plr.playerGameCount;
         data.loyaltyRank = plr.loyaltyRank;
         data.prestigeLevel = plr.prestigeLevel;
-
+        data.prestigePoints = plr.prestigePoints;
         data.playerEquipment = plr.playerEquipment;
         data.playerEquipmentN = plr.playerEquipmentN;
         data.playerAppearance = plr.playerAppearance;
@@ -789,7 +790,12 @@ public void setAutoRet(int autoRet){
     public void setColorMeta(Map<Integer, int[]> colorMeta) {
         this.colorMeta = colorMeta;
     }
-
+public int getPrestigePoints(){
+        return prestigePoints;
+}
+public void setPrestigePoints(int prestigePoints){
+        this.prestigePoints = prestigePoints;
+}
 }
 
 

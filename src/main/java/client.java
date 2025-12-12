@@ -3657,7 +3657,14 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4642, 1, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4641, 1, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4640, 1, 1, 10));
-
+//prestige zone banks
+                server.getGlobalObjects().add(new GlobalObject(2213, 2153, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2152, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2151, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2150, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2149, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2148, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(2213, 2147, 5091, 0, 0, 10));
     }
 
     public void OBJECTS() {
@@ -9298,22 +9305,22 @@ public void setHouse(House house) {
         getPA().sendQuest("Godzhell Reborn", 640);
         /*Free Quests*/
         getPA().sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
-
+        getPA().sendQuest("<col=FF7F00>Prestige Points:</col> <col=ffffff>" + prestigePoints+"</col>", 19412);
         getPA().sendQuest("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
-                + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19412);
-        getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19413);
+                + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19413);
+        getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19414);
         if (getSlayer().getTask().isEmpty()) {
-            getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19414);
+            getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19415);
         } else {
-            getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19414);
+            getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19415);
         }
         if (getSlayer().getTask().isEmpty()) {
-            getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19415);
+            getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19416);
         } else {
-            getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19415);
+            getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19416);
         }
 
-        getPA().sendQuest("", 19416);
+
         getPA().sendQuest("", 19417);
         getPA().sendQuest("", 19418);
         getPA().sendQuest("", 19419);
@@ -12327,41 +12334,8 @@ public void setHouse(House house) {
             if (playerName.equalsIgnoreCase("Superblueman")) {
                 titles = "[3rd Co Owner] ";
             }
-            if (prestigeLevel == 1) {
-                titles = "[Prestige 1] ";
-            }
-            if (prestigeLevel == 2) {
-                titles = "[Prestige 2] ";
-            }
-            if (prestigeLevel == 3) {
-                titles = "[Prestige 3] ";
-            }
-            if (prestigeLevel == 4) {
-                titles = "[Prestige 4] ";
-            }
-            if (prestigeLevel == 5) {
-                titles = "[Prestige 5] ";
-            }
-            if (prestigeLevel == 6) {
-                titles = "[Prestige 6] ";
-            }
-            if (prestigeLevel == 7) {
-                titles = "[Prestige 7] ";
-            }
-            if (prestigeLevel == 8) {
-                titles = "[Prestige 8] ";
-            }
-            if (prestigeLevel == 9) {
-                titles = "[Prestige 9] ";
-            }
-            if (prestigeLevel == 10) {
-                titles = "[Prestige 10] ";
-            }
-            if (prestigeLevel == 11) {
-                titles = "[Prestige 11] ";
-            }
-            if (prestigeLevel == 12) {
-                titles = "[Prestige 12] ";
+            if (prestigeLevel >= 1) {
+                titles = getPrestigeTitle(prestigeLevel);
             }
             PlayerHandler.messageToAll = titles + playerName + ": "
                     + command.substring(5);
@@ -12497,7 +12471,14 @@ public void setHouse(House house) {
             playerIsVisible = 1;
             requestUpdates();
         }
-        if (command.startsWith("prestige")) {
+        if (command.equalsIgnoreCase("prestigezone")) {
+            if(prestigeLevel >= 10){
+                movePlayer(2150, 5093, 0);
+            } else {
+                sendMessage("You must have 10 prestige to go here.");
+            }
+        }
+        if (command.equalsIgnoreCase("prestige")) {
             isMaxed(); // Checks if all skills are maxed
             if (!maxed) {
                 sendMessage("You must max all skills before prestiging.");
@@ -12528,7 +12509,9 @@ public void setHouse(House house) {
 
                 // Increment prestige
                 prestigeLevel += 1;
+                prestigePoints += 100 * prestigeLevel;
                 sendMessage("You have prestiged to level " + prestigeLevel + ".");
+                sendMessage("You been rewarded "+100 * prestigeLevel+" prestige points.");
                 PlayerHandler.messageToAll = "<shad=A9a9a9><col=7851a9>" + playerName +
                         "@bla@ has prestiged to prestige level " + prestigeLevel + ".";
 
@@ -21188,23 +21171,31 @@ nated = Integer.parseInt(token2);
                 secondsPlayed = 0;
             }
             getPA().sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
+            getPA().sendQuest("<col=FF7F00>Prestige Points:</col> <col=ffffff>" + prestigePoints+"</col>", 19412);
+            getPA().sendQuest("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
+                    + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19413);
+            getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19414);
+            if (getSlayer().getTask().isEmpty()) {
+                getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19415);
+            } else {
+                getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19415);
+            }
+            if (getSlayer().getTask().isEmpty()) {
+                getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19416);
+            } else {
+                getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19416);
+            }
 
-            getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19413);
-            if (getSlayer().getTask().isEmpty()) {
-                getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>None</col>", 19414);
-            } else {
-                getPA().sendQuest("<col=FF7F00>Slayer Task:</col> <col=ffffff>" +getSlayer().getTask().get().getPrimaryName().toLowerCase()+ "</col>", 19414);
-            }
-            if (getSlayer().getTask().isEmpty()) {
-                getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>0 </col>", 19415);
-            } else {
-                getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19415);
-            }
+
             if (minutesPlayed == 60) {
+                if(prestigeLevel > 1){
+                    prestigePoints += 10 * prestigeLevel;
+                }
                 hoursPlayed += 1;
                 minutesPlayed = 0;
             }
             if (hoursPlayed == 24) {
+
                 daysPlayed += 1;
                 hoursPlayed = 0;
             }
@@ -21803,6 +21794,28 @@ nated = Integer.parseInt(token2);
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+    public String getPrestigeTitle(int prestigeLevel) {
+        // Define color codes for each 10-level tier
+        String[] colors = {
+                "FFFFFF", // 1-10: white
+                "00FF00", // 11-20: green
+                "0000FF", // 21-30: blue
+                "FFFF00", // 31-40: yellow
+                "FF00FF", // 41-50: magenta
+                "00FFFF", // 51-60: cyan
+                "FFA500", // 61-70: orange
+                "800080", // 71-80: purple
+                "FF0000", // 81-90: red
+                "7851A9"  // 91-100: custom dark purple
+        };
+
+        // Determine tier index (0-9)
+        int tierIndex = (prestigeLevel - 1) / 10;
+        if (tierIndex >= colors.length) tierIndex = colors.length - 1;
+
+        // Return formatted title with color
+        return "<col=" + colors[tierIndex] + "><shad=000000>[Prestige " + prestigeLevel + "] </col></shad>";
     }
 
     public boolean packetSending() { // Ringer24: this is used for sending packets
@@ -23564,6 +23577,13 @@ nated = Integer.parseInt(token2);
                 } else if (NPCID == 2270){
                     PutNPCCoords = true;
                     WanneShop = 239; // obby shop
+                } else if (NPCID == 11674){
+                    if(prestigeLevel >= 10){
+                    PutNPCCoords = true;
+                    WanneShop = 240; // prestige shop
+                    } else {
+                        sendMessage("You need a prestige level of 10 to use this shop.");
+                    }
                 } else if (NPCID == 18) { // THEIVING warrior
                     if (playerLevel[17] < 25) {
                         sendMessage("You need 25 theiving to pickpocket warriors.");
@@ -27103,6 +27123,10 @@ nated = Integer.parseInt(token2);
                     }
                     if (MyShopID == 115) {
                         sendMessage(GetItemName(removeID) + ": currently costs " + ShopValue + " Tokkul" + ShopAdd);
+                        return;
+                    }
+                    if (MyShopID == 240) {
+                        sendMessage(GetItemName(removeID) + ": currently costs " + getShops().getPrestigePointPrice(removeID) + " prestige Points" + ShopAdd);
                         return;
                     }
                     sendMessage(GetItemName(removeID) + ": currently costs " + ShopValue + " coins" + ShopAdd);
@@ -35510,7 +35534,7 @@ public int GetGLCLConstruction(int ItemID) {
             this.playerGameCount = playerData.getPlayerGameCount();
             this.loyaltyRank = playerData.getLoyaltyRank();
             this.prestigeLevel = playerData.getPrestigeLevel();
-
+            this.prestigePoints = playerData.getPrestigePoints();
             // Copy arrays
             this.playerEquipment = playerData.getPlayerEquipment();
             this.playerEquipmentN = playerData.getPlayerEquipmentN();
@@ -35587,6 +35611,7 @@ public int GetGLCLConstruction(int ItemID) {
         playerData.setPlayerGameCount(playerGameCount);
         playerData.setLoyaltyRank(loyaltyRank);
         playerData.setPrestigeLevel(prestigeLevel);
+        playerData.setPrestigePoints(prestigePoints);
         playerData.setPlayerEquipment(playerEquipment);
         playerData.setPlayerEquipmentN(playerEquipmentN);
         playerData.setPlayerAppearance(playerAppearance);
