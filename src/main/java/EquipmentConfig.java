@@ -31,7 +31,12 @@ public class EquipmentConfig {
             ItemIDs.RUNE_PICKAXE, ItemIDs.BRONZE_PICKAXE, ItemIDs.IRON_PICKAXE, ItemIDs.STEEL_PICKAXE, ItemIDs.MITHRIL_PICKAXE, ItemIDs.ADAMANT_PICKAXE, ItemIDs.RUNE_PICKAXE,
             ItemIDs.DRAGON_PICKAXE,
     };
-
+    public static final int[] WHIP = {
+            ItemIDs.ABYSSAL_WHIP, 27885, 28013, 28014, 28015, 28016, 28017, 28018, 28019,
+            29523, 26017, 26018, 26019, 26020, 26021, 26022,26023, 26024, 26025, 26026, 26027,
+            26028, 26029, 25624, 25618, 25612, 25344, 25000, 25001, 24555, 24562, 24119, 24108,
+            24107, 24106, 24105, 24104, 24103, 24102, 24101
+    };
     public static boolean isBattleaxe(int itemId) {
         for (int id : BATTLEAXES) {
             if (id == itemId) return true;
@@ -46,6 +51,12 @@ public class EquipmentConfig {
     }
     public static boolean isPickaxe(int itemId) {
         for (int id : PICKAXES) {
+            if (id == itemId) return true;
+        }
+        return false;
+    }
+    public static boolean isWhip(int itemId) {
+        for (int id : WHIP) {
             if (id == itemId) return true;
         }
         return false;

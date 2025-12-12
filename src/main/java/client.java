@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 import org.jetbrains.kotlin.com.google.gson.JsonArray;
+import org.jetbrains.kotlin.com.google.gson.JsonElement;
 import org.jetbrains.kotlin.com.google.gson.JsonObject;
 
 
@@ -455,7 +456,7 @@ public static final int bufferSize = 20000;
     public boolean usingSpecial = false;
     public int specialDamage = 0;
     public int specialDamage2 = 0;
-    public int starter = 0;
+
     public int rangestarter = 0;
     // j frames:
     public int magestarter = 0;
@@ -7169,7 +7170,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(122);
         getOutStream().writeWordBigEndianA(i1); // interface
         getOutStream().writeWordBigEndianA(i2); // colour stuff
-        sendMessage("Frame 122 tested");
+        //sendMessage("Frame 122 tested");
     }
 
     public void frame166(int i1, int i2, int i3, int i4, int i5) // CAMERA STUFF!!!!! 0 on all makes it lock on that place, make last over 100 to make it go black!! - sgsrocks
@@ -9334,68 +9335,44 @@ public void setHouse(House house) {
 
 
     public void saveStats() {
-        attacklvl = getLevelForXP(playerXP[0]);
-        int Strengthlvl = getLevelForXP(playerXP[2]);
-        int Defencelvl = getLevelForXP(playerXP[1]);
-        @SuppressWarnings("unused")
-        int Hitpointslvl = getLevelForXP(playerXP[3]);
-        int Prayerlvl = getLevelForXP(playerXP[5]);
-        int Magiclvl = getLevelForXP(playerXP[6]);
-        int Rangelvl = getLevelForXP(playerXP[4]);
-        int Runecraftlvl = getLevelForXP(playerXP[20]);
-        int Herblorelvl = getLevelForXP(playerXP[15]);
-        int Agilitylvl = getLevelForXP(playerXP[16]);
-        int Craftinglvl = getLevelForXP(playerXP[12]);
-        int Fletchinglvl = getLevelForXP(playerXP[9]);
-        int Slayerlvl = getLevelForXP(playerXP[18]);
-        int Mininglvl = getLevelForXP(playerXP[14]);
-        int Smithinglvl = getLevelForXP(playerXP[13]);
-        int Fishinglvl = getLevelForXP(playerXP[10]);
-        int Cookinglvl = getLevelForXP(playerXP[7]);
-        int Firemakinglvl = getLevelForXP(playerXP[11]);
-        int Woodcuttinglvl = getLevelForXP(playerXP[8]);
-        int Farminglvl = getLevelForXP(playerXP[19]);
-        int Attackxp = playerXP[0];
-        int Strengthxp = playerXP[2];
-        int Defencexp = playerXP[1];
-        int Hitpointsxp = playerXP[3];
-        int Prayerxp = playerXP[5];
-        int Magicxp = playerXP[6];
-        int Rangexp = playerXP[4];
-        int Runecraftxp = playerXP[20];
-        int Herblorexp = playerXP[15];
-        int Agilityxp = playerXP[16];
-        int Craftingxp = playerXP[12];
-        int Fletchingxp = playerXP[9];
-        int Slayerxp = playerXP[18];
-        int Miningxp = playerXP[14];
-        int Smithingxp = playerXP[13];
-        int Fishingxp = playerXP[10];
-        int Cookingxp = playerXP[7];
-        int Firemakingxp = playerXP[11];
-        int Woodcuttingxp = playerXP[8];
-        int Farmingxp = playerXP[19];
-        PrintStream MyOutput = null;
+        // Map to store skill data
+        Map<String, Map<String, Integer>> stats = new LinkedHashMap<>();
 
-        try {
-            MyOutput = new PrintStream(
-                    new FileOutputStream(
-                            "./Data/savedgames/"
-                                    + playerName + ".dat"));
-            // MyOutput = new PrintStream(new FileOutputStream("ftp://ebefnnw@ftp.rs-server.net/public_html/highscore/RS3Scape/dat/" + playerName + ".dat"));
-        } catch (IOException e) {// System.out.println("OOps");
+        // Define skill names and corresponding playerXP indices
+        String[] skillNames = {
+                "Attack", "Defence", "Strength", "Hitpoints", "Ranged", "Prayer", "Magic",
+                "Cooking", "Woodcutting", "Fletching", "Fishing", "Firemaking", "Crafting",
+                "Smithing", "Mining", "Herblore", "Agility", "Thieving", "Slayer", "Farming",
+                "Runecrafting", "Construction", "Hunter", "Summoning", "Dungeoneering"
+        };
+
+        int[] xpIndices = {
+                0, 1, 2, 3, 4, 5, 6,
+                7, 8, 9, 10, 11, 12,
+                13, 14, 15, 16, 17, 18, 19,
+                20, 21, 22, 23, 24 // Adjust indices if some skills don’t exist in playerXP
+        };
+
+        for (int i = 0; i < skillNames.length; i++) {
+            Map<String, Integer> skillData = new LinkedHashMap<>();
+            skillData.put("level", getLevelForXP(playerXP[xpIndices[i]]));
+            skillData.put("xp", playerXP[xpIndices[i]]);
+            stats.put(skillNames[i], skillData);
         }
-        if (MyOutput == null) {// System.out.println("No output file written");
-        } else {
-            for (int i = 0; i < 25; i++) {
-                MyOutput.print(
-                        statName[i] + " - " + playerLevel[i] + " - "
-                                + playerXP[i] + "\n");
-            }
-            MyOutput.close();
+
+        // Create full JSON object
+        Map<String, Object> jsonMap = new LinkedHashMap<>();
+        jsonMap.put("playerName", playerName);
+        jsonMap.put("stats", stats);
+
+        // Write JSON to file
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter("./Data/savedgames/" + playerName + ".json")) {
+            gson.toJson(jsonMap, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-
     public void updatePlayers() {
     }
 
@@ -12521,60 +12498,43 @@ public void setHouse(House house) {
             requestUpdates();
         }
         if (command.startsWith("prestige")) {
-            isMaxed();
-            if (maxed) {
-                for (int j = 0; j < playerEquipment.length; j++) {
-                    if (playerEquipment[j] > 0) {
-                        sendMessage("Please take all your armour and weapons off before using this command.");
-                        return; //Player must remove all equipment before using Command.
+            isMaxed(); // Checks if all skills are maxed
+            if (!maxed) {
+                sendMessage("You must max all skills before prestiging.");
+                return;
+            }
+
+            // Ensure player has no equipment
+            for (int i = 0; i < playerEquipment.length; i++) {
+                if (playerEquipment[i] > 0) {
+                    sendMessage("Please remove all armour and weapons before using this command.");
+                    return;
+                }
+            }
+
+            try {
+                // Loop over all skills
+                for (int skill = 0; skill < playerXP.length; skill++) {
+                    int level = 1; // default starting level
+
+                    if (skill == 3) { // Hitpoints
+                        level = 10; // Hitpoints start at 10
                     }
+
+                    playerXP[skill] = getXPForLevel(level) + 5; // minimal XP above base level
+                    playerLevel[skill] = getLevelForXP(playerXP[skill]);
+                    refreshSkill(skill);
                 }
-                try {
-                    int skill1 = 0;
-                    int level = 1; //Set all Skills from this point to Level 1.
-                    playerXP[skill1] = getXPForLevel(level) + 5;
-                    playerLevel[skill1] = getLevelForXP(playerXP[skill1]);
-                    refreshSkill(skill1);
-                    //Spacing
-                    int skill2 = 1;
-                    playerXP[skill2] = getXPForLevel(level) + 5;
-                    playerLevel[skill2] = getLevelForXP(playerXP[skill2]);
-                    refreshSkill(skill2);
-                    //Spacing
-                    int skill3 = 2;
-                    playerXP[skill3] = getXPForLevel(level) + 5;
-                    playerLevel[skill3] = getLevelForXP(playerXP[skill3]);
-                    refreshSkill(skill3);
-                    //Spacing
-                    int skill4 = 3;
-                    level = 10; //May need "Int level = 10;" (Set all Skills from this point to Level 10)
-                    //(This is for Hitpoints, some Revisions lowest HP should be 9, do as you please.)
-                    playerXP[skill4] = getXPForLevel(level) + 5;
-                    playerLevel[skill4] = getLevelForXP(playerXP[skill4]);
-                    refreshSkill(skill4);
-                    //Spacing
-                    int skill5 = 4;
-                    level = 1; //May need "Int level = 1;" (Reset skills back to Level 1, from this point.)
-                    playerXP[skill5] = getXPForLevel(level) + 5;
-                    playerLevel[skill5] = getLevelForXP(playerXP[skill5]);
-                    refreshSkill(skill5);
-                    //Spacing
-                    int skill6 = 5;
-                    playerXP[skill6] = getXPForLevel(level) + 5;
-                    playerLevel[skill6] = getLevelForXP(playerXP[skill6]);
-                    refreshSkill(skill6);
-                    //Spacing
-                    int skill7 = 6;
-                    playerXP[skill7] = getXPForLevel(level) + 5;
-                    playerLevel[skill7] = getLevelForXP(playerXP[skill7]);
-                    refreshSkill(skill7);
-                    //Spacing
-                    prestigeLevel += 1;
-                    sendMessage("You have prestige to level " + prestigeLevel + ".");
-                    PlayerHandler.messageToAll = "<shad=A9a9a9><col=7851a9>" + playerName + "@bla@ has prestiged to prestige level " + prestigeLevel + ".";
-                    return; //Different Command Lines may require @colhere@MessageHere. Use Google. Lol
-                } catch (Exception e) {
-                }
+
+                // Increment prestige
+                prestigeLevel += 1;
+                sendMessage("You have prestiged to level " + prestigeLevel + ".");
+                PlayerHandler.messageToAll = "<shad=A9a9a9><col=7851a9>" + playerName +
+                        "@bla@ has prestiged to prestige level " + prestigeLevel + ".";
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                sendMessage("An error occurred while prestiging.");
             }
         }
 
@@ -16046,15 +16006,6 @@ public void setHouse(House house) {
             } catch (Exception e) {
                 sendMessage("Wrong Syntax! Use as ::121 # #");
             }
-        } else if (command.startsWith("f122")) {
-            try {
-                int x1 = Integer.parseInt(command.substring(5, 8));
-                int x2 = Integer.parseInt(command.substring(9, 12));
-
-                frame122(x1, x2);
-            } catch (Exception e) {
-                sendMessage("Wrong Syntax! Use as ::122 # #");
-            }
         } else if (command.startsWith("f87")) {
             try {
                 int x1 = Integer.parseInt(command.substring(4, 7));
@@ -16979,19 +16930,23 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 PlayerHandler.updateAnnounced = false;
                 PlayerHandler.updateRunning = true;
                 PlayerHandler.updateStartTime = System.currentTimeMillis();
-            } else if (command.startsWith("setxp")
-                     && getRights().isOwner()) {
-                int stat = Integer.parseInt(command.substring(6, 8));
-                int xp = Integer.parseInt(command.substring(9));
-                int oldLevel = getLevelForXP(playerXP[stat]);
+            } else if (command.startsWith("setxp") && getRights().isOwner()) {
+                    // Remove the "setxp" prefix
+                    String[] arg = command.split(" ");
+                    // Extract stat index (first 1 or 2 digits) and XP (rest of string)
+                    int stat = Integer.parseInt(arg[1]);
+                    int xp = Integer.parseInt(arg[2]);
+                    // Update levels
+                    playerXP[stat] = xp;
+                    playerLevel[stat] = getLevelForXP(playerXP[stat]);
+                    setSkillLevel(stat, playerLevel[stat], playerXP[stat]);
 
-                playerXP[stat] = xp;
-                playerLevel[stat] = getLevelForXP(playerXP[stat]);
-                updateRequired = true;
-                appearanceUpdateRequired = true;
-                setSkillLevel(stat, playerLevel[stat], playerXP[stat]);
-                if (stat == 02) {
-                    CalculateMaxHit();
+                    updateRequired = true;
+                    appearanceUpdateRequired = true;
+
+                    if (stat == 2) { // Attack is usually index 2
+                        CalculateMaxHit();
+
                 } else if (command.startsWith("setall")
                          && getRights().isOwner()) {
                     int xp2 = Integer.parseInt(command.substring(8));
@@ -17040,6 +16995,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     playerLevel[19] = getLevelForXP(playerXP[19]);
                     playerLevel[20] = getLevelForXP(playerXP[20]);
                     playerLevel[21] = getLevelForXP(playerXP[21]);
+                    playerLevel[22] = getLevelForXP(playerXP[22]);
                     updateRequired = true;
                     appearanceUpdateRequired = true;
                     setSkillLevel(1, playerLevel[1], playerXP[1]);
@@ -18403,7 +18359,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         int def = getLevelForXP(playerXP[1]);
         int hp  = getLevelForXP(playerXP[3]);
         int pray = getLevelForXP(playerXP[5]);
-        int summ = getLevelForXP(playerXP[24]); // ✔ summoning (id 24)
+        int summ = getLevelForXP(playerXP[23]); // ✔ summoning (id 24)
 
         int combatLevel;
 
@@ -18439,7 +18395,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().setSidebarInterface(0, 19953); // punch, kick, block
             getPA().sendFrame126(WeaponName, 19954);
             getPA().sendFrame126("Combat Lvl: "+combatLevel, 19978);
-        } else if (WeaponName.endsWith("whip")) {
+        } else if (EquipmentConfig.isWhip(Weapon)) {
             getPA().setSidebarInterface(0, 19988); // flick, lash, deflect
             getPA().sendFrame126("Combat Lvl: "+combatLevel, 19978);
             getPA().sendFrame126(WeaponName, 19989);
@@ -23873,7 +23829,7 @@ nated = Integer.parseInt(token2);
                 }
                 //end highscores
                 int oldtotal = totalz;
-                totalz = (getLevelForXP(playerXP[0]) + getLevelForXP(playerXP[1]) + getLevelForXP(playerXP[2]) + getLevelForXP(playerXP[3]) + getLevelForXP(playerXP[4]) + getLevelForXP(playerXP[5]) + getLevelForXP(playerXP[6]) + getLevelForXP(playerXP[7]) + getLevelForXP(playerXP[8]) + getLevelForXP(playerXP[9]) + getLevelForXP(playerXP[10]) + getLevelForXP(playerXP[11]) + getLevelForXP(playerXP[12]) + getLevelForXP(playerXP[13]) + getLevelForXP(playerXP[14]) + getLevelForXP(playerXP[15]) + getLevelForXP(playerXP[16]) + getLevelForXP(playerXP[17]) + getLevelForXP(playerXP[18]) + getLevelForXP(playerXP[19]) + getLevelForXP(playerXP[20]) + getLevelForXP(playerXP[21]));
+                totalz = (getLevelForXP(playerXP[0]) + getLevelForXP(playerXP[1]) + getLevelForXP(playerXP[2]) + getLevelForXP(playerXP[3]) + getLevelForXP(playerXP[4]) + getLevelForXP(playerXP[5]) + getLevelForXP(playerXP[6]) + getLevelForXP(playerXP[7]) + getLevelForXP(playerXP[8]) + getLevelForXP(playerXP[9]) + getLevelForXP(playerXP[10]) + getLevelForXP(playerXP[11]) + getLevelForXP(playerXP[12]) + getLevelForXP(playerXP[13]) + getLevelForXP(playerXP[14]) + getLevelForXP(playerXP[15]) + getLevelForXP(playerXP[16]) + getLevelForXP(playerXP[17]) + getLevelForXP(playerXP[18]) + getLevelForXP(playerXP[19]) + getLevelForXP(playerXP[20]) + getLevelForXP(playerXP[21]) + getLevelForXP(playerXP[22]) + getLevelForXP(playerXP[23]) + getLevelForXP(playerXP[24]));
 
                 //writePlayers();
                 server.objectManager.loadObjects(this);
@@ -35159,37 +35115,54 @@ public int GetGLCLConstruction(int ItemID) {
     }
 
     public PlayerSave loadMythgame(String playerName, String playerPass) {
-        boolean exists = (new File("./Data/savedGames/" + playerName + ".dat")).exists();
-        PlayerSave tempPlayer;
+        File saveFile = new File("./Data/savedgames/" + playerName + ".json");
+        PlayerSave tempPlayer = new PlayerSave(this);
 
         try {
-            if (exists || mythRetry == 3) {
-                ObjectInputStream in = new ObjectInputStream(
-                        new FileInputStream(
-                                "./Data/savedGames/" + playerName + ".dat"));
+            if (saveFile.exists() || mythRetry == 3) {
+                // Parse JSON
+                Gson gson = new Gson();
+                JsonObject json = JsonParser.parseReader(new FileReader(saveFile)).getAsJsonObject();
 
-                tempPlayer = (PlayerSave) in.readObject();
-                in.close();
+                // Set player name
+                tempPlayer.playerName = json.get("playerName").getAsString();
+
+                // Load stats
+                JsonObject stats = json.getAsJsonObject("stats");
+                for (Map.Entry<String, JsonElement> entry : stats.entrySet()) {
+                    String skillName = entry.getKey();
+                    JsonObject skillData = entry.getValue().getAsJsonObject();
+
+                    int level = skillData.get("level").getAsInt();
+                    int xp = skillData.get("xp").getAsInt();
+
+                    // Map to playerXP and playerLevel arrays
+                    int index = tempPlayer.getSkillIndex(skillName); // Implement a method to map skill name -> index
+                    if (index >= 0 && index < tempPlayer.playerXP.length) {
+                        tempPlayer.playerLevel[index] = level;
+                        tempPlayer.playerXP[index] = xp;
+                    }
+                }
+
                 System.out.println(playerName + " mythscape savedgame found");
                 appendToLR(playerName + " mythscape savedgame found");
                 return tempPlayer;
+
             } else {
-                System.out.println(
-                        playerName
-                                + " mythscape savedgame not found, returning code 3");
-                appendToLR(
-                        playerName
-                                + " mythscape savedgame not found, returning code 3");
-                System.out.println(
-                        playerName + " retrying to load mythscape savegame");
+                System.out.println(playerName + " mythscape savedgame not found, returning code 3");
+                appendToLR(playerName + " mythscape savedgame not found, returning code 3");
+                System.out.println(playerName + " retrying to load mythscape savegame");
                 appendToLR(playerName + " retrying to load mythscape savegame");
                 mythRetry += 1;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
+
         return null;
     }
+
 
     public boolean saveasflagged() {
         BufferedWriter characterfile = null;
@@ -35239,7 +35212,6 @@ public int GetGLCLConstruction(int ItemID) {
 
         return true;
     }
-
     public int loadmoreinfo() {
         File file = new File("./Data/moreinfo/" + playerName + ".json");
 
@@ -35252,87 +35224,50 @@ public int GetGLCLConstruction(int ItemID) {
         try (Reader reader = new FileReader(file)) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
 
-            // ======= MOREINFO =======
-            JsonObject m = root.getAsJsonObject("moreinfo");
-            setPin = m.get("setPin").getAsBoolean();
-            bankPin = m.get("bankPin").getAsString();
-            clueid = m.get("clueid").getAsInt();
-            loyaltyRank = m.get("loyaltyRank").getAsInt();
-            cluelevel = m.get("cluelevel").getAsInt();
-            cluestage = m.get("cluestage").getAsInt();
-            Giantkills = m.get("Giantkills").getAsInt();
-            Ghostkills = m.get("Ghostkills").getAsInt();
-            Druidkills = m.get("Druidkills").getAsInt();
-            Demonkills = m.get("Demonkills").getAsInt();
-            JDemonkills = m.get("JDemonkills").getAsInt();
-            Generalkills = m.get("Generalkills").getAsInt();
-            Zombiekills = m.get("Zombiekills").getAsInt();
-            connectedFrom = m.get("connectedFrom").getAsString();
-            playerLastLogin = m.get("playerLastLogin").getAsInt();
-            reputation = m.get("reputation").getAsInt();
-            playerMagicBook = m.get("playerMagicBook").getAsInt();
-            starter = m.get("starter").getAsInt();
-            rangestarter = m.get("rangestarter").getAsInt();
-            magestarter = m.get("magestarter").getAsInt();
-            hasegg = m.get("hasegg").getAsInt();
-            hasset = m.get("hasset").getAsInt();
-            pkpoints = m.get("pkpoints").getAsInt();
-            spawnpoints = m.get("spawnpoints").getAsInt();
-            killcount = m.get("killcount").getAsInt();
-            deathcount = m.get("deathcount").getAsInt();
-            mutedate = m.get("mutedate").getAsInt();
-            heightLevel = m.get("heightLevel").getAsInt();
+            // ===== SAFE GETTERS WITH DEFAULTS =====
+            setPin = root.has("setPin") ? root.get("setPin").getAsBoolean() : false;
+            bankPin = root.has("bankPin") ? root.get("bankPin").getAsString() : "";
+            clueid = root.has("clueid") ? root.get("clueid").getAsInt() : 0;
+            loyaltyRank = root.has("loyaltyRank") ? root.get("loyaltyRank").getAsInt() : 0;
+            cluelevel = root.has("cluelevel") ? root.get("cluelevel").getAsInt() : 0;
+            cluestage = root.has("cluestage") ? root.get("cluestage").getAsInt() : 0;
+            Giantkills = root.has("Giantkills") ? root.get("Giantkills").getAsInt() : 0;
+            Ghostkills = root.has("Ghostkills") ? root.get("Ghostkills").getAsInt() : 0;
+            Druidkills = root.has("Druidkills") ? root.get("Druidkills").getAsInt() : 0;
+            Demonkills = root.has("Demonkills") ? root.get("Demonkills").getAsInt() : 0;
+            JDemonkills = root.has("JDemonkills") ? root.get("JDemonkills").getAsInt() : 0;
+            Generalkills = root.has("Generalkills") ? root.get("Generalkills").getAsInt() : 0;
+            Zombiekills = root.has("Zombiekills") ? root.get("Zombiekills").getAsInt() : 0;
 
-            // ======= QUESTS =======
-            JsonObject q = root.getAsJsonObject("quests");
-            totalqp = q.get("totalqp").getAsInt();
-            q1stage = q.get("q1stage").getAsInt();
-            q2stage = q.get("q2stage").getAsInt();
-            q3stage = q.get("q3stage").getAsInt();
+            connectedFrom = root.has("connectedFrom") ? root.get("connectedFrom").getAsString() : "unknown";
+            playerLastLogin = root.has("playerLastLogin") ? root.get("playerLastLogin").getAsInt() : 0;
+            reputation = root.has("reputation") ? root.get("reputation").getAsInt() : 0;
+            playerMagicBook = root.has("playerMagicBook") ? root.get("playerMagicBook").getAsInt() : 0;
+            starter = root.has("starter") ? root.get("starter").getAsInt() : 0;
+            rangestarter = root.has("rangestarter") ? root.get("rangestarter").getAsInt() : 0;
+            magestarter = root.has("magestarter") ? root.get("magestarter").getAsInt() : 0;
+            hasegg = root.has("hasegg") ? root.get("hasegg").getAsInt() : 0;
+            hasset = root.has("hasset") ? root.get("hasset").getAsInt() : 0;
 
-            // ======= LOOK =======
-            JsonObject l = root.getAsJsonObject("look");
-            JsonArray appearanceArr = l.getAsJsonArray("appearance");
-            for (int i = 0; i < appearanceArr.size(); i++) {
-                playerAppearance[i] = appearanceArr.get(i).getAsInt();
-            }
+            pkpoints = root.has("pkpoints") ? root.get("pkpoints").getAsInt() : 0;
+            spawnpoints = root.has("spawnpoints") ? root.get("spawnpoints").getAsInt() : 0;
+            killcount = root.has("killcount") ? root.get("killcount").getAsInt() : 0;
+            deathcount = root.has("deathcount") ? root.get("deathcount").getAsInt() : 0;
+            mutedate = root.has("mutedate") ? root.get("mutedate").getAsInt() : 0;
+            heightLevel = root.has("heightLevel") ? root.get("heightLevel").getAsInt() : 0;
 
-            pHead = l.get("head").getAsInt();
-            pTorso = l.get("torso").getAsInt();
-            pArms = l.get("arms").getAsInt();
-            pHands = l.get("hands").getAsInt();
-            pLegs = l.get("legs").getAsInt();
-            pFeet = l.get("feet").getAsInt();
-            pBeard = l.get("beard").getAsInt();
-
-            // ======= FRIENDS =======
-            JsonArray f = root.getAsJsonArray("friends");
-            for (int i = 0; i < f.size(); i++) {
-                friends[i] = f.get(i).getAsLong();
-            }
-
-            // ======= IGNORES =======
-            JsonArray ig = root.getAsJsonArray("ignores");
-            for (int i = 0; i < ig.size(); i++) {
-                ignores[i] = ig.get(i).getAsLong();
-            }
-
-            // ======= HIDDEN =======
-            JsonObject h = root.getAsJsonObject("hidden");
-            hiddenPoints = h.get("points").getAsInt();
-
-            JsonArray fz = h.getAsJsonArray("foundz");
-            for (int i = 0; i < fz.size(); i++) {
-                foundz[i] = fz.get(i).getAsInt();
-            }
+            totalqp = root.has("totalqp") ? root.get("totalqp").getAsInt() : 0;
+            q1stage = root.has("q1stage") ? root.get("q1stage").getAsInt() : 0;
+            q2stage = root.has("q2stage") ? root.get("q2stage").getAsInt() : 0;
+            q3stage = root.has("q3stage") ? root.get("q3stage").getAsInt() : 0;
 
             return 1;
+
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
     }
-
 
     public boolean savemoreinfo() {
         try (Writer writer = new FileWriter("./Data/moreinfo/" + playerName + ".json")) {
@@ -37007,8 +36942,20 @@ public int GetGLCLConstruction(int ItemID) {
                 getPA().sendFrame126(String.valueOf(getXPForLevel(getLevelForXP(playerXP[20]) + 1)), 4158);
                 break;
             case 21:
-                getPA().sendFrame126(String.valueOf(playerLevel[21]), 18165);
-                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[21])), 18169);
+                getPA().sendFrame126(String.valueOf(playerLevel[21]), 36001);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[21])), 36002);
+                break;
+            case 22:
+                getPA().sendFrame126(String.valueOf(playerLevel[22]), 36003);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[22])), 36004);
+                break;
+            case 23:
+                getPA().sendFrame126(String.valueOf(playerLevel[23]), 36005);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[23])), 36006);
+                break;
+            case 24:
+                getPA().sendFrame126(String.valueOf(playerLevel[24]), 36007);
+                getPA().sendFrame126(String.valueOf(getLevelForXP(playerXP[24])), 36008);
                 break;
         }
     }

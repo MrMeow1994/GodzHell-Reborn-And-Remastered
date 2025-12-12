@@ -91,12 +91,21 @@ public abstract class Player extends Entity {
 	public Rights rights;
 	public boolean maxed = false;
 
-	public void isMaxed(){
-		if(getLevelForXP(playerXP[0]) > 98 && getLevelForXP(playerXP[1]) > 98 && getLevelForXP(playerXP[2]) > 98 && getLevelForXP(playerXP[3]) > 98 && getLevelForXP(playerXP[4]) > 98 && getLevelForXP(playerXP[5]) > 98 && getLevelForXP(playerXP[6]) > 98){
+	public void isMaxed() {
+		maxed = true; // assume maxed until proven otherwise
+
+		for (int i = 0; i < playerXP.length; i++) {
+			if (getLevelForXP(playerXP[i]) <= 98) {
+				maxed = false;
+				break; // no need to check further if any skill is not maxed
+			}
+		}
+
+		if (maxed) {
 			System.out.println("Player is maxed");
-			maxed = true;
 		}
 	}
+
 	public boolean wearingCape(int cape) {
 		int capes[] = {9747, 9748, 9750, 9751,
 				9753, 9754, 9756, 9757,
@@ -226,6 +235,7 @@ public abstract class Player extends Entity {
 	public int[] fishingProp = new int[11];
 	public ArrayList<Integer> addPlayerList = new ArrayList<Integer>();
 	public int addPlayerSize = 0;
+	public int starter = 0;
 	public int killedJad;
 	public int tzhaarTimer;
 	public int objRot;
@@ -319,11 +329,15 @@ public abstract class Player extends Entity {
 		for (int i = 0; i<playerItemsN.length; i++) { //Setting Item amounts
 			playerItemsN[i] = 0;
 		}
-
 		for (int i=0; i<playerLevel.length; i++) { //Setting Levels
 			if (i == 3) {
-				playerLevel[i] = 99;
-				playerXP[i] = 1155;
+				if(starter == 0) {
+					playerLevel[i] = 99;
+					playerXP[i] = 1155;
+				} else {
+					playerLevel[i] = 10;
+					playerXP[i] = 1155;
+				}
 			} else {
 				playerLevel[i] = 1;
 				playerXP[i] = 0;

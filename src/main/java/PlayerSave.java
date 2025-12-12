@@ -58,4 +58,36 @@ public class PlayerSave implements Serializable {
         // connectedFrom = plr.connectedFrom;
 
     }
+
+    public int getSkillIndex(String skillName) {
+        switch (skillName) {
+            case "Attack": return 0;
+            case "Defence": return 1;
+            case "Strength": return 2;
+            case "Hitpoints": return 3;
+            case "Ranged": return 4;
+            case "Prayer": return 5;
+            case "Magic": return 6;
+            case "Cooking": return 7;
+            case "Woodcutting": return 8;
+            case "Fletching": return 9;
+            case "Fishing": return 10;
+            case "Firemaking": return 11;
+            case "Crafting": return 12;
+            case "Smithing": return 13;
+            case "Mining": return 14;
+            case "Herblore": return 15;
+            case "Agility": return 16;
+            case "Thieving": return 17;
+            case "Slayer": return 18;
+            case "Farming": return 19;
+            case "Runecrafting": return 20;
+            case "Construction": return 21;
+            case "Hunter": return 22;
+            case "Summoning": return 23;
+            case "Dungeoneering": return 24;
+            default: return -1; // skill not found
+        }
+    }
+
 }

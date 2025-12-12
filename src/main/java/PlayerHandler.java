@@ -834,14 +834,20 @@ public class PlayerHandler {
     }
 
     public boolean saveGame(Player plr) {
+        // Create a PlayerSave object from the Player
         PlayerSave tempSave = new PlayerSave(plr);
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("./Data/savedGames/" + tempSave.playerName + ".dat"));
-            out.writeObject(tempSave);
-            out.close();
-        } catch (Exception e) {
+
+        // Prepare Gson with pretty printing
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        // Write JSON to file
+        try (FileWriter writer = new FileWriter("./Data/savedgames/" + tempSave.playerName + ".json")) {
+            gson.toJson(tempSave, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
+
         return true;
     }
 
