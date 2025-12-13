@@ -288,7 +288,7 @@ public final class IndexedFileSystem implements Closeable {
 			int nextType;
 
 			// Large file check
-			if (fd.getFile() <= 0xffff) {
+			if (fd.getFile() <= 65535) {
 				nextFile = ((header[0] & 0xff) << 8) + (header[1] & 0xff); // Short
 				curChunk = ((header[2] & 0xff) << 8) + (header[3] & 0xff); // Short
 				nextBlock = ((header[4] & 0xff) << 16) + ((header[5] & 0xff) << 8) + (header[6] & 0xff); // Medium
@@ -336,6 +336,7 @@ public final class IndexedFileSystem implements Closeable {
 		}
 
 		buffer.flip();
+		System.out.println("requested file id "+fd.getFile()+", Type: "+fd.getType());
 		return buffer;
 	}
 	public void dumpAll(File outputDir) {

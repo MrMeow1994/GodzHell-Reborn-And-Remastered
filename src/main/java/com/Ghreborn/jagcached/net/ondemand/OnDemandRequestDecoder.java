@@ -16,9 +16,9 @@ public final class OnDemandRequestDecoder extends FrameDecoder {
 
 	@Override
 	protected Object decode(ChannelHandlerContext ctx, Channel c, ChannelBuffer buf) throws Exception {
-		if (buf.readableBytes() >= 4) {
+		if (buf.readableBytes() >= 6) {
 			int type = buf.readUnsignedByte() + 1;
-			int file = buf.readUnsignedShort();
+			int file = buf.readInt();
 			int priority = buf.readUnsignedByte();
 			
 			FileDescriptor desc = new FileDescriptor(type, file);
