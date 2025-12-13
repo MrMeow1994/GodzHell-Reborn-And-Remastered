@@ -3667,6 +3667,8 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2213, 2149, 5091, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2148, 5091, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2147, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(6552, 2146, 5093, 0, 3, 10));
+
     }
 
     public void OBJECTS() {
@@ -35494,8 +35496,8 @@ public int GetGLCLConstruction(int ItemID) {
             this.playerPass = playerData.getPassword();
             this.displayName = playerData.getDisplayName();
             this.heightLevel = playerData.getHeightLevel();
-            this.teleportToX = (playerData.getAbsX() <= 0 ? 3210 : playerData.getAbsX());
-            this.teleportToY = (playerData.getAbsY() <= 0 ? 3424 : playerData.getAbsY());
+            this.teleportToX = (playerData.getAbsX() == -1 ? 3210 : playerData.getAbsX());
+            this.teleportToY = (playerData.getAbsY() == -1 ? 3424 : playerData.getAbsY());
             this.setRights(Rights.get(playerData.getRights()));
             this.runEnergy = playerData.getRunEnergy();
             this.runningToggled = playerData.isRunningToggled();

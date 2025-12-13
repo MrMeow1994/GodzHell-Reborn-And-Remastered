@@ -405,6 +405,7 @@ public class Region {
             new WorldObject2(2213, 2150, 5091, 0, 10, 0),
             new WorldObject2(2213, 2149, 5091, 0, 10, 0),
             new WorldObject2(2213, 2148, 5091, 0, 10, 0),
+            new WorldObject2(6552, 2146, 5093, 0, 10, 3),
             new WorldObject2(2213, 2147, 5091, 0, 10, 0)
     };
 
