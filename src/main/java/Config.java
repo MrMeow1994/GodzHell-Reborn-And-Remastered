@@ -21,6 +21,8 @@ public class Config {
 	public static boolean ADMIN_DROP_ITEMS = false;
 	public static  boolean ADMIN_CAN_SELL_ITEMS = false;
 	public static  boolean MINI_GAMES = false;
+	public static final boolean PRAYER_POINTS_REQUIRED = true; // you need prayer points to use prayer
+	public static final boolean PRAYER_LEVEL_REQUIRED = true; // need prayer level to use different prayers
 	public static  boolean LOCK_EXPERIENCE = false;
 	public static final boolean DOUBLE_EXP = false;
 	public static String LOGOUT_MESSAGE = "";

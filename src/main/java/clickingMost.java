@@ -1484,7 +1484,21 @@ public class clickingMost {
                     c.actionTimer = 7;
                 }
                 break;
-
+            case 21245: // protect from magic
+                if (c.altarPrayed == 1) {
+                    return;
+                }
+                c.activatePrayer(16);
+                break;
+            case 21246: // protect from range
+                if (c.altarPrayed == 1) {
+                    return;
+                }
+                c.activatePrayer(17);
+                break;
+            case 21247:// case 97204: // protect from melee
+                c.activatePrayer(18);
+                break;
             case 4150: //1st ancient tele
                 if(c.actionTimer == 0) {
                 c.TeleTo("Camelot", 45, ItemIDs.AIR_RUNE, 5, ItemIDs.LAW_RUNE, 1);

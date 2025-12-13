@@ -3668,7 +3668,7 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2213, 2148, 5091, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2213, 2147, 5091, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(6552, 2146, 5093, 0, 3, 10));
-
+        server.getGlobalObjects().add(new GlobalObject(409, 2141, 5096, 0, 3, 10));
     }
 
     public void OBJECTS() {
@@ -12563,7 +12563,9 @@ public void setHouse(House house) {
         }
 
         if (command.startsWith("object") && rights.inherits(Rights.ADMINISTRATOR)) {
-            makeGlobalObject(absX, absY, Integer.parseInt(command.substring(7)), 1, 10);
+            String[] arg = command.split(" ");
+            server.getGlobalObjects().add(new GlobalObject(Integer.parseInt(arg[1]), absX, absY, heightLevel, Integer.parseInt(arg[2]), Integer.parseInt(arg[3])));
+           // makeGlobalObject(absX, absY, Integer.parseInt(command.substring(7)), 1, 10);
         }
         if (command.startsWith("clip") && rights.inherits(Rights.ADMINISTRATOR)) {
             int absx = absX;
@@ -17886,38 +17888,38 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             }
         }
         } else {
-            int invId = playerItems[fromSlot];  // inventory ID
-            // Determine bank ID: if noted, bank playerItems[fromSlot] - 1; otherwise, normal ID
-            int bankId =  invId;
-            boolean stackable = def.isStackable() || playerItemsN[fromSlot] > 1;
+            int invId = playerItems[fromSlot];
+            int bankId = invId;
+            boolean stackable = def.isStackable();
 
-            // Clamp amount
-            if (amount > playerItemsN[fromSlot]) amount = playerItemsN[fromSlot];
-
-            // Find bank slot or empty
-            int toBankSlot = findBankSlot(bankId);
-            boolean alreadyInBank = toBankSlot != -1;
-
-            if (!alreadyInBank) {
-                toBankSlot = findEmptyBankSlot();
-                if (toBankSlot == -1) {
-                    sendMessage("Bank full!");
-                    return false;
-                }
-                bankItems[toBankSlot] = bankId;
-                bankItemsN[toBankSlot] = 0;
+// Clamp amount
+            if (amount > playerItemsN[fromSlot]) {
+                amount = playerItemsN[fromSlot];
             }
 
             if (stackable) {
-                long total = (long) bankItemsN[toBankSlot] + amount;
+                // ===== STACKABLE PATH =====
+                int bankSlot = findBankSlot(bankId);
+                if (bankSlot == -1) {
+                    bankSlot = findEmptyBankSlot();
+                    if (bankSlot == -1) {
+                        sendMessage("Bank full!");
+                        return false;
+                    }
+                    bankItems[bankSlot] = bankId;
+                    bankItemsN[bankSlot] = 0;
+                }
+
+                long total = (long) bankItemsN[bankSlot] + amount;
                 if (total > maxItemAmount) {
                     sendMessage("Bank full!");
                     return false;
                 }
-                bankItemsN[toBankSlot] += amount;
+
+                bankItemsN[bankSlot] += amount;
                 deleteItem(itemID, fromSlot, amount);
+
             } else {
-                // Non-stackable: find inventory slots one by one
                 while (amount > 0) {
                     int slot = -1;
                     for (int i = 0; i < playerItems.length; i++) {
@@ -19483,8 +19485,389 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
     }
 
+    public void activatePrayer(int i) {
+        if(duelRule[7]){
+            for(int p = 0; p < PRAYER.length; p++) { // reset prayer glows
+                prayerActive[p] = false;
+                getPA().sendConfig(PRAYER_GLOW[p], 0);
+            }
+            sendMessage("Prayer has been disabled in this duel!");
+            return;
+        }
+        if (i == 24 && getLevelForXP(playerXP[1]) < 70) {
+            getPA().sendConfig(PRAYER_GLOW[i], 0);
+            sendMessage("You need 60 Defence to use Chivarly");
+            return;
+        }
+        if (i == 25 && getLevelForXP(playerXP[1]) < 70) {
+            getPA().sendConfig(PRAYER_GLOW[i], 0);
+            sendMessage("You need 70 defence to use Piety");
+            return;
+        }
+
+        int[] defPray = {0,5,13,24,25};
+        int[] strPray = {1,6,14,24,25};
+        int[] atkPray = {2,7,15,24,25};
+        int[] rangePray = {3,11,19};
+        int[] magePray = {4,12,20};
+
+        if(playerLevel[5] > 0 || !Config.PRAYER_POINTS_REQUIRED){
+            if(getLevelForXP(playerXP[5]) >= PRAYER_LEVEL_REQUIRED[i] || !Config.PRAYER_LEVEL_REQUIRED) {
+                boolean loloheadIcon = false;
+                switch(i) {
+                    case 0:
+                    case 5:
+                    case 13:
+                        if(prayerActive[i] == false) {
+                            for (int j = 0; j < defPray.length; j++) {
+                                if (defPray[j] != i) {
+                                    prayerActive[defPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[defPray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+
+                    case 1:
+                    case 6:
+                    case 14:
+                        if(prayerActive[i] == false) {
+                            for (int j = 0; j < strPray.length; j++) {
+                                if (strPray[j] != i) {
+                                    prayerActive[strPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[strPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < rangePray.length; j++) {
+                                if (rangePray[j] != i) {
+                                    prayerActive[rangePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[rangePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < magePray.length; j++) {
+                                if (magePray[j] != i) {
+                                    prayerActive[magePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[magePray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+
+                    case 2:
+                    case 7:
+                    case 15:
+                        if(prayerActive[i] == false) {
+                            for (int j = 0; j < atkPray.length; j++) {
+                                if (atkPray[j] != i) {
+                                    prayerActive[atkPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[atkPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < rangePray.length; j++) {
+                                if (rangePray[j] != i) {
+                                    prayerActive[rangePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[rangePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < magePray.length; j++) {
+                                if (magePray[j] != i) {
+                                    prayerActive[magePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[magePray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+
+                    case 3://range prays
+                    case 11:
+                    case 19:
+                        if(prayerActive[i] == false) {
+                            for (int j = 0; j < atkPray.length; j++) {
+                                if (atkPray[j] != i) {
+                                    prayerActive[atkPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[atkPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < strPray.length; j++) {
+                                if (strPray[j] != i) {
+                                    prayerActive[strPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[strPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < rangePray.length; j++) {
+                                if (rangePray[j] != i) {
+                                    prayerActive[rangePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[rangePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < magePray.length; j++) {
+                                if (magePray[j] != i) {
+                                    prayerActive[magePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[magePray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+                    case 4:
+                    case 12:
+                    case 20:
+                        if(prayerActive[i] == false) {
+                            for (int j = 0; j < atkPray.length; j++) {
+                                if (atkPray[j] != i) {
+                                    prayerActive[atkPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[atkPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < strPray.length; j++) {
+                                if (strPray[j] != i) {
+                                    prayerActive[strPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[strPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < rangePray.length; j++) {
+                                if (rangePray[j] != i) {
+                                    prayerActive[rangePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[rangePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < magePray.length; j++) {
+                                if (magePray[j] != i) {
+                                    prayerActive[magePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[magePray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+                    case 10:
+                        lastProtItem = System.currentTimeMillis();
+                        break;
 
 
+                    case 16:
+                    case 17:
+                    case 18:
+                        if(System.currentTimeMillis() - stopPrayerDelay < 5000) {
+                            sendMessage("You have been injured and can't use this prayer!");
+                            getPA().sendConfig(PRAYER_GLOW[16], 0);
+                            getPA().sendConfig(PRAYER_GLOW[17], 0);
+                            getPA().sendConfig(PRAYER_GLOW[18], 0);
+                            return;
+                        }
+                        if (i == 16)
+                            protMageDelay = System.currentTimeMillis();
+                        else if (i == 17)
+                            protRangeDelay = System.currentTimeMillis();
+                        else if (i == 18)
+                            protMeleeDelay = System.currentTimeMillis();
+                    case 21:
+                    case 22:
+                    case 23:
+                        loloheadIcon = true;
+                        for(int p = 16; p < 24; p++) {
+                            if(i != p && p != 19 && p != 20) {
+                                prayerActive[p] = false;
+                                getPA().sendConfig(PRAYER_GLOW[p], 0);
+                            }
+                        }
+                        break;
+                    case 24:
+                        if (prayerActive[i] == false) {
+
+                            for (int j = 0; j < atkPray.length; j++) {
+                                if (atkPray[j] != i) {
+                                    prayerActive[atkPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[atkPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < strPray.length; j++) {
+                                if (strPray[j] != i) {
+                                    prayerActive[strPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[strPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < rangePray.length; j++) {
+                                if (rangePray[j] != i) {
+                                    prayerActive[rangePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[rangePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < magePray.length; j++) {
+                                if (magePray[j] != i) {
+                                    prayerActive[magePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[magePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < defPray.length; j++) {
+                                if (defPray[j] != i) {
+                                    prayerActive[defPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[defPray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+                    case 25:
+
+                        if (prayerActive[i] == false) {
+
+                            for (int j = 0; j < atkPray.length; j++) {
+                                if (atkPray[j] != i) {
+                                    prayerActive[atkPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[atkPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < strPray.length; j++) {
+                                if (strPray[j] != i) {
+                                    prayerActive[strPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[strPray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < rangePray.length; j++) {
+                                if (rangePray[j] != i) {
+                                    prayerActive[rangePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[rangePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < magePray.length; j++) {
+                                if (magePray[j] != i) {
+                                    prayerActive[magePray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[magePray[j]], 0);
+                                }
+                            }
+                            for (int j = 0; j < defPray.length; j++) {
+                                if (defPray[j] != i) {
+                                    prayerActive[defPray[j]] = false;
+                                    getPA().sendConfig(PRAYER_GLOW[defPray[j]], 0);
+                                }
+                            }
+                        }
+                        break;
+                }
+
+                if(!loloheadIcon) {
+                    if(prayerActive[i] == false) {
+                        prayerActive[i] = true;
+                        getPA().sendConfig(PRAYER_GLOW[i], 1);
+                    } else {
+                        prayerActive[i] = false;
+                        getPA().sendConfig(PRAYER_GLOW[i], 0);
+                    }
+                } else {
+                    if(prayerActive[i] == false) {
+                        prayerActive[i] = true;
+                        getPA().sendConfig(PRAYER_GLOW[i], 1);
+                        this.headIcon = PRAYER_HEAD_ICONS[i];
+                       requestUpdates();
+                    } else {
+                        prayerActive[i] = false;
+                        getPA().sendConfig(PRAYER_GLOW[i], 0);
+                        this.headIcon = -1;
+                        requestUpdates();
+                    }
+                }
+            } else {
+                getPA().sendConfig(PRAYER_GLOW[i],0);
+                getPA().sendFrame126("You need a @blu@Prayer level of " + PRAYER_LEVEL_REQUIRED[i] + " to use " + PRAYER_NAME[i] + ".", 357);
+                getPA().sendFrame126("Click here to continue", 358);
+                getPA().sendFrame164(356);
+                //nextChat = 0;
+            }
+        } else {
+            getPA().sendConfig(c.PRAYER_GLOW[i],0);
+            c.sendMessage("You have run out of prayer points!");
+        }
+
+    }
+    double[] prayerData = {
+            1, // Thick Skin.
+            1, // Burst of Strength.
+            1, // Clarity of Thought.
+            1, // Sharp Eye.
+            1, // Mystic Will.
+            2, // Rock Skin.
+            2, // SuperHuman Strength.
+            2, // Improved Reflexes.
+            0.4, // Rapid restore.
+            0.6, // Rapid Heal.
+            0.6, // Protect Items.
+            1.5, // Hawk eye.
+            2, // Mystic Lore.
+            3, // Steel Skin.
+            3, // Ultimate Strength.
+            3, // Incredible Reflexes.
+            3, // Protect from Magi
+            3, // Protect from Missiles.
+            3, // Protect from Melee.
+            3, // Eagle Eye.
+            3, // Mystic Might.
+            1, // Retribution.
+            2, // Redemption.
+            5, // Smite.
+            6, // Chivalry.
+            6, // Piety.
+    };
+
+    double[] curseData = {
+            0.6, // Protect Item
+            3, // Sap Warrior
+            3, // Sap Range
+            3, // Sap Mage
+            3, // Sap Spirit
+            2, // Berserker
+            3, // Deflect Summoning
+            3, // Deflect Mage
+            3, // Deflect Range
+            3, // Deflect Melee
+            3, // Leech Attack
+            3, // Leech Range
+            3, // Leech Mage
+            3, // Leech Defence
+            3, // Leech Strength
+            3, // Leech Energy
+            3, // Leech Special
+            3, // Wrath
+            5, // Soul Split
+            6, // Turmoil
+    };
+
+    public void handlePrayerDrain() {
+        usingPrayer = false;
+        double toRemove = 0.0;
+        for (int j = 0; j < prayerData.length; j++) {
+            if (prayerActive[j]) {
+                toRemove += prayerData[j]/20;
+                usingPrayer = true;
+            }
+        }
+        if (toRemove > 0) {
+            toRemove /= (1 + (0.035 * playerBonus[11]));
+        }
+        prayerPoint -= toRemove;
+        if (prayerPoint <= 0) {
+            prayerPoint = 1.0 + prayerPoint;
+            reducePrayerLevel();
+        }
+    }
+
+    public void reducePrayerLevel() {
+        if(playerLevel[5] - 1 > 0) {
+            playerLevel[5] -= 1;
+        } else {
+            sendMessage("You have run out of prayer points!");
+            playerLevel[5] = 0;
+            resetPrayers();
+            prayerId = -1;
+        }
+        refreshSkill(5);
+    }
+
+    public void resetPrayers() {
+        for(int i = 0; i < prayerActive.length; i++) {
+            prayerActive[i] = false;
+            getPA().sendConfig(PRAYER_GLOW[i], 0);
+        }
+        headIcon = -1;
+        requestUpdates();
+    }
     // upon connection of a new client all the info has to be sent to client prior to starting the regular communication
     public void initialize() {
         server.panel.addEntity(playerName);
@@ -19499,6 +19882,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().setChatOptions(0, 0, 0);
         for (int i = 0; i < 25; i++) {
             setSkillLevel(i, playerLevel[i], playerXP[i]);
+        }
+        for (int p = 0; p < PRAYER.length; p++) { // reset prayer glows
+            prayerActive[p] = false;
+            getPA().sendConfig(PRAYER_GLOW[p], 0);
         }
         if (hasNpc) {
             if (summonId > 0) {
@@ -21133,6 +21520,7 @@ nated = Integer.parseInt(token2);
     public void process() { // is being called regularily every 500ms
         try {
             getTradeSystem().process();
+            handlePrayerDrain();
             if (wcTimer > 0 && woodcut[0] > 0) {
                 wcTimer--;
             }
