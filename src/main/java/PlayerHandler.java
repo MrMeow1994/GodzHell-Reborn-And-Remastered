@@ -763,6 +763,7 @@ public class PlayerHandler {
         playerData.setHasThirdFloorDone(plr.hasthirdfloorDone);
         playerData.setHasFourthFloorDone(plr.hasfourthfloorDone);
         playerData.setSkullTimer(plr.skullTimer);
+        playerData.setAutoRet(plr.autoRet);
         playerData.setRuneMist(plr.runeMist);
         playerData.setGertCat(plr.gertCat);
         playerData.setRestGhost(plr.restGhost);
@@ -821,7 +822,7 @@ public class PlayerHandler {
         playerData.setBankItemsN3(plr.bankItemsN3);
         playerData.setFriends(plr.friends);
         playerData.setIgnores(plr.ignores);
-
+        playerData.setColorMeta(plr.getColorManager().getItems());
         // Convert the PlayerData object to JSON and save it to a file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("./Data/characters/" + plr.playerName + ".json")) {

@@ -681,6 +681,9 @@ public abstract class Player extends Entity {
 		if(Boundary.isIn((client) this, Boundary.ghr_train)){
 			return true;
 		}
+		if(Boundary.isIn((client) this, Boundary.prestige)){
+			return true;
+		}
 		if(Boundary.isIn((client) this, Boundary.ARDOUGNE_BOUNDARY)){
 			return true;
 		}

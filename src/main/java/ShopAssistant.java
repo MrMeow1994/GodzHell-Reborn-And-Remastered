@@ -160,17 +160,26 @@ public class ShopAssistant {
     public int getPrestigePointPrice(int itemID) {
         switch (itemID) {
             case 24090:
-                return 50;
             case 24091:
-                return 50;
             case 24092:
-                return 50;
             case 24093:
-                return 50;
             case 24094:
-                return 50;
             case 24095:
-                return 50;
+            case 24096:
+            case 24097:
+            case 24098:
+            case 24099:
+                return 100;
+            case 24100:
+            case 24101:
+            case 24102:
+            case 24103:
+            case 24104:
+            case 24105:
+            case 24106:
+            case 24107:
+            case 24108:
+                return 200;
             // Add more items here
             default:
                 return 0; // Items with no price cannot be bought
@@ -252,9 +261,9 @@ public class ShopAssistant {
 
             // Deduct currency and give item
             if (currencyItemID == -1) { // prestigePoints
-                c.prestigePoints -= TotPrice2;
+                c.prestigePoints -= TotPrice2*amount;
             } else {
-                c.deleteItem2(currencyItemID, TotPrice2);
+                c.deleteItem2(currencyItemID, TotPrice2*amount);
             }
             c.addItem(itemID, 1);
             boughtAmount++;

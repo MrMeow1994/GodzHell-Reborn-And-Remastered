@@ -3130,6 +3130,8 @@ public void setHouse(House house) {
         deletethatobject(3079, 9509);
         deletethatobject(3078, 9509);
 
+        deletethatobject(2154, 5096); // Tree
+        deletethatobject(2158, 5097); // Tree
         deletethatobject(2935, 3355); // hang
 
         //deletethatobject(2468, 3178); // new training area for chicken
@@ -21151,6 +21153,15 @@ nated = Integer.parseInt(token2);
                     appearanceUpdateRequired = true;
                 }
             }
+            if(Boundary.isIn(this, Boundary.prestige)){
+                if(prestigeLevel < 10){
+                    heightLevel = 0;
+                    teleportToX = 2466;
+                    teleportToY = 3188;
+                    isTeleporting = true;
+                    sendMessage("You been teleported to Home.");
+                }
+            }
             if (turkeydelay == 28) {
                 setAnimation(10994);
             }
@@ -21172,6 +21183,9 @@ nated = Integer.parseInt(token2);
             }
             getPA().sendQuest("<col=FF7F00>Prestige Level:</col> <col=ffffff>" + prestigeLevel+"</col>", 19411);
             getPA().sendQuest("<col=FF7F00>Prestige Points:</col> <col=ffffff>" + prestigePoints+"</col>", 19412);
+            if(prestigePoints < 0){
+                prestigePoints = 0;
+            }
             getPA().sendQuest("<col=FF7F00>Days:</col> <col=ffffff>" + daysPlayed + "</col><col=FF7F00> Hrs:</col> <col=ffffff>" + hoursPlayed
                     + "</col><col=FF7F00> Mins:</col> <col=ffffff>" + minutesPlayed + "</col>", 19413);
             getPA().sendQuest("<col=FF7F00>Donation Amount:</col> <col=ffffff>"+amDonated+"$</col>", 19414);

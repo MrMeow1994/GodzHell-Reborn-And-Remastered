@@ -2772,6 +2772,13 @@ public class NPCHandler {
                 npc.textUpdate = "Smithin' Shop";
             }
         }
+        if (npc.npcType == 11674) {
+            if (misc.random2(30) <= 2) {
+                npc.updateRequired = true;
+                npc.textUpdateRequired = true;
+                npc.textUpdate = "Prestige Shop";
+            }
+        }
         if (npc.npcType == 558) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
