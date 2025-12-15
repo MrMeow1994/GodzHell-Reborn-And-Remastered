@@ -16,8 +16,8 @@ public class DwarfMultiCannon {
 	private static final int CANNONBALL = 2, CANNON_BASE_ID = 6, CANNON_STAND_ID = 8, CANNON_BARRELS_ID = 10, CANNON_FURNACE_ID = 12;
 	
 	public void setUpCannon() {
-		if (canSetUpCannon() || inGoodArea())
-			return;
+		//if (canSetUpCannon() || inGoodArea())
+			//return;
 		CycleEventHandler.getSingleton().addEvent(player,new CycleEvent() {
 			int time = 4;
 			public void execute(CycleEventContainer setup) {
@@ -31,9 +31,8 @@ public class DwarfMultiCannon {
 						player.hasCannon = true;
 						player.settingUpCannon = true;
 						player.setUpBase = true;
-						Objects3 base = new Objects3(CANNON_BASE, player.absX, player.absY, 0, 0, 10, 0);
-						server.objectHandler.addObject(base);
-						server.objectHandler.placeObject(base);
+						GlobalObject base = new GlobalObject(CANNON_BASE, player.absX, player.absY, 0, 0, 10, 0);
+						server.getGlobalObjects().add(base);
 						player.oldCannon = base;
 						player.deleteItem(CANNON_BASE_ID, 1);
 						base.belongsTo = player.playerName;
@@ -46,10 +45,8 @@ public class DwarfMultiCannon {
 						}
 						player.startAnimation(827);
 						player.setUpStand = true;
-						Objects3 stand = new Objects3(CANNON_STAND, player.absX, player.absY, 0, 0, 10, 0);
-						server.objectHandler.removeObject(player.oldCannon);
-						server.objectHandler.addObject(stand);
-						server.objectHandler.placeObject(stand);
+						GlobalObject stand = new GlobalObject(CANNON_STAND, player.absX, player.absY, 0, 0, 10, 0);
+						server.getGlobalObjects().replace(player, player.oldCannon, stand);
 						player.oldCannon = stand;
 						player.deleteItem(CANNON_STAND_ID, 1);
 						stand.belongsTo = player.playerName;
@@ -62,10 +59,8 @@ public class DwarfMultiCannon {
 						}
 						player.startAnimation(827);
 						player.setUpBarrels = true;
-						Objects3 barrel = new Objects3(CANNON_BARRELS, player.absX, player.absY, 0, 0, 10, 0);
-						server.objectHandler.removeObject(player.oldCannon);
-						server.objectHandler.addObject(barrel);
-						server.objectHandler.placeObject(barrel);
+						GlobalObject barrel = new GlobalObject(CANNON_BARRELS, player.absX, player.absY, 0, 0, 10, 0);
+						server.getGlobalObjects().replace(player, player.oldCannon, barrel);
 						player.oldCannon = barrel;
 						player.deleteItem(CANNON_BARRELS_ID, 1);
 						barrel.belongsTo = player.playerName;
@@ -78,13 +73,11 @@ public class DwarfMultiCannon {
 						}
 						player.startAnimation(827);
 						player.setUpFurnace = true;
-						Objects3 cannon = new Objects3(CANNON, player.absX, player.absY, 0, 0, 10, 0);
+						GlobalObject cannon = new GlobalObject(CANNON, player.absX, player.absY, 0, 0, 10, 0);
 						player.cannonBaseX = player.absX;
 						player.cannonBaseY = player.absY;
 						player.cannonBaseH = player.heightLevel;
-						//player.removeObject(player.oldCannon);
-						server.objectHandler.addObject(cannon);
-						server.objectHandler.placeObject(cannon);
+						server.getGlobalObjects().replace(player, player.oldCannon, cannon);
 						player.oldCannon = cannon;
 						player.deleteItem(CANNON_FURNACE_ID, 1);
 						cannon.belongsTo = player.playerName;
@@ -103,7 +96,7 @@ public class DwarfMultiCannon {
 				// TODO Auto-generated method stub
 				
 			}
-		}, 2000);
+		}, 2);
 	}
 	
 	public void shootCannon() {
@@ -157,7 +150,7 @@ public class DwarfMultiCannon {
 				// TODO Auto-generated method stub
 				
 			}
-		}, (player.inMulti() ? 800 : 2500));
+		}, (player.inMulti() ? 2 : 5));
 	}
 	
 	private void rotateCannon(Objects3 cannon) {
@@ -332,9 +325,9 @@ public class DwarfMultiCannon {
 		return null;
 	}
 	
-	private static void startCannonballProjectile(client player, Objects3 cannon, NPC n) {
-		int oX = cannon.objectX;
-		int oY = cannon.objectY;
+	private static void startCannonballProjectile(client player, GlobalObject cannon, NPC n) {
+		int oX = cannon.getX();
+		int oY = cannon.getY();
 		int offX = ((oX - n.getX()) * -1);
 		int offY = ((oY - n.getY()) * -1);
 		player.createPlayersProjectile(oX, oY, offY, offX, 50, 60, 53, 20, 20, - player.oldNpcIndex + 1, 30);

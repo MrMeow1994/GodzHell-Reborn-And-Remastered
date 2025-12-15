@@ -160,7 +160,7 @@ public static final int bufferSize = 20000;
     public int SpecDelay2 = 0;
     public boolean DoubleDamg = false;
     public boolean DDS = false;
-    public int[] untradable = {6384, ItemIDs.LUCKY_SARADOMIN_GODSWORD, 15341, 15342, 15343, 15086, 15082, 15083, 15085, 15084, 15070, 15075, 15076, 15078, 15077, 15068, 15066, 15067, 15073, 15072}; // put all untradable itemz here bitchz XD - xero
+    public int[] untradable = {6384, ItemIDs.LUCKY_SARADOMIN_GODSWORD, 25341, 25342, 25343, 15086, 15082, 15083, 15085, 15084, 15070, 15075, 15076, 15078, 15077, 15068, 15066, 15067, 15073, 15072}; // put all untradable itemz here bitchz XD - xero
     public int teleReq = 0;
     public String teleLoc = "";
     public boolean teleOtherScreen = false;
@@ -3478,7 +3478,6 @@ public void setHouse(House house) {
 //        server.getGlobalObjects().add(new GlobalObject(362, 3301, 3309, 0, 0, 10));
 //        server.getGlobalObjects().add(new GlobalObject(362, 3302, 3309, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7319, 3092, 3503, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(11666, 3047, 9791, 0, 2, 10));
         server.getGlobalObjects().add(new GlobalObject(404, 3170, 6793, 0, -3, 10));
         server.getGlobalObjects().add(new GlobalObject(404, 3171, 6793, 0, -3, 10));
         server.getGlobalObjects().add(new GlobalObject(404, 3172, 6793, 0, -3, 10));
@@ -3906,6 +3905,9 @@ public void setHouse(House house) {
         DoubleGates.useDoubleGate(this, objectID);
         ResourceDungeons.handleObjects(this, objectID);
         switch (objectID) {
+            case 6045:
+                sendMessage("You search the cart but find nothing.");
+                break;
             case 1408:
                 PickableObjects.pickupPineapple(this, objectID, objectX, objectY);
                 break;
@@ -19921,7 +19923,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().setSidebarInterface(10, 2449);
         getPA().setSidebarInterface(11, 904);
         getPA().setSidebarInterface(12, 147);
-        getPA().setSidebarInterface(13, 1);
+        getPA().setSidebarInterface(13, 962);
         getPA().setSidebarInterface(0, 2423);
         QuestAssistant.sendStages(this);
 
@@ -23966,6 +23968,9 @@ nated = Integer.parseInt(token2);
                     PutNPCCoords = true;
                     WanneBank = 2;
                     getPA().openUpBank(); // bank
+                } else if (NPCID == 9710) { // tzhaar banker
+                    WanneBank = 3;
+                    getPA().openUpBank(); // bank
                 } else if (NPCID == 2621) { // the obby caves guy
                     PutNPCCoords = true;
                     WanneShop = 41; // obby shop
@@ -24275,9 +24280,9 @@ nated = Integer.parseInt(token2);
                 int ItemSlot = inStream.readUnsignedWordA();
                 int ItemID = inStream.readUnsignedWordBigEndian();
 
-            /* if (IsUsingSkill == false && CheckForSkillUse3(ItemID, ItemSlot) == true) {
+             if (IsUsingSkill == false && CheckForSkillUse3(ItemID, ItemSlot) == true) {
              IsUsingSkill = true;
-             }*/
+             }
                    if (getFood().isFood(ItemID)) {
                        getFood().eat(ItemID, ItemSlot);
                        return;
@@ -28242,13 +28247,13 @@ nated = Integer.parseInt(token2);
         if (playerEquipment[playerWeapon] == (ItemIDs.LUCKY_SARADOMIN_GODSWORD)) {
             return false;
         }
-        if (playerEquipment[playerWeapon] == (15341)) {
+        if (playerEquipment[playerWeapon] == (25341)) {
             return false;
         }
-        if (playerEquipment[playerWeapon] == (15342)) {
+        if (playerEquipment[playerWeapon] == (25342)) {
             return false;
         }
-        if (playerEquipment[playerWeapon] == (15343)) {
+        if (playerEquipment[playerWeapon] == (25343)) {
             return false;
         }
         attackingPlayerId = AttackingOn2.index;
@@ -30203,15 +30208,15 @@ nated = Integer.parseInt(token2);
                     PlayerHandler.messageToAll = "@red@" + playerName + " Has Gotten an lucky sgs!";
                 } else if (prsent == 400) {
                     sendMessage("You just got an Lucky Armadyl Godsword!");
-                    addItem(15341, 1);
+                    addItem(25341, 1);
                     PlayerHandler.messageToAll = "@red@" + playerName + " Has Gotten an lucky ags!";
                 } else if (prsent == 600) {
                     sendMessage("You just got an Lucky Zamorak Godsword!");
-                    addItem(15342, 1);
+                    addItem(25342, 1);
                     PlayerHandler.messageToAll = "@red@" + playerName + " Has Gotten an lucky zgs!";
                 } else if (prsent == 800) {
                     sendMessage("You just got an Lucky Bandos godsword!");
-                    addItem(15343, 1);
+                    addItem(25343, 1);
                     PlayerHandler.messageToAll = "@red@" + playerName + " Has Gotten an lucky bgs!";
                 } else {
                     int val2 = 10000+misc.random3(5000000);
@@ -30571,9 +30576,9 @@ nated = Integer.parseInt(token2);
                 || playerEquipment[playerWeapon] == 15337
                 || playerEquipment[playerWeapon] == 15339
                 || playerEquipment[playerWeapon] == ItemIDs.LUCKY_SARADOMIN_GODSWORD
-                || playerEquipment[playerWeapon] == 15341
-                || playerEquipment[playerWeapon] == 15342
-                || playerEquipment[playerWeapon] == 15343) // 756
+                || playerEquipment[playerWeapon] == 25341
+                || playerEquipment[playerWeapon] == 25342
+                || playerEquipment[playerWeapon] == 25343) // 756
         {
             return 11979;
         }
@@ -30841,15 +30846,15 @@ nated = Integer.parseInt(token2);
         {
             return 7039;
         }
-        if (id == 15341) // scythe
+        if (id == 25341) // scythe
         {
             return 7039;
         }
-        if (id == 15342) // scythe
+        if (id == 25342) // scythe
         {
             return 7039;
         }
-        if (id == 15343) // scythe
+        if (id == 25343) // scythe
         {
             return 7039;
         }
@@ -30980,7 +30985,7 @@ nated = Integer.parseInt(token2);
         {
             return 2074;
         }
-        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul
         {
             return 7047;
         }
@@ -31018,7 +31023,7 @@ nated = Integer.parseInt(token2);
         if(weaponName.contains("whip")) {
             return 11975;
         }
-        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul
         {
             return 7043;
         } else {
@@ -31030,7 +31035,7 @@ nated = Integer.parseInt(token2);
         if (weaponName.contains("whip")) {
             return 11975;
         }
-        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul{
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul{
         {
             return 7043;
         } else {
@@ -31043,7 +31048,7 @@ nated = Integer.parseInt(token2);
         if(weaponName.contains("whip")) {
             return 11975;
         }
-        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 15341 || id == 15342 || id == 15343) // maul
+        if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul
         {
             return 7044;
         } else {
@@ -31097,15 +31102,15 @@ nated = Integer.parseInt(token2);
         {
             return 7050;
         }
-        if (id == 15341) // rune sq shield
+        if (id == 25341) // rune sq shield
         {
             return 7050;
         }
-        if (id == 15342) // rune sq shield
+        if (id == 25342) // rune sq shield
         {
             return 7050;
         }
-        if (id == 15343) // rune sq shield
+        if (id == 25343) // rune sq shield
         {
             return 7050;
         }

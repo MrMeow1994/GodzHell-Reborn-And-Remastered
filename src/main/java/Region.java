@@ -233,7 +233,7 @@ public class Region {
 //            new WorldObject2(362, 3301, 3309, 0, 10, 0),
 //            new WorldObject2(362, 3302, 3309, 0, 10, 0),
             new WorldObject2(7319, 3092, 3503, 0, 10, 0),
-            new WorldObject2(11666, 3047, 9791, 0, 10, 2),
+         //   new WorldObject2(11666, 3047, 9791, 0, 10, 2),
             new WorldObject2(404, 3170, 6793, 0, 10, -3),
             new WorldObject2(404, 3171, 6793, 0, 10, -3),
             new WorldObject2(404, 3172, 6793, 0, 10, -3),

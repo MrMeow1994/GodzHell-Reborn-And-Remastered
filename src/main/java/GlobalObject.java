@@ -105,4 +105,6 @@ public class GlobalObject {
         return type;
     }
 
+    public static String belongsTo;
+
 }

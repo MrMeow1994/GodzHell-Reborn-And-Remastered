@@ -364,6 +364,34 @@
     "magicDefense": 0
   },
   {
+    "id": 1341,
+    "name": "Dagannoth",
+    "attack": 68,
+    "strength": 70,
+    "defense": 71,
+    "ranged": 1,
+    "magic": 1,
+    "prayer": 0,
+    "maxHit": 8,
+    "attackSpeed": 4,
+    "rangedDefense": 0,
+    "magicDefense": 0
+  },
+  {
+    "id": 2455,
+    "name": "Dagannoth",
+    "attack": 68,
+    "strength": 70,
+    "defense": 71,
+    "ranged": 1,
+    "magic": 1,
+    "prayer": 0,
+    "maxHit": 8,
+    "attackSpeed": 4,
+    "rangedDefense": 0,
+    "magicDefense": 0
+  },
+  {
     "id": 3260,
     "name": "Barbarian",
     "attack": 8,

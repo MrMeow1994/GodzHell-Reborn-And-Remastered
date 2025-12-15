@@ -231,7 +231,7 @@ public abstract class Player extends Entity {
 	/* Cannon Variables */
 	public boolean settingUpCannon, hasCannon, cannonIsShooting, setUpBase, setUpStand, setUpBarrels, setUpFurnace;
 	public int cannonBalls, cannonBaseX, cannonBaseY, cannonBaseH, rotation, cannonID;
-	public Objects3 oldCannon;
+	public GlobalObject oldCannon;
 	/**
 	 * Retrieves the rights for this player.
 	 *

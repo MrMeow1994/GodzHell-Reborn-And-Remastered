@@ -2800,8 +2800,12 @@ public class NPCHandler {
         if (!npc.IsDead) return;
 
         if (npc.actionTimer == 0 && !npc.DeadApply && !npc.NeedRespawn) {
+
             npc.killedBy = getNpcKillerId(index);
             npc.IsUnderAttack = npc.IsUnderAttackNpc = false;
+            int playerIndex = npc.StartKilling;
+            client player = (client) server.playerHandler.players[playerIndex];
+            player.sendSound(getNpcDeathSound(npc.npcType), 6, 0);
             npc.animNumber = getNpcDeathAnimation(npc.npcType);
             npc.updateRequired = true;
             npc.animUpdateRequired = true;
@@ -3449,7 +3453,15 @@ public class NPCHandler {
     }
     public int getNpcDeathSound(int npcType) {
         String npc = NPCCacheDefinition.forID(npcType).getName().toLowerCase();
-
+        switch(npcType){
+            case 2455:
+            case 1341:
+                return 1621;
+            case 3260:
+                return 502;
+            case 118:
+                return 418;
+        }
         if (npc.contains("bat")) {
             return 293; // Bat death screech
         }
@@ -3476,9 +3488,6 @@ public class NPCHandler {
         }
         if (npc.contains("wolf")) {
             return 584; // Wolf dying growl
-        }
-        if (npc.equalsIgnoreCase("barbarian woman")) {
-            return 505; // Ghostly moan
         }
         if (npc.contains("bear")) {
             return 597; // Bear groan on death
@@ -3511,11 +3520,16 @@ public class NPCHandler {
         if (npc.equalsIgnoreCase("tzhaar-mej")) return 263;
         if (npc.equalsIgnoreCase("tzhaar-xil")) return 270;
         // Generic fallback death sound for unknowns
-        return 793;
+        return 512;
     }
 
     public int getNpcDeathAnimation(int npcType) {
         switch (npcType) {
+            case 118:
+                return 102;
+            case 2455:
+            case 1341:
+                return 1342;
             case 677: return 67;
             case 5362:
             case 53:
@@ -3683,6 +3697,15 @@ public class NPCHandler {
     }
     public int getNpcAttackSound(int npcType) {
         String npc = NPCCacheDefinition.forID(npcType).getName().toLowerCase();
+        switch(npcType){
+            case 2455:
+            case 1341:
+                return 1615;
+            case 3260:
+                return 501;
+            case 118:
+                return 417;
+        }
         if (npc.equalsIgnoreCase("frost dragon")) {
             return 85; // Confirmed zombie death
         }
@@ -3771,6 +3794,11 @@ public class NPCHandler {
         }
 
         switch (npc.npcType) {
+            case 118:
+                return 99;
+            case 2455:
+            case 1341:
+                return 1341;
             case 677: return 64;
             case 5362:
             case 53:
@@ -3901,7 +3929,13 @@ public class NPCHandler {
 
     public int getNpcBlockSound(int npcType) {
         String npc = NPCCacheDefinition.forID(npcType).getName().toLowerCase();
-
+        switch(npcType){
+            case 2455:
+            case 1341:
+                return 1622;
+            case 118:
+                return 419;
+        }
         if (npc.contains("bat")) {
             return 294; // Bat block screech
         }
@@ -3976,6 +4010,11 @@ public class NPCHandler {
 
     public int GetNPCBlockAnim(int id) {
         switch (id) {
+            case 118:
+                return 100;
+            case 2455:
+            case 1341:
+                return 1340;
             case 677: return 65;
             case 5362:
             case 53:
@@ -4559,9 +4598,9 @@ public class NPCHandler {
         int baseDamage = misc.random(maxHit); // Max hit is usually precomputed based on strength
 
         // --- PRAYER REDUCTION ---
-      //  if (player.prayerActive[18] && npc.attackType == 0) baseDamage /= 4; // melee
-      //  if (player.prayerActive[17] && npc.attackType == 1) baseDamage /= 4; // ranged
-      //  if (player.prayerActive[16] && npc.attackType == 2) baseDamage /= 4; // magic
+        if (player.prayerActive[18] && npc.attackType == 0) baseDamage /= 4; // melee
+        if (player.prayerActive[17] && npc.attackType == 1) baseDamage /= 4; // ranged
+        if (player.prayerActive[16] && npc.attackType == 2) baseDamage /= 4; // magic
 
         // --- LIMIT TO CURRENT HP ---
         return Math.min(baseDamage, player.NewHP);
