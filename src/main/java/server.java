@@ -213,6 +213,7 @@ public class server implements Runnable {
                 globalObjects.pulse();
                 getEventHandler().process();
                 CycleEventHandler.getSingleton().process();
+                Pets.petGrowthTick();
             objectManager.process();
             antilag.process();
             //GlobalDrops.process();

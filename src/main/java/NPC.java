@@ -433,6 +433,12 @@ public class NPC {
         transformUpdateRequired = true;
         updateRequired = true;
     }
+    public void requestPetTransform(int id) {
+        transformId = id;
+        npcType = id;
+        transformUpdateRequired = true;
+        updateRequired = true;
+    }
     public void clearUpdateFlags() {
         updateRequired = false;
         animUpdateRequired = false;

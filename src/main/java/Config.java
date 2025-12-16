@@ -18,6 +18,7 @@ public class Config {
     public static final int CRAFTING_EXPERIENCE = 50;
 	public static final int SLAYER_EXPERIENCE = 50;
 	public static final int THIEVING_EXPERIENCE = 50;
+	public final static int NPC_FOLLOW_DISTANCE = 10;
 	public static boolean ADMIN_DROP_ITEMS = false;
 	public static  boolean ADMIN_CAN_SELL_ITEMS = false;
 	public static  boolean MINI_GAMES = false;

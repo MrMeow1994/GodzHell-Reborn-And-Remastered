@@ -265,6 +265,11 @@ public class ShopAssistant {
             } else {
                 c.deleteItem2(currencyItemID, TotPrice2*amount);
             }
+            if(itemID == 15262){
+                if(c.Spirit_shard_pack_Amount == 0) {
+                    c.Spirit_shard_pack_Amount = 5000;
+                }
+            }
             c.addItem(itemID, 1);
             boughtAmount++;
 

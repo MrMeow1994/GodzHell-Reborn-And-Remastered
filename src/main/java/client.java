@@ -494,7 +494,15 @@ public static final int bufferSize = 20000;
     public int healTimer = 0;
     public int mythRetry = 0;
     public int freezeTimer;
+    // Tracks growth progress per summoned pet NPC
+    public Map<Integer, Integer> petGrowthTicks = new HashMap<>();
+
+    // Tracks hunger ticks for each pet (increments every server tick)
+    public Map<Integer, Integer> petHungerTicks = new HashMap<>();
     public boolean HasNpc = false;
+
+    public SummoningFamiliar activeFamiliar = null;
+    public boolean pethasfeed = false;
     public long singleCombatDelay2;
     public int WanneShop = 0;
     public boolean PutNPCCoords;
@@ -509,7 +517,6 @@ public static final int bufferSize = 20000;
     int skillcape = 0;
     private boolean canChangeAppearance = false;
     private final DwarfMultiCannon cannon = new DwarfMultiCannon(this);
-    private final Summoning summoning = new Summoning(this);
     private final CraftingGems craftinggems = new CraftingGems(this);
     private final Farming farming = new Farming(this);
     private final PrayerAltar prayeralter = new PrayerAltar(this);
@@ -10642,7 +10649,11 @@ public void setHouse(House house) {
         }
 
         try {
-
+            if(hasActiveFamiliar()){
+                Summoning.cleanup(this);
+            }
+            if (hasNpc)
+                getPets().quickPickup(this, summonId);
             savechar();
             savemoreinfo();
             System.out.println("Game saved for player " + playerName);
@@ -11790,8 +11801,11 @@ public void setHouse(House house) {
         if (getRights().isPlayer()) {
             PlayerHandler.messageToAll = "[Player] " + playerName + " has logged out";
         }
+        if(hasActiveFamiliar()){
+            Summoning.cleanup(this);
+        }
         if (hasNpc)
-            getSummon().pickUpClean(this, summonId);
+            getPets().quickPickup(this, summonId);
 
     }
 
@@ -12378,45 +12392,6 @@ public void setHouse(House house) {
         }
 
 
-        if (command.startsWith("sarachick")) {
-            server.npcHandler.newPetNPC(6949, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6949), false, index);
-            sM("you got an Saradomin chick!");
-        }
-        if (command.startsWith("sarabird")) {
-            server.npcHandler.newPetNPC(6950, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6950), false, index);
-            sM("you got an Saradomin bird!");
-        }
-
-        if (command.startsWith("saraowl")) {
-            server.npcHandler.newPetNPC(6951, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6951), false, index);
-            sM("you got an Saradomin owl!");
-        }
-        if (command.startsWith("zamchick")) {
-            server.npcHandler.newPetNPC(6952, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6952), false, index);
-            sM("you got an Zamorak chick!");
-        }
-        if (command.startsWith("zambird")) {
-            server.npcHandler.newPetNPC(6953, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6953), false, index);
-            sM("you got an Zamorak bird!");
-        }
-
-        if (command.startsWith("zamhawk")) {
-            server.npcHandler.newPetNPC(6954, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6954), false, index);
-            sM("you got an Zamorak hawk!");
-        }
-        if (command.startsWith("guthchick")) {
-            server.npcHandler.newPetNPC(6955, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6955), false, index);
-            sM("you got an Guthix chick!");
-        }
-        if (command.startsWith("guthbird")) {
-            server.npcHandler.newPetNPC(6956, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6956), false, index);
-            sM("you got an Guthix bird!");
-        }
-
-        if (command.startsWith("guthrap")) {
-            server.npcHandler.newPetNPC(6957, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(6957), false, index);
-            sM("you got an Guthix raptor!");
-        }
 
         if (command.startsWith("forcelog") && rights.inherits(Rights.ADMINISTRATOR)) {
             String nam = command.substring(9);
@@ -22496,6 +22471,7 @@ nated = Integer.parseInt(token2);
                 System.out.println("Item2ID4: " + item2ID4);
 
                 checkwildy();
+                Summoning.summonFamiliar(this, item2ID3, item2ID);
                 switch(item2ID3){
                     case ItemIDs.BUCKET_OF_SAND:
                         if(playerHasItem(ItemIDs.BUCKET_OF_SAND, 1)){
@@ -23227,6 +23203,17 @@ nated = Integer.parseInt(token2);
                 if(!goodDistance(NPCHandler.npcs[NPCSlot].absX, NPCHandler.npcs[NPCSlot].absY, absX, absY, npcDistance)) {
                     return;
                 }
+                if (Pets.Pet.isCatNpc(NPCID)) {
+                    if (NPCHandler.npcs[NPCSlot].spawnedBy == index) {
+                        getPets().pickUpPet(this, summonId);
+                        hasNpc = false;
+                        summonId = -1;
+                        return;
+                    } else {
+                        sendMessage("This is not your pet.");
+                        return;
+                    }
+                }
                 if (Fishing.fishingNPC(NPCID)) {
                     Fishing.fishingNPC(this, 1, NPCID);
                     return;
@@ -23363,11 +23350,7 @@ nated = Integer.parseInt(token2);
                         PutNPCCoords = true;
                     }
                 }
-                if (NPCID == 3506) {
-                    getSummon().pickUpClean(c, summonId);
-                    hasNpc = false;
-                    summonId = 0;
-                }
+
                 if (NPCID == 3777) {
                     NpcDialogue = 24;
                     NpcDialogueSend = false;
@@ -23986,6 +23969,12 @@ nated = Integer.parseInt(token2);
                 } else if (NPCID == 2270){
                     PutNPCCoords = true;
                     WanneShop = 239; // obby shop
+                } else if (NPCID == 6892){
+                    PutNPCCoords = true;
+                    WanneShop = 241; // obby shop
+                } else if (NPCID == 6970){
+                    PutNPCCoords = true;
+                    WanneShop = 242; // obby shop
                 } else if (NPCID == 11674){
                     if(prestigeLevel >= 10){
                     PutNPCCoords = true;
@@ -27381,7 +27370,26 @@ nated = Integer.parseInt(token2);
                 testinterfaceId = inStream.readUnsignedWordA();
 
                 boolean isTwoHander = EquipmentConfig.isTwoHander(wearID);
-
+                if(wearID == 15262){
+                    if(playerHasItem(15262)) {
+                        if (Spirit_shard_pack_Amount == 5000) {
+                            addItem(12183, Spirit_shard_pack_Amount);
+                            Spirit_shard_pack_Amount -= 5000;
+                            sendMessage("You take the Sprit shards out of the pack.");
+                        } else  if (Spirit_shard_pack_Amount < 5000) {
+                            addItem(12183, Spirit_shard_pack_Amount);
+                            int shardamount = Spirit_shard_pack_Amount;
+                            sendMessage("You take the rest of the Sprit shards out of the pack.");
+                            Spirit_shard_pack_Amount -= shardamount;
+                        }
+                        if(Spirit_shard_pack_Amount < 1){
+                            deleteItem2(15262, 1);
+                            Spirit_shard_pack_Amount = 5000;
+                            return;
+                        }
+                    }
+                    return;
+                }
                 // if trying to equip a 2h weapon in weapon slot while shield equipped
                 if (wearSlot == 5 && isTwoHander && playerEquipment[playerShield] != -1) {
                     sendMessage("You cannot equip a two-handed weapon while wearing a shield.");
@@ -27829,6 +27837,11 @@ nated = Integer.parseInt(token2);
                     sM("admins cant drop items.");
                     return;
                 }
+                if (Pets.Pet.isCatItem(droppedItem)) {
+                    Pets.dropPet(this, droppedItem, slot);
+                    return;
+                }
+
                 writeLog(playerName + " dropped Item " + droppedItem + " ", " dropslog");
                 // println_debug("dropItem: "+droppedItem+" Slot: "+slot);
                 if (isUntradable(droppedItem)) {
@@ -27838,83 +27851,6 @@ nated = Integer.parseInt(token2);
                     deleteItem(droppedItem, slot, playerItemsN[slot]);
                 }
 
-                if (droppedItem == 1560) {
-                    sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(766, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(766), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1559) {
-                    sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(765, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(765), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1558) {
-                    sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(764, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(764), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1557) {
-                    sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(763, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(763), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1556) {
-                    sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(762, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(762), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1555) {
-                    sendMessage("You drop your Kitten");
-                    server.npcHandler.newPetNPC(761, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(761), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1561) {
-                    sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(768, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(768), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1562) {
-                    sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(769, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(769), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1563) {
-                    sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(770, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(770), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1564) {
-                    sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(771, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(771), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1565) {
-                    sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(772, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(772), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 1566) {
-                    sendMessage("You drop your Cat");
-                    server.npcHandler.newPetNPC(773, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(773), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-                if (droppedItem == 7585) {
-                    sendMessage("You drop your HellCat");
-                    server.npcHandler.newPetNPC(3507, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(3507), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-
-                if (droppedItem == 14489) {
-                    sendMessage("You drop your Gecko");
-                    server.npcHandler.newPetNPC(6916, absX, absY - 1, heightLevel, absX - 1, absY - 1, absX + 1, absY - 1, 1, server.npcHandler.GetNpcListHP(3507), false, this.index);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
-
-                if (droppedItem == 7584) {
-                    sendMessage("You drop your HellCat");
-                    server.npcHandler.spawnNpc3(c, server.npcHandler.summonItemId(droppedItem), absX, absY - 1, heightLevel, 0, 120, 25, 200, 200, true, false, true);
-                    deleteItem(droppedItem, slot, playerItemsN[slot]);
-                }
                 if (droppedItem == 744 && absX == 2780 && absY == 3515
                         && q3stage == 5) {
                     server.npcHandler.newNPC(1645, absX + 1, absY, heightLevel,
@@ -28018,6 +27954,7 @@ nated = Integer.parseInt(token2);
     }
 
     private void handleItemOnNPC(int npcId, int itemId, int itemSlot2) {
+        getPets().feedPet(this, NPCHandler.npcs[npcId].npcType, itemId);
         switch(NPCHandler.npcs[npcId].npcType){
             case 43:
                 NPCHandler.npcs[npcId].shearSheep(this, 1735, 1737, 893, 43, 42, 50);
@@ -29784,6 +29721,20 @@ nated = Integer.parseInt(token2);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
+            case  15262:
+                if(playerHasItem(15262)) {
+                    if (Spirit_shard_pack_Amount > 1) {
+                        addItem(12183, 1);
+                        Spirit_shard_pack_Amount -= 1;
+                        sendMessage("You take a Sprit shard out of the pack.");
+                    }
+                    if(Spirit_shard_pack_Amount < 1){
+                        deleteItem2(15262, 1);
+                        Spirit_shard_pack_Amount = 5000;
+                        return false;
+                    }
+                }
+            break;
             case 135: // defence pot (2)
                 defPot = true;
                 defPotTimer = 90;
@@ -35921,6 +35872,7 @@ public int GetGLCLConstruction(int ItemID) {
             this.pirateTreasure = playerData.getPirateTreasure();
             this.desertTreasure = playerData.getDesertTreasure();
             this.autoRet = playerData.getAutoRet();
+            this.Spirit_shard_pack_Amount = playerData.getSpirit_shard_pack_Amount();
             if (playerData.getSlayerTask().isPresent()) {
                 this.getSlayer().setTask(playerData.getSlayerTask());
                 this.getSlayer().setTaskAmount(playerData.getSlayerTaskAmount());
@@ -36001,6 +35953,7 @@ public int GetGLCLConstruction(int ItemID) {
         playerData.setHasFourthFloorDone(hasfourthfloorDone);
         playerData.setSkullTimer(skullTimer);
         playerData.setAutoRet(autoRet);
+        playerData.setSpirit_shard_pack_Amount(Spirit_shard_pack_Amount);
         playerData.setSlayerTask(getSlayer().getTask());
         playerData.setSlayerTaskAmount(getSlayer().getTaskAmount());
         playerData.setSlayerMaster(getSlayer().getMaster());
@@ -37394,9 +37347,6 @@ public int GetGLCLConstruction(int ItemID) {
         }
     }
 
-    public Summoning getSummon() {
-        return summoning;
-    }
 
     public CraftingGems getCrafting() {
         return craftinggems;
@@ -37667,6 +37617,21 @@ public int GetGLCLConstruction(int ItemID) {
         }
 
     }
+    public boolean hasActiveFamiliar() {
+        return activeFamiliar != null && hasNpc;
+    }
+
+    public SummoningFamiliar getActiveFamiliar() {
+        return activeFamiliar;
+    }
+
+    public int getActiveFamiliarNpcId() {
+        return activeFamiliar != null ? activeFamiliar.getNpcId() : -1;
+    }
+
+    public boolean isFamiliarNpc(int npcId) {
+        return activeFamiliar != null && activeFamiliar.getNpcId() == npcId;
+    }
 
     public Slayer getSlayer() {
         if (slayer == null) {
@@ -37742,6 +37707,17 @@ public int GetGLCLConstruction(int ItemID) {
         }
 
         return notBlocked && !Region.isBlockedPath(destination.getX(), destination.getY(), x, y, destination.getZ());
+    }
+    private final Pets pets = new Pets();
+
+    public Pets getPets() {
+        return pets;
+    }
+
+    private final Summoning summ = new Summoning();
+
+    public Summoning getSummoning() {
+        return summ;
     }
 
 }  

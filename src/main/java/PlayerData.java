@@ -38,6 +38,7 @@ public class PlayerData {
     private int prestigePoints;
     private int autoRet;
     private Map<Integer, int[]> colorMeta;
+    private int Spirit_shard_pack_Amount;
 
     // Slayer data
     private Optional<SlayerTask> slayerTask = Optional.empty(); // Optional field for SlayerTask
@@ -113,6 +114,7 @@ public class PlayerData {
         data.pirateTreasure = plr.pirateTreasure;
         data.desertTreasure = plr.desertTreasure;
         data.autoRet = plr.autoRet;
+        data.Spirit_shard_pack_Amount = plr.Spirit_shard_pack_Amount;
         client target = (client) plr;
         data.slayerTask = target.getSlayer().getTask();
         data.slayerTaskAmount = target.getSlayer().getTaskAmount();
@@ -795,6 +797,12 @@ public int getPrestigePoints(){
 }
 public void setPrestigePoints(int prestigePoints){
         this.prestigePoints = prestigePoints;
+}
+public int getSpirit_shard_pack_Amount(){
+        return Spirit_shard_pack_Amount;
+}
+public void setSpirit_shard_pack_Amount(int Spirit_shard_pack_Amount){
+        this.Spirit_shard_pack_Amount = Spirit_shard_pack_Amount;
 }
 }
 

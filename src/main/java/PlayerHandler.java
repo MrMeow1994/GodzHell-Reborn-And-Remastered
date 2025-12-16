@@ -764,6 +764,7 @@ public class PlayerHandler {
         playerData.setHasFourthFloorDone(plr.hasfourthfloorDone);
         playerData.setSkullTimer(plr.skullTimer);
         playerData.setAutoRet(plr.autoRet);
+        playerData.setSpirit_shard_pack_Amount(plr.Spirit_shard_pack_Amount);
         playerData.setRuneMist(plr.runeMist);
         playerData.setGertCat(plr.gertCat);
         playerData.setRestGhost(plr.restGhost);

@@ -364,7 +364,17 @@ public class NPCHandler {
         return 0;
 
     }
-
+    public static boolean followPlayer(int i) {
+        switch (npcs[i].npcType) {
+            case 1456:
+            case 2892:
+            case 2894:
+            case 1532:
+            case 1534:
+                return false;
+        }
+        return true;
+    }
     public void followPlayer(int i, int playerId) {
         if (server.playerHandler.players[playerId] == null) {
             return;
@@ -376,8 +386,65 @@ public class NPCHandler {
             return;
         }
 
-        //if (!followPlayer(i)) {
-        npcs[i].facePlayer(playerId);
+        if (npcs[i].npcType == 1532 || npcs[i].npcType == 1534) {
+            return;
+        }
+
+        if (!followPlayer(i) && npcs[i].npcType != 1532 && npcs[i].npcType != 1534) {
+            npcs[i].facePlayer(playerId);
+            return;
+        }
+
+        int playerX = PlayerHandler.players[playerId].absX;
+        int playerY = PlayerHandler.players[playerId].absY;
+        npcs[i].randomWalk = false;
+        if (goodDistance(npcs[i].getX(), npcs[i].getY(), playerX, playerY, distanceRequired(i))) {
+            return;
+        }
+
+        NPC    npc    = npcs[i];
+        int    x      = npc.absX;
+        int    y      = npc.absY;
+        Player player = PlayerHandler.players[playerId];
+        if (npcs[i].spawnedBy > 0
+                || x < npc.makeX + Config.NPC_FOLLOW_DISTANCE
+                && x > npc.makeX - Config.NPC_FOLLOW_DISTANCE
+                && y < npc.makeY + Config.NPC_FOLLOW_DISTANCE
+                && y > npc.makeY - Config.NPC_FOLLOW_DISTANCE) {
+            if (npc.heightLevel == player.heightLevel) {
+                if (player != null && npc != null) {
+                    if (playerX > x && playerY < y) {
+                        npc.moveX = GetMove(x, playerX);//Diagonal bottom right
+                    } else if (playerX < x && playerY < y) {
+                        npc.moveY = GetMove(y, playerY); //Diagonal bottom left
+                    } else if (playerX < x && playerY > y) {
+                        npc.moveX = GetMove(x, playerX);// Diagonal top left
+                    } else if (playerX > x && playerY > y) {
+                        npc.moveY = GetMove(y, playerY);// Diagonal top right
+                    } else if (playerY < y) {
+                        npc.moveX = GetMove(x, playerX); //Move South to player
+                        npc.moveY = GetMove(y, playerY);
+                    } else if (playerY > y) {
+                        npc.moveX = GetMove(x, playerX); //Move North to player
+                        npc.moveY = GetMove(y, playerY);
+                    } else if (playerX < x) {
+                        npc.moveX = GetMove(x, playerX); //Move West to player
+                        npc.moveY = GetMove(y, playerY);
+                    } else if (playerX > x) {
+                        npc.moveX = GetMove(x, playerX); //Move East to player
+                        npc.moveY = GetMove(y, playerY);
+                    }
+                    npc.facePlayer(playerId);
+                    handleClipping(i);
+                    npc.getNextNPCMovement(i);
+                    npc.updateRequired = true;
+                }
+            }
+        } else {
+            npc.facePlayer(0);
+            npc.randomWalk = true;
+            npc.underAttack = false;
+        }
     }
 
     public int getCloseRandomPlayer(int i) {
@@ -538,6 +605,21 @@ public class NPCHandler {
         newNPC.Respawns = Respawns;
         npcs[slot] = newNPC;
     }
+    public void removeNpc(int index) {
+        if (index < 0 || index >= npcs.length) {
+            return;
+        }
+
+        NPC npc = npcs[index];
+        if (npc == null) {
+            return;
+        }
+
+        // Mark as dead/removed so processing loop ignores it
+        npc.IsDead = true;
+        npc.NeedRespawn = false;
+        npcs[index] = null;
+    }
 
     public void newSummonedNPC(int npcType, int x, int y, int heightLevel, int rangex1, int rangey1, int rangex2, int rangey2, int WalkingType, int HP, boolean Respawns, int summonedBy) {
         // first, search for a free slot
@@ -689,31 +771,6 @@ public class NPCHandler {
         return 0;
     }
 
-    public void FollowPlayer(int NPCID) {
-        int follow = npcs[NPCID].followPlayer;
-        int playerX = server.playerHandler.players[follow].absX;
-        int playerY = server.playerHandler.players[follow].absY;
-
-        npcs[NPCID].RandomWalk = false;
-        if (server.playerHandler.players[follow] != null) {
-            if (playerY < npcs[NPCID].absY) {
-                npcs[NPCID].moveX = GetMove(npcs[NPCID].absX, playerX);
-                npcs[NPCID].moveY = GetMove(npcs[NPCID].absY, playerY + 1);
-            } else if (playerY > npcs[NPCID].absY) {
-                npcs[NPCID].moveX = GetMove(npcs[NPCID].absX, playerX);
-                npcs[NPCID].moveY = GetMove(npcs[NPCID].absY, playerY - 1);
-            } else if (playerX < npcs[NPCID].absX) {
-                npcs[NPCID].moveX = GetMove(npcs[NPCID].absX, playerX + 1);
-                npcs[NPCID].moveY = GetMove(npcs[NPCID].absY, playerY);
-            } else if (playerX > npcs[NPCID].absX) {
-                npcs[NPCID].moveX = GetMove(npcs[NPCID].absX, playerX - 1);
-                npcs[NPCID].moveY = GetMove(npcs[NPCID].absY, playerY);
-            }
-            handleClipping(NPCID);
-            npcs[NPCID].getNextNPCMovement(NPCID);
-            npcs[NPCID].updateRequired = true;
-        }
-    }
 
     public void FollowPlayerCB(int NPCID, int playerID) {
         int playerX = server.playerHandler.players[playerID].absX;
@@ -2294,16 +2351,26 @@ public class NPCHandler {
     }
 
     private void handleSummoningSync(NPC npc) {
-        if (!npc.summoner) return;
-        client owner = (client) server.playerHandler.players[npc.summonedBy];
-        if (owner == null) {
-            npc.absX = npc.absY = 0;
-        } else if (owner.hasNpc && (!owner.goodDistance(npc.getX(), npc.getY(), owner.absX, owner.absY, 15)
-                || owner.heightLevel != npc.heightLevel)) {
-            npc.absX = owner.absX;
-            npc.absY = owner.absY;
-            npc.heightLevel = owner.heightLevel;
+        client slaveOwner = (client) PlayerHandler.players[npc.summonedBy];
+        if (slaveOwner == null && npc.summoner) {
+            npc.absX = 0;
+            npc.absY = 0;
         }
+        if (slaveOwner != null
+                && slaveOwner.hasNpc
+                && !slaveOwner.goodDistance(npc.getX(),
+                npc.getY(), slaveOwner.absX,
+                slaveOwner.absY, 15) && npc.summoner) {
+            npc.absX = slaveOwner.absX;
+            npc.absY = slaveOwner.absY - 1;
+        }
+
+        if (slaveOwner != null && slaveOwner.hasNpc && npc.summoner) {
+            if (slaveOwner.goodDistance(npc.absX, npc.absY, slaveOwner.absX, slaveOwner.absY, 15)) {
+                server.npcHandler.followPlayer(npc.npcId, slaveOwner.index);
+            }
+        }
+
     }
 
     private void handleTickTimers(NPC npc, int index) {
@@ -2357,7 +2424,7 @@ public class NPCHandler {
                     npc.IsUnderAttack = true;
                     attackPlayer(index);
                 } else {
-                    FollowPlayer(index);
+                    followPlayer(index, target.index);
                 }
             }
         } else if (npc.IsUnderAttackNpc) {
@@ -2805,7 +2872,9 @@ public class NPCHandler {
             npc.IsUnderAttack = npc.IsUnderAttackNpc = false;
             int playerIndex = npc.StartKilling;
             client player = (client) server.playerHandler.players[playerIndex];
-            player.sendSound(getNpcDeathSound(npc.npcType), 6, 0);
+            if (player != null) {
+                player.sendSound(getNpcDeathSound(npc.npcType), 6, 0);
+            }
             npc.animNumber = getNpcDeathAnimation(npc.npcType);
             npc.updateRequired = true;
             npc.animUpdateRequired = true;
@@ -3452,7 +3521,12 @@ public class NPCHandler {
         }
     }
     public int getNpcDeathSound(int npcType) {
-        String npc = NPCCacheDefinition.forID(npcType).getName().toLowerCase();
+        NPCCacheDefinition def = NPCCacheDefinition.forID(npcType);
+
+        String npc = def != null && def.getName() != null
+                ? def.getName().toLowerCase()
+                : "";
+
         switch(npcType){
             case 2455:
             case 1341:
@@ -3696,7 +3770,11 @@ public class NPCHandler {
         }
     }
     public int getNpcAttackSound(int npcType) {
-        String npc = NPCCacheDefinition.forID(npcType).getName().toLowerCase();
+        NPCCacheDefinition def = NPCCacheDefinition.forID(npcType);
+
+        String npc = def != null && def.getName() != null
+                ? def.getName().toLowerCase()
+                : "";
         switch(npcType){
             case 2455:
             case 1341:
@@ -3928,7 +4006,11 @@ public class NPCHandler {
     }
 
     public int getNpcBlockSound(int npcType) {
-        String npc = NPCCacheDefinition.forID(npcType).getName().toLowerCase();
+        NPCCacheDefinition def = NPCCacheDefinition.forID(npcType);
+
+        String npc = def != null && def.getName() != null
+                ? def.getName().toLowerCase()
+                : "";
         switch(npcType){
             case 2455:
             case 1341:

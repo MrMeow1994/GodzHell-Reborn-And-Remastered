@@ -224,6 +224,7 @@ public abstract class Player extends Entity {
 	public int loyaltyRank;
 	public int duelTimer, duelTeleX, duelTeleY, duelSlot, duelSpaceReq,
 			duelOption, duelingWith;
+	public int Spirit_shard_pack_Amount;
 	public int startTz;
 	public String displayName = "notset";
 	public boolean keep6570;
