@@ -11,6 +11,7 @@ public class clickingMost {
         QuestAssistant.questButtons(c, c.actionButtonId);
         c.getGlassBlowing().handleActionButtin(c.actionButtonId);
         c.getSmithing().getBar(c, c.actionButtonId);
+        SummoningPouch.makePouch(c, c.actionButtonId);
         if (c.playerIsfFetching) {
             Fletching.attemptData(c, c.actionButtonId);
         }
@@ -23,6 +24,28 @@ public class clickingMost {
             return;
         }
         switch (c.actionButtonId) {
+//            case 73141: //Deposit Inventory
+//            case 74003:
+//                    for (int i = 0; i < 28; i++) {
+//                        if (c.playerItems[i] != 0 && c.playerItemsN[i] != 0) {
+//                            int itemId = c.playerItems[i];
+//                            int itemamount = c.playerItemsN[i];
+//                            c.bankItem(itemId, i, itemamount);
+//                        }
+//                    }
+//                break;
+//            case 74002:
+//            case 73140: //Deposit worn items
+//                for (int r = 0; r < c.playerEquipment.length; r++) {
+//                        int item2 = c.playerEquipment[r];
+//                        if ((item2 > 0) && (item2 < 29999)) {
+//                            c.remove(item2, r, 1688);
+//                        }
+//                    }
+//                    for (int t = 0; t < 28; t++) {
+//                        c.bankItem(c.playerItems[t], t, c.playerItemsN[t]);
+//                }
+//                break;
             case 250002:
                 c.closeInterface();
                 break;
@@ -168,6 +191,10 @@ public class clickingMost {
             case 54104: // farming
                 c.getSkillInterfaces().farmingComplex(1);
                 c.getSkillInterfaces().selected = 20;
+                break;
+            case 141083: // farming
+                c.getSkillInterfaces().summoningComplex(1);
+                c.getSkillInterfaces().selected = 23;
                 break;
             case 34185:
             case 34193:
@@ -1498,6 +1525,15 @@ public class clickingMost {
                 break;
             case 21247:// case 97204: // protect from melee
                 c.activatePrayer(18);
+                break;
+            case 66127:
+                Summoning.cleanup(c);
+                break;
+            case 91179:
+                c.getPA().showInterface(22760);
+                break;
+            case 88234:
+                c.getPA().showInterface(23471);
                 break;
             case 4150: //1st ancient tele
                 if(c.actionTimer == 0) {

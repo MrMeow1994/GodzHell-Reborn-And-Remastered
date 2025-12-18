@@ -24109,7 +24109,7 @@ public class ObjectIDs {
     public static final int BACKPACK_2 = 53_079;
     public static final int GROUP_GATESTONE_PORTAL_2 = 53_124;
     public static final int GROUP_GATESTONE_PORTAL_3 = 53_125;
-    public static final int GROUP_GATESTONE_PORTAL_4 = 53_126;
+    public static final int GROUP_GATESTONE_ = 53_126;
     public static final int PHOTO_BOOTH_2 = 53_128;
     public static final int PHOTO_BOOTH_3 = 53_130;
     public static final int PHOTO_BOOTH_4 = 53_132;

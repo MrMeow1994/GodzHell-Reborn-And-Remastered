@@ -76202,3 +76202,49 @@ time: 19.52.11 | sgsrocks:  ::bank
 
 time: 13.11.39 | sgsrocks:  ::object 5785 
 
+time: 8.10.53 | sgsrocks: d 
+
+time: 8.10.55 | sgsrocks: duxk
+
+time: 12.43.53 | sgsrocks: what 
+
+time: 12.43.56 | sgsrocks: lol 
+
+time: 12.31.43 | sgsrocks: oo
+
+time: 16.25.9 | sgsrocks: lolololo
+
+time: 17.56.2 | sgsrocks: really 
+
+time: 15.26.43 | sgsrocks: t 
+
+time: 21.43.13 | sgsrocks:  ::players
+
+time: 10.17.59 | sgsrocks: :;music 960
+
+time: 11.26.6 | sgsrocks:  ::yell lol
+
+time: 17.30.53 | sgsrocks:  ::prestigezone
+
+time: 13.30.8 | sgsrocks: fuck yesss
+
+time: 15.48.8 | sgsrocks: :;pickup 25343 1
+
+time: 16.24.54 | sgsrocks: 00000000000000000000000000000000000000000000000000000000000000
+
+time: 18.21.16 | sgsrocks:  ::pickup 22639 1 
+
+time: 8.54.59 | sgsrocks: lol 
+
+time: 11.58.6 | sgsrocks:  ::pickup 12471 1 
+
+time: 15.0.30 | sgsrocks: :pickup 1927 10
+
+time: 9.24.53 | sgsrocks: \::tele 2207 5346
+
+time: 16.27.6 | sgsrocks: '::bank
+
+time: 19.10.46 | sgsrocks: \::object 49298 0 10
+
+time: 19.13.1 | sgsrocks: '::object 42022 0 10
+

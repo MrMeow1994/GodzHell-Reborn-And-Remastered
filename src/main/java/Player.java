@@ -50,6 +50,10 @@ public abstract class Player extends Entity {
 	public int headIconPk = -1;
 	public int prayerId = -1;
 	public double prayerPoint = 1.0;
+	public boolean familiarActive = false; // Is a familiar currently summoned
+	public double summoningPointsDrainRate = 0; // SP drain per tick
+	public double summoningPoints = 1.0; // Current SP
+	public double maxSummoningPoints = 1.0; // Maximum SP based on level
 	public long stopPrayerDelay, prayerDelay, lastProtItem, protMageDelay, protRangeDelay, protMeleeDelay;
 	public boolean usingPrayer;
 	public int altarPrayed = 0;
@@ -691,6 +695,9 @@ public abstract class Player extends Entity {
 		if(Boundary.isIn((client) this, Boundary.rdleveloftrain)){
 			return true;
 		}
+		if(Boundary.isIn((client) this, Boundary.SUMMONING)){
+			return true;
+		}
 		if(Boundary.isIn((client) this, Boundary.reousce_dung_one)){
 			return true;
 		}
@@ -851,6 +858,7 @@ public abstract class Player extends Entity {
 	public int[] bankItems3 = new int[800];
 	public int[] bankItemsN3 = new int[800];
 	public boolean bankNotes2 = false;
+	public boolean hasSentMessage = false;
 
 	public boolean checkDisplayName(String name) {
 		try {
@@ -870,6 +878,12 @@ public abstract class Player extends Entity {
 		return false;
 	}
 
+	public void gfx0(int gfx) {
+		mask100var1 = gfx;
+		mask100var2 = 65536;
+		gfxUpdateRequired = true;
+		updateRequired = true;
+	}
 
 
 	public void createDisplayName(String name) {

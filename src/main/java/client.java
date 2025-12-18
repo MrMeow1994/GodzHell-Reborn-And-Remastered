@@ -3323,23 +3323,23 @@ public void setHouse(House house) {
     }
 
     public void NewObjects() {
-        server.getGlobalObjects().add(new GlobalObject(2213, 3284, 2777, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3283, 2777, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3282, 2777, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3281, 2777, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3280, 2777, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3279, 2777, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3278, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3284, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3283, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3282, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3281, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3280, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3279, 2777, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3278, 2777, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(1032, 3281, 2764, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2472, 2864, 3599, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(10687, 3285, 2770, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(6552, 2467, 3176, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(410, 2467, 3179, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(409, 2469, 3182, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5786, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5787, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5784, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2361, 5783, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5786, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5787, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5784, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5783, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2783, 2356, 5785, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2783, 2356, 5787, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2728, 2360, 5789, 0, 0, 10));
@@ -3388,22 +3388,22 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(4877, 2961, 3383, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(34385, 2961, 3380, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(34383, 2965, 3376, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3353, 3332, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3352, 3332, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3351, 3332, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3350, 3332, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3353, 3332, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3352, 3332, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3351, 3332, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3350, 3332, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7353, 2468, 3178, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(8987, 2469, 3178, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2474, 2471, 3179, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(8972, 2470, 3176, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.PORTAL_99, 2470, 3176, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(16050, 2471, 3176, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3485, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3486, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3487, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3488, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3489, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3490, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2385, 3491, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3485, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3486, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3487, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3488, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3489, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3490, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2385, 3491, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(7409, 2389, 3489, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7409, 2389, 3490, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7409, 2389, 3491, 0, 0, 10));
@@ -3422,32 +3422,32 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2098, 2462, 3186, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2091, 2462, 3185, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2096, 2462, 3184, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2862, 3756, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3045, 9778, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2862, 3756, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3045, 9778, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2472, 2466, 3167, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3270, 3347, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3270, 3348, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3270, 3349, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3270, 3350, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3270, 3351, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3347, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3348, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3349, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3350, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3351, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2783, 3265, 3346, 0, 2, 10));
         server.getGlobalObjects().add(new GlobalObject(2783, 3263, 3346, 0, 2, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2348, 3171, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2348, 3172, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2348, 3171, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2348, 3172, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 2345, 3174, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 2345, 3168, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 2332, 3174, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 2332, 3168, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2380, 2340, 3168, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2895, 3531, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2896, 3531, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2890, 3531, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2895, 3531, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2896, 3531, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2890, 3531, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(28779, 2894, 3538, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(28780, 2893, 3538, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(28781, 2892, 3538, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2468, 2889, 3538, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2465, 2888, 3538, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2273, 4696, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2273, 4696, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2478, 2260, 4702, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2480, 2267, 4704, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2481, 2272, 4704, 0, 0, 10));
@@ -3461,10 +3461,10 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2488, 2281, 4697, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2489, 2282, 4694, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(2490, 2262, 4693, 0, 0, 10));
-//        server.getGlobalObjects().add(new GlobalObject(2213, 3300, 3306, 0, 0, 10));
-//        server.getGlobalObjects().add(new GlobalObject(2213, 3301, 3306, 0, 0, 10));
-//        server.getGlobalObjects().add(new GlobalObject(2213, 3302, 3306, 0, 0, 10));
-//        server.getGlobalObjects().add(new GlobalObject(2213, 3303, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3300, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3301, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3302, 3306, 0, 0, 10));
+//        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3303, 3306, 0, 0, 10));
 //        server.getGlobalObjects().add(new GlobalObject(362, 3306, 3303, 0, 0, 10));
 //        server.getGlobalObjects().add(new GlobalObject(362, 3305, 3303, 0, 0, 10));
 //        server.getGlobalObjects().add(new GlobalObject(362, 3304, 3303, 0, 0, 10));
@@ -3493,22 +3493,22 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(5259, 3173, 6785, 0, -2, 10));
         server.getGlobalObjects().add(new GlobalObject(1308, 3301, 3486, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 3295, 3481, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3094, 3499, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3094, 3498, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3094, 3497, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3095, 3496, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3096, 3496, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3097, 3496, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3097, 3495, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3097, 3494, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3097, 3493, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3097, 3492, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3097, 3491, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3096, 3491, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3095, 3491, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3094, 3490, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3094, 3489, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3094, 3488, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3094, 3499, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3094, 3498, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3094, 3497, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3095, 3496, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3096, 3496, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3097, 3496, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3097, 3495, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3097, 3494, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3097, 3493, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3097, 3492, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3097, 3491, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3096, 3491, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3095, 3491, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3094, 3490, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3094, 3489, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3094, 3488, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(564, 3094, 3493, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(563, 3095, 3493, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(562, 3094, 3494, 0, 1, 10));
@@ -3551,8 +3551,8 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(4078, 3090, 3499, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(4089, 3090, 3500, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(4078, 3091, 3500, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3492, 9938, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3492, 9937, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3492, 9938, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3492, 9937, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3491, 9942, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(14859, 3491, 9943, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2098, 3485, 9946, 0, 1, 10));
@@ -3571,24 +3571,24 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(2098, 3480, 9935, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(10687, 2854, 5081, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(10687, 2841, 5082, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2847, 5064, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2848, 5064, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2847, 5094, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2848, 5094, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2387, 4693, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2388, 4693, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2389, 4693, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2390, 4693, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2847, 5064, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2848, 5064, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2847, 5094, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2848, 5094, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2387, 4693, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2388, 4693, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2389, 4693, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2390, 4693, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(1766, 2381, 4679, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(1767, 2526, 4635, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(1765, 2532, 4644, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(1768, 2318, 9809, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2315, 9799, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2314, 9799, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2313, 9799, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2312, 9799, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2311, 9799, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2310, 9799, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2315, 9799, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2314, 9799, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2313, 9799, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2312, 9799, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2311, 9799, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2310, 9799, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(9398, 2312, 9802, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(2565, 2787, 2778, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2417, 3001, 3931, 0, 0, 10));
@@ -3598,20 +3598,20 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(13571, 3237, 9797, 0, 2, 10));
         server.getGlobalObjects().add(new GlobalObject(13572, 3236, 9797, 0, 2, 10));
         server.getGlobalObjects().add(new GlobalObject(13573, 3235, 9797, 0, 2, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3084, 3520, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3088, 3520, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3084, 3520, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3088, 3520, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(9398, 2599, 3425, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(9398, 2605, 3411, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3357, 3215, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3357, 3214, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3357, 3213, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3357, 3212, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3357, 3211, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3357, 3215, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3357, 3214, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3357, 3213, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3357, 3212, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3357, 3211, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(3192, 3079, 3518, 0, -3, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3222, 3217, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3221, 3217, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3222, 3220, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3221, 3220, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3222, 3217, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3221, 3217, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3222, 3220, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3221, 3220, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(23095, 2895, 3538, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(1330, 2857, 3755, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(1332, 2864, 3755, 0, 0, 10));
@@ -3631,48 +3631,48 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(63, 3145, 3215, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(63, 3144, 3215, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(63, 3143, 3215, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3141, 3204, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3141, 3204, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(3769, 3420, 4776, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(8576, 2602, 4779, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(8576, 2603, 4779, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(8576, 2602, 4780, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(8576, 2603, 4780, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3022, 3454, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3022, 3453, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3022, 3452, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3022, 3451, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3022, 3450, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3022, 3449, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3022, 3454, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3022, 3453, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3022, 3452, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3022, 3451, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3022, 3450, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3022, 3449, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(1306, 3016, 3461, 0, -1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2807, 2787, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2807, 2786, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2807, 2785, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2807, 2784, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2807, 2783, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3114, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3115, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3116, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3117, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3118, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3119, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3120, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3121, 9850, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 3116, 9846, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2807, 2787, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2807, 2786, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2807, 2785, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2807, 2784, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2807, 2783, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3114, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3115, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3116, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3117, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3118, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3119, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3120, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3121, 9850, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3116, 9846, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(1308, 3121, 9838, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(61, 3114, 9836, 0, 0, 10));
         //server.getGlobalObjects().add(new GlobalObject(2187, 3123, 9848, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4643, 1, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4642, 1, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4641, 1, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2529, 4640, 1, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2529, 4643, 1, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2529, 4642, 1, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2529, 4641, 1, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2529, 4640, 1, 1, 10));
 //prestige zone banks
-                server.getGlobalObjects().add(new GlobalObject(2213, 2153, 5091, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2152, 5091, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2151, 5091, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2150, 5091, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2149, 5091, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2148, 5091, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(2213, 2147, 5091, 0, 0, 10));
+                server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2153, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2152, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2151, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2150, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2149, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2148, 5091, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2147, 5091, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(6552, 2146, 5093, 0, 3, 10));
         server.getGlobalObjects().add(new GlobalObject(409, 2141, 5096, 0, 3, 10));
     }
@@ -3912,6 +3912,19 @@ public void setHouse(House house) {
         DoubleGates.useDoubleGate(this, objectID);
         ResourceDungeons.handleObjects(this, objectID);
         switch (objectID) {
+            case 28716:
+                getPA().showInterface(23471);
+                break;
+            case 28653:
+                if(objectX == 2927 && objectY == 3444){
+                    movePlayer(2209, 5348, 0);
+                }
+                break;
+            case 28714:
+                if(objectX == 2209 && objectY == 5349){
+                    movePlayer(2926, 3444, 0);
+                }
+                break;
             case 6045:
                 sendMessage("You search the cart but find nothing.");
                 break;
@@ -5657,7 +5670,7 @@ public void setHouse(House house) {
                 sendMessage("You Teleport To The Woodcutting Area.");
                 break;
 
-            case ObjectIDs.PORTAL_44:
+            case ObjectIDs.PORTAL_99:
                 teleportToX = 2602;
                 teleportToY = 4776;
                 sendMessage("You Teleport To The Farming Area.");
@@ -6287,7 +6300,17 @@ public void setHouse(House house) {
                     }
                 }
                 break;
-
+            case 29954:
+            case 5787:
+                setSkillLevel(playerSummoning, getLevelForXP(playerXP[playerSummoning]), playerXP[playerSummoning]);
+                playerLevel[playerSummoning] = getLevelForXP(playerXP[playerSummoning]);
+                summoningPoints =  playerLevel[playerSummoning];
+                refreshSkills();
+                setAnimation(645);
+                sendMessage("You recharge your summoning points");
+                updateRequired = true;
+                appearanceUpdateRequired = true;
+                break;
             case 61:
                 setSkillLevel(5, getLevelForXP(playerXP[5]), playerXP[5]);
                 playerLevel[5] = getLevelForXP(playerXP[5]);
@@ -7719,13 +7742,16 @@ public void setHouse(House house) {
         NpcDialogueSend = true;
 
         if (level >= 99) {
-            addItem(skill.getCape(), 1);
-            addItem(skill.getCapeTrim(), 1);
-            addItem(skill.getHood(), 1);
-            sendMessage("Congratulations, you just received the " + skill.getDisplayName() + " skill cape and hood!");
-            PlayerHandler.messageToAll = playerName + " has just gotten " + level + " " + skill.getDisplayName() + "!";
+            if (!playerHasItemEverywhere(skill.getCape()) && !playerHasItemEverywhere(skill.getCapeTrim()) && !playerHasItemEverywhere(skill.getHood())) {
+                addItemToBank(skill.getCape(), 1);
+                addItemToBank(skill.getCapeTrim(), 1);
+                addItemToBank(skill.getHood(), 1);
+                sendMessage("Congratulations, you just received the " + skill.getDisplayName() + " skill cape and hood!");
+                PlayerHandler.messageToAll = playerName + " has just gotten " + level + " " + skill.getDisplayName() + "!";
+                return;
+            }
         }
-    }
+        }
 
     private LevelUpData.Skill getSkillById(int id) {
         for (LevelUpData.Skill s : LevelUpData.Skill.values()) {
@@ -8607,7 +8633,30 @@ public void setHouse(House house) {
         return false;
 
     }
+    public boolean playerHasBankItem(int itemID) {
+        for (int playerItem : bankItems) {
+            if (playerItem == itemID + 1) {
+                return true;
+            }
+        }
+        return false;
 
+    }
+    public boolean playerHasItemEverywhere(int itemID){
+        if(playerHasItem(itemID) || playerHasBankItem(itemID) || playerHasEquipmentItem(itemID)){
+            return true;
+        }
+        return false;
+    }
+    public boolean playerHasEquipmentItem(int itemID) {
+        for (int playerItem : playerEquipment) {
+            if (playerItem == itemID + 1) {
+                return true;
+            }
+        }
+        return false;
+
+    }
     public boolean playerHasItem2(int itemID) {
         for (int playerItem : playerItems) {
             if (playerItem == itemID + 1) {
@@ -10654,9 +10703,6 @@ public void setHouse(House house) {
             }
             if (hasNpc)
                 getPets().quickPickup(this, summonId);
-            savechar();
-            savemoreinfo();
-            System.out.println("Game saved for player " + playerName);
             disconnected = true;
             ConnectionList.getInstance().remove(mySock.getInetAddress());
 
@@ -10680,7 +10726,8 @@ public void setHouse(House house) {
             server.panel.removeEntity(playerName);
             server.getEventHandler().stop(this);
             CycleEventHandler.getSingleton().stopEvents(this);
-
+            savechar();
+            savemoreinfo();
             mySock = null;
             in = null;
             out = null;
@@ -10700,7 +10747,16 @@ public void setHouse(House house) {
         super.destruct();
     }
 
-
+    public int getItemId(String itemName) {
+        for (int i = 0; i < Config.MAX_ITEMS; i++) {
+            if (server.itemHandler.ItemList[i] != null) {
+                if (server.itemHandler.ItemList[i].itemName.equalsIgnoreCase(itemName)) {
+                    return server.itemHandler.ItemList[i].itemId;
+                }
+            }
+        }
+        return -1;
+    }
     public boolean banned(String host) {
         try {
             BufferedReader in = new BufferedReader(
@@ -11546,8 +11602,7 @@ public void setHouse(House house) {
 
 
     }
-
-    public int readSave() throws FileNotFoundException {
+    public int readSave() {
         if (PlayerHandler.updateRunning) {
             returnCode = 14;
             disconnected = true;
@@ -11564,84 +11619,28 @@ public void setHouse(House house) {
             return 3;
         }
 
+        // Attempt to load the game
         int loadResult = loadGame(playerName, playerPass, macAddress);
 
-        if (loadResult == 2) {
-            // Player exists, but password was incorrect
+        if (loadResult == 2) { // Wrong password or invalid player
+            println_debug("Wrong password for " + playerName);
+            returnCode = 3;
+            disconnected = true;
+            savefile = false;
+            return 3;
+        } else if (loadResult == 3) { // New account required
             File file = new File("./Data/characters/" + playerName + ".json");
-            if (!file.exists()) {
+
+            // Safety: if file exists, do not overwrite
+            if (file.exists()) {
+                println_debug("Load failed for existing account: " + playerName);
                 returnCode = 3;
                 disconnected = true;
                 savefile = false;
                 return 3;
             }
 
-            // Step 1: Parse the MAC and password from file (don't deserialize whole PlayerData)
-            String storedMac = "";
-            String currentPassword = "";
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (line.startsWith("\"macAddress\"")) {
-                        storedMac = line.split(":", 2)[1].replace("\"", "").replace(",", "").trim();
-                    } else if (line.startsWith("\"password\"")) {
-                        currentPassword = line.split(":", 2)[1].replace("\"", "").replace(",", "").trim();
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            if (!currentPassword.isEmpty()) {
-                println_debug("❌ Password exists, fallback not allowed.");
-                returnCode = 3;
-                disconnected = true;
-                savefile = false;
-                return 3;
-            }
-
-            if (!macAddress.equalsIgnoreCase(storedMac)) {
-                println_debug("❌ MAC mismatch, cannot fallback set password.");
-                returnCode = 3;
-                disconnected = true;
-                savefile = false;
-                return 3;
-            }
-
-            // Step 2: Patch the password line in-place
-            List<String> lines = new ArrayList<>();
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (line.trim().startsWith("\"password\"")) {
-                        line = "  \"password\": \"" + playerPass + "\",";
-                    }
-                    lines.add(line);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                for (String line : lines) {
-                    writer.write(line);
-                    writer.newLine();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            println_debug("✅ Patched password via MAC fallback for " + playerName);
-            returnCode = 2;
-            disconnected = false;
-            savefile = true;
-            return 1;
-        }
-
-        if (loadResult == 3) {
-            // New account path
+            // Create new account
             returnCode = 2;
             disconnected = false;
             savefile = true;
@@ -11663,11 +11662,19 @@ public void setHouse(House house) {
                     }
                 }
             }
+        } else if (loadResult == 1) { // Normal successful load
+            returnCode = 2;
+            disconnected = false;
+            savefile = true;
+        } else { // Fail-safe
+            returnCode = 3;
+            disconnected = true;
+            savefile = false;
+            return 3;
         }
 
         return 1;
     }
-
 
 
     public void secondaryload() {
@@ -13137,6 +13144,7 @@ public void setHouse(House house) {
             addSkillXP(2147000000, 21);
             addSkillXP(2147000000, 22);
             addSkillXP(2147000000, 23);
+            addSkillXP(2147000000, 24);
             sendMessage(playerName + " .. your a nerd.");
         }
         if (command.equalsIgnoreCase("dproom")) {
@@ -18466,21 +18474,23 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getOutStream().writeWord(5382); // bank
         getOutStream().writeWord(playerBankSize); // number of items
         for (int i = 0; i < playerBankSize; i++) {
-            if (bankItemsN[i] > 254) {
-                getOutStream().writeByte(255);
-                getOutStream().writeDWord_v2(bankItemsN[i]);
-            } else {
-                getOutStream().writeByte(bankItemsN[i]); // amount
-            }
-            if (bankItemsN[i] < 1) {
-                bankItems[i] = 0;
-            }
-            if (bankItems[i] > Config.MAX_ITEMS || bankItems[i] < 0) {
-                bankItems[i] = Config.MAX_ITEMS;
-            }
-            getOutStream().writeWordBigEndianA(bankItems[i]); // itemID
+
+                if (bankItemsN[i] > 254) {
+                    getOutStream().writeByte(255);
+                    getOutStream().writeDWord_v2(bankItemsN[i]);
+                } else {
+                    getOutStream().writeByte(bankItemsN[i]); // amount
+                }
+                if (bankItemsN[i] < 1) {
+                    bankItems[i] = 0;
+                }
+                if (bankItems[i] > Config.MAX_ITEMS || bankItems[i] < 0) {
+                    bankItems[i] = Config.MAX_ITEMS + 1;
+                }
+                getOutStream().writeWordBigEndianA(bankItems[i]); // itemID;
         }
         getOutStream().endFrameVarSizeWord();
+        flushOutStream();
     }
 
     public void resetBank2() {
@@ -18501,8 +18511,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 bankItems2[i] = Config.MAX_ITEMS;
             }
             getOutStream().writeWordBigEndianA(bankItems2[i]); // itemID
+            getOutStream().writeByte(1);
+            getOutStream().writeWordBigEndianA(-1);
         }
         getOutStream().endFrameVarSizeWord();
+        flushOutStream();
     }
 
     public void resetBank3() {
@@ -19824,6 +19837,57 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             reducePrayerLevel();
         }
     }
+    public void startSummoningDrain(SummoningFamiliar familiar) {
+        familiarActive = true;
+        // Example: drain rate 0.1 per tick + 0.01 per level
+        summoningPointsDrainRate = 0.1 + (playerLevel[playerSummoning] * 0.01);
+    }
+    private int summoningDrainTickCounter = 0; // counts server ticks
+
+    public void handleSummoningDrainTick() {
+        if (!familiarActive) return;
+
+        summoningDrainTickCounter++;
+
+        // Drain every 5 ticks (~3 seconds)
+        if (summoningDrainTickCounter >= 10) {
+            summoningDrainTickCounter = 0;
+            drainSummoningPoints();
+        }
+    }
+
+    private void drainSummoningPoints() {
+        summoningPoints = playerLevel[playerSummoning];
+        summoningPoints -= summoningPointsDrainRate;
+        reduceSummoningLevel();
+        if (summoningPoints <= 0) {
+            summoningPoints = 0;
+            despawnFamiliar();
+            sM("Your familiar has vanished as your Summoning Points ran out!");
+        }
+    }
+
+    public void despawnFamiliar() {
+        if (activeFamiliar == null) return;
+
+        // Remove the NPC
+        for (int i = 0; i < server.npcHandler.npcs.length; i++) {
+            NPC npc = server.npcHandler.npcs[i];
+            if (npc == null) continue;
+            if (npc.npcType == activeFamiliar.getNpcId() && npc.summonedBy == index) {
+                npc.absX = 0;
+                npc.absY = 0;
+                npc.IsDead = true;
+                npc.NeedRespawn = false;
+                server.npcHandler.npcs[i] = null;
+            }
+        }
+
+        // Reset player flags
+        familiarActive = false;
+        activeFamiliar = null;
+        summonId = -1;
+    }
 
     public void reducePrayerLevel() {
         if(playerLevel[5] - 1 > 0) {
@@ -19835,6 +19899,19 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             prayerId = -1;
         }
         refreshSkill(5);
+    }
+    public void reduceSummoningLevel() {
+        if (playerLevel[playerSummoning] - 1  > 0) {
+            playerLevel[playerSummoning] -= 1; // drain 1 point per tick
+            refreshSkill(playerSummoning);
+        } else {
+            sendMessage("You have run out of Summoning points!");
+            playerLevel[playerSummoning] = 0;
+            despawnFamiliar(); // familiar vanishes
+            activeFamiliar = null;
+            familiarActive = false;
+            summonId = -1;
+        }
     }
 
     public void resetPrayers() {
@@ -19892,7 +19969,16 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     if (playerMagicBook == 2) {
         getPA().setSidebarInterface(6, 29999);
     }
+    if(hasActiveFamiliar()){
+        getPA().setSidebarInterface(7, 17011);
+    } else {
         getPA().setSidebarInterface(7, 28128);
+    }
+        if(summonId != -1){
+            getPA().setSidebarInterface(7, 17011);
+        } else {
+            getPA().setSidebarInterface(7, 28128);
+        }
         getPA().setSidebarInterface(8, 5065);
         getPA().setSidebarInterface(9, 5715);
         getPA().setSidebarInterface(10, 2449);
@@ -21498,6 +21584,7 @@ nated = Integer.parseInt(token2);
         try {
             getTradeSystem().process();
             handlePrayerDrain();
+            handleSummoningDrainTick();
             if (wcTimer > 0 && woodcut[0] > 0) {
                 wcTimer--;
             }
@@ -21620,6 +21707,7 @@ nated = Integer.parseInt(token2);
             if (timedMessage > 0) {
                 timedMessage--;
             }
+
             if (starter == 0) {
                 addItem(ItemIDs.COINS, 25000000);
                 addItem(ItemIDs.MANTA_RAY_NOTED, 15000);
@@ -21777,7 +21865,16 @@ nated = Integer.parseInt(token2);
                 updateRequired = true;
                 getPA().setSidebarInterface(6, 12855);
             }
-
+            if(hasActiveFamiliar()){
+                getPA().setSidebarInterface(7, 17011);
+            } else {
+                getPA().setSidebarInterface(7, 28128);
+            }
+            if(summonId != -1){
+                getPA().setSidebarInterface(7, 17011);
+            } else {
+                getPA().setSidebarInterface(7, 28128);
+            }
             if (playerLevel[0] > getLevelForXP(playerXP[0]) && potTimer0 == 0) {
                 playerLevel[0] -= 1;
                 potTimer0 += 250;
@@ -26180,6 +26277,9 @@ nated = Integer.parseInt(token2);
                         objectXOffset = 1;
                         objectYOffset = 1;
                         break;
+                    case 28716:
+                        objectDistance = 2;
+                        break;
 
                     case 5094:
                     case 5096:
@@ -26256,6 +26356,9 @@ nated = Integer.parseInt(token2);
                         objectDistance = 2;
                         objectXOffset = 1;
                         objectYOffset = 1;
+                        break;
+                    case 28716:
+                        objectDistance = 2;
                         break;
                     case 11666:
                         objectDistance = 3;

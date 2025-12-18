@@ -51,7 +51,14 @@ public class Pets {
         // Geckos
 
         GECKO(6916, 12489),
-        BABY_GECKO(6915, 12488, GECKO, 12125, 10, "geek"),
+        BABY_GECKO(6915, 12738, GECKO, 12125, 10, "geek"),
+        GECKO2(7282, 12743),
+        BABY_GECKO2(7278, 12739, GECKO2, 12125, 10, "geek"),
+        GECKO3(7283, 12744),
+        BABY_GECKO3(7279, 12740, GECKO3, 12125, 10, "geek"),
+        GECKO4(7284, 12745),
+        BABY_GECKO4(7280, 12741, GECKO4, 12125, 10, "geek"),
+
         // Squirrels
 
         squirrel(6920, 12491),

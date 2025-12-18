@@ -59,6 +59,8 @@ public class SkillInterfaces {
             woodcuttingComplex(screen);
         } else if (selected == 20) {
             farmingComplex(screen);
+        } else if (selected == 23) {
+            summoningComplex(screen);
         }
     }
 
@@ -2426,6 +2428,57 @@ public class SkillInterfaces {
             optionTab("Farming", "Scarecrows", "Allotments", "Hops", "Trees",
                     "Fruit Trees", "Bushes", "Flowers", "Herbs", "Special",
                     "Scarecrows", "", "", "", "");
+        }
+    }
+
+    public void summoningComplex(int screen) {
+        if (screen == 1) {
+            clearMenu();
+            menuLine("1", "Spirit wolf", 12047, 0);
+            menuLine("4", "Dreadfowl", 12043, 1);
+            menuLine("10", "Spirit spider", 12059, 2);
+            menuLine("13", "Thorny snail", 12019, 3);
+            menuLine("16", "Granite crab", 12069, 4);
+            menuLine("17", "Spirit mosquito", 12778, 5);
+            menuLine("18", "Desert wyrm", 12049, 6);
+            menuLine("19", "Spirit scorpion", 12055, 7);
+            menuLine("22", "Spirit tz-kih", 12808, 8);
+            menuLine("23", "Abino rat", 12067, 9);
+            menuLine("25", "Spirit kalphite", 12063, 10);
+            menuLine("29", "Compost mound", 12091, 11);
+            menuLine("32", "Honey Badger", 12065, 12);
+            menuLine("41", "Macaw", 12071, 13);
+            menuLine("49", "Bloated leach", 12061, 14);
+            menuLine("51", "Spirit Terrorbird", 12007, 15);
+            menuLine("55", "Ibis", 12531, 16);
+            menuLine("61", "Smoke devil", 12085, 17);
+            menuLine("64", "Stranger plant", 12045, 18);
+            menuLine("68", "Bunyip", 12029, 19);
+            menuLine("80", "Hydra", 12025, 20);
+            menuLine("88", "Unicorn stallian", 12039, 21);
+            menuLine("89", "Geyser titan", 12786, 22);
+            menuLine("96", "Pack yak", 12093, 23);
+            menuLine("99", "Steel titan", 12077, 24);
+            menuLine("99", "Skill mastery", 12169, 25);
+            optionTab("Summoning", "Familars", "Familars", "Pets", "Other",
+                    "", "", "", "", "",
+                    "", "", "", "", "");
+        }
+        if (screen == 2) {
+            clearMenu();
+            menuLine("1", "Bulldog", 12523, 0);
+            menuLine("1", "Dalmatian", 12519, 1);
+            menuLine("1", "Terrier", 12513, 2);
+            menuLine("1", "Greyhound", 12515, 4);
+            menuLine("1", "Sheepdog", 12521, 3);
+            menuLine("1", "Labrador", 12517, 5);
+            menuLine("10", "Gecko", 12489, 6);
+            menuLine("30", "Penguin", 12482, 7);
+            menuLine("40", "Giant crab", 12501, 8);
+            menuLine("50", "Raven", 12485, 9);
+            optionTab("Summoning", "Pets", "Familars", "Pets", "Other",
+                    "", "", "", "", "",
+                    "", "", "", "", "");
         }
     }
 }

@@ -227,6 +227,7 @@ public class Boundary {
             new Boundary(2442, 10128, 2490, 10165),
             new Boundary(2493, 10124, 2550, 10168)
     };
+    public static final Boundary SUMMONING = new Boundary(2203, 5340, 2210, 5349);
     public static final Boundary HOME = new Boundary(2432, 3136, 2495, 3199);
     public static final Boundary gh_shop_zone = new Boundary(3328, 3328, 3391, 3391);
     public static final Boundary gh_train = new Boundary(3091, 9814, 3133, 9855);

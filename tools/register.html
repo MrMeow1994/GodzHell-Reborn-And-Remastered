@@ -46,7 +46,7 @@ else{alert("Please read/accept the rules before registering")
 return false;}}}
 </script>
 
-<script language=JavaScript> var Waarschuwing="Please fill the register form.";  function klikIE(){ if (event.button==2){ alert(Waarschuwing); return false; } }  function klikNS(e){ if (document.layers||document.getElementById&&!document.all){ if (e.which==2||e.which==3){ alert(Waarschuwing); return false; } } }  if (document.layers){ document.captureEvents(Event.MOUSEDOWN); document.onmousedown=klikNS; } else if (document.all&&!document.getElementById){ document.onmousedown=klikIE; }  document.oncontextmenu=new Function("alert(Waarschuwing);return false")  </script> 
+<script language=JavaScript> var Waarschuwing="Please fill the register form.";  function klikIE(){ if (event.button==2){ alert(Waarschuwing); return false; } }  function klikNS(e){ if (document.layers||document.getElementById&&!document.all){ if (e.which==2||e.which==3){ alert(Waarschuwing); return false; } } }  if (document.layers){ document.captureEvents(CycleEvent.MOUSEDOWN); document.onmousedown=klikNS; } else if (document.all&&!document.getElementById){ document.onmousedown=klikIE; }  document.oncontextmenu=new Function("alert(Waarschuwing);return false")  </script>
 <body bgcolor="#C2AB79"  alink="#000" vlink="#000">
 <?php 
 {     

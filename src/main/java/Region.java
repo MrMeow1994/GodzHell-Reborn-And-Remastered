@@ -143,7 +143,7 @@ public class Region {
             new WorldObject2(7353, 2468, 3178, 0, 10, -1),
             new WorldObject2(8987, 2469, 3178, 0, 10, -1),
             new WorldObject2(2474, 2471, 3179, 0, 10, -1),
-            new WorldObject2(8972, 2470, 3176, 0, 10, 0),
+            new WorldObject2(ObjectIDs.PORTAL_99, 2470, 3176, 0, 10, 0),
             new WorldObject2(16050, 2471, 3176, 0, 10, 0),
             new WorldObject2(2213, 2385, 3485, 0, 10, 1),
             new WorldObject2(2213, 2385, 3486, 0, 10, 1),
