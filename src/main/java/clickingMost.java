@@ -1527,7 +1527,15 @@ public class clickingMost {
                 c.activatePrayer(18);
                 break;
             case 66127:
-                Summoning.cleanup(c);
+                if(c.hasActiveFamiliar()){
+                    Summoning.cleanup(c);
+                }
+                if (c.hasNpc)
+                    c.getPets().quickPickup(c, c.summonId);
+                break;
+            case 66133:
+                if (c.hasNpc)
+                    c.getPets().recallFollowers(c);
                 break;
             case 91179:
                 c.getPA().showInterface(22760);

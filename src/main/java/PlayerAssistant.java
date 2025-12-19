@@ -86,7 +86,14 @@ public class PlayerAssistant {
         }
 
     }
+    public void multiWay(int i1) {
+        // synchronized(c) {
+        c.outStream.createFrame(61);
+        c.outStream.writeByte(i1);
+        c.updateRequired = true;
+        c.appearanceUpdateRequired = true;
 
+    }
     public void openUpBank2() {
         if (c.getOutStream() != null) {
             resetItems(5064);

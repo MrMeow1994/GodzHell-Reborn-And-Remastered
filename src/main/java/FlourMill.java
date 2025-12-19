@@ -64,7 +64,7 @@ public class FlourMill {
                 public void stop() {
 
                 }
-            }, 1 * 600);
+            }, 1);
             c.flourAmount += c.grain;
             if (c.flourAmount > LIMIT) {
                 c.flourAmount = LIMIT;// Flour amount returns to limit.

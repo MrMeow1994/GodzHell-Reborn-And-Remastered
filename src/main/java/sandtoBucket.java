@@ -54,7 +54,7 @@ public class sandtoBucket {
                             c.startAnimation(65535);
                             c.fillingWater = false;
                         }
-                    }, 3 * 600);
+                    }, 3);
                 }
             }
         }

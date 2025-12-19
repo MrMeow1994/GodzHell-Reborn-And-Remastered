@@ -228,7 +228,7 @@ public class Pets {
                     for (int i = 0; i < NPCHandler.maxNPCs; i++) {
                         NPC npc = NPCHandler.npcs[i];
                         if (npc != null) {
-                            if (pet.npcId == npc.npcType) {
+                            if (pet.npcId == npc.index) {
                                 npc.forceChat(pet.getTxt4());
                             }
                         }
@@ -323,7 +323,7 @@ public class Pets {
             NPC npc = server.npcHandler.npcs[i];
             if (npc == null) continue;
 
-            if (npc.npcType == baby.getNpcId() && npc.summonedBy == player.index) {
+            if (npc.index == baby.getNpcId() && npc.summonedBy == player.index) {
                 // Transform the NPC in-place
                 npc.requestPetTransform(adult.getNpcId()); // optional depending on your system
                 player.summonId = adult.getNpcId();
@@ -400,6 +400,37 @@ public class Pets {
             player.sendMessage("You need a Summoning Level of "+pet.getSummoningLevel()+" to drop this.");
         }
     }
+    public void recallFollowers(client c) {
+        for (NPC npc : server.npcHandler.npcs) {
+            if (npc == null)
+                continue;
+
+            if (!npc.summoner || npc.summonedBy != c.index)
+                continue;
+
+            if (npc.IsDead)
+                continue;
+
+            int x = c.absX;
+            int y = c.absY - 1;
+
+            npc.absX = x;
+            npc.absY = y;
+
+            npc.makeX = x;
+            npc.makeY = y;
+
+            // 🔑 This is the missing piece
+            npc.moveX = 0;
+            npc.moveY = 0;
+            npc.walkingType = 0;
+            npc.randomWalk = false;
+
+            npc.updateRequired = true;
+        }
+
+        c.sendMessage("Your followers rush to your side.");
+    }
 
     public void quickPickup(client player, int id) {
         for (int i = 0; i < server.npcHandler.npcs.length; i++) {
@@ -407,7 +438,7 @@ public class Pets {
             if (npc == null) {
                 continue;
             }
-            if (npc.npcType == id) {
+            if (npc.index == id) {
                 Pet cat = Pet.forNpc(id);
                 if (cat == null) {
                     return; // not a cat pet
@@ -417,7 +448,7 @@ public class Pets {
                 npc.absY = 0;
                 npc.IsDead = true;
                 npc.NeedRespawn = false;
-                npc.npcType = -1;
+                npc.index = -1;
                 server.npcHandler.npcs[i] = null;
                 player.hasNpc = false;
             }
@@ -443,14 +474,14 @@ public class Pets {
                 continue;
             }
 
-            if (npc.npcType == npcId && npc.summonedBy == player.index) {
+            if (npc.index == npcId && npc.summonedBy == player.index) {
                 player.startAnimation(827);
 
                 npc.absX = 0;
                 npc.absY = 0;
                 npc.IsDead = true;
                 npc.NeedRespawn = false;
-                npc.npcType = -1;
+                npc.index = -1;
                 server.npcHandler.npcs[i] = null;
                 // Give item back
 

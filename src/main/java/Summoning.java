@@ -65,7 +65,7 @@ public class Summoning {
 		for (int i = 0; i < server.npcHandler.npcs.length; i++) {
 			NPC npc = server.npcHandler.npcs[i];
 			if (npc == null) continue;
-			if (npc.npcType == familiar.getNpcId() && npc.summonedBy == player.index) {
+			if (npc.index == familiar.getNpcId() && npc.summonedBy == player.index) {
 				npc.gfx0(1315);
 			}
 		}
@@ -139,7 +139,7 @@ public class Summoning {
 			NPC npc = server.npcHandler.npcs[i];
 			if (npc == null) continue;
 
-			if (npc.npcType == player.summonId && npc.summonedBy == player.index) {
+			if (npc.index == player.summonId && npc.summonedBy == player.index) {
 				npc.absX = 0;
 				npc.absY = 0;
 				npc.IsDead = true;

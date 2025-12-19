@@ -312,35 +312,7 @@ public abstract class Player extends Entity {
 	// the center region that is 6 regions in each direction (notice the magical 6
 	// appearing also in map region arithmetics...)
 	public int combat = 0;
-	public boolean inMulti() {
-		if (Boundary.isIn(this, Boundary.BANDIT_CAMP_BOUNDARY) ||
-				Boundary.isIn(this, Boundary.TzHarr_City)) {
-			return true;
-		}
-		if (Boundary.isIn(this, Boundary.Train)) {
-			return true;
-		}
-		if (Boundary.isIn(this, Boundary.CORP)) {
-			return true;
-		}
-		if((absX >= 3136 && absX <= 3327 && absY >= 3519 && absY <= 3607) ||
-				(absX >= 3190 && absX <= 3327 && absY >= 2568 && absY <= 3839) ||
-				(absX >= 3200 && absX <= 3390 && absY >= 3840 && absY <= 3967) ||
-				(absX >= 2992 && absX <= 3007 && absY >= 3912 && absY <= 3967) ||
-				(absX >= 2946 && absX <= 2959 && absY >= 3816 && absY <= 3831) ||
-				(absX >= 3008 && absX <= 3199 && absY >= 3856 && absY <= 3903) ||
-				(absX >= 3008 && absX <= 3071 && absY >= 3600 && absY <= 3711) ||
-				(absX >= 2624 && absX <= 2690 && absY >= 2550 && absY <= 2619) ||
-				(absX >= 2371 && absX <= 2422 && absY >= 5062 && absY <= 5117) ||
-				(absX >= 2896 && absX <= 2927 && absY >= 3595 && absY <= 3630) ||
-				(absX >= 2892 && absX <= 2932 && absY >= 4435 && absY <= 4464) ||
-				(absX >= 2256 && absX <= 2287 && absY >= 4680 && absY <= 4711)) {
-			return true;
-		}
-		return false;
-	}
-
-
+	public boolean hasMultiSign;
 	public Player(int _playerId) {
 		index = _playerId;
 		//playerName = "player"+playerId;
@@ -542,8 +514,8 @@ public abstract class Player extends Entity {
 		currentX = currentY = 0;
 		resetWalkingQueue();
 	}
-	public int FocusPointX = -1, FocusPointY = -1;
-	private void appendSetFocusDestination(stream str) {
+	@Override
+	protected void appendSetFocusDestination(stream str) {
 		str.writeWordBigEndianA(FocusPointX);
 		str.writeWordBigEndian(FocusPointY);
 	}
@@ -687,154 +659,6 @@ public abstract class Player extends Entity {
 	public String playerPass = null;			// name of the connecting client
 	public boolean isRunning2 = false;
 	public boolean stoprunning = false;
-
-	public boolean nonWild() {
-		if((absX == 3125 && absY == 9845) || (absX == 3125 && absY == 9844) || (absX == 3122 && absY == 9836) || (absX == 3122 && absY == 9835) || (absX == 3119 && absY == 9831)) {
-			return false;
-		}
-		if(Boundary.isIn((client) this, Boundary.rdleveloftrain)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.SUMMONING)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.reousce_dung_one)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.VARROCK_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.ghr_train)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.prestige)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.ARDOUGNE_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.ARDOUGNE_ZOO_BRIDGE_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.FALADOR_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.CRAFTING_GUILD_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.TAVERLY_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.TZHAAR_CITY_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.LUMRIDGE_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.DRAYNOR_DUNGEON_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.AL_KHARID_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.DRAYNOR_MANOR_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.DRAYNOR_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.KARAMJA_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.BRIMHAVEN_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.BRIMHAVEN_DUNGEON_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.CATHERBY_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.CANIFIS_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.SEERS_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.RELLEKKA_BOUNDARY)){
-			return true;
-		}
-
-		if(Boundary.isIn((client) this, Boundary.SKILLZ)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.DUNGEONS)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.UMBYSWAPES)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.GODWARS_BOSSROOMS)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.GH_NONWILD)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.TZHAAR_CITY_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.SLAYER_TOWER_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.LUNAR_ISLE_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.FREMENNIK_ISLES_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.WATERBIRTH_ISLAND_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.MISCELLANIA_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.APE_ATOLL_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.FELDIP_HILLS_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.YANILLE_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.DESERT_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.LLETYA_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.GNOME_STRONGHOLD_BOUNDARY)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.HANG)){
-			return true;
-		}
-		if(Boundary.isIn((client) this, Boundary.Theive)){
-			return true;
-		}
-		if(inSafePvP()){
-			return false;
-		}
-		return false;
-	}
-
-
-
-
-
-	public boolean inSafePvP() {
-		return absX >= 1889 && absX <= 1910 && absY >= 5345 && absY <= 5366 && heightLevel == 2;
-	}
 
 
 	public PlayerHandler handler = null;
@@ -1044,12 +868,9 @@ public abstract class Player extends Entity {
 
 
 	public int mapRegionX, mapRegionY;		// the map region the player is currently in
-	public int absX, absY;					// absolute x/y coordinates
 	public int currentX, currentY;			// relative x/y coordinates (to map region)
 	// Note that mapRegionX*8+currentX yields absX
-	public int heightLevel;		// 0-3 supported by the client
-
-	public boolean updateRequired = true;		// set to true if, in general, updating for this player is required
+	// set to true if, in general, updating for this player is required
 	// i.e. this should be set to true whenever any of the other
 	// XXXUpdateRequired flags are set to true
 	// Important: this does NOT include chatTextUpdateRequired!
@@ -1062,6 +883,7 @@ public abstract class Player extends Entity {
 	public boolean runningToggled = true;
 	public boolean isSkulled;
 	public int teleportToX = -1, teleportToY = -1;	// contain absolute x/y coordinates of destination we want to teleport to
+	public int lastDirection = -1;
 
 
 
@@ -1134,6 +956,7 @@ public abstract class Player extends Entity {
 		currentY += misc.directionDeltaY[dir];
 		absX += misc.directionDeltaX[dir];
 		absY += misc.directionDeltaY[dir];
+		lastDirection = dir;
 		return dir;
 	}
 	private Position walkingDestination = new Position(absX, absY, heightLevel);
@@ -1417,7 +1240,7 @@ public abstract class Player extends Entity {
 		str.writeBits(5, z); // x coordinate relative to thisPlayer
 
 		str.writeBits(1, 0); // something??
-		str.writeBits(14, npc.npcType);
+		str.writeBits(14, npc.index);
 
 		boolean savedUpdateRequired = npc.updateRequired;
 
@@ -1939,16 +1762,14 @@ public abstract class Player extends Entity {
 		updateRequired = true;
 		faceUpdateRequired = true;
 	}
-
-	public int animationRequest = -1, animationWaitCycles = 0;
-	protected boolean animationUpdateRequired = false;
 	public void startAnimation(int animIdx)
 	{
 		animationRequest = animIdx;
 		updateRequired = true;
 		animationUpdateRequired = true;
 	}
-	public void appendAnimationRequest(stream str)
+	@Override
+	protected  void appendAnimationRequest(stream str)
 	{
 		str.writeWordBigEndian((animationRequest==-1) ? 65535 : animationRequest);
 		str.writeByteC(animationWaitCycles);
@@ -2068,7 +1889,7 @@ public abstract class Player extends Entity {
 	public int attacknpc = -1;
 	public int Essence;
 	public int underAttackByNpc = -1;
-
+	public long lastNpcCombatTime = 0;
 	public boolean IsShopping = false;
 	public int MyShopID = 0;
 	public boolean UpdateShop = false;

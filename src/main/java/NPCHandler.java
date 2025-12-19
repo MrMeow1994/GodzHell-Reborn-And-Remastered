@@ -51,7 +51,7 @@ public class NPCHandler {
             if (npcs[i] == npc) {
                 npc.IsDead = true;
                 npc.NeedRespawn = false;
-                npc.npcType = -1;
+                npc.index = -1;
                 npcs[i] = null;
                 break;
             }
@@ -201,7 +201,7 @@ public class NPCHandler {
     }
 
     public int npcSize(int i) {
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 2883:
             case 2882:
             case 2881:
@@ -212,7 +212,7 @@ public class NPCHandler {
 
 
     public int distanceRequired(int i) {
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 2025:
             case 2028:
                 return 6;
@@ -249,7 +249,7 @@ public class NPCHandler {
     }
 
     public void loadSpell(NPC npc) {
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 3491: // Kolodion
                 npc.attackType = 2; // Magic
                 npc.projectileId = 130;
@@ -329,7 +329,7 @@ public class NPCHandler {
     }
 
     public boolean multiAttacks(int i) {
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 6222: // Kree'arra
             case 6223:
             case 1913: // Kemli
@@ -348,7 +348,7 @@ public class NPCHandler {
     }
 
     public int followDistance(int i) {
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 2550:
             case 2551:
             case 2562:
@@ -365,7 +365,7 @@ public class NPCHandler {
 
     }
     public static boolean followPlayer(int i) {
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 1456:
             case 2892:
             case 2894:
@@ -375,6 +375,10 @@ public class NPCHandler {
         }
         return true;
     }
+    // 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW
+    private static final int[] DX = { 0, 1, 1, 1, 0, -1, -1, -1 };
+    private static final int[] DY = { 1, 1, 0, -1, -1, -1, 0, 1 };
+
     public void followPlayer(int i, int playerId) {
         if (server.playerHandler.players[playerId] == null) {
             return;
@@ -386,18 +390,38 @@ public class NPCHandler {
             return;
         }
 
-        if (npcs[i].npcType == 1532 || npcs[i].npcType == 1534) {
+        if (npcs[i].index == 1532 || npcs[i].index == 1534) {
             return;
         }
 
-        if (!followPlayer(i) && npcs[i].npcType != 1532 && npcs[i].npcType != 1534) {
+        if (!followPlayer(i) && npcs[i].index != 1532 && npcs[i].index != 1534) {
             npcs[i].facePlayer(playerId);
             return;
         }
 
-        int playerX = PlayerHandler.players[playerId].absX;
-        int playerY = PlayerHandler.players[playerId].absY;
-        npcs[i].randomWalk = false;
+        Player player = PlayerHandler.players[playerId];
+
+        int dir = player.lastDirection;
+
+// Standing still fallback
+        if (dir < 0 || dir > 7) {
+            dir = 4; // south default
+        }
+
+// Start with standard behind offset
+        int targetX = player.absX - DX[dir];
+        int targetY = player.absY - DY[dir];
+
+// Clamp so NPC never ends up on player tile
+        if (targetX == player.absX && targetY == player.absY) {
+            // Just nudge it one more step opposite of direction
+            targetX -= DX[dir];
+            targetY -= DY[dir];
+        }
+        int playerX = targetX;
+        int playerY = targetY;
+
+ npcs[i].randomWalk = false;
         if (goodDistance(npcs[i].getX(), npcs[i].getY(), playerX, playerY, distanceRequired(i))) {
             return;
         }
@@ -405,7 +429,6 @@ public class NPCHandler {
         NPC    npc    = npcs[i];
         int    x      = npc.absX;
         int    y      = npc.absY;
-        Player player = PlayerHandler.players[playerId];
         if (npcs[i].spawnedBy > 0
                 || x < npc.makeX + Config.NPC_FOLLOW_DISTANCE
                 && x > npc.makeX - Config.NPC_FOLLOW_DISTANCE
@@ -469,7 +492,7 @@ public class NPCHandler {
     }
 
     public boolean isFightCaveNpc(int i) {
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 2627:
             case 2630:
             case 2631:
@@ -686,26 +709,26 @@ public class NPCHandler {
     }
 
     public boolean rareDrops(int i) {
-        return misc.random(NPCDrops.dropRarity.get(npcs[i].npcType)) == 0;
+        return misc.random(NPCDrops.dropRarity.get(npcs[i].index)) == 0;
     }
 
     public void dropItems(int i) {
         // long start = System.currentTimeMillis();
         client c = (client) PlayerHandler.players[GetNpcKiller(i)];
         if (c != null) {
-            if (NPCDrops.constantDrops.get(npcs[i].npcType) != null) {
-                for (int item : NPCDrops.constantDrops.get(npcs[i].npcType)) {
+            if (NPCDrops.constantDrops.get(npcs[i].index) != null) {
+                for (int item : NPCDrops.constantDrops.get(npcs[i].index)) {
                     ItemHandler.addItem(item, npcs[i].absX, npcs[i].absY, 1, c.index, false);
                     // if (c.clanId >= 0)
                     // Server.clanChat.handleLootShare(c, item, 1);
                 }
             }
 
-            if (NPCDrops.dropRarity.get(npcs[i].npcType) != null) {
+            if (NPCDrops.dropRarity.get(npcs[i].index) != null) {
                 if (rareDrops(i)) {
                     int random = misc.random(NPCDrops.rareDrops
-                            .get(npcs[i].npcType).length - 1);
-                    ItemHandler.addItem(NPCDrops.rareDrops.get(npcs[i].npcType)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.rareDrops.get(npcs[i].npcType)[random][1], c.index, false);
+                            .get(npcs[i].index).length - 1);
+                    ItemHandler.addItem(NPCDrops.rareDrops.get(npcs[i].index)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.rareDrops.get(npcs[i].index)[random][1], c.index, false);
                     //if (c.clanId >= 0)
                     //Server.clanChat
                     //.handleLootShare(
@@ -714,8 +737,8 @@ public class NPCHandler {
                     //NPCDrops.rareDrops.get(npcs[i].npcType)[random][1]);
                 } else {
                     int random = misc.random(NPCDrops.normalDrops
-                            .get(npcs[i].npcType).length - 1);
-                    ItemHandler.addItem(NPCDrops.normalDrops.get(npcs[i].npcType)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.normalDrops.get(npcs[i].npcType)[random][1], c.index, false);
+                            .get(npcs[i].index).length - 1);
+                    ItemHandler.addItem(NPCDrops.normalDrops.get(npcs[i].index)[random][0], npcs[i].absX, npcs[i].absY, NPCDrops.normalDrops.get(npcs[i].index)[random][1], c.index, false);
                     // Server.clanChat.handleLootShare(c,
                     //NPCDrops.normalDrops.get(npcs[i].npcType)[random][0],
                     //NPCDrops.normalDrops.get(npcs[i].npcType)[random][1]);
@@ -838,7 +861,7 @@ public class NPCHandler {
         if (Boundary.isIn(npcs[i], Boundary.GODWARS_BOSSROOMS)) {
             return true;
         }
-        switch (npcs[i].npcType) {
+        switch (npcs[i].index) {
             case 5535:
             case 5867:
             case 8352:
@@ -913,7 +936,7 @@ public class NPCHandler {
             if (player.distanceToPoint(npc.absX, npc.absY) > getDistanceForNpc(npc))
                 continue;
 
-            int npcLevel = GetNpcListCombat(npc.npcType);
+            int npcLevel = GetNpcListCombat(npc.index);
             int playerLevel = player.combat;
 
             long now = System.currentTimeMillis();
@@ -998,7 +1021,7 @@ public class NPCHandler {
     public int getDistanceForNpc(NPC npc) {
         if (npc == null) return 1;
 
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 1913:
                 return 15;
 
@@ -1087,7 +1110,7 @@ public class NPCHandler {
 
 
     public boolean npcGetsAnnoyed(NPC Npc) {
-        switch (Npc.npcType) {
+        switch (Npc.index) {
             case 677:
             case 6260:
             case 1588:
@@ -2351,27 +2374,33 @@ public class NPCHandler {
     }
 
     private void handleSummoningSync(NPC npc) {
-        client slaveOwner = (client) PlayerHandler.players[npc.summonedBy];
-        if (slaveOwner == null && npc.summoner) {
-            npc.absX = 0;
-            npc.absY = 0;
-        }
-        if (slaveOwner != null
-                && slaveOwner.hasNpc
-                && !slaveOwner.goodDistance(npc.getX(),
-                npc.getY(), slaveOwner.absX,
-                slaveOwner.absY, 15) && npc.summoner) {
-            npc.absX = slaveOwner.absX;
-            npc.absY = slaveOwner.absY - 1;
+        if (!npc.summoner)
+            return;
+
+        client owner = (client) PlayerHandler.players[npc.summonedBy];
+        if (owner == null || !owner.hasNpc)
+            return;
+
+        // Teleport detection: if distance is huge, snap follower
+        int distX = Math.abs(npc.absX - owner.absX);
+        int distY = Math.abs(npc.absY - owner.absY);
+
+        if (distX > 20 || distY > 20) { // arbitrary threshold
+            npc.absX = owner.absX;
+            npc.absY = owner.absY - 1; // behind player, tweak as needed
+            npc.makeX = npc.absX;
+            npc.makeY = npc.absY;
+            npc.moveX = 0;
+            npc.moveY = 0;
+            npc.randomWalk = false;
+            npc.updateRequired = true;
         }
 
-        if (slaveOwner != null && slaveOwner.hasNpc && npc.summoner) {
-            if (slaveOwner.goodDistance(npc.absX, npc.absY, slaveOwner.absX, slaveOwner.absY, 15)) {
-                server.npcHandler.followPlayer(npc.npcId, slaveOwner.index);
-            }
-        }
-
+        // Normal following
+        server.npcHandler.followPlayer(npc.npcId, owner.index);
     }
+
+
 
     private void handleTickTimers(NPC npc, int index) {
         if (npc.actionTimer > 0) npc.actionTimer--;
@@ -2428,7 +2457,7 @@ public class NPCHandler {
                 }
             }
         } else if (npc.IsUnderAttackNpc) {
-            if (isMageNpc(npc.npcType)) {
+            if (isMageNpc(npc.index)) {
                 AttackNPCMage(index);
             } else {
                 AttackNPC(index);
@@ -2448,234 +2477,234 @@ public class NPCHandler {
 
     private void updateNpcTextIfNeeded(NPC npc) {
         // Replace this with a cleaner lookup map of npcType → List<String> messages
-        if (npc.npcType == 81 || npc.npcType == 397
-                || npc.npcType == 1766
-                || npc.npcType == 1767
-                || npc.npcType == 1768) {
+        if (npc.index == 81 || npc.index == 397
+                || npc.index == 1766
+                || npc.index == 1767
+                || npc.index == 1768) {
             if (misc.random2(50) == 1) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Moo";
             }
         }
-        if (npc.npcType == 8172) {
+        if (npc.index == 8172) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Talk to me to start Desert Treasure!";
             }
         }
-        if (npc.npcType == 619) {
+        if (npc.index == 619) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "This is as close as im getting.";
             }
         }
-        if (npc.npcType == 246) {
+        if (npc.index == 246) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Do ::inside Sir!";
             }
         }
-        if (npc.npcType == 532) {
+        if (npc.index == 532) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Member Shop!";
             }
         }
-        if (npc.npcType == 3005) {
+        if (npc.index == 3005) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Ladder For Mems Only! Get's you behind edge bank!";
             }
         }
-        if (npc.npcType == 3006) {
+        if (npc.index == 3006) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Come In if your Mem!, if not go to www.Ghreborn.com";
             }
         }
-        if (npc.npcType == 660) {
+        if (npc.index == 660) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "We are the knights of the party room!";
             }
         }
-        if (npc.npcType == 660) {
+        if (npc.index == 660) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Here to Party 24/7!";
             }
         }
-        if (npc.npcType == 364) {
+        if (npc.index == 364) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Mod & Admin Portal Only!";
             }
         }
-        if (npc.npcType == 280) {
+        if (npc.index == 280) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Strength Guild, 99 strength to Enter!";
             }
         }
-        if (npc.npcType == 172) {
+        if (npc.index == 172) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Range/Magic Guild, 99 Range and Magic to Enter!";
             }
         }
-        if (npc.npcType == 212) {
+        if (npc.index == 212) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to the Mod/Admin Zone..Keep up the Good Work!";
             }
         }
-        if (npc.npcType == 945) {
+        if (npc.index == 945) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Talk to me to learn about the server.";
             }
         }
-        if (npc.npcType == 225) {
+        if (npc.index == 225) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Icon Minigame!";
             }
         }
-        if (npc.npcType == 648) {
+        if (npc.index == 648) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to Training Made To Own N33bs!";
             }
         }
-        if (npc.npcType == 793) {
+        if (npc.index == 793) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Enchanted Minigame!";
             }
         }
-        if (npc.npcType == 2253) {
+        if (npc.index == 2253) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Clan Wars Portal!!";
             }
         }
-        if (npc.npcType == 541) {
+        if (npc.index == 541) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Skill Cape Shop!";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "We are the righteous ones in his eyes alone.";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Let them not infest our cities and towns...";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "And lo, we become the power, indeed the force to stop these monsters in their tracks.";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Verily I urge you, my friends to take up your spades and farm your farms to feed our people in this blessed sanctuary.";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "If thine monsters visage does frighten thee, then tear it off I say... tear it off!";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "For Saradomin will guide our sword arms and smash the enemies of humans till their bones become dust.";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "And let us smite these monsters unto their deaths.";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "For they are not the chosen ones in Saradomin's eyes.";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Where do we go for safety from these monsters... here, my brethren!";
             }
         }
-        if (npc.npcType == 1713) {
+        if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "And let there be no cave or shelter for their spawn until the end of days.";
             }
         }
-        if (npc.npcType == 2821) {
+        if (npc.index == 2821) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Fishing Portal!";
             }
         }
-        if (npc.npcType == 2304) {
+        if (npc.index == 2304) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Farming Shop!By seed's for patch's!";
             }
         }
-        if (npc.npcType == 461) {
+        if (npc.index == 461) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Magic Shop!";
             }
         }
-        if (npc.npcType == 57) {
+        if (npc.index == 57) {
             if (misc.random2(30) == 1) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
@@ -2683,7 +2712,7 @@ public class NPCHandler {
                 npc.textUpdate = "Players Online: " + players;
             }
         }
-        if (npc.npcType == 8206) {
+        if (npc.index == 8206) {
             if (misc.random2(30) == 1) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
@@ -2691,126 +2720,126 @@ public class NPCHandler {
                 npc.textUpdate = "Lottery is at " + lottery + "m";
             }
         }
-        if (npc.npcType == 550) {
+        if (npc.index == 550) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Pk Shop!";
             }
         }
-        if (npc.npcType == 1759) {
+        if (npc.index == 1759) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Shops Here!";
             }
         }
-        if (npc.npcType == 1699) {
+        if (npc.index == 1699) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Pur3 Sh0p!";
             }
         }
-        if (npc.npcType == 2475) {
+        if (npc.index == 2475) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Training Portal!";
             }
         }
-        if (npc.npcType == 28) {
+        if (npc.index == 28) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Train Your Skills Here!";
             }
         }
-        if (npc.npcType == 1917) {
+        if (npc.index == 1917) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Rune Armor Shop!!!";
             }
         }
-        if (npc.npcType == 522) {
+        if (npc.index == 522) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "General Store!";
             }
         }
-        if (npc.npcType == 522) {
+        if (npc.index == 522) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Great deals Here!";
             }
         }
-        if (npc.npcType == 548) {
+        if (npc.index == 548) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Gloves, Robes, Boots Shop!";
             }
         }
-        if (npc.npcType == 530) {
+        if (npc.index == 530) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Skillers Shop!";
             }
         }
-        if (npc.npcType == 528) {
+        if (npc.index == 528) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Woodcutting Store!!";
             }
         }
-        if (npc.npcType == 949) {
+        if (npc.index == 949) {
             if (misc.random2(30) <= 3) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to Moderator Island!";
             }
         }
-        if (npc.npcType == 2244) {
+        if (npc.index == 2244) {
             if (misc.random2(30) <= 3) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to Moderator Island!";
             }
         }
-        if (npc.npcType == 213) {
+        if (npc.index == 213) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "You need the frozen key to get in this portal! Kill the troll for key!";
             }
         }
-        if (npc.npcType == 555) {
+        if (npc.index == 555) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Random Stoof!";
             }
         }
-        if (npc.npcType == 561) {
+        if (npc.index == 561) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Hood Shop!";
             }
         }
-        if (npc.npcType == 538) {
+        if (npc.index == 538) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Slayer Shop!";
             }
         }
-        if (npc.npcType == 529) {
+        if (npc.index == 529) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
@@ -2818,42 +2847,42 @@ public class NPCHandler {
             }
         }
 
-        if (npc.npcType == 3117) {
+        if (npc.index == 3117) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Click the chests for slayer exp ..";
             }
         }
-        if (npc.npcType == 866) {
+        if (npc.index == 866) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Et .. Phone .. Home!";
             }
         }
-        if (npc.npcType == 549) {
+        if (npc.index == 549) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Smithin' Shop";
             }
         }
-        if (npc.npcType == 11674) {
+        if (npc.index == 11674) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Prestige Shop";
             }
         }
-        if (npc.npcType == 558) {
+        if (npc.index == 558) {
             if (misc.random2(30) <= 2) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Herblore shop!!";
             }
         }
-        if (npc.npcType == 1552) {
+        if (npc.index == 1552) {
             if (misc.random2(30) == 1) {
                 npc.updateRequired = true;
                 npc.textUpdateRequired = true;
@@ -2873,13 +2902,17 @@ public class NPCHandler {
             int playerIndex = npc.StartKilling;
             client player = (client) server.playerHandler.players[playerIndex];
             if (player != null) {
-                player.sendSound(getNpcDeathSound(npc.npcType), 6, 0);
+                player.sendSound(getNpcDeathSound(npc.index), 6, 0);
             }
-            npc.animNumber = getNpcDeathAnimation(npc.npcType);
+            if (player.underAttackByNpc == npc.index) {
+                player.underAttackByNpc = -1;
+            }
+
+            npc.animationRequest = getNpcDeathAnimation(npc.index);
             npc.updateRequired = true;
-            npc.animUpdateRequired = true;
+            npc.animationUpdateRequired = true;
             npc.DeadApply = true;
-            npc.actionTimer = AnimationLength.getFrameLength(npc.animNumber);
+            npc.actionTimer = AnimationLength.getFrameLength(npc.animationRequest);
         } else if (npc.actionTimer == 0 && npc.DeadApply && !npc.NeedRespawn) {
             int killerIndex = npc.killedBy;
             int dropX = npc.absX, dropY = npc.absY;
@@ -2895,7 +2928,7 @@ public class NPCHandler {
 
                     // Optional: Animated Armour special drop
                     if (AnimatedArmour.isAnimatedArmourNpc(npc.npcId)) {
-                        AnimatedArmour.dropTokens(killer, npc.npcType, dropX, dropY);
+                        AnimatedArmour.dropTokens(killer, npc.index, dropX, dropY);
                     }
                 }
 
@@ -2910,10 +2943,10 @@ public class NPCHandler {
             npc.absY = npc.makeY;
             npc.HP = npc.MaxHP;
             npc.updateRequired = true;
-            npc.animUpdateRequired = true;
+            npc.animationUpdateRequired = true;
         }
         else if (npc.actionTimer == 0 && npc.NeedRespawn && npc.Respawns) {
-            newNPC(npc.npcType, npc.makeX, npc.makeY, npc.heightLevel,
+            newNPC(npc.index, npc.makeX, npc.makeY, npc.heightLevel,
                     npc.moverangeX1, npc.moverangeY1, npc.moverangeX2, npc.moverangeY2,
                     npc.walkingType, npc.MaxHP, true);
             npcs[index] = null;
@@ -2949,34 +2982,34 @@ public class NPCHandler {
                                 && server.playerHandler.players[Play] != null
                                 && server.playerHandler.players[GetNpcKiller(NPCID)]
                                 != null) {
-                            if (npcs[NPCID].npcType == 275) {
+                            if (npcs[NPCID].index == 275) {
                                 ItemHandler.addItem(4273, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 18) {
+                            if (npcs[NPCID].index == 18) {
                                 ItemHandler.addItem(Item3.randomguard(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 21) {
+                            if (npcs[NPCID].index == 21) {
                                 ItemHandler.addItem(Item3.randomhero(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 2256) {
+                            if (npcs[NPCID].index == 2256) {
                                 ItemHandler.addItem(Item3.randomguardz(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1021) {
+                            if (npcs[NPCID].index == 1021) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2660;
                                 ppl.teleportToY = 4839;
                             }
-                            if (npcs[NPCID].npcType == 2468) {
+                            if (npcs[NPCID].index == 2468) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -2986,56 +3019,56 @@ public class NPCHandler {
                                         ppl.absX + 3, ppl.absY + 3, ppl.absX + -3, ppl.absY + -3, 1, server.npcHandler.GetNpcListHP(2627), false);
 
                             }
-                            if (npcs[NPCID].npcType == 1020) {
+                            if (npcs[NPCID].index == 1020) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2713; // Change coordinates
                                 ppl.teleportToY = 4836; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 752) {
+                            if (npcs[NPCID].index == 752) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2542; // Change coordinates
                                 ppl.teleportToY = 3029; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 275) {
+                            if (npcs[NPCID].index == 275) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2608; // Change coordinates
                                 ppl.teleportToY = 3163; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 477) {
+                            if (npcs[NPCID].index == 477) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2608; // Change coordinates
                                 ppl.teleportToY = 3159; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 1919) {
+                            if (npcs[NPCID].index == 1919) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2866; // Change coordinates
                                 ppl.teleportToY = 9952; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 509) {
+                            if (npcs[NPCID].index == 509) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2792; // Change coordinates
                                 ppl.teleportToY = 9325; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 274) {
+                            if (npcs[NPCID].index == 274) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2540; // Change coordinates
                                 ppl.teleportToY = 3019; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 1022) {
+                            if (npcs[NPCID].index == 1022) {
 
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
@@ -3043,14 +3076,14 @@ public class NPCHandler {
                                 ppl.teleportToX = 2584; // Change coordinates
                                 ppl.teleportToY = 4836; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 1019) {
+                            if (npcs[NPCID].index == 1019) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.teleportToX = 2464; // Change coordinates
                                 ppl.teleportToY = 4834; // Change coordinates
                             }
-                            if (npcs[NPCID].npcType == 2026) {
+                            if (npcs[NPCID].index == 2026) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3059,37 +3092,37 @@ public class NPCHandler {
                                 ppl.addItem(1543, 1);
                                 ppl.sendMessage("Good Job Now Kill Verac To Go To Torag!");
                             }
-                            if (npcs[NPCID].npcType == 2745) {
+                            if (npcs[NPCID].index == 2745) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 PlayerHandler.messageToAll = "@red@" + ppl.playerName + " @bla@Has Killed Jad!";
                             }
-                            if (npcs[NPCID].npcType == 8133) {
+                            if (npcs[NPCID].index == 8133) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 PlayerHandler.messageToAll = "@red@" + ppl.playerName + " @bla@Has Killed corp!";
                             }
-                            if (npcs[NPCID].npcType == 5666) {
+                            if (npcs[NPCID].index == 5666) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 PlayerHandler.messageToAll = "@red@" + ppl.playerName + " @bla@Has Killed Barrelchest!";
                             }
-                            if (npcs[NPCID].npcType == 3847) {
+                            if (npcs[NPCID].index == 3847) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 PlayerHandler.messageToAll = "@red@" + ppl.playerName + " @bla@Has Killed The Sea Queen!";
                             }
-                            if (npcs[NPCID].npcType == 50) {
+                            if (npcs[NPCID].index == 50) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 PlayerHandler.messageToAll = "@red@" + ppl.playerName + " @bla@Someone Has Killed Kbd!";
                             }
-                            if (npcs[NPCID].npcType == 2030) {
+                            if (npcs[NPCID].index == 2030) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3098,7 +3131,7 @@ public class NPCHandler {
                                 ppl.addItem(1544, 1);
                                 ppl.sendMessage("Good Job Now Kill Torag To Go To Ahrims!");
                             }
-                            if (npcs[NPCID].npcType == 2029) {
+                            if (npcs[NPCID].index == 2029) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3107,7 +3140,7 @@ public class NPCHandler {
                                 ppl.addItem(1545, 1);
                                 ppl.sendMessage("Good Job Now Kill Ahrim To Go To Guthan!");
                             }
-                            if (npcs[NPCID].npcType == 2025) {
+                            if (npcs[NPCID].index == 2025) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3116,48 +3149,48 @@ public class NPCHandler {
                                 ppl.addItem(1546, 1);
                                 ppl.sendMessage("Good Job Now Kill Guthan To Go To Karil!");
                             }
-                            if (npcs[NPCID].npcType == 193) //Druid
+                            if (npcs[NPCID].index == 193) //Druid
                             {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Druidkills += 1;
                             }
 
-                            if (npcs[NPCID].npcType == 2837) {
+                            if (npcs[NPCID].index == 2837) {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Zombiekills += 1;
                             }
-                            if (npcs[NPCID].npcType == 104) //Ghost
+                            if (npcs[NPCID].index == 104) //Ghost
                             {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Ghostkills += 1;
                             }
-                            if (npcs[NPCID].npcType == 111) {
+                            if (npcs[NPCID].index == 111) {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Giantkills += 1;
                             }
-                            if (npcs[NPCID].npcType == 752) //Lesser Demon
+                            if (npcs[NPCID].index == 752) //Lesser Demon
                             {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Demonkills += 1;
                             }
-                            if (npcs[NPCID].npcType == 7552) //General Khazard
+                            if (npcs[NPCID].index == 7552) //General Khazard
                             {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Generalkills += 1;
                             }
-                            if (npcs[NPCID].npcType == 1472) //Jungle demon
+                            if (npcs[NPCID].index == 1472) //Jungle demon
                             {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.JDemonkills += 1;
                             }
-                            if (npcs[NPCID].npcType == 752) //Lesser Demon
+                            if (npcs[NPCID].index == 752) //Lesser Demon
                             {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
@@ -3165,7 +3198,7 @@ public class NPCHandler {
                                 ppl.teleportToX = 3182;
                                 ppl.teleportToY = 6829;
                             }
-                            if (npcs[NPCID].npcType == 7552) //General Khazard
+                            if (npcs[NPCID].index == 7552) //General Khazard
                             {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
@@ -3173,7 +3206,7 @@ public class NPCHandler {
                                 ppl.teleportToX = 3136;
                                 ppl.teleportToY = 6853;
                             }
-                            if (npcs[NPCID].npcType == 1472) //Jungle demon
+                            if (npcs[NPCID].index == 1472) //Jungle demon
                             {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
@@ -3182,7 +3215,7 @@ public class NPCHandler {
                                 ppl.teleportToY = 6806;
                             }
 
-                            if (npcs[NPCID].npcType == 2027) {
+                            if (npcs[NPCID].index == 2027) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3192,7 +3225,7 @@ public class NPCHandler {
                                 ppl.sendMessage("Good Job Now Kill Karil To Go To Chaos Elemental!!");
                             }
 
-                            if (npcs[NPCID].npcType == 2028) {
+                            if (npcs[NPCID].index == 2028) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3201,7 +3234,7 @@ public class NPCHandler {
                                 ppl.addItem(1548, 1);
                                 ppl.sendMessage("Good Job Now Kill Chaos Elemental To Go To The Chest!!");
                             }
-                            if (npcs[NPCID].npcType == 3200) {
+                            if (npcs[NPCID].index == 3200) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
@@ -3211,189 +3244,189 @@ public class NPCHandler {
                                 ppl.sendMessage("SWEET Y0U DID IT! CLICK THE CHEST!");
                             }
 
-                            if (npcs[NPCID].npcType == 17) {
+                            if (npcs[NPCID].index == 17) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.sendMessage("Grab The Dropped Item.....");
                             }
 
-                            if (npcs[NPCID].npcType == 35) {
+                            if (npcs[NPCID].index == 35) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.sendMessage("Grab The Dropped Item.....");
                             }
 
-                            if (npcs[NPCID].npcType == 113) {
+                            if (npcs[NPCID].index == 113) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.sendMessage("Grab The Dropped Item.....");
                             }
 
-                            if (npcs[NPCID].npcType == 86) {
+                            if (npcs[NPCID].index == 86) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.sendMessage("Grab The Dropped Item.....");
                             }
 
-                            if (npcs[NPCID].npcType == 55) {
+                            if (npcs[NPCID].index == 55) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
                                 ppl.sendMessage("Grab The Dropped Item.....");
                             }
 
-                            if (npcs[NPCID].npcType == 1007) {
+                            if (npcs[NPCID].index == 1007) {
                                 ItemHandler.addItem(6754, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 49) {
+                            if (npcs[NPCID].index == 49) {
                                 ItemHandler.addItem(4272, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 795) {
+                            if (npcs[NPCID].index == 795) {
                                 ItemHandler.addItem(4078, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 509) {
+                            if (npcs[NPCID].index == 509) {
                                 ItemHandler.addItem(6104, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 2880) {
+                            if (npcs[NPCID].index == 2880) {
                                 ItemHandler.addItem(5585, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 2745) {
+                            if (npcs[NPCID].index == 2745) {
                                 ItemHandler.addItem(6570, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 3847) {
+                            if (npcs[NPCID].index == 3847) {
                                 ItemHandler.addItem(13487, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 1859) {
+                            if (npcs[NPCID].index == 1859) {
                                 ItemHandler.addItem(6529, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 10000000,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1160) {
+                            if (npcs[NPCID].index == 1160) {
                                 ItemHandler.addItem(Item2.randomKQ(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 391) {
+                            if (npcs[NPCID].index == 391) {
                                 ItemHandler.addItem(Item2.randomtroll(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 951) {
+                            if (npcs[NPCID].index == 951) {
                                 ItemHandler.addItem(Item2.randomchicken(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 90) {
+                            if (npcs[NPCID].index == 90) {
                                 ItemHandler.addItem(Item2.randomskeleton(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1648) {
+                            if (npcs[NPCID].index == 1648) {
                                 ItemHandler.addItem(Item2.randomcrawlinghand(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1832) {
+                            if (npcs[NPCID].index == 1832) {
                                 ItemHandler.addItem(Item2.randomcavebug(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1637) {
+                            if (npcs[NPCID].index == 1637) {
                                 ItemHandler.addItem(Item2.randomjelly(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1604) {
+                            if (npcs[NPCID].index == 1604) {
                                 ItemHandler.addItem(
                                         Item2.randomaberrantspecter(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1615) {
+                            if (npcs[NPCID].index == 1615) {
                                 ItemHandler.addItem(Item2.randomabyssaldemon(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 2783) {
+                            if (npcs[NPCID].index == 2783) {
                                 ItemHandler.addItem(Item2.randomdarkbeast(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 89) {
+                            if (npcs[NPCID].index == 89) {
                                 ItemHandler.addItem(Item2.randomunicorn(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 912) {
+                            if (npcs[NPCID].index == 912) {
                                 ItemHandler.addItem(Item2.randombattlemagesara(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 913) {
+                            if (npcs[NPCID].index == 913) {
                                 ItemHandler.addItem(
                                         Item2.randombattlemagezammy(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 914) {
+                            if (npcs[NPCID].index == 914) {
                                 ItemHandler.addItem(
                                         Item2.randombattlemageguthix(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 86) {
+                            if (npcs[NPCID].index == 86) {
                                 ItemHandler.addItem(Item2.randomrat(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 35) {
+                            if (npcs[NPCID].index == 35) {
                                 ItemHandler.addItem(Item2.randomsoldier(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 114) {
+                            if (npcs[NPCID].index == 114) {
                                 ItemHandler.addItem(Item2.randomogre(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 19) {
+                            if (npcs[NPCID].index == 19) {
                                 ItemHandler.addItem(Item2.randomwhiteknight(), npcs[NPCID].absX, npcs[NPCID].absY, 1, GetNpcKiller(NPCID), false);
                             }
 
-                            if (npcs[NPCID].npcType == 3260) {
+                            if (npcs[NPCID].index == 3260) {
                                 ItemHandler.addItem(Item2.randombarbarian(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 3425) {
+                            if (npcs[NPCID].index == 3425) {
                                 ItemHandler.addItem(Item2.randomfishy(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 55) {
+                            if (npcs[NPCID].index == 55) {
                                 ItemHandler.addItem(Item2.randombluedragon(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 112) {
+                            if (npcs[NPCID].index == 112) {
                                 ItemHandler.addItem(532,
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
@@ -3401,66 +3434,66 @@ public class NPCHandler {
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1591) {
+                            if (npcs[NPCID].index == 1591) {
                                 ItemHandler.addItem(Item2.randomirondragon(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1338) {
+                            if (npcs[NPCID].index == 1338) {
                                 ItemHandler.addItem(Item2.randomDagannoths(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 3494) {
+                            if (npcs[NPCID].index == 3494) {
                                 ItemHandler.addItem(Item2.randomFlambeed(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1859) {
+                            if (npcs[NPCID].index == 1859) {
                                 ItemHandler.addItem(Item2.randomArzinian_Being_of_Bordanzan(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1575) {
+                            if (npcs[NPCID].index == 1575) {
                                 ItemHandler.addItem(Item2.randomSkeleton_Hellhound(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 84) {
+                            if (npcs[NPCID].index == 84) {
                                 ItemHandler.addItem(Item2.randomBlack_Demon(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 111) {
+                            if (npcs[NPCID].index == 111) {
                                 ItemHandler.addItem(Item2.randomIce_giant(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 2919) {
+                            if (npcs[NPCID].index == 2919) {
                                 ItemHandler.addItem(Item2.randomAgrith_Naar(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
 
-                            if (npcs[NPCID].npcType == 188) {
+                            if (npcs[NPCID].index == 188) {
                                 ItemHandler.addItem(16, npcs[NPCID].absX,
                                         npcs[NPCID].absY, 1, GetNpcKiller(NPCID),
                                         false);
                             }
-                            if (npcs[NPCID].npcType == 1625
-                                    || npcs[NPCID].npcType == 1604
-                                    || npcs[NPCID].npcType == 2035) {
+                            if (npcs[NPCID].index == 1625
+                                    || npcs[NPCID].index == 1604
+                                    || npcs[NPCID].index == 2035) {
                                 ItemHandler.addItem(Item.randomSlayeritem65(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1625
-                                    || npcs[NPCID].npcType == 1604) {
+                            if (npcs[NPCID].index == 1625
+                                    || npcs[NPCID].index == 1604) {
                                 ItemHandler.addItem(Item.randomSlayeritem75(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
                             }
-                            if (npcs[NPCID].npcType == 1605) {
+                            if (npcs[NPCID].index == 1605) {
                                 ItemHandler.addItem(Item.randomSlayer99item(),
                                         npcs[NPCID].absX, npcs[NPCID].absY, 1,
                                         GetNpcKiller(NPCID), false);
@@ -3871,7 +3904,7 @@ public class NPCHandler {
             return 0; // or a default animation
         }
 
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 118:
                 return 99;
             case 2455:
@@ -4324,7 +4357,7 @@ public class NPCHandler {
     }
 
     public int getNpcAttackType(NPC npc) {
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 2025: // Ahrim
                 return 2; // Magic only
 
@@ -4372,6 +4405,41 @@ public class NPCHandler {
             default -> 1;
         };
     }
+    public boolean canNpcAttackPlayer(NPC npc, client player) {
+        int startX = npc.absX;
+        int startY = npc.absY;
+        int endX = player.absX;
+        int endY = player.absY;
+
+        // Simple Bresenham's line or grid check
+        int dx = Math.abs(endX - startX);
+        int dy = Math.abs(endY - startY);
+        int sx = startX < endX ? 1 : -1;
+        int sy = startY < endY ? 1 : -1;
+        int err = dx - dy;
+
+        int x = startX;
+        int y = startY;
+        int z = player.heightLevel;
+
+        while (x != endX || y != endY) {
+            if (Region.isTileBlockedByObject(x, y, z)) { // Replace with your clipping check
+                return false; // Obstacle in the way
+            }
+
+            int e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return true; // Path is clear
+    }
 
     public boolean attackPlayer(int npcId) {
         NPC npc = npcs[npcId];
@@ -4390,13 +4458,23 @@ public class NPCHandler {
             return false;
         }
 
+        // === SINGLE vs MULTI COMBAT OWNERSHIP (ONLY CHECK) ===
+        if (!canNpcEngagePlayer(npc, player, npcId)) {
+            npc.RandomWalk = true;
+            return false;
+        }
+
+        if (!canNpcAttackPlayer(npc, player)) {
+            npc.RandomWalk = true;
+            return false;
+        }
+
         handleFacing(npc, player);
 
-        // Determine attack range based on attack type
         int allowedDistance = switch (npc.attackType) {
-            case 2 -> getDistanceForNpc(npc);         // Magic
-            case 1 -> Math.min(7, getDistanceForNpc(npc)); // Ranged
-            case 0 -> 1;                                // Melee
+            case 2 -> getDistanceForNpc(npc);
+            case 1 -> Math.min(7, getDistanceForNpc(npc));
+            case 0 -> 1;
             default -> 1;
         };
 
@@ -4404,19 +4482,16 @@ public class NPCHandler {
             return false;
         }
 
-        if (npc.actionTimer > 0 || player.IsDead) {
-            return false;
-        }
+        if (npc.actionTimer > 0 || player.IsDead) return false;
 
         if (shouldTriggerRingOfLife(player)) {
             player.SafeMyLife = true;
             return true;
         }
 
-        npc.attackType = getNpcAttackType(npc); // Optional per-tick logic
+        npc.attackType = getNpcAttackType(npc);
         handleNpcTransform(npc);
 
-        // Spell preloading
         if (npc.attackType == 2) {
             loadSpell(npc);
         }
@@ -4424,67 +4499,123 @@ public class NPCHandler {
         int damage = calculateHit(npc, player);
         if (damage > player.NewHP) damage = player.NewHP;
 
-        // === Multi-Attack Logic ===
-        if (multiAttacks(npcId)) {
+        // === TRUE MULTI-COMBAT BEHAVIOR ===
+        // Other NPCs will ALSO attack independently via their own attackPlayer calls
+        // This block is ONLY for AoE / splash attacks
+        if (npc.inMulti() && multiAttacks(npcId)) {
             for (Player p : server.playerHandler.players) {
                 if (p == null || p.IsDead || !p.inMulti()) continue;
-                if (goodDistance(npc.absX, npc.absY, p.absX, p.absY, 1)) {
-                    client c = (client) p;
-                    int multiDamage = calculateHit(npc, c);
+                if (p == player) continue;
+
+                client c = (client) p;
+                int range = getMultiAttackRange(npc);
+
+                if (misc.goodDistance(npc.absX, npc.absY, c.absX, c.absY, range)) {
+                    int splashDamage = calculateHit(npc, c);
+
                     if (npc.attackType == 2) {
                         doMagicGFX(npc, c);
                     }
-                    c.hitDiff = multiDamage;
+
+                    npc.hitDelayTimer = getHitDelay(npc);
+                    npc.pendingDamage = splashDamage;
                     c.hitUpdateRequired = true;
                     c.updateRequired = true;
                     c.appearanceUpdateRequired = true;
-                    c.startAnimation(c.GetBlockAnim(c.playerEquipment[c.playerWeapon]));
+                    c.startAnimation(
+                            c.GetBlockAnim(c.playerEquipment[c.playerWeapon])
+                    );
                 }
             }
         }
 
-        // === Attack Type Logic ===
+        // === MAIN TARGET ATTACK ===
+        npc.startAnimation(getNpcAttackAnimation(npcId));
+        player.sendSound(getNpcAttackSound(npc.index), 4, 0);
+
         switch (npc.attackType) {
-            case 0 -> { // Melee
-                npc.animNumber = getNpcAttackAnimation(npcId);
-                player.sendSound(getNpcAttackSound(npc.npcType), 4, 0);
-            }
             case 1 -> { // Ranged
-                npc.animNumber = getNpcAttackAnimation(npcId);
-                player.sendSound(getNpcAttackSound(npc.npcType), 4, 0);
                 npc.projectileId = getProjectile(npc, 1);
-                if (npc.projectileId > 0) sendProjectile(npc, player);
+                if (npc.projectileId > 0) {
+                    sendProjectile(npc, player);
+                }
             }
             case 2 -> { // Magic
-                npc.animNumber = getNpcAttackAnimation(npcId);
-                player.sendSound(getNpcAttackSound(npc.npcType), 4, 0);
-                if (npc.projectileId > 0) sendProjectile(npc, player);
+                if (npc.projectileId > 0) {
+                    sendProjectile(npc, player);
+                }
                 doMagicGFX(npc, player);
                 damage = getMagicDamage(npc, player);
                 if (damage > player.NewHP) damage = player.NewHP;
             }
         }
 
-        // Block animation
+        player.hitUpdateRequired = true;
+        player.updateRequired = true;
+        player.appearanceUpdateRequired = true;
+        player.startAnimation(
+                player.GetBlockAnim(player.playerEquipment[player.playerWeapon])
+        );
         player.sendSound(soundConfig.getPlayerBlockSounds(player), 4, 0);
-        player.startAnimation(player.GetBlockAnim(player.playerEquipment[player.playerWeapon]));
 
-        npc.animUpdateRequired = true;
         npc.updateRequired = true;
-
-        npc.hitDelayTimer = getHitDelay(npc); // Schedule delayed hit
+        npc.hitDelayTimer = getHitDelay(npc);
         npc.pendingDamage = damage;
 
-        int animId = npc.animNumber;
-        int actualLength = AnimationLength.getFrameLength(animId);
-        npc.actionTimer = Math.max(4, actualLength);
+        int animLength = AnimationLength.getFrameLength(npc.animationRequest);
+        npc.actionTimer = Math.max(4, animLength);
 
         return true;
     }
 
 
+    public boolean canNpcEngagePlayer(NPC npc, client player, int npcId) {
+
+        // Multi zone = always allowed
+        if (npc.inMulti() && player.inMulti()) {
+            return true;
+        }
+
+        // Single zone logic
+        if (player.underAttackByNpc == -1) {
+            player.lastNpcCombatTime = System.currentTimeMillis();
+            return true;
+        }
+
+        // Same NPC continuing combat
+        return player.underAttackByNpc == npcId;
+    }
+    /**
+     * Returns the multi-attack range for the given NPC.
+     * Melee NPCs = 1 tile, Ranged/Magic = 7 tiles by default.
+     * You can override ranges per specific NPC ID if needed.
+     */
+    public int getMultiAttackRange(NPC npc) {
+        if (npc == null) return 1;
+
+        // Special NPCs can have custom ranges
+        switch (npc.index) {
+            case 2745: // Jad
+                return 10; // wider range for special attack
+            case 8133: // Corporeal Beast
+                return 10;
+            case 6222: // Kree'arra
+            case 6223:
+                return 7; // Ranged/AoE attack
+            // Add other special NPCs here
+        }
+
+        // Default ranges based on attack type
+        return switch (npc.attackType) {
+            case 0 -> 1;  // Melee
+            case 1 -> 7;  // Ranged
+            case 2 -> 7;  // Magic
+            default -> 1;
+        };
+    }
+
     private int getMagicDamage(NPC npc, client p) {
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 1645: return 6 + misc.random(43);
             case 509:  return 8 + misc.random(20);
             case 1241: return 2 + misc.random(19);
@@ -4496,7 +4627,7 @@ public class NPCHandler {
         }
     }
     private int getProjectile(NPC npc, int type) {
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 3231: return 9;
             // Add more custom cases if needed
             default: return 0;
@@ -4506,7 +4637,7 @@ public class NPCHandler {
         if (npc == null || p == null)
             return;
 
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 1645:
                 npc.stillgfx(368, npc.absY, npc.absX); // Caster gfx
                 p.stillgfx(369, p.absY, p.absX); // Target impact
@@ -4612,7 +4743,7 @@ public class NPCHandler {
     private void handleNpcTransform(NPC npc) {
         int hp = npc.HP;
 
-        switch (npc.npcType) {
+        switch (npc.index) {
             case 8352:
                 if (hp >= 1000 && hp <= 1500) npc.requestTransform(8351);
                 break;
@@ -4650,7 +4781,7 @@ public class NPCHandler {
 
     private int calculateHit(NPC npc, client player) {
         // Load NPC stats
-        NPCStatLoader.NPCStats stats = server.npcStatLoader.getStats(npc.npcType);
+        NPCStatLoader.NPCStats stats = server.npcStatLoader.getStats(npc.index);
         if (stats == null) {
             stats = new NPCStatLoader.NPCStats();
             stats.maxHit = npc.MaxHit; // fallback
@@ -4700,9 +4831,9 @@ public class NPCHandler {
 
 
     private void playAttackEffects(NPC npc, client player) {
-        player.sendSound(getNpcAttackSound(npc.npcType), 4, 0);
-        npc.animNumber = getNpcAttackAnimation(npc.npcType);
-        npc.animUpdateRequired = true;
+        player.sendSound(getNpcAttackSound(npc.index), 4, 0);
+        npc.animationRequest = getNpcAttackAnimation(npc.index);
+        npc.animationUpdateRequired = true;
         npc.updateRequired = true;
 
         if (npc.projectileId > 0) {
@@ -4714,8 +4845,8 @@ public class NPCHandler {
     }
 
     private void sendProjectile(NPC npc, client player) {
-        int startX = npc.getX() + offset(npc.npcType);
-        int startY = npc.getY() + offset(npc.npcType);
+        int startX = npc.getX() + offset(npc.index);
+        int startY = npc.getY() + offset(npc.index);
         int targetX = player.getX();
         int targetY = player.getY();
         int offX = (startX - targetX) * -1;
@@ -4725,7 +4856,7 @@ public class NPCHandler {
 
         player.createPlayersProjectile(
                 centerX, centerY, offX, offY, 50,
-                getProjectileSpeed(npc.npcType),
+                getProjectileSpeed(npc.index),
                 npc.projectileId,
                 getProjectileStartHeight(npc.npcId, npc.projectileId),
                 getProjectileEndHeight(npc.npcId, npc.projectileId),
@@ -4777,40 +4908,40 @@ public class NPCHandler {
                 ResetAttackNPC(NPCID);
                 // npcs[NPCID].textUpdate = "Oh yeah I win bitch!";
                 // npcs[NPCID].textUpdateRequired = true;
-                npcs[NPCID].animNumber = 2103;
-                npcs[NPCID].animUpdateRequired = true;
+                npcs[NPCID].animationRequest = 2103;
+                npcs[NPCID].animationUpdateRequired = true;
                 npcs[NPCID].updateRequired = true;
             } else {
-                npcs[NPCID].animNumber = 711; // mage attack
-                if (npcs[NPCID].npcType == 1645) {
+                npcs[NPCID].animationRequest = 711; // mage attack
+                if (npcs[NPCID].index == 1645) {
                     gfxAll(369, EnemyY, EnemyX);
                     hitDiff = 6 + misc.random(43);
                 }
-                if (npcs[NPCID].npcType == 1645) {
+                if (npcs[NPCID].index == 1645) {
                     gfxAll(369, EnemyY, EnemyX);
                     hitDiff = 6 + misc.random(43);
                 }
-                if (npcs[NPCID].npcType == 509) {
+                if (npcs[NPCID].index == 509) {
                     hitDiff = 8 + misc.random(20);
                 }
-                if (npcs[NPCID].npcType == 1241) {
+                if (npcs[NPCID].index == 1241) {
                     gfxAll(363, EnemyY, EnemyX);
                     hitDiff = 2 + misc.random(19);
                 }
-                if (npcs[NPCID].npcType == 1246) {
+                if (npcs[NPCID].index == 1246) {
                     gfxAll(368, npcs[NPCID].absY, npcs[NPCID].absX);
                     gfxAll(367, EnemyY, EnemyX);
                     hitDiff = 4 + misc.random(35);
                 }
-                if (npcs[NPCID].npcType == 1159) {
+                if (npcs[NPCID].index == 1159) {
                     gfxAll(552, EnemyY, EnemyX);
                     hitDiff = 2 + misc.random(88);
                 }
-                if (npcs[NPCID].npcType == 54) {
+                if (npcs[NPCID].index == 54) {
                     gfxAll(197, EnemyY, EnemyX);
                     hitDiff = 2 + misc.random(96);
                 }
-                npcs[NPCID].animUpdateRequired = true;
+                npcs[NPCID].animationUpdateRequired = true;
                 npcs[NPCID].updateRequired = true;
                 if ((EnemyHP - hitDiff) < 0) {
                     hitDiff = EnemyHP;
@@ -4819,7 +4950,7 @@ public class NPCHandler {
                 npcs[npcs[NPCID].attacknpc].attacknpc = NPCID;
                 npcs[npcs[NPCID].attacknpc].updateRequired = true;
                 npcs[npcs[NPCID].attacknpc].hitUpdateRequired = true;
-                npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animNumber);
+                npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animationRequest);
                 return true;
             }
             return false;
@@ -4840,40 +4971,40 @@ public class NPCHandler {
                 ResetAttackNPC(NPCID);
                 // npcs[NPCID].textUpdate = "Oh yeah I win bitch!";
                 // npcs[NPCID].textUpdateRequired = true;
-                npcs[NPCID].animNumber = 2103;
-                npcs[NPCID].animUpdateRequired = true;
+                npcs[NPCID].animationRequest = 2103;
+                npcs[NPCID].animationUpdateRequired = true;
                 npcs[NPCID].updateRequired = true;
             } else {
-                npcs[NPCID].animNumber = 711; // mage attack
-                if (npcs[NPCID].npcType == 1645) {
+                npcs[NPCID].animationRequest = 711; // mage attack
+                if (npcs[NPCID].index == 1645) {
                     gfxAll(369, EnemyY, EnemyX);
                     hitDiff = 6 + misc.random(43);
                 }
-                if (npcs[NPCID].npcType == 1645) {
+                if (npcs[NPCID].index == 1645) {
                     gfxAll(369, EnemyY, EnemyX);
                     hitDiff = 6 + misc.random(43);
                 }
-                if (npcs[NPCID].npcType == 509) {
+                if (npcs[NPCID].index == 509) {
                     hitDiff = 8 + misc.random(20);
                 }
-                if (npcs[NPCID].npcType == 1241) {
+                if (npcs[NPCID].index == 1241) {
                     gfxAll(363, EnemyY, EnemyX);
                     hitDiff = 2 + misc.random(19);
                 }
-                if (npcs[NPCID].npcType == 1246) {
+                if (npcs[NPCID].index == 1246) {
                     gfxAll(368, npcs[NPCID].absY, npcs[NPCID].absX);
                     gfxAll(367, EnemyY, EnemyX);
                     hitDiff = 4 + misc.random(35);
                 }
-                if (npcs[NPCID].npcType == 1159) {
+                if (npcs[NPCID].index == 1159) {
                     gfxAll(552, EnemyY, EnemyX);
                     hitDiff = 2 + misc.random(88);
                 }
-                if (npcs[NPCID].npcType == 54) {
+                if (npcs[NPCID].index == 54) {
                     gfxAll(197, EnemyY, EnemyX);
                     hitDiff = 2 + misc.random(96);
                 }
-                npcs[NPCID].animUpdateRequired = true;
+                npcs[NPCID].animationUpdateRequired = true;
                 npcs[NPCID].updateRequired = true;
                 if ((EnemyHP - hitDiff) < 0) {
                     hitDiff = EnemyHP;
@@ -4882,7 +5013,7 @@ public class NPCHandler {
                 npcs[npcs[NPCID].attacknpc].attacknpc = NPCID;
                 npcs[npcs[NPCID].attacknpc].updateRequired = true;
                 npcs[npcs[NPCID].attacknpc].hitUpdateRequired = true;
-                npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animNumber);
+                npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animationRequest);
                 return true;
             }
             return false;
@@ -4907,8 +5038,8 @@ public class NPCHandler {
             ResetAttackNPC(NPCID);
             attacker.textUpdate = "Oh yeah I win bitch!";
             attacker.textUpdateRequired = true;
-            attacker.animNumber = 2103;
-            attacker.animUpdateRequired = true;
+            attacker.animationRequest = 2103;
+            attacker.animationUpdateRequired = true;
             attacker.updateRequired = true;
             return true;
         }
@@ -4917,19 +5048,19 @@ public class NPCHandler {
         if (hitDiff > target.HP) hitDiff = target.HP;
 
         // Animations per NPC type
-        switch (attacker.npcType) {
+        switch (attacker.index) {
             case 9:
             case 1605:
-                attacker.animNumber = 386;
+                attacker.animationRequest = 386;
                 break;
             case 3200:
-                attacker.animNumber = 0x326;
+                attacker.animationRequest = 0x326;
                 break;
         }
 
-        attacker.animUpdateRequired = true;
+        attacker.animationUpdateRequired = true;
         attacker.updateRequired = true;
-        attacker.actionTimer = AnimationLength.getFrameLength(attacker.animNumber);
+        attacker.actionTimer = AnimationLength.getFrameLength(attacker.animationRequest);
         attacker.IsAttackingNPC = true;
         attacker.RandomWalk = false;
 
@@ -4947,8 +5078,8 @@ public class NPCHandler {
         npcs[NPCID].IsAttackingNPC = false;
         npcs[NPCID].attacknpc = -1;
         npcs[NPCID].RandomWalk = true;
-        npcs[NPCID].animNumber = 0x328;
-        npcs[NPCID].animUpdateRequired = true;
+        npcs[NPCID].animationRequest = 0x328;
+        npcs[NPCID].animationUpdateRequired = true;
         npcs[NPCID].updateRequired = true;
         return true;
     }
@@ -4993,8 +5124,8 @@ public class NPCHandler {
         npcs[NPCID].IsUnderAttack = false;
         npcs[NPCID].StartKilling = 0;
         npcs[NPCID].RandomWalk = true;
-        npcs[NPCID].animNumber = 0x328;
-        npcs[NPCID].animUpdateRequired = true;
+        npcs[NPCID].animationRequest = 0x328;
+        npcs[NPCID].animationUpdateRequired = true;
         npcs[NPCID].updateRequired = true;
         return true;
     }

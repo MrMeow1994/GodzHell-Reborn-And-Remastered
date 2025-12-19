@@ -70,7 +70,7 @@ public class Boundary {
      * @param boundaries The array of Boundary objects
      * @return
      */
-    public static boolean isIn(client player, Boundary... boundaries) {
+    public static boolean isIn(Entity player, Boundary... boundaries) {
         for(Boundary b : boundaries) {
             if (b.height > 0) {
                 if (player.heightLevel != b.height) {
@@ -84,7 +84,7 @@ public class Boundary {
         return false;
     }
 
-    public static boolean isIn1(client player, Boundary[] boundaries) {
+    public static boolean isIn1(Entity player, Boundary[] boundaries) {
         for(Boundary b : boundaries) {
             if (b.height > 0) {
                 if (player.heightLevel != b.height) {
@@ -98,7 +98,7 @@ public class Boundary {
         return false;
     }
 
-    public static boolean isIn2(client player, Boundary... boundaries) {
+    public static boolean isIn2(Entity player, Boundary... boundaries) {
         for(Boundary b : boundaries) {
             if (player.absX >= b.minX && player.absX <= b.highX && player.absY >= b.minY && player.absY <= b.highY) {
                 return true;
@@ -122,7 +122,7 @@ public class Boundary {
      * @param boundaries The boundary object
      * @return
      */
-    public static boolean isIn(Player player, Boundary boundaries) {
+    public static boolean isIn(Entity player, Boundary boundaries) {
         if (boundaries.height > 0) {
             if (player.heightLevel != boundaries.height) {
                 return false;
@@ -132,36 +132,6 @@ public class Boundary {
                 && player.absY >= boundaries.minY && player.absY <= boundaries.highY;
     }
 
-    /**
-     *
-     * @param npc The npc object
-     * @param boundaries The boundary object
-     * @return
-     */
-    public static boolean isIn(NPC npc, Boundary boundaries) {
-        if (boundaries.height > 0) {
-            if (npc.heightLevel != boundaries.height) {
-                return false;
-            }
-        }
-        return npc.absX >= boundaries.minX && npc.absX <= boundaries.highX
-                && npc.absY >= boundaries.minY && npc.absY <= boundaries.highY;
-    }
-
-    public static boolean isIn(NPC npc, Boundary[] boundaries) {
-        for (Boundary boundary : boundaries) {
-            if (boundary.height > 0) {
-                if (npc.heightLevel != boundary.height) {
-                    return false;
-                }
-            }
-            if (npc.absX >= boundary.minX && npc.absX <= boundary.highX
-                    && npc.absY >= boundary.minY && npc.absY <= boundary.highY) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static boolean isInSameBoundary(Player player1, Player player2, Boundary[] boundaries) {
         Optional<Boundary> boundary1 = Arrays.asList(boundaries).stream().filter(b -> isIn(player1, b)).findFirst();
@@ -184,6 +154,7 @@ public class Boundary {
     /**
      * Diary locations
      */
+    public static final Boundary ANCHENT = new Boundary(1721, 5307, 1799, 5391);
     public static final Boundary VARROCK_BOUNDARY = new Boundary(3136, 3349, 3326, 3519);
     public static final Boundary ARDOUGNE_BOUNDARY = new Boundary(2432, 3259, 2690, 3380);
     public static final Boundary ARDOUGNE_ZOO_BRIDGE_BOUNDARY = new Boundary(2611, 3270, 2614, 3280);

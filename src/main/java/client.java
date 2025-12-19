@@ -4,7 +4,6 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
-import org.jetbrains.kotlin.com.google.gson.JsonArray;
 import org.jetbrains.kotlin.com.google.gson.JsonElement;
 import org.jetbrains.kotlin.com.google.gson.JsonObject;
 
@@ -360,6 +359,7 @@ public static final int bufferSize = 20000;
     public int agilPotTimer = 0;
     public boolean agilPot = true;
     public int fishPotTimer = 0;
+    public int lastDirection = -1;
     public boolean fishPot = true;
     public int rangePotTimer = 0;
     public boolean rangePot = true;
@@ -1739,21 +1739,21 @@ public void setHouse(House house) {
     }
 
     public boolean nonattackable(int npcIndex) {
-        return NPCHandler.npcs[npcIndex].npcType == 57
-                || NPCHandler.npcs[npcIndex].npcType == 522
-                || NPCHandler.npcs[npcIndex].npcType == 585
-                || NPCHandler.npcs[npcIndex].npcType == 548
-                || NPCHandler.npcs[npcIndex].npcType == 209
-                || NPCHandler.npcs[npcIndex].npcType == 530
-                || NPCHandler.npcs[npcIndex].npcType == 944
-                || NPCHandler.npcs[npcIndex].npcType == 554
-                || NPCHandler.npcs[npcIndex].npcType == 550
-                || NPCHandler.npcs[npcIndex].npcType == 461
-                || NPCHandler.npcs[npcIndex].npcType == 2304
-                || NPCHandler.npcs[npcIndex].npcType == 555
-                || NPCHandler.npcs[npcIndex].npcType == 1699
-                || NPCHandler.npcs[npcIndex].npcType == 541
-                || NPCHandler.npcs[npcIndex].npcType == 8206;
+        return NPCHandler.npcs[npcIndex].index == 57
+                || NPCHandler.npcs[npcIndex].index == 522
+                || NPCHandler.npcs[npcIndex].index == 585
+                || NPCHandler.npcs[npcIndex].index == 548
+                || NPCHandler.npcs[npcIndex].index == 209
+                || NPCHandler.npcs[npcIndex].index == 530
+                || NPCHandler.npcs[npcIndex].index == 944
+                || NPCHandler.npcs[npcIndex].index == 554
+                || NPCHandler.npcs[npcIndex].index == 550
+                || NPCHandler.npcs[npcIndex].index == 461
+                || NPCHandler.npcs[npcIndex].index == 2304
+                || NPCHandler.npcs[npcIndex].index == 555
+                || NPCHandler.npcs[npcIndex].index == 1699
+                || NPCHandler.npcs[npcIndex].index == 541
+                || NPCHandler.npcs[npcIndex].index == 8206;
     }
 
     void setTurnIndexes(int player, int turn, int turn180, int turn90CW, int turn90CCW) {
@@ -7748,7 +7748,6 @@ public void setHouse(House house) {
                 addItemToBank(skill.getHood(), 1);
                 sendMessage("Congratulations, you just received the " + skill.getDisplayName() + " skill cape and hood!");
                 PlayerHandler.messageToAll = playerName + " has just gotten " + level + " " + skill.getDisplayName() + "!";
-                return;
             }
         }
         }
@@ -15041,7 +15040,7 @@ public void setHouse(House house) {
         if (command.equalsIgnoreCase("npcreset") && rights.inherits(Rights.OWNER)) {
             for (int i = 0; i < NPCHandler.maxNPCs; i++) {
                 if (NPCHandler.npcs[i] != null) {
-                    if (NPCHandler.npcs[i].npcType == 2627 || NPCHandler.npcs[i].npcType == 2630 || NPCHandler.npcs[i].npcType == 2631 || NPCHandler.npcs[i].npcType == 2741 || NPCHandler.npcs[i].npcType == 2743 || NPCHandler.npcs[i].npcType == 2745 || NPCHandler.npcs[i].npcType == 2746 || NPCHandler.npcs[i].npcType == 2738 || NPCHandler.npcs[i].npcType == 3777 || NPCHandler.npcs[i].npcType == 3778 || NPCHandler.npcs[i].npcType == 3779 || NPCHandler.npcs[i].npcType == 3780) {
+                    if (NPCHandler.npcs[i].index == 2627 || NPCHandler.npcs[i].index == 2630 || NPCHandler.npcs[i].index == 2631 || NPCHandler.npcs[i].index == 2741 || NPCHandler.npcs[i].index == 2743 || NPCHandler.npcs[i].index == 2745 || NPCHandler.npcs[i].index == 2746 || NPCHandler.npcs[i].index == 2738 || NPCHandler.npcs[i].index == 3777 || NPCHandler.npcs[i].index == 3778 || NPCHandler.npcs[i].index == 3779 || NPCHandler.npcs[i].index == 3780) {
                         NPCHandler.npcs[i].IsDead = false;
                         PlayerHandler.messageToAll = "[System] - Npcs Have Been Reset!";
                     } else
@@ -18938,12 +18937,31 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
         getPA().resetItems(3214);
     }
+    public void resetWeaponAnimations() {
+        playerStandIndex = 0x328;     // default stand
+        playerWalkIndex = 0x333;      // default walk
+        playerRunIndex = 0x338;       // default run
+        playerTurnIndex = 0x337;
+        playerTurn180Index = 0x334;
+        playerTurn90CWIndex = 0x335;
+        playerTurn90CCWIndex = 0x336;
+
+        playerSEA = -1; // if used
+        SendWeapon(-1, "Unarmed");
+
+        updateRequired = true;
+        appearanceUpdateRequired = true;
+    }
 
     public void setEquipment(int wearID, int amount, int targetSlot, String weaponName) {
         int Stat = playerDefence;
 
         if (targetSlot == playerWeapon) {
             Stat = playerAttack;
+        }
+        if (targetSlot == playerWeapon && wearID <= 0) {
+            resetWeaponAnimations();
+            return;
         }
         if(getOutStream() != null) {
             getOutStream().createFrameVarSizeWord(34);
@@ -18992,9 +19010,13 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 return;
             }
             if (weaponName.contains("halberd")) {
-                playerStandIndex = 12021;
-                playerWalkIndex = 12023;
-                playerRunIndex = 12024;
+                playerStandIndex = 809;
+                playerWalkIndex = 1205;
+                playerRunIndex = 1210;
+                playerTurnIndex = 1209;
+                playerTurn180Index = 1206;
+                playerTurn90CWIndex = 1207;
+                playerTurn90CCWIndex = 1206;
                 return;
             }
 
@@ -19386,8 +19408,9 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             ResetBonus();
             GetBonus();
             WriteBonus();
+
             if (slot == playerWeapon) {
-                SendWeapon(-1, "Unarmed");
+                resetWeaponAnimations();
             }
             SendWeapon((playerEquipment[playerWeapon]),
                     GetItemName(playerEquipment[playerWeapon]));
@@ -19874,7 +19897,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         for (int i = 0; i < server.npcHandler.npcs.length; i++) {
             NPC npc = server.npcHandler.npcs[i];
             if (npc == null) continue;
-            if (npc.npcType == activeFamiliar.getNpcId() && npc.summonedBy == index) {
+            if (npc.index == activeFamiliar.getNpcId() && npc.summonedBy == index) {
                 npc.absX = 0;
                 npc.absY = 0;
                 npc.IsDead = true;
@@ -21675,6 +21698,14 @@ nated = Integer.parseInt(token2);
                     updateRequired = true;
                 }
             }
+            if (!hasMultiSign && inMulti()) {
+                hasMultiSign = true;
+                getPA().multiWay(1);
+            }
+            if (hasMultiSign && !inMulti()) {
+                hasMultiSign = false;
+                getPA().multiWay(-1);
+            }
             if (InBank == 1) {
                 getPA().sendQuest("The Bank Of Godzhell Reborn.", 5383);
                 updateRequired = true;
@@ -23279,7 +23310,7 @@ nated = Integer.parseInt(token2);
 
             case 155: // first Click npc
                 int NPCSlot = inStream.readSignedWordBigEndian();
-                int NPCID = NPCHandler.npcs[NPCSlot].npcType;
+                int NPCID = NPCHandler.npcs[NPCSlot].index;
                 int npcDistance = 0;
                 faceUpdate(NPCSlot);
                 setNext = 0;
@@ -23752,7 +23783,7 @@ nated = Integer.parseInt(token2);
 
             case 17: //second Click npc
                 NPCSlot = inStream.readSignedWordBigEndianA();
-                NPCID = NPCHandler.npcs[NPCSlot].npcType;
+                NPCID = NPCHandler.npcs[NPCSlot].index;
                 faceUpdate(NPCSlot);
                 setNext = 0;
                 npcClickIndex = NPCSlot;
@@ -24141,7 +24172,7 @@ nated = Integer.parseInt(token2);
                         sendMessage("You can't attack that npc");
                         return;
                     }
-                    if (npc.npcType == 4291) {
+                    if (npc.index == 4291) {
                         if (Boundary.isIn(this, WarriorsGuild.CYCLOPS_BOUNDARY)) {
                             if (!getWarriorsGuild().isActive()) {
                                 sendMessage("You cannot attack a cyclops without talking to kamfreena.");
@@ -24149,147 +24180,147 @@ nated = Integer.parseInt(token2);
                             }
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("crawling hand")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("crawling hand")) {
                         if (playerLevel[18] < 5) {
                             sendMessage(
                                     "You need a slayer level of 5 to slay crawling hands.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cave bug")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cave bug")) {
                         if (playerLevel[18] < 7) {
                             sendMessage(
                                     "You need a slayer level of 7 to slay cave bugs.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cave crawler")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cave crawler")) {
                         if (playerLevel[18] < 10) {
                             sendMessage(
                                     "You need a slayer level of 10 to slay cave crawlers.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("banshee")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("banshee")) {
                         if (playerLevel[18] < 15) {
                             sendMessage(
                                     "You need a slayer level of 15 to slay banshees.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cave slime")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cave slime")) {
                         if (playerLevel[18] < 17) {
                             sendMessage(
                                     "You need a slayer level of 17 to slay cave slimes.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("rockslug")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("rockslug")) {
                         if (playerLevel[18] < 20) {
                             sendMessage(
                                     "You need a slayer level of 20 to slay rockslugs.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cockatrice")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cockatrice")) {
                         if (playerLevel[18] < 25) {
                             sendMessage(
                                     "You need a slayer level of 25 to slay cockatrices.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("pyrefiend")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("pyrefiend")) {
                         if (playerLevel[18] < 30) {
                             sendMessage(
                                     "You need a slayer level of 30 to slay Pyrefiends.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("basalisk")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("basalisk")) {
                         if (playerLevel[18] < 40) {
                             sendMessage(
                                     "You need a slayer level of 40 to slay Basalisks.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("infernal mage")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("infernal mage")) {
                         if (playerLevel[18] < 45) {
                             sendMessage(
                                     "You need a slayer level of 45 to slay Infernal Mages.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("bloodveld")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("bloodveld")) {
                         if (playerLevel[18] < 50) {
                             sendMessage(
                                     "You need a slayer level of 50 to slay Bloodvelds.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("jelly")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("jelly")) {
                         if (playerLevel[18] < 52) {
                             sendMessage(
                                     "You need a slayer level of 52 to slay Jellys.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("turoth")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("turoth")) {
                         if (playerLevel[18] < 55) {
                             sendMessage(
                                     "You need a slayer level of 55 to slay Turoths.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("aberrant spectre")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("aberrant spectre")) {
                         if (playerLevel[18] < 60) {
                             sendMessage(
                                     "You need a slayer level of 60 to slay Aberrant spectres.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("dust devil")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("dust devil")) {
                         if (playerLevel[18] < 65) {
                             sendMessage(
                                     "You need a slayer level of 65 to slay dust Devils.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("kurask")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("kurask")) {
                         if (playerLevel[18] < 70) {
                             sendMessage(
                                     "You need a slayer level of 70 to slay Kurasks.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("skeletal wyvern")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("skeletal wyvern")) {
                         if (playerLevel[18] < 72) {
                             sendMessage(
                                     "You need a slayer level of 72 to slay skeletal wyverns.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("gargoyle")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("gargoyle")) {
                         if (playerLevel[18] < 75) {
                             sendMessage(
                                     "You need a slayer level of 75 to slay gargoyles.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("Nechryael")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("Nechryael")) {
                         if (playerLevel[18] < 80) {
                             sendMessage(
                                     "You need a slayer level of 80 to slay Nechryaels.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("Abyssal Demon")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("Abyssal Demon")) {
                         if (playerLevel[18] < 85) {
                             sendMessage(
                                     "You need a slayer level of 85 to slay Abyssal Demons.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("dark beast")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("dark beast")) {
                         if (playerLevel[18] < 90) {
                             sendMessage(
                                     "You need a slayer level of 90 to slay Dark Beasts.");
@@ -24494,7 +24525,7 @@ nated = Integer.parseInt(token2);
                 break;
             case 21:
                 NPCSlot = inStream.readSignedWord();
-                NPCID = NPCHandler.npcs[NPCSlot].npcType;
+                NPCID = NPCHandler.npcs[NPCSlot].index;
                 faceUpdate(NPCSlot);
                 setNext = 0;
                 FishingGo = false;
@@ -24523,7 +24554,7 @@ nated = Integer.parseInt(token2);
 
             case 18: // another npc option, do ::npc 2579 and right click and click trade ;)
                 NPCSlot = inStream.readSignedWordBigEndian();
-                NPCID = NPCHandler.npcs[NPCSlot].npcType;
+                NPCID = NPCHandler.npcs[NPCSlot].index;
                 faceUpdate(NPCSlot);
                 setNext = 0;
                 FishingGo = false;
@@ -24725,7 +24756,7 @@ nated = Integer.parseInt(token2);
                 int itemid2 = inStream.readSignedWordA();//itemID
                 int NPCSlot2 = inStream.readSignedWordA();//NpcSlot
                 int ItemSlot2 = inStream.readSignedWordBigEndian();//ItemSlot
-                int NPCID2 = NPCHandler.npcs[NPCSlot2].npcType;
+                int NPCID2 = NPCHandler.npcs[NPCSlot2].index;
                 if (NPCSlot2 >= NPCHandler.npcs.length || NPCSlot2 < 0)
                     return;
                 if (!playerHasItem(itemid2)) {
@@ -27198,7 +27229,7 @@ nated = Integer.parseInt(token2);
                         Cant = true;
                         sendMessage("You can't attack a dueling npc!");
                     }
-                    if (npc.npcType == 4291) {
+                    if (npc.index == 4291) {
                         if (Boundary.isIn(this, WarriorsGuild.CYCLOPS_BOUNDARY)) {
                             if (!getWarriorsGuild().isActive()) {
                                 sendMessage("You cannot attack a cyclops without talking to kamfreena.");
@@ -27206,147 +27237,147 @@ nated = Integer.parseInt(token2);
                             }
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("crawling hand")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("crawling hand")) {
                         if (playerLevel[18] < 5) {
                             sendMessage(
                                     "You need a slayer level of 5 to slay crawling hands.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cave bug")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cave bug")) {
                         if (playerLevel[18] < 7) {
                             sendMessage(
                                     "You need a slayer level of 7 to slay cave bugs.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cave crawler")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cave crawler")) {
                         if (playerLevel[18] < 10) {
                             sendMessage(
                                     "You need a slayer level of 10 to slay cave crawlers.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("banshee")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("banshee")) {
                         if (playerLevel[18] < 15) {
                             sendMessage(
                                     "You need a slayer level of 15 to slay banshees.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cave slime")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cave slime")) {
                         if (playerLevel[18] < 17) {
                             sendMessage(
                                     "You need a slayer level of 17 to slay cave slimes.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("rockslug")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("rockslug")) {
                         if (playerLevel[18] < 20) {
                             sendMessage(
                                     "You need a slayer level of 20 to slay rockslugs.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("cockatrice")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("cockatrice")) {
                         if (playerLevel[18] < 25) {
                             sendMessage(
                                     "You need a slayer level of 25 to slay cockatrices.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("pyrefiend")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("pyrefiend")) {
                         if (playerLevel[18] < 30) {
                             sendMessage(
                                     "You need a slayer level of 30 to slay Pyrefiends.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("basalisk")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("basalisk")) {
                         if (playerLevel[18] < 40) {
                             sendMessage(
                                     "You need a slayer level of 40 to slay Basalisks.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("infernal mage")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("infernal mage")) {
                         if (playerLevel[18] < 45) {
                             sendMessage(
                                     "You need a slayer level of 45 to slay Infernal Mages.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("bloodveld")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("bloodveld")) {
                         if (playerLevel[18] < 50) {
                             sendMessage(
                                     "You need a slayer level of 50 to slay Bloodvelds.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("jelly")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("jelly")) {
                         if (playerLevel[18] < 52) {
                             sendMessage(
                                     "You need a slayer level of 52 to slay Jellys.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("turoth")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("turoth")) {
                         if (playerLevel[18] < 55) {
                             sendMessage(
                                     "You need a slayer level of 55 to slay Turoths.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("aberrant spectre")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("aberrant spectre")) {
                         if (playerLevel[18] < 60) {
                             sendMessage(
                                     "You need a slayer level of 60 to slay Aberrant spectres.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("dust devil")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("dust devil")) {
                         if (playerLevel[18] < 65) {
                             sendMessage(
                                     "You need a slayer level of 65 to slay dust Devils.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("kurask")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("kurask")) {
                         if (playerLevel[18] < 70) {
                             sendMessage(
                                     "You need a slayer level of 70 to slay Kurasks.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("skeletal wyvern")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("skeletal wyvern")) {
                         if (playerLevel[18] < 72) {
                             sendMessage(
                                     "You need a slayer level of 72 to slay skeletal wyverns.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("gargoyle")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("gargoyle")) {
                         if (playerLevel[18] < 75) {
                             sendMessage(
                                     "You need a slayer level of 75 to slay gargoyles.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("Nechryael")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("Nechryael")) {
                         if (playerLevel[18] < 80) {
                             sendMessage(
                                     "You need a slayer level of 80 to slay Nechryaels.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("Abyssal Demon")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("Abyssal Demon")) {
                         if (playerLevel[18] < 85) {
                             sendMessage(
                                     "You need a slayer level of 85 to slay Abyssal Demons.");
                             return;
                         }
                     }
-                    if (NPCCacheDefinition.forID(npc.npcType).getName().equalsIgnoreCase("dark beast")) {
+                    if (NPCCacheDefinition.forID(npc.index).getName().equalsIgnoreCase("dark beast")) {
                         if (playerLevel[18] < 90) {
                             sendMessage(
                                     "You need a slayer level of 90 to slay Dark Beasts.");
@@ -28057,8 +28088,8 @@ nated = Integer.parseInt(token2);
     }
 
     private void handleItemOnNPC(int npcId, int itemId, int itemSlot2) {
-        getPets().feedPet(this, NPCHandler.npcs[npcId].npcType, itemId);
-        switch(NPCHandler.npcs[npcId].npcType){
+        getPets().feedPet(this, NPCHandler.npcs[npcId].index, itemId);
+        switch(NPCHandler.npcs[npcId].index){
             case 43:
                 NPCHandler.npcs[npcId].shearSheep(this, 1735, 1737, 893, 43, 42, 50);
 
@@ -28815,10 +28846,6 @@ nated = Integer.parseInt(token2);
         return true;
     }
 
-    private void appendSetFocusDestination(stream str) {
-        str.writeWordBigEndianA(FocusPointX);
-        str.writeWordBigEndian(FocusPointY);
-    }
 
     public void PKz() {
         if (PlayerHandler.players[KillerId] != null) {
@@ -32584,9 +32611,9 @@ nated = Integer.parseInt(token2);
                         actionTimer = 7;
 
 // Play block sound and animation
-                        sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].npcType), 4, 0);
-                        NPCHandler.npcs[attacknpc].animNumber = server.npcHandler.GetNPCBlockAnim(
-                                NPCHandler.npcs[attacknpc].npcType);
+                        sendSound(server.npcHandler.getNpcBlockSound(NPCHandler.npcs[attacknpc].index), 4, 0);
+                        NPCHandler.npcs[attacknpc].animationRequest = server.npcHandler.GetNPCBlockAnim(
+                                NPCHandler.npcs[attacknpc].index);
 
                     } else if (UseBow) {
                         if (!HasArrows) {
@@ -32617,8 +32644,8 @@ nated = Integer.parseInt(token2);
                             teleportToX = absX;
                             teleportToY = absY;
                             actionTimer = AnimationLength.getFrameLength(GetWepAnim());
-                            NPCHandler.npcs[attacknpc].animNumber = server.npcHandler.GetNPCBlockAnim(
-                                    NPCHandler.npcs[attacknpc].npcType);
+                            NPCHandler.npcs[attacknpc].animationRequest = server.npcHandler.GetNPCBlockAnim(
+                                    NPCHandler.npcs[attacknpc].index);
                         }
                     }
 
@@ -32673,7 +32700,7 @@ nated = Integer.parseInt(token2);
             if (NPCHandler.npcs[i] != null) {
                 if (NPCHandler.npcs[i].absX == coordX
                         && NPCHandler.npcs[i].absY == coordY) {
-                    return NPCHandler.npcs[i].npcType;
+                    return NPCHandler.npcs[i].index;
                 }
             }
         }

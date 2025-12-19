@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class NPC {
+public class NPC extends Entity {
     public final int[][] fearShadow = new int[100][100];
     public final int[][] CONTAIN_THIS = new int[2][2];
     public boolean faceUpdateRequired;
@@ -15,14 +15,11 @@ public class NPC {
      */
     //public int FocusPointX = -1, FocusPointY = -1;
     //public int face = 0;
-    public int npcType;
     public boolean fighting = false;
-    public int focusPointX, focusPointY;
     public int hitDiff2 = 0;
     public boolean hitUpdateRequired2;
     public int PoisonDelay = 999999;
     public int PoisonClear = 0;
-    public int absX, absY;
     public int heightLevel;
     public boolean FaceDirection;
     public int FocusPointX;
@@ -36,14 +33,12 @@ public class NPC {
     // Inside your NPC class
     public int targetScanCooldown = 0;
     public boolean walkingHome, underAttack;
-    public int HP, MaxHP, hitDiff, MaxHit, animNumber, actionTimer, hitDelayTimer, pendingDamage,StartKilling, enemyX, enemyY;
+    public int HP, MaxHP, hitDiff, MaxHit, actionTimer, hitDelayTimer, pendingDamage,StartKilling, enemyX, enemyY;
     public boolean IsDead, DeadApply, NeedRespawn, IsUnderAttack, IsClose, Respawns, IsUnderAttackNpc, IsAttackingNPC, poisondmg, walkingToPlayer, followingPlayer;
     public int[] Killing = new int[PlayerHandler.maxPlayers];
     public boolean RandomWalk;
     public boolean dirUpdateRequired;
-    public boolean animUpdateRequired;
     public boolean hitUpdateRequired;
-    public boolean updateRequired;
     public boolean textUpdateRequired;
     public boolean faceToUpdateRequired;
     public boolean attackable = true;
@@ -98,7 +93,7 @@ public class NPC {
     public Queue<int[]> walkingQueue = new LinkedList<>();
     public NPC(int _npcId, int _npcType) {
         npcId = _npcId;
-        npcType = _npcType;
+        index = _npcType;
         direction = -1;
         IsDead = false;
         DeadApply = false;
@@ -220,7 +215,7 @@ public class NPC {
     }
 
     public int getNPCSize() {
-        return NPCSize.getNPCSize(npcType);
+        return NPCSize.getNPCSize(index);
     }
 
     public String Glod() {
@@ -276,7 +271,7 @@ public class NPC {
     }
 
     public boolean animals() {
-        switch (npcType) {
+        switch (index) {
             case 5103:
             case 5104:
             case 5105:
@@ -367,7 +362,7 @@ public class NPC {
         }
 
         // Write update blocks in correct order
-        if (animUpdateRequired) appendAnimUpdate(str);
+        if (animationRequest != -1) appendAnimationRequest(str);
         if (!IsDead && hitUpdateRequired2) appendHitUpdate2(str);
         if (gfxUpdateRequired) appendMask80Update(str);
         if (faceEntityUpdateRequired) appendFaceEntity(str);
@@ -380,7 +375,7 @@ public class NPC {
     }
     private int buildUpdateMask() {
         int mask = 0;
-        if (animUpdateRequired) mask |= 0x10;
+        if (animationRequest != -1) mask |= 0x10;
         if (hitUpdateRequired2) mask |= 0x08;
         if (gfxUpdateRequired) mask |= 0x80;
         if (faceEntityUpdateRequired) mask |= 0x20;
@@ -435,13 +430,13 @@ public class NPC {
     }
     public void requestPetTransform(int id) {
         transformId = id;
-        npcType = id;
+        index = id;
         transformUpdateRequired = true;
         updateRequired = true;
     }
     public void clearUpdateFlags() {
         updateRequired = false;
-        animUpdateRequired = false;
+        animationUpdateRequired = false;
         hitUpdateRequired2 = false;
         gfxUpdateRequired = false;
         faceEntityUpdateRequired = false;
@@ -453,8 +448,8 @@ public class NPC {
         moveY = 0;
         teleporting = false;
         direction = -1;
-        focusPointX = -1;
-        focusPointY = -1;
+        FocusPointX = -1;
+        FocusPointY = -1;
     }
 
 
@@ -483,6 +478,7 @@ public class NPC {
     public void appendFaceEntity(stream str) {
         str.writeUnsignedWord(face);
     }
+    @Override
     protected void appendHitUpdate(stream str) {
         HP -= hitDiff;
         if (HP <= 0) {
@@ -506,7 +502,7 @@ public class NPC {
         poisondmg = false;
     }
 
-
+    @Override
     protected void appendHitUpdate2(stream str) {
         HP -= hitDiff2;
         if (HP <= 0) {
@@ -538,7 +534,8 @@ public class NPC {
         FaceDirection = true;
     }
 
-    private void appendSetFocusDestination(stream stream1) {
+    @Override
+    protected void appendSetFocusDestination(stream stream1) {
         if (stream1 != null) {
             stream1.writeWordBigEndian(FocusPointX);
             stream1.writeWordBigEndian(FocusPointY);
@@ -546,9 +543,9 @@ public class NPC {
     }
 
 
-    public void appendAnimUpdate(stream str) {
-        str.writeWordBigEndian(animNumber);
-        str.writeByte(1);
+    public void appendAnimationRequest(stream str) {
+        str.writeWordBigEndian((animationRequest==-1) ? 65535 : animationRequest);
+        str.writeByte(animationWaitCycles);
     }
     public void appendTransformUpdate(stream str) {
         str.writeWordBigEndianA(transformId);
@@ -594,7 +591,7 @@ public class NPC {
 
     public int getId() {
         // TODO Auto-generated method stub
-        return npcType;
+        return index;
     }
 
     public int getProjectileDelay () {
@@ -606,7 +603,8 @@ public class NPC {
     }
 
     public void startAnimation(int i) {
-        animNumber = i;
-        animUpdateRequired = true;
+        animationRequest = i;
+        updateRequired = true;
+        animationUpdateRequired = true;
     }
 }

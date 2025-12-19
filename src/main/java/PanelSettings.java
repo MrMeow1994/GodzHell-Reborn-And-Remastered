@@ -241,7 +241,7 @@ public class PanelSettings {
                 for (int i = 0; i < Config.MAX_NPCS; i++) {
                     if (validNpc(i)) {
                         NPC n = getNpc(i);
-                        if(inList(""+n.npcType))
+                        if(inList(""+n.index))
                             n.forceChat(p.FORCE_NPCS_CHAT_TEXT.getText());
                     }
                 }
@@ -260,8 +260,8 @@ public class PanelSettings {
                 for (int i = 0; i < Config.MAX_NPCS; i++) {
                     if (validNpc(i)) {
                         NPC n = getNpc(i);
-                        if (inList(""+n.npcType)) {
-                            n.animNumber = Integer.parseInt(p.NPC_ANIMATION_TEXT.getText());
+                        if (inList(""+n.index)) {
+                            n.animationRequest = Integer.parseInt(p.NPC_ANIMATION_TEXT.getText());
                             n.updateRequired = true;
                         }
                     }
@@ -270,7 +270,7 @@ public class PanelSettings {
                 for (int i = 0; i < Config.MAX_NPCS; i++) {
                     if (validNpc(i)) {
                         NPC n = getNpc(i);
-                        n.animNumber = Integer.parseInt(p.NPC_ANIMATION_TEXT.getText());
+                        n.animationRequest = Integer.parseInt(p.NPC_ANIMATION_TEXT.getText());
                         n.updateRequired = true;
                     }
                 }
@@ -307,7 +307,7 @@ public class PanelSettings {
                 NPC n = server.npcHandler.npcs[i];
                 if (n != null) {
                     for (int k : SKIP_NPCS) {
-                        if (n.npcType == k) {
+                        if (n.index == k) {
                             skip = true;
                         }
                     }

@@ -286,7 +286,7 @@ public class DwarfMultiCannon {
 		int myY = players.cannonBaseY;
 		int theirX = npc.absX;
 		int theirY = npc.absY;
-		if (!npc.IsDead && npc.heightLevel == height && !npc.IsDead && npc.HP != 0 && npc.npcType != 1266 && npc.npcType != 1268) {
+		if (!npc.IsDead && npc.heightLevel == height && !npc.IsDead && npc.HP != 0 && npc.index != 1266 && npc.index != 1268) {
 			switch (players.rotation) {
 				case 1: //north
 					if(theirY > myY && theirX >= myX - 1 && theirX <= myX + 1)

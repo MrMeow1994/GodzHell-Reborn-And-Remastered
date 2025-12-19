@@ -37,8 +37,8 @@ public class NpcVsNpc {
 
 
 		// Set animation
-		attacker.animNumber = server.npcHandler.getNpcAttackAnimation(attacker.npcId);
-		attacker.animUpdateRequired = true;
+		attacker.animationRequest = server.npcHandler.getNpcAttackAnimation(attacker.npcId);
+		attacker.animationUpdateRequired = true;
 		attacker.updateRequired = true;
 
 		// Set delay before next attack
@@ -58,8 +58,8 @@ public class NpcVsNpc {
 			int maxHit = getNpcRangeAttack(attacker.npcId);
 			int hit = random.nextInt(maxHit + 1);
 
-			attacker.animNumber =  server.npcHandler.getNpcAttackAnimation(attacker.npcId);
-			attacker.animUpdateRequired = true;
+			attacker.animationRequest =  server.npcHandler.getNpcAttackAnimation(attacker.npcId);
+			attacker.animationUpdateRequired = true;
 			target.dealDoubleDamage(hit, 0, Hitmark.HIT); // Again, your NPC class needs this
 			//System.out.println(attacker.npcId + " ranges " + target.npcId + " for " + hit + " damage.");
 		} catch (Exception e) {

@@ -148,7 +148,7 @@ public class Slayer {
         if (taskAmount == 0) {
             return;
         }
-        final NPCCacheDefinition def = NPCCacheDefinition.forID(npc.npcType);
+        final NPCCacheDefinition def = NPCCacheDefinition.forID(npc.index);
         task.ifPresent(task -> {
             String name = def.getName().toLowerCase().replace("_", " ");
 
