@@ -336,6 +336,23 @@ public class Boundary {
             new Boundary(3332, 3244, 3359, 3259),
             new Boundary(3364, 3244, 3389, 3259)
     };
+    public static final Boundary[] dog_ofwar = {
+            new Boundary(1858, 5237, 1866, 5245),
+            new Boundary(1857, 5232, 1860, 5238),
+            new Boundary(1858, 5213, 1866, 5231),
+            new Boundary(1867, 5225, 1874, 5245),
+            new Boundary(1875, 5237, 1887, 5246),
+            new Boundary(1888, 5240, 1902, 5246),
+            new Boundary(1903, 5234, 1915, 5245),
+            new Boundary(1875, 5228, 1885, 5236),
+            new Boundary(1887, 5226, 1902, 5239),
+            new Boundary(1856, 5199, 1867, 5212),
+            new Boundary(1857, 5185, 1878, 5198),
+            new Boundary(1871, 5199, 1897, 5225),
+            new Boundary(1879, 5184, 1907, 5198),
+            new Boundary(1898, 5199, 1913, 5211),
+            new Boundary(1901, 5212, 1915, 5230)
+    };
     public static final Boundary[] BANKS = new Boundary[] {
             new Boundary(3091, 3488, 3098, 3499),
             new Boundary(3180, 3433, 3190, 3447),

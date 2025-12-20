@@ -49,12 +49,19 @@ public class TextHandler {
         p.getPA().sendQuest("@whi@No", 960);
         p.getPA().sendQuest("@whi@Yes", 959);
         p.getPA().sendQuest("@gre@Split Chat", 956);
-        p.getPA().sendQuest("@whi@", 940);
-        p.getPA().sendQuest("@whi@", 946);
-        p.getPA().sendQuest("@whi@", 947);
-        p.getPA().sendQuest("@whi@", 948);
-        p.getPA().sendQuest("@whi@", 949);
-        p.getPA().sendQuest("@whi@", 950);
+        p.getPA().sendQuest("@gre@Accept Aid",  12463);
+        p.getPA().sendQuest("@gre@Music\\n@gre@Volume",  929);
+        p.getPA().sendQuest("@gre@Effect\\n@gre@Volume",  940);
+        p.getPA().sendQuest("@whi@Off", 935);
+        p.getPA().sendQuest("@whi@Off", 946);
+        p.getPA().sendQuest("@whi@1", 936);
+        p.getPA().sendQuest("@whi@1", 947);
+        p.getPA().sendQuest("@whi@2", 937);
+        p.getPA().sendQuest("@whi@2", 948);
+        p.getPA().sendQuest("@whi@3", 938);
+        p.getPA().sendQuest("@whi@3", 949);
+        p.getPA().sendQuest("@whi@4", 939);
+        p.getPA().sendQuest("@whi@4", 950);
         p.getPA().sendQuest("      @whi@Teleports", 174);
 
         p.getPA().sendQuest(" Change your character looks!", 3649);

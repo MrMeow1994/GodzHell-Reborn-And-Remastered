@@ -824,6 +824,17 @@ public class PlayerHandler {
         playerData.setFriends(plr.friends);
         playerData.setIgnores(plr.ignores);
         playerData.setColorMeta(plr.getColorManager().getItems());
+        if (plr instanceof client) {
+            client target = (client) plr;
+            playerData.setUnlockedMusic(target.getMusic().getUnlockedMusic());
+            playerData.setMusicVolume(target.musicVolume);
+            playerData.setSoundVolume(target.soundVolume);
+            playerData.setChateffects(target.chateffects);
+            playerData.setMousebuttons(target.mousebuttons);
+            playerData.setSplitchat(target.splitchat);
+            playerData.setBrightness(target.brightness);
+            playerData.setAcceptaid(target.acceptaid);
+        }
         // Convert the PlayerData object to JSON and save it to a file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("./Data/characters/" + plr.playerName + ".json")) {

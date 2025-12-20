@@ -84,6 +84,9 @@ public abstract class Entity {
         if(Boundary.isIn( this, Boundary.TAVERLY_BOUNDARY)){
             return true;
         }
+        if(Boundary.isIn( this, Boundary.dog_ofwar)){
+            return true;
+        }
         if(Boundary.isIn( this, Boundary.TZHAAR_CITY_BOUNDARY)){
             return true;
         }

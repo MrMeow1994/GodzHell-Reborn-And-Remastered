@@ -1878,6 +1878,13 @@ public abstract class Player extends Entity {
 	public int playerMD = -1;
 	public int viewToX = -1;
 	public int viewToY = -1;
+	public int musicVolume;
+	public int soundVolume;
+	public int chateffects;
+	public int mousebuttons;
+	public int splitchat;
+	public int brightness = 1;
+	public int acceptaid;
 	protected boolean dirUpdateRequired = false;
 	protected boolean dirUpdate2Required = false;
 	public boolean IsCutting = false;

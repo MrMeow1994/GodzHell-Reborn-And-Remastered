@@ -11,6 +11,7 @@ public class clickingMost {
         QuestAssistant.questButtons(c, c.actionButtonId);
         c.getGlassBlowing().handleActionButtin(c.actionButtonId);
         c.getSmithing().getBar(c, c.actionButtonId);
+        c.getMusic().handleMusicButtons(c.actionButtonId);
         SummoningPouch.makePouch(c, c.actionButtonId);
         if (c.playerIsfFetching) {
             Fletching.attemptData(c, c.actionButtonId);
@@ -793,7 +794,139 @@ public class clickingMost {
             case 28172:
             case 28178:
                 break;
+            case 3162:
+                if(c.musicVolume != 4){
+                    c.musicVolume = 4;
+                    c.getPA().sendConfig(168, c.musicVolume);
+                }
+                break;
+            case 3163:
+                if(c.musicVolume != 3){
+                    c.musicVolume = 3;
+                    c.getPA().sendConfig(168, c.musicVolume);
+                }
+                break;
+            case 3164:
+                if(c.musicVolume != 2){
+                    c.musicVolume = 2;
+                    c.getPA().sendConfig(168, c.musicVolume);
+                }
+                break;
+            case 3165:
+                if(c.musicVolume != 1){
+                    c.musicVolume = 1;
+                    c.getPA().sendConfig(168, c.musicVolume);
+                }
+                break;
+            case 3166:
+                if(c.musicVolume != 0){
+                    c.musicVolume = 0;
+                    c.getPA().sendConfig(168, c.musicVolume);
+                }
+                break;
+            case 3148:
+                if(c.chateffects != 1){
+                    c.chateffects = 1;
+                    c.getPA().sendConfig(171, c.chateffects);
+                }
+                break;
+            case 3147:
+                if(c.chateffects != 0){
+                    c.chateffects = 0;
+                    c.getPA().sendConfig(171, c.chateffects);
+                }
+                break;
+            case 3146:
+                if(c.mousebuttons != 1){
+                    c.mousebuttons = 1;
+                    c.getPA().sendConfig(170, c.mousebuttons);
+                }
+                break;
+            case 3145:
+                if(c.mousebuttons != 0){
+                    c.mousebuttons = 0;
+                    c.getPA().sendConfig(170, c.mousebuttons);
+                }
+                break;
+            case 3189:
+                if(c.splitchat != 1){
+                    c.splitchat = 1;
+                    c.getPA().sendConfig(287, c.splitchat);
+                }
+                break;
+            case 3190:
+                if(c.splitchat != 0){
+                    c.splitchat = 0;
+                    c.getPA().sendConfig(287, c.splitchat);
+                }
+                break;
+            case 3173:
+                if(c.soundVolume != 4){
+                    c.soundVolume = 4;
+                    c.getPA().sendConfig(169, c.soundVolume);
+                }
+                break;
+            case 3174:
+                if(c.soundVolume != 3){
+                    c.soundVolume = 3;
+                    c.getPA().sendConfig(169, c.soundVolume);
+                }
+                break;
+            case 3175:
+                if(c.soundVolume != 2){
+                    c.soundVolume = 2;
+                    c.getPA().sendConfig(169, c.soundVolume);
+                }
+                break;
+            case 3176:
+                if(c.soundVolume != 1){
+                    c.soundVolume = 1;
+                    c.getPA().sendConfig(169, c.soundVolume);
+                }
+                break;
+            case 3177:
+                if(c.soundVolume != 0){
+                    c.soundVolume = 0;
+                    c.getPA().sendConfig(169, c.soundVolume);
+                }
+                break;
 
+            case 3138:
+                if(c.brightness != 1){
+                    c.brightness = 1;
+                    c.getPA().sendConfig(166, c.brightness);
+                }
+                break;
+            case 3140:
+                if(c.brightness != 2){
+                    c.brightness = 2;
+                    c.getPA().sendConfig(166, c.brightness);
+                }
+                break;
+            case 3142:
+                if(c.brightness != 3){
+                    c.brightness = 3;
+                    c.getPA().sendConfig(166, c.brightness);
+                }
+                break;
+            case 3144:
+                if(c.brightness != 4){
+                    c.brightness = 4;
+                    c.getPA().sendConfig(166, c.brightness);
+                }
+                break;
+            case 48176:
+                if(c.acceptaid != 1){
+                    c.acceptaid = 1;
+                    c.getPA().sendConfig(427, c.acceptaid);
+                }
+                break;
+            case 48177:
+                if(c.acceptaid != 0){
+                    c.acceptaid = 0;
+                    c.getPA().sendConfig(427, c.acceptaid);
+                }
+                break;
             case 28173:
             case 28174:
             case 28169:
@@ -2236,13 +2369,6 @@ public class clickingMost {
                 c.getPA().setSidebarInterface(0, 328);
                 break;
 
-            case 3162:
-                c.InWildrange = true;
-                break;
-
-            case 3163:
-                c.InWildrange = false;
-                break;
 
             case 24135: // Clue debug set to on
             {

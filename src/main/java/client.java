@@ -343,6 +343,7 @@ public static final int bufferSize = 20000;
     public int PickUpDelete = 0;
     public int CombatExpRate = 1;
     public int SkillID = 0;
+
     public boolean WildernessWarning = false;
     public boolean superRestore = false;
     public int abc;
@@ -533,6 +534,12 @@ public static final int bufferSize = 20000;
     public int playerAttackingIndex;
     private int hitsoundmagic = 0;
     private long lastClanTeleport;
+    private MusicManager music = new MusicManager (this);
+    public MusicManager getMusic() {
+        // TODO Auto-generated method stub
+        return music;
+    }
+
     public PlayerAssistant getPA() {
         return playerAssistant;
     }
@@ -9339,18 +9346,37 @@ public void setHouse(House house) {
     }
 
     public void createNewTileObject(int x, int y, int typeID, int orientation, int tileObjectType) {
-        if(getOutStream() != null) {
-            getOutStream().createFrame(85);
-            getOutStream().writeByteC(y - (mapRegionY * 8));
-            getOutStream().writeByteC(x - (mapRegionX * 8));
 
-            getOutStream().createFrame(151);
-            // getOutStream().writeByteA(((x&7) << 4) + (y&7));
-            getOutStream().writeByteA(0);
-            getOutStream().writeWordBigEndian(typeID);
-            getOutStream().writeByteS((tileObjectType << 2) + (orientation & 3));
+        if (getOutStream() == null) {
+            return;
         }
+
+        // Convert to local region coords
+        int localX = x - (mapRegionX * 8);
+        int localY = y - (mapRegionY * 8);
+
+        // Invalid for this region → don't send
+        if (localX < 0 || localX > 255 || localY < 0 || localY > 255) {
+            return;
+        }
+
+        // Prevent buffer overflow (VERY important)
+        if (getOutStream().currentOffset + 7 >= getOutStream().buffer.length) {
+            flushOutStream(); // or writePacket/reset depending on your base
+        }
+
+        // Set tile position
+        getOutStream().createFrame(85);
+        getOutStream().writeByteC(localY);
+        getOutStream().writeByteC(localX);
+
+        // Create object
+        getOutStream().createFrame(151);
+        getOutStream().writeByteA(0); // usually object offset
+        getOutStream().writeWordBigEndian(typeID);
+        getOutStream().writeByteS((tileObjectType << 2) | (orientation & 3));
     }
+
 
     public void createAddMap() {
     }
@@ -12250,6 +12276,15 @@ public void setHouse(House house) {
                 }
             }
 
+        }
+        if (command.startsWith("reloadmusic") && playerName.equalsIgnoreCase("sgsrocks")) {
+            try {
+                new MusicLoader().load();
+                sendMessage("music reloaded", 255);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
         if (command.startsWith("reloadshops") && playerName.equalsIgnoreCase("sgsrocks")) {
             server.shopHandler = null;
@@ -19973,10 +20008,19 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         refreshSkills();
         server.lottery.checkUnclaimedWinners(this);
         // WriteWildyLevel();
-
+        if(brightness == 0){
+            brightness = 1;
+        }
         getOutStream().createFrame(107); // resets something in the client
         getPA().sendConfig(173, runningToggled ? 1 : 0);
         getPA().sendConfig(172, autoRet);
+        getPA().sendConfig(166, brightness);
+        getPA().sendConfig(168, musicVolume);
+        getPA().sendConfig(169, soundVolume);
+        getPA().sendConfig(170, mousebuttons);
+        getPA().sendConfig(287, splitchat);
+        getPA().sendConfig(171, chateffects);
+        getPA().sendConfig(427, acceptaid);
         getPA().sendFrame126(runEnergy+"%", 149);
         getPA().setSidebarInterface(1, 3917);
         getPA().setSidebarInterface(2, 638);
@@ -20009,6 +20053,8 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().setSidebarInterface(12, 147);
         getPA().setSidebarInterface(13, 962);
         getPA().setSidebarInterface(0, 2423);
+        getMusic().load();
+        getMusic().updateRegionMusic(getRegionId());
         QuestAssistant.sendStages(this);
 
         // add player commands...
@@ -22515,6 +22561,7 @@ nated = Integer.parseInt(token2);
             case 202:
                 break;
             case 210: // loads new area
+                    getMusic().updateRegionMusic(getRegionId());
                 server.getGlobalObjects().updateRegionObjects(this);
                 if (IsAttackingNPC || showedFire || showedUnfire || isTeleporting) {
                     aggrotimer = System.currentTimeMillis();
@@ -25621,6 +25668,7 @@ nated = Integer.parseInt(token2);
                 if (misc.distance(absX, absY, finalX, finalY) < 35) {
                     PathFinder.getPathFinder().findRoute(this, finalX, finalY, true, 0, 0);
                 }
+                getMusic().updateRegionMusic(getRegionId());
                 break;
 
 
@@ -28003,6 +28051,7 @@ nated = Integer.parseInt(token2);
 
             case 185: // clicking most buttons
                 actionButtonId = misc.HexToInt(inStream.buffer, 0, packetSize);
+                int realButtonId = inStream.readUnsignedWord();
                 server.clickingMost.clicking(this.index);
                 switch (actionButtonId) {
 
@@ -28010,7 +28059,7 @@ nated = Integer.parseInt(token2);
                     default:
                         parseIncomingPackets2();
                         // System.out.println("Player stands in: X="+absX+" Y="+absY);
-                        println_debug("Case 185: Action Button: " + actionButtonId);
+                        println_debug("Case 185: Action Button: " + actionButtonId+", Real id: "+realButtonId);
                         break;
                 }
                 break;
@@ -36047,6 +36096,16 @@ public int GetGLCLConstruction(int ItemID) {
             if (playerData.getColorMeta() != null) {
                 this.getColorManager().setColorItems(playerData.getColorMeta());
             }
+            if (playerData.getUnlockedMusic() != null) {
+                getMusic().unlockedMusics = playerData.getUnlockedMusic();
+            }
+            this.musicVolume = playerData.getMusicVolume();
+            this.soundVolume = playerData.getSoundVolume();
+            this.chateffects = playerData.getChateffects();
+            this.mousebuttons = playerData.getMousebuttons();
+            this.splitchat = playerData.getSplitchat();
+            this.brightness = playerData.getBrightness();
+            this.acceptaid = playerData.getAcceptaid();
             return 1; // Success
 
         } catch (FileNotFoundException e) {
@@ -36121,7 +36180,14 @@ public int GetGLCLConstruction(int ItemID) {
         playerData.setFriends(friends);
         playerData.setIgnores(ignores);
         playerData.setColorMeta(getColorManager().getItems());
-
+        playerData.setUnlockedMusic(getMusic().getUnlockedMusic());
+        playerData.setMusicVolume(musicVolume);
+        playerData.setSoundVolume(soundVolume);
+        playerData.setChateffects(chateffects);
+        playerData.setMousebuttons(mousebuttons);
+        playerData.setSplitchat(splitchat);
+        playerData.setBrightness(brightness);
+        playerData.setAcceptaid(acceptaid);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("./Data/characters/" + playerName + ".json")) {
             gson.toJson(playerData, writer);
@@ -36399,6 +36465,12 @@ public int GetGLCLConstruction(int ItemID) {
         SkillHandler.resetPlayerSkillVariables(this);
     }
 
+    public int getRegionId() {
+        int regionX = absX >> 3;
+        int regionY = absY >> 3;
+        int regionId = (regionX / 8 << 8) + regionY / 8;
+        return regionId;
+    }
     public void resetAllActions() {
         if (face > 0) {
             ResetAttack();

@@ -1,0 +1,408 @@
+[
+  {
+    "region": 12851,
+    "name": "Autumn Voyage",
+    "song": 2,
+    "frame": 46435,
+    "button": 181099
+  },
+  {
+    "region": 12850,
+    "name": "Harmony",
+    "song": 76,
+    "frame":  46703,
+    "button": 182111
+  },
+  {
+    "region": 12849,
+    "name": "Yesteryear",
+    "song": 145,
+    "frame": 47191,
+    "button": 184087
+  },
+  {
+    "region": 12593,
+    "name": "Book Of Spells",
+    "song": 64,
+    "frame": 46466,
+    "button": 181130
+  },
+  {
+    "region": 12594,
+    "name": "Dream",
+    "song": 327,
+    "frame": 46595,
+    "button": 182003
+  },
+  {
+    "region": 12595,
+    "name": "Flute Salad",
+    "song": 163,
+    "frame": 46644,
+    "button": 182052
+  },
+  {
+    "region": 12596,
+    "name": "Greatness",
+    "song": 116,
+    "frame": 46689,
+    "button": 182097
+  },
+  {
+    "region": 12340,
+    "name": "Spooky",
+    "song": 333,
+    "frame": 46997,
+    "button": 183149
+  },
+  {
+    "region": 12339,
+    "name": "Start",
+    "song": 151,
+    "frame":  47003,
+    "button": 183155
+  },
+  {
+    "region": 12338,
+    "name": "Unknown Land",
+    "song": 3,
+    "frame": 47143,
+    "button": 184039
+  },
+  {
+    "region": 12337,
+    "name": "Vision",
+    "song": 85,
+    "frame": 47153,
+    "button": 184049
+  },
+  {
+    "region": 12341,
+    "name": "Barbarianism",
+    "song": 141,
+    "frame": 46446,
+    "button": 181110
+  },
+  {
+    "region": 14631,
+    "name": "Scape Main",
+    "song": 16,
+    "frame": 46948,
+    "button": 183100
+  },
+  {
+    "region": 14630,
+    "name": "Scape Original",
+    "song": 400,
+    "frame": 46949,
+    "button": 183101
+  },
+  {
+    "region": 14635,
+    "name": "Scape Hunter",
+    "song": 207,
+    "frame": 46947,
+    "button": 183099
+  },
+  {
+    "region": 8787,
+    "name": "Scape Summon",
+    "song": 457,
+    "frame": 46954,
+    "button": 183106
+  },
+  {
+    "region": 14632,
+    "name": "Scape Santa",
+    "song": 547,
+    "frame": 46951,
+    "button": 183103
+  },
+  {
+    "region": 12184,
+    "name": "Cave Background",
+    "song": 325,
+    "frame": 46487,
+    "button": 181151
+  },
+  {
+    "region": 12185,
+    "name": "Cave Background",
+    "song": 325,
+    "frame": 46487,
+    "button": 181151
+  },
+  {
+    "region": 12183,
+    "name": "Cave Background",
+    "song": 325,
+    "frame": 46487,
+    "button": 181151
+  },
+  {
+    "region": 11929,
+    "name": "Cave Background",
+    "song": 325,
+    "frame": 46487,
+    "button": 181151
+  },
+  {
+    "region": 12698,
+    "name": "Scape Cave",
+    "song": 144,
+    "frame": 46945,
+    "button": 183097
+  },
+  {
+    "region": 12954,
+    "name": "Scape Cave",
+    "song": 144,
+    "frame": 46945,
+    "button": 183097
+  },
+  {
+    "region": 13210,
+    "name": "Scape Cave",
+    "song": 144,
+    "frame": 46945,
+    "button": 183097
+  },
+  {
+    "region": 10645,
+    "name": "7th Realm",
+    "song": 363,
+    "frame": 46387,
+    "button": 181051
+  },
+  {
+    "region": 10644,
+    "name": "7th Realm",
+    "song": 363,
+    "frame": 46387,
+    "button": 181051
+  },
+  {
+    "region": 12598,
+    "name": "The Trade Parade",
+    "song": 496,
+    "frame": 47084,
+    "button": 183236
+  },
+  {
+    "region": 12597,
+    "name": "Spirit",
+    "song": 175,
+    "frame": 46994,
+    "button": 183146
+  },
+  {
+    "region": 12853,
+    "name": "Garden",
+    "song": 125,
+    "frame":  46658,
+    "button": 182066
+  },
+  {
+    "region": 13109,
+    "name": "Medieval",
+    "song": 157,
+    "frame": 46831,
+    "button": 182239
+  },
+  {
+    "region": 12852,
+    "name": "Expanse",
+    "song": 106,
+    "frame": 46620,
+    "button": 182028
+  },
+  {
+    "region": 13108,
+    "name": "Still Night",
+    "song": 111,
+    "frame": 47005,
+    "button": 183157
+  },
+  {
+    "region": 13107,
+    "name": "Arabian 2",
+    "song": 123,
+    "frame": 46414,
+    "button": 181078
+  },
+  {
+    "region": 13106,
+    "name": "Arabian",
+    "song": 36,
+    "frame": 46413,
+    "button": 181077
+  },
+  {
+    "region": 13105,
+    "name": "Al Kharid",
+    "song": 50,
+    "frame": 46402,
+    "button": 181066
+  },
+  {
+    "region": 13617,
+    "name": "Arabian",
+    "song": 36,
+    "frame": 46413,
+    "button": 181077
+  },
+  {
+    "region": 13361,
+    "name": "Al Kharid",
+    "song": 50,
+    "frame": 46402,
+    "button": 181066
+  },
+  {
+    "region": 12342,
+    "name": "Forever",
+    "song": 98,
+    "frame": 46648,
+    "button": 182056
+  },
+  {
+    "region": 12610,
+    "name": "Safety in Numbers",
+    "song": 493,
+    "frame": 46939,
+    "button": 183091
+  },
+  {
+    "region": 12081,
+    "name": "Tomorrow",
+    "song": 105,
+    "frame": 47104,
+    "button": 184000
+  },
+  {
+    "region": 12082,
+    "name": "Sea Shanty 2",
+    "song": 35,
+    "frame": 46962,
+    "button": 183114
+  },
+  {
+    "region": 12083,
+    "name": "Wander",
+    "song": 49,
+    "frame": 47183,
+    "button": 184079
+  },
+  {
+    "region": 12084,
+    "name": "Workshop",
+    "song": 15,
+    "frame": 47187,
+    "button": 184083
+  },
+  {
+    "region": 11828,
+    "name": "Fanfare",
+    "song": 72,
+    "frame": 46627,
+    "button": 182035
+  },
+  {
+    "region": 11827,
+    "name": "Nightfall",
+    "song": 127,
+    "frame": 46867,
+    "button": 183019
+  },
+  {
+    "region": 11826,
+    "name": "Long Way Home",
+    "song": 12,
+    "frame": 46804,
+    "button": 182212
+  },
+  {
+    "region": 11825,
+    "name": "Attention",
+    "song": 180,
+    "frame": 46434,
+    "button": 181098
+  },
+  {
+    "region": 11824,
+    "name": "Mudskipper Melody",
+    "song": 515,
+    "frame": 46854,
+    "button": 183006
+  },
+  {
+    "region": 11570,
+    "name": "Emperor",
+    "song":138,
+    "frame":  46609,
+    "button": 182017
+  },
+  {
+    "region": 11571,
+    "name": "Miles Away",
+    "song":107,
+    "frame": 46838,
+    "button": 182246
+  },
+  {
+    "region": 11572,
+    "name": "Arrival",
+    "song": 186,
+    "frame": 46424,
+    "button": 181088
+  },
+  {
+    "region": 11573,
+    "name": "Horizon",
+    "song": 18,
+    "frame": 46726,
+    "button": 182134
+  },
+  {
+    "region": 11829,
+    "name": "Scape Soft",
+    "song": 54,
+    "frame": 46953,
+    "button": 183105
+  },
+  {
+    "region": 12085,
+    "name": "Dwarf Theme",
+    "song": 310,
+    "frame": 46601,
+    "button": 182009
+  },
+  {
+    "region": 7505,
+    "name": "Dogs of War",
+    "song": 537,
+    "frame": 46585,
+    "button": 181249
+  },
+  {
+    "region": 8017,
+    "name": "Food for Thought",
+    "song": 558,
+    "frame": 46645,
+    "button": 182053
+  },
+  {
+    "region": 8560,
+    "name": "Malady",
+    "song": 559,
+    "frame": 46823,
+    "button": 182231
+  },
+  {
+    "region": 9297,
+    "name": "Dance of Death",
+    "song": 560,
+    "frame": 46544,
+    "button": 181208
+  }
+]

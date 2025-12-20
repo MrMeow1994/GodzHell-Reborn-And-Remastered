@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ public class PlayerData {
     private int autoRet;
     private Map<Integer, int[]> colorMeta;
     private int Spirit_shard_pack_Amount;
-
+    private List<Integer> unlockedMusic;
     // Slayer data
     private Optional<SlayerTask> slayerTask = Optional.empty(); // Optional field for SlayerTask
 
@@ -72,9 +73,16 @@ public class PlayerData {
     private long[] ignores;
     private int consecutiveTasks; // Field for consecutive tasks
     private int loyaltyRank; // Field for loyalty rank
-    public int runeMist, gertCat, restGhost,
+    private int runeMist, gertCat, restGhost,
             romeojuliet, lostCity, vampSlayer, cookAss, doricQuest, blackKnight, shieldArrav,
             sheepShear, impsC, knightS, witchspot, pirateTreasure, desertTreasure;
+    private int musicVolume;
+    private int soundVolume;
+    private int chateffects;
+    private int mousebuttons;
+    private int splitchat;
+    private int brightness;
+    private int acceptaid;
     public static PlayerData from(Player plr) {
         PlayerData data = new PlayerData();
 
@@ -154,7 +162,14 @@ public class PlayerData {
         data.friends = plr.friends;
         data.ignores = plr.ignores;
         data.colorMeta = plr.getColorManager().getItems();
-
+        data.unlockedMusic = target.getMusic().getUnlockedMusic();
+        data.musicVolume = plr.musicVolume;
+        data.soundVolume = plr.soundVolume;
+        data.chateffects = plr.chateffects;
+        data.mousebuttons = plr.mousebuttons;
+        data.splitchat = plr.splitchat;
+        data.brightness = plr.brightness;
+        data.acceptaid = plr.acceptaid;
         return data;
     }
     // Add these methods to the class:
@@ -804,6 +819,55 @@ public int getSpirit_shard_pack_Amount(){
 public void setSpirit_shard_pack_Amount(int Spirit_shard_pack_Amount){
         this.Spirit_shard_pack_Amount = Spirit_shard_pack_Amount;
 }
+    public List<Integer> getUnlockedMusic() {
+        return unlockedMusic;
+    }
+
+    public void setUnlockedMusic(List<Integer> unlockedMusic) {
+        this.unlockedMusic = unlockedMusic;
+    }
+    public int getMusicVolume(){
+        return musicVolume;
+    }
+    public void setMusicVolume(int musicVolume){
+        this.musicVolume = musicVolume;
+    }
+    public int getSoundVolume(){
+        return soundVolume;
+    }
+    public void setSoundVolume(int soundVolume){
+        this.soundVolume = soundVolume;
+    }
+    public int getChateffects(){
+        return chateffects;
+    }
+    public void setChateffects(int chateffects){
+        this.chateffects = chateffects;
+    }
+    public int getMousebuttons(){
+        return mousebuttons;
+    }
+    public void setMousebuttons(int mousebuttons){
+        this.mousebuttons = mousebuttons;
+    }
+    public int getSplitchat(){
+        return splitchat;
+    }
+    public void setSplitchat(int splitchat){
+        this.splitchat = splitchat;
+    }
+    public int getBrightness() {
+        return brightness;
+    }
+    public void setBrightness(int brightness){
+        this.brightness = brightness;
+    }
+    public int getAcceptaid(){
+        return acceptaid;
+    }
+    public void setAcceptaid(int acceptaid){
+        this.acceptaid = acceptaid;
+    }
 }
 
 

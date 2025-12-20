@@ -157,6 +157,12 @@ public class server implements Runnable {
         ColorManager.init();
         lottery.loadLists();
         npcStatLoader.init();
+        try {
+            new MusicLoader().load();
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
        // server.lottery.loadLists();
         Region.init();
         textHandler = new TextHandler();
