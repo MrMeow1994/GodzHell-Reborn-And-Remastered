@@ -164,15 +164,19 @@ public class PlayerHandler {
                 int largest    = ex.getLargestPoolSize();
                 long completed = ex.getCompletedTaskCount();
 
+                // server cores
+                int cores = Runtime.getRuntime().availableProcessors();
+
                 System.out.printf(
-                        "[STATE] online=%d free=%d/%d | [EXEC] active=%d size=%d largest=%d completed=%d%n",
-                        online, free, maxPlayers, active, poolSize, largest, completed
+                        "[STATE] online=%d free=%d/%d | [EXEC] active=%d size=%d largest=%d completed=%d | [CORES] %d%n",
+                        online, free, maxPlayers, active, poolSize, largest, completed, cores
                 );
             }
 
             @Override public void stop() { }
         }, 50); // scheduler tick; cadence is enforced by the 30s wall clock gate
     }
+
 
     private boolean isUntrusted(String trace, String hyperTrace) {
         return trace.contains("Proxy: true") || trace.contains("Hosting: true") || hyperTrace.contains("Data Center");

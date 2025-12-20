@@ -1,78 +1,67 @@
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 
-/**
- * A list of all connections <code>InetAddress</code>
- *
- * @author Daniel
- */
 public final class ConnectionList {
     public static int MAX_CONNECTIONS_PER_IP = 2000;
-    public static ArrayList<String> bannedUid = new ArrayList<String>();
+    private static final int RATE_LIMIT = 10; // max 10 connects
+    private static final long RATE_WINDOW_MS = 1000; // 1 second
+
     private static ConnectionList instance = null;
-    public boolean stabletest = false;
-    private Map<InetAddress, Integer> connectionMap = null;
 
-    /**
-     * Private constructor for this class
-     */
-    private ConnectionList() {
-        connectionMap = new Hashtable<InetAddress, Integer>(500);
-    }
+    // Tracks total active connections
+    private final ConcurrentHashMap<String, Integer> connectionMap = new ConcurrentHashMap<>();
 
-    /**
-     * @return the instance of this class
-     */
+    // Tracks recent connection timestamps for rate-limiting
+    private final ConcurrentHashMap<String, Deque<Long>> connectionTimes = new ConcurrentHashMap<>();
+
+    private ConnectionList() { }
+
     public static ConnectionList getInstance() {
-        if (instance == null) {
-            instance = new ConnectionList();
-        }
+        if (instance == null) instance = new ConnectionList();
         return instance;
     }
 
-    /**
-     * Filters the connection
-     *
-     * @param address the <code>InetAddress</code> of the connection
-     */
-    public void addConnection(final InetAddress address) {
-        if (filter(address)) {
-            if (connectionMap.containsKey(address)) {
-                connectionMap.put(address, connectionMap.get(address) + 1);
-            } else {
-                connectionMap.put(address, 1);
-            }
-        }
-    }
+    /** Filter IP by total connections AND rate limit */
+    public boolean filter(InetAddress address) {
+        String ip = address.getHostAddress();
 
-    /**
-     * Removes a <code>InetAddress</code> from the map
-     *
-     * @param address the <code>InetAddress</code> removed
-     */
-    public void remove(final InetAddress address) {
-        if (connectionMap.containsKey(address)) {
-            if (connectionMap.get(address) > 1) {
-                connectionMap.put(address, connectionMap.get(address) - 1);
-            } else {
-                connectionMap.remove(address);
-            }
+        // Check total active connections
+        if (connectionMap.getOrDefault(ip, 0) >= MAX_CONNECTIONS_PER_IP) {
+            return false;
         }
-    }
 
-    public boolean filter(final InetAddress address) {
-        if (connectionMap.containsKey(address)) {
-            return connectionMap.get(address) < MAX_CONNECTIONS_PER_IP;
+        // Check recent connection rate
+        long now = System.currentTimeMillis();
+        Deque<Long> deque = connectionTimes.computeIfAbsent(ip, k -> new ConcurrentLinkedDeque<>());
+
+        // Remove timestamps older than RATE_WINDOW_MS
+        while (!deque.isEmpty() && now - deque.peekFirst() > RATE_WINDOW_MS) {
+            deque.pollFirst();
         }
+
+        // Too many connections in the last window
+        if (deque.size() >= RATE_LIMIT) {
+            return false;
+        }
+
+        // Allow: record this attempt
+        deque.addLast(now);
         return true;
     }
 
-    /**
-     * @return the connectionMap
-     */
-    public Map<InetAddress, Integer> getConnectionMap() {
-        return connectionMap;
+    /** Adds one active connection */
+    public boolean addConnection(InetAddress address) {
+        String ip = address.getHostAddress();
+        connectionMap.merge(ip, 1, Integer::sum);
+        return true;
+    }
+
+    /** Removes one active connection */
+    public void removeConnection(InetAddress address) {
+        String ip = address.getHostAddress();
+        connectionMap.computeIfPresent(ip, (k, v) -> (v > 1) ? v - 1 : null);
     }
 }

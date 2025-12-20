@@ -4440,6 +4440,14 @@ public class NPCHandler {
 
         return true; // Path is clear
     }
+    public int getNpcCount() {
+        return npcs.length; // or npcList.size() if you use a list
+    }
+
+    public NPC getNpc(int index) {
+        if (index < 0 || index >= npcs.length) return null;
+        return npcs[index];
+    }
 
     public boolean attackPlayer(int npcId) {
         NPC npc = npcs[npcId];

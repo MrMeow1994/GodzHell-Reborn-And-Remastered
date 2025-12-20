@@ -4,6 +4,7 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.kotlin.com.google.gson.JsonElement;
 import org.jetbrains.kotlin.com.google.gson.JsonObject;
 
@@ -76,7 +77,6 @@ public static final int bufferSize = 20000;
     public static int[] clue = {1, 2, 3, 4, 5};
     public static int[] getprize = {1, 2};
     public static int[] Weather = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-    private static final int followId = 0;
     public int dupeTimer = 0;
     public boolean hasNpc;
     public boolean isMorphed = false;
@@ -1102,92 +1102,87 @@ public void setHouse(House house) {
     }
 
     public void resetFollow() {
-        followID = 0;
+        playerFollowID = 0;
         getOutStream().createFrame(174);
         followID2 = 0;
         getOutStream().writeWord(0);
         getOutStream().writeByte(0);
         getOutStream().writeWord(1);
     }
-
-    public void followDirection() {
-        if (PlayerHandler.players[followID] == null
-                || PlayerHandler.players[followID].IsDead) {
-            resetFollow();
-            return;
-        }
-        if (IsDead || playerLevel[3] <= 0)
-            return;
-
-        int otherX = PlayerHandler.players[followID].getX();
-        int otherY = PlayerHandler.players[followID].getY();
-
-        boolean sameSpot = (absX == otherX && absY == otherY);
-
-
-        if (!goodDistance(otherX, otherY, getX(), getY(), 25)) {
-            followID = 0;
-            resetFollow();
-            return;
-        }
-        faceUpdate(followID + 32768);
-        if (!sameSpot) {
-            if (playerIndex > 0 && !usingSpecial) {
-            }
-            if (otherX == absX && otherY == absY) {
-                int r = misc.random(3);
-                switch (r) {
-                    case 0:
-                        walkTo2(0, -1);
-                        break;
-                    case 1:
-                        walkTo2(0, 1);
-                        break;
-                    case 2:
-                        walkTo2(1, 0);
-                        break;
-                    case 3:
-                        walkTo2(-1, 0);
-                        break;
-                }
-            } else if (runningToggled) {
-                if (otherY > getY() && otherX == getX()) {
-                    walkTo2(otherX, otherY - 1);
-                } else if (otherY < getY() && otherX == getX()) {
-                    walkTo2(otherX, otherY + 1);
-                } else if (otherX > getX() && otherY == getY()) {
-                    walkTo2(otherX - 1, otherY);
-                } else if (otherX < getX() && otherY == getY()) {
-                    walkTo2(otherX + 1, otherY);
-                } else if (otherX < getX() && otherY < getY()) {
-                    walkTo2(otherX + 1, otherY + 1);
-                } else if (otherX > getX() && otherY > getY()) {
-                    walkTo2(otherX - 1, otherY - 1);
-                } else if (otherX < getX() && otherY > getY()) {
-                    walkTo2(otherX + 1, otherY - 1);
-                } else if (otherX > getX() && otherY < getY()) {
-                    walkTo2(otherX + 1, otherY - 1);
-                }
-            } else if (otherY > getY() && otherX == getX()) {
-                walkTo2(otherX, otherY - 1);
-            } else if (otherY < getY() && otherX == getX()) {
-                walkTo2(otherX, otherY + 1);
-            } else if (otherX > getX() && otherY == getY()) {
-                walkTo2(otherX - 1, otherY);
-            } else if (otherX < getX() && otherY == getY()) {
-                walkTo2(otherX + 1, otherY);
-            } else if (otherX < getX() && otherY < getY()) {
-                walkTo2(otherX + 1, otherY + 1);
-            } else if (otherX > getX() && otherY > getY()) {
-                walkTo2(otherX - 1, otherY - 1);
-            } else if (otherX < getX() && otherY > getY()) {
-                walkTo2(otherX + 1, otherY - 1);
-            } else if (otherX > getX() && otherY < getY()) {
-                walkTo2(otherX - 1, otherY + 1);
-            }
-            faceUpdate(followID + 32768);
-        }
+    public void playerWalk(int x, int y) {
+        PathFinder.getPathFinder().findRoute(this, x, y, true, 1, 1);
     }
+
+    public void playerWalk(int x, int y, int xLength, int yLength) {
+        PathFinder.getPathFinder().findRoute(this, x, y, true, xLength, yLength);
+    }
+    public void followDirection() {
+        if (playerFollowID < 0 || playerFollowID >= PlayerHandler.players.length) {
+            resetFollow();
+            return;
+        }
+
+        client target = (client) PlayerHandler.players[playerFollowID];
+        final int otherX = PlayerHandler.players[playerFollowID].getX();
+        final int otherY = PlayerHandler.players[playerFollowID].getY();
+
+        if (target == null || target.IsDead || IsDead || playerLevel[3] <= 0) {
+            resetFollow();
+            return;
+        }
+
+        // Stop following if stunned/frozen or special boundaries
+        if (freezeTimer > 0) {
+            return;
+        }
+
+        // Optional: boundary checks (like duel arena, pvp areas)
+        // if (Boundary.isIn(this, Boundary.DUEL_ARENA)) { ... }
+
+
+        int followX = target.lastX;
+        int followY = target.lastY;
+        if (followX != 0 && followY != 0 && PathFinder.getPathFinder().accessable(this, followX, followY)) {
+            playerWalk(followX, followY);
+        } else if (misc.distance(c.absX, c.absY, otherX, otherY) != 1.0) {
+            Pair<Integer, Integer> tile = getFollowPosition(target, otherX, otherY, false);
+            if (tile.getLeft() != 0 && tile.getRight() != 0) {
+                playerWalk(tile.getLeft(), tile.getRight());
+            } else {
+                playerWalk(otherX, otherY);
+            }
+        }
+            faceUpdate(playerFollowID + 32768);
+    }
+
+    // Pick the optimal tile behind the player
+    public Pair<Integer, Integer> getFollowPosition(Entity target, int targetX, int targetY, boolean projectile) {
+        int bestX = 0, bestY = 0;
+        double closestDist = Double.MAX_VALUE;
+
+        // Non-diagonal offsets first (behind / sides)
+        int[][] offsets = { {0, 1}, {0, -1}, {1, 0}, {-1, 0} };
+
+        for (int[] offset : offsets) {
+            int x = targetX + offset[0];
+            int y = targetY + offset[1];
+
+            if (!PathFinder.getPathFinder().accessable(this, x, y)) continue;
+
+            double dist = Math.hypot(absX - x, absY - y);
+            if (dist < closestDist) {
+                closestDist = dist;
+                bestX = x;
+                bestY = y;
+            }
+        }
+
+        return Pair.of(bestX, bestY);
+    }
+
+
+
+
 
     public int getMove(int i, int j) {
         if (i - j == 0) {
@@ -10729,7 +10724,7 @@ public void setHouse(House house) {
             if (hasNpc)
                 getPets().quickPickup(this, summonId);
             disconnected = true;
-            ConnectionList.getInstance().remove(mySock.getInetAddress());
+            ConnectionList.getInstance().removeConnection(mySock.getInetAddress());
 
             misc.println("ClientHandler: Client " + playerName + " disconnected.");
 
@@ -11374,19 +11369,12 @@ public void setHouse(House house) {
                     "Trade With");
             getOutStream().endFrameVarSize();
 
-            if (rights.inherits(Rights.MODERATOR)) {
                 getOutStream().createFrameVarSize(104);
                 getOutStream().writeByteC(2); // command slot
                 getOutStream().writeByteA(0); // 0 or 1; 1 if command should be placed on top in context menu
                 getOutStream().writeString("Follow");
                 getOutStream().endFrameVarSize();
-            } else if (rights.inherits(Rights.ADMINISTRATOR)) {
-                getOutStream().createFrameVarSize(104);
-                getOutStream().writeByteC(2); // command slot (does it matter which one?)
-                getOutStream().writeByteA(0); // 0 or 1; 0 if command should be placed on top in context menu
-                getOutStream().writeString("Follow");
-                getOutStream().endFrameVarSize();
-            }
+
             // end of ban list
 
 
@@ -21657,7 +21645,7 @@ nated = Integer.parseInt(token2);
             if (wcTimer > 0 && woodcut[0] > 0) {
                 wcTimer--;
             }
-            if (followID > 0) {
+            if (playerFollowID > 0) {
                 followDirection();
             }
             if (followID2 > 0) {
@@ -26897,29 +26885,50 @@ nated = Integer.parseInt(token2);
                 System.out.println("Received packet 152 with byte: " + value);
                 // You can use 'value' if needed — otherwise ignore it
                 break;
-            case 153: // Follow
-                int FollowID = (misc.HexToInt(inStream.buffer, 0, packetSize) / 1000);
+            case 153: // Follow player
+                int followId = misc.HexToInt(inStream.buffer, 0, packetSize) / 1000;
 
-                if (playerFollowID != -1) {
-                    for (i = 0; i < playerFollow.length; i++) {
-                        if (PlayerHandler.players[playerFollowID].playerFollow[i]
-                                == this.index) {
-                            PlayerHandler.players[playerFollowID].playerFollow[i] = -1;
-                            break;
+                // Validate
+                if (followId < 0 || followId >= PlayerHandler.players.length) {
+                    sendMessage("Invalid player.");
+                    break;
+                }
+
+                if (followId == this.index) {
+                    sendMessage("You cannot follow yourself.");
+                    break;
+                }
+
+                client target = (client)PlayerHandler.players[followId];
+                if (target == null || target.disconnected) {
+                    sendMessage("That player is not online.");
+                    break;
+                }
+
+                // Remove old follow
+                if (followId != -1) {
+                    client oldTarget = (client) PlayerHandler.players[followId];
+                    if (oldTarget != null) {
+                        for (int i2 = 0; i2 < oldTarget.playerFollow.length; i2++) {
+                            if (oldTarget.playerFollow[i2] == this.index) {
+                                oldTarget.playerFollow[i2] = -1;
+                                break;
+                            }
                         }
                     }
                 }
-                playerFollowID = FollowID;
-                for (i = 0; i < playerFollow.length; i++) {
-                    if (PlayerHandler.players[playerFollowID].playerFollow[i] == -1
-                            && PlayerHandler.players[playerFollowID] != null) {
-                        PlayerHandler.players[playerFollowID].playerFollow[i] = this.index;
+
+                // Assign new follow
+                playerFollowID = followId;
+
+                for (int i3 = 0; i3 < target.playerFollow.length; i3++) {
+                    if (target.playerFollow[i3] == -1) {
+                        target.playerFollow[i3] = this.index;
                         break;
                     }
                 }
-                sendMessage(
-                        "You are now following "
-                                + PlayerHandler.players[playerFollowID].playerName);
+
+                sendMessage("You are now following " + target.playerName);
                 break;
 
             case 139: // Trade answer
@@ -36496,7 +36505,7 @@ public int GetGLCLConstruction(int ItemID) {
         isCrafting = false;
         isSmething = false;
         walkingToItem = false;
-        if (followID > 0) followID = 0;
+        if (playerFollowID > 0) playerFollowID = 0;
         if (followID2 > 0) followID2 = 0;
         if (skillcape > 0) skillcape = 0;
     }

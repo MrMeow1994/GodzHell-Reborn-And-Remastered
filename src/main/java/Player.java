@@ -869,6 +869,8 @@ public abstract class Player extends Entity {
 
 	public int mapRegionX, mapRegionY;		// the map region the player is currently in
 	public int currentX, currentY;			// relative x/y coordinates (to map region)
+	public int lastX;
+	public int lastY;
 	// Note that mapRegionX*8+currentX yields absX
 	// set to true if, in general, updating for this player is required
 	// i.e. this should be set to true whenever any of the other
@@ -952,6 +954,8 @@ public abstract class Player extends Entity {
 		if(dir == -1)
 			return -1;
 		dir >>= 1;
+		lastX = absX;
+		lastY = absY;
 		currentX += misc.directionDeltaX[dir];
 		currentY += misc.directionDeltaY[dir];
 		absX += misc.directionDeltaX[dir];
@@ -1024,6 +1028,8 @@ public abstract class Player extends Entity {
 			lastTeleport[1] = currentY;
 			absX = teleportToX;
 			absY = teleportToY;
+			lastX = absX;
+			lastY = absY - 1;
 			resetWalkingQueue();
 			teleportToX = teleportToY = -1;
 			didTeleport = true;

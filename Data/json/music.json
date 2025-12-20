@@ -404,5 +404,27 @@
     "song": 560,
     "frame": 46544,
     "button": 181208
+  },
+  {
+    "region": 13364,
+    "name": "Venture",
+    "song": 75,
+    "frame": 47149,
+    "button": 184045
+  },
+
+  {
+    "region": 13362,
+    "name": "Duel Arena",
+    "song": 47,
+    "frame": 46598,
+    "button": 182006
+  },
+  {
+    "region": 13363,
+    "name": "Shine",
+    "song": 122,
+    "frame": 46971,
+    "button": 183123
   }
 ]
