@@ -23,7 +23,7 @@ public class Item {
     /* Fullhat covers your head but not your beard. */
     private static String[] fullhat = {"splitbark helm", "mystic", "black mask", "highwayman mask", "mime mask",
             "facemask", "Virtus mask", "Pernix cowl", "ironman helm", "grim reaper", "Headless head", "imp mask", "mage hat", "med helm", "coif",
-            "Dharok's helm", "hood", "Initiate helm", "Coif", "Helm of neitiznot", "Armadyl helmet", "Berserker helm",
+            "Dharok's helm", "hood", "Initiate helm", "Coif", "Armadyl helmet", "Berserker helm",
             "Archer helm", "Farseer helm", "Warrior helm", "Void", "reindeer", "cowl", "Void ranger helm",
             "Blacksmith's_helm", "black mask", "kandarin headgear", "Robin hood hat",
             "pith helmet", "spiny helmet", "gold helmet", "mining helmet", "camo helmet", "crab helmet",

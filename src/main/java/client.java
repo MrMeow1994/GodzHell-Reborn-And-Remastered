@@ -516,7 +516,7 @@ public static final int bufferSize = 20000;
     Herblore herblore = new Herblore(this);
     private final Allotments allotment = new Allotments(this);
     int skillcape = 0;
-    private boolean canChangeAppearance = false;
+    boolean canChangeAppearance = false;
     private final DwarfMultiCannon cannon = new DwarfMultiCannon(this);
     private final CraftingGems craftinggems = new CraftingGems(this);
     private final Farming farming = new Farming(this);
@@ -1144,7 +1144,7 @@ public void setHouse(House house) {
         int followY = target.lastY;
         if (followX != 0 && followY != 0 && PathFinder.getPathFinder().accessable(this, followX, followY)) {
             playerWalk(followX, followY);
-        } else if (misc.distance(c.absX, c.absY, otherX, otherY) != 1.0) {
+        } else if (misc.distance(absX, absY, otherX, otherY) != 1.0) {
             Pair<Integer, Integer> tile = getFollowPosition(target, otherX, otherY, false);
             if (tile.getLeft() != 0 && tile.getRight() != 0) {
                 playerWalk(tile.getLeft(), tile.getRight());
@@ -1412,7 +1412,7 @@ public void setHouse(House house) {
             stillgfx(446, EnemyY, EnemyX);
             stillgfx(453, EnemyY, EnemyX);
             PlayerHandler.players[AttackingOn].currentHealth -= hitDiff;
-            PlayerHandler.players[AttackingOn].updateRequired = true;
+            PlayerHandler.players[AttackingOn].setUpdateRequired(true);
             PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
         }
     }
@@ -1421,7 +1421,7 @@ public void setHouse(House house) {
         mask100var1 = gfx;
         mask100var2 = 6553600;
         gfxUpdateRequired = true;
-        updateRequired = true;
+        setUpdateRequired(true);
     }
 
     public void drawback() {
@@ -1559,7 +1559,7 @@ public void setHouse(House house) {
             stillgfx(246, absY, absX);
             hitDiff = 10 + misc.random(20);
             PlayerHandler.players[AttackingOn].currentHealth -= hitDiff;
-            PlayerHandler.players[AttackingOn].updateRequired = true;
+            PlayerHandler.players[AttackingOn].setUpdateRequired(true);
             PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
         }
     }
@@ -1569,7 +1569,7 @@ public void setHouse(House house) {
             sendMessage("Your necklaces effect will not boost you over 250 str.");
             stillgfx(247, absY, absX);
             playerLevel[2] = 249;
-            updateRequired = true;
+            setUpdateRequired(true);
         }
     }
 
@@ -1626,7 +1626,7 @@ public void setHouse(House house) {
         mask100var1 = id;
         mask100var2 = delay;
         gfxUpdateRequired = true;
-        updateRequired = true;
+        setUpdateRequired(true);
     }
 
     public void sendExecMessage(String command) {
@@ -2274,7 +2274,7 @@ public void setHouse(House house) {
                         damage = PlayerHandler.players[AttackingOn].playerLevel[3];
                     }
                     PlayerHandler.players[AttackingOn].hitDiff = damage;
-                    PlayerHandler.players[AttackingOn].updateRequired = true;
+                    PlayerHandler.players[AttackingOn].setUpdateRequired(true);
                     PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
                 }
             }
@@ -2293,7 +2293,7 @@ public void setHouse(House house) {
                 NPCHandler.npcs[attacknpc].RandomWalk = false;
                 NPCHandler.npcs[attacknpc].IsUnderAttack = true;
                 NPCHandler.npcs[attacknpc].hitDiff = damage;
-                NPCHandler.npcs[attacknpc].updateRequired = true;
+                NPCHandler.npcs[attacknpc].setUpdateRequired(true);
                 NPCHandler.npcs[attacknpc].hitUpdateRequired = true;
             }
         }
@@ -2547,7 +2547,7 @@ public void setHouse(House house) {
                         }
                         person.hitDiff = damage;
                         person.KillerId = index;
-                        person.updateRequired = true;
+                        person.setUpdateRequired(true);
                         person.hitUpdateRequired = true;
                     }
                 }
@@ -2664,7 +2664,7 @@ public void setHouse(House house) {
         viewToX = ((2 * coordX) + 1);
         viewToY = ((2 * coordY) + 1);
         dirUpdate2Required = true;
-        updateRequired = true;
+        setUpdateRequired(true);
     }
 
 
@@ -4323,13 +4323,13 @@ public void setHouse(House house) {
                 if(desertTreasure == 8){
                 if (playerMagicBook == 0) {
                     emotes = 2;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     getPA().setSidebarInterface(6, 12855);
                     playerMagicBook = 1;
                     sendMessage("A strange Knowlenge enters your mind...");
                 } else if (playerMagicBook == 1) {
                     emotes = 0;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     getPA().setSidebarInterface(6, 1151);
                     playerMagicBook = 0;
                     sendMessage("You seem to forgot the magic of Ancients...");
@@ -4337,7 +4337,7 @@ public void setHouse(House house) {
                 } else {
                     if (playerMagicBook == 1) {
                         emotes = 0;
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         getPA().setSidebarInterface(6, 1151);
                         playerMagicBook = 0;
                         //sendMessage("You seem to forgot the magic of Ancients...");
@@ -4728,7 +4728,7 @@ public void setHouse(House house) {
                         setAnimation(776);
                         addSkillXP((playerLevel[2]), 2);
                         stillgfx(639, absY, absX);
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                     }
                 }
@@ -4802,7 +4802,7 @@ public void setHouse(House house) {
                         setAnimation(776);
                         addSkillXP((playerLevel[2]), 2);
                         stillgfx(639, absY, absX);
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                         actionTimer = 20;
                     }
@@ -5887,7 +5887,7 @@ public void setHouse(House house) {
                     hitDiff = 10 + misc.random(5);
                     actionTimer = 30;
                     currentHealth -= hitDiff;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     hitUpdateRequired = true;
                 }
                 break;
@@ -6018,7 +6018,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some Crafting, and get some Cash!.");
                     setAnimation(0x378);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6031,7 +6031,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some RuneCrafting, and get some Cash!.");
                     setAnimation(0x362);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6042,7 +6042,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some Range.");
                     setAnimation(426);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6054,7 +6054,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some Smithing, and get some Cash!.");
                     setAnimation(0x378);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6066,7 +6066,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some Agility, and get some Cash");
                     setAnimation(0x323);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6077,7 +6077,7 @@ public void setHouse(House house) {
                         sendMessage("You Gain Some Mining,");
                         setAnimation(624);
                         actionTimer = 15;
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                     }
                 break;
@@ -6089,7 +6089,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some Mining, and get some Cash!!");
                     setAnimation(624);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6101,7 +6101,7 @@ public void setHouse(House house) {
                     addSkillXP(150 * playerLevel[10], 10);
                     sendMessage("You fish a shrimp");
                     actionTimer = 5;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6113,7 +6113,7 @@ public void setHouse(House house) {
                     addSkillXP(300 * playerLevel[10], 10);
                     sendMessage("You fish a lobster");
                     actionTimer = 5;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6125,7 +6125,7 @@ public void setHouse(House house) {
                     addSkillXP(500 * playerLevel[10], 10);
                     sendMessage("You fish a shark");
                     actionTimer = 5;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6137,7 +6137,7 @@ public void setHouse(House house) {
                     addSkillXP(750 * playerLevel[10], 10);
                     sendMessage("You fish a manta ray");
                     actionTimer = 5;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6149,7 +6149,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some FireMaking.");
                     setAnimation(1979);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6161,7 +6161,7 @@ public void setHouse(House house) {
                     sendMessage("You Gain Some Herblore!");
                     setAnimation(0x378);
                     actionTimer = 15;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 break;
@@ -6257,7 +6257,7 @@ public void setHouse(House house) {
                         setAnimation(423);
                         addSkillXP((1700 * playerLevel[18]), 18);
                         stillgfx(199, absY, absX);
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                     }
                 }
@@ -6271,7 +6271,7 @@ public void setHouse(House house) {
                         setAnimation(1658);
                         addSkillXP((playerLevel[4]), 4);
                         stillgfx(246, absY, absX);
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                     }
                 }
@@ -6285,7 +6285,7 @@ public void setHouse(House house) {
                         setAnimation(422);
                         addSkillXP((playerLevel[0]), 0);
                         stillgfx(246, absY, absX);
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                     }
                 }
@@ -6297,7 +6297,7 @@ public void setHouse(House house) {
                         addSkillXP((playerLevel[1]), 1);
                         actionTimer = 10;
                         setAnimation(0x320);
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         appearanceUpdateRequired = true;
                     }
                 }
@@ -6310,7 +6310,7 @@ public void setHouse(House house) {
                 refreshSkills();
                 setAnimation(645);
                 sendMessage("You recharge your summoning points");
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 break;
             case 61:
@@ -6319,7 +6319,7 @@ public void setHouse(House house) {
                 refreshSkills();
                 setAnimation(645);
                 sendMessage("You recharge your prayer");
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 break;
 
@@ -6329,7 +6329,7 @@ public void setHouse(House house) {
                 refreshSkills();
                 setAnimation(645);
                 sendMessage("You recharge your prayer");
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 break;
 
@@ -6339,7 +6339,7 @@ public void setHouse(House house) {
                 refreshSkills();
                 setAnimation(645);
                 sendMessage("You recharge your prayer");
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 break;
 
@@ -7093,7 +7093,7 @@ public void setHouse(House house) {
                 playerEquipmentN[playerArrows] -= 1;
             }
         }
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7247,7 +7247,7 @@ public void setHouse(House house) {
         getOutStream().writeWordBigEndian(i2); // offset Y
         getOutStream().writeWordBigEndian(i3); // interface, definatly.
         sendMessage("Frame 70 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7265,7 +7265,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(240);
         getOutStream().writeWord(i1);
         sendMessage("Frame 240 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7274,7 +7274,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(110);
         getOutStream().writeByte(i1);
         sendMessage("Frame 110 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7283,7 +7283,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(106);
         getOutStream().writeByteC(i1);
         sendMessage("Frame 106 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7292,7 +7292,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(24);
         getOutStream().writeByteA(i1);
         sendMessage("Frame 24 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7301,7 +7301,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(142);
         getOutStream().writeWordBigEndian(i1);
         sendMessage("Frame 142 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7309,7 +7309,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(142);
         getOutStream().writeWordBigEndian_dup(i1);
         sendMessage("Frame 142d tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7328,7 +7328,7 @@ public void setHouse(House house) {
             getOutStream().writeWord(i2);
         }
         sendMessage("Frame 254 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7346,7 +7346,7 @@ public void setHouse(House house) {
         getOutStream().writeByte(i3);
         getOutStream().writeByte(i4);
         sendMessage("Frame 35 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7450,7 +7450,7 @@ public void setHouse(House house) {
             getOutStream().writeWord(i3);
             getOutStream().writeWordBigEndianA(i4);
         }// junk? not sure
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7459,7 +7459,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(114);
         getOutStream().writeWordBigEndian(i1);
         sendMessage("Frame 114 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7475,7 +7475,7 @@ public void setHouse(House house) {
             getOutStream().writeByte(volume);
         }
         // sendMessage("Frame 174 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7502,7 +7502,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(99);
         getOutStream().writeByte(i1);
         // sendMessage("Frame 99 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7511,7 +7511,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(218);
         getOutStream().writeWordBigEndianA(i1);
         sendMessage("Frame 218 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7520,7 +7520,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(61);
         getOutStream().writeByte(i1);
         sendMessage("Frame 61 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7530,7 +7530,7 @@ public void setHouse(House house) {
         getOutStream().writeWordBigEndian(i1);
         getOutStream().writeWordA(i2);
         sendMessage("Frame 87 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7540,7 +7540,7 @@ public void setHouse(House house) {
         getOutStream().writeWordBigEndian(i1);
         getOutStream().writeByte(i2);
         sendMessage("Frame 36 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7549,7 +7549,7 @@ public void setHouse(House house) {
         getOutStream().createFrame(214);
         getOutStream().writeQWord(i1);
         sendMessage("Frame 214 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7557,7 +7557,7 @@ public void setHouse(House house) {
     {
         getOutStream().createFrame(187);
         sendMessage("Frame 187 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7565,7 +7565,7 @@ public void setHouse(House house) {
     {
         getOutStream().createFrame(27);
         sendMessage("Frame 27 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7573,7 +7573,7 @@ public void setHouse(House house) {
     {
         getOutStream().createFrame(65);
         sendMessage("Frame 65 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7581,7 +7581,7 @@ public void setHouse(House house) {
     {
         getOutStream().createFrame(68);
         sendMessage("Frame 68 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7589,7 +7589,7 @@ public void setHouse(House house) {
     {
         getOutStream().createFrame(78);
         sendMessage("Frame 78 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7597,14 +7597,14 @@ public void setHouse(House house) {
     {
        // getOutStream().createFrame(81);
         sendMessage("Frame 81 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
     public void frame1() // cancels all player and npc emotes within area!
     {
         getOutStream().createFrame(1);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7617,7 +7617,7 @@ public void setHouse(House house) {
         getOutStream().writeByteA(i1);
         getOutStream().writeByteA(i2);
         getOutStream().writeWordA(i3);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
         sendMessage("Frame 160 tested");
     }
@@ -7640,7 +7640,7 @@ public void setHouse(House house) {
         getOutStream().writeByte(i10);
         getOutStream().writeByte(i11);
         sendMessage("Frame 117 tested");
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -7777,7 +7777,7 @@ public void setHouse(House house) {
                         }
                         person.hitDiff = damage;
                         person.KillerId = index;
-                        person.updateRequired = true;
+                        person.setUpdateRequired(true);
                         person.hitUpdateRequired = true;
                     }
                 }
@@ -7805,7 +7805,7 @@ public void setHouse(House house) {
                 npc.RandomWalk = false;
                 npc.IsUnderAttack = true;
                 npc.hitDiff = damage;
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.hitUpdateRequired = true;
             }
         }
@@ -7816,7 +7816,7 @@ public void setHouse(House house) {
         mask100var1 = id;
         mask100var2 = delay;
         gfxUpdateRequired = true;
-        updateRequired = true;
+        setUpdateRequired(true);
     }
 
     public void stillgfxz(int id, int Y, int X, int height, int time) {
@@ -8057,7 +8057,7 @@ public void setHouse(House house) {
                 addSkillXP(mageXP, 6);
                 NPCHandler.npcs[index].hitDiff = hitDiff;
                 NPCHandler.npcs[index].Killing[this.index] += hitDiff;
-                NPCHandler.npcs[index].updateRequired = true;
+                NPCHandler.npcs[index].setUpdateRequired(true);
                 NPCHandler.npcs[index].hitUpdateRequired = true;
                 // actionTimer = 4;
             }
@@ -8107,7 +8107,7 @@ public void setHouse(House house) {
                 addSkillXP(mageXP, 6);
                 NPCHandler.npcs[index].hitDiff = hitDiff;
                 NPCHandler.npcs[index].Killing[this.index] += hitDiff;
-                NPCHandler.npcs[index].updateRequired = true;
+                NPCHandler.npcs[index].setUpdateRequired(true);
                 NPCHandler.npcs[index].hitUpdateRequired = true;
                 // actionTimer = 4;
             }
@@ -8137,7 +8137,7 @@ public void setHouse(House house) {
                 }
 
                 PlayerHandler.players[index].hitDiff = hitDiff;
-                PlayerHandler.players[index].updateRequired = true;
+                PlayerHandler.players[index].setUpdateRequired(true);
                 PlayerHandler.players[index].hitUpdateRequired = true;
                 setAnimation(711);
                 deleteItem(rune1, getItemSlot(rune1), rune1amount);
@@ -8172,7 +8172,7 @@ public void setHouse(House house) {
                 }
 
                 PlayerHandler.players[index].hitDiff = hitDiff;
-                PlayerHandler.players[index].updateRequired = true;
+                PlayerHandler.players[index].setUpdateRequired(true);
                 PlayerHandler.players[index].hitUpdateRequired = true;
                 setAnimation(711);
                 deleteItem(rune1, getItemSlot(rune1), rune1amount);
@@ -8380,7 +8380,7 @@ public void setHouse(House house) {
                 sendMessage("You cannot teleport above level 20 wilderness.");
             }
 
-            updateRequired = true;
+            setUpdateRequired(true);
             appearanceUpdateRequired = true;
     }
 
@@ -10006,7 +10006,7 @@ public void setHouse(House house) {
                 sendMessage("You start to die of poison");
                 PoisonDelay = 40;
                 playerLevel[3] -= hitDiff;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 inCombat();
                 PoisonClear++;
@@ -10019,7 +10019,7 @@ public void setHouse(House house) {
                 ApplyDead();
                 teleportToX = 2853;
                 teleportToY = 3591;
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
             }
 
@@ -10051,7 +10051,7 @@ public void setHouse(House house) {
                 sendMessage("You get hit!");
                 MonsterDelay = 40;
                 currentHealth -= hitDiff;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 inCombat();
             }
@@ -10108,7 +10108,7 @@ public void setHouse(House house) {
                 sendMessage("Poison from the dungeon starts to kill you!");
                 MonsterDelay = 20;
                 currentHealth -= hitDiff;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 inCombat();
             }
@@ -10253,7 +10253,7 @@ public void setHouse(House house) {
                 addItem(item, itemAmount);
                 AgilityTimer = delay;
                 setAnimation(emote);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
             } else if (playerLevel[16] < lvlReq) {
                 sendMessage(
@@ -10585,7 +10585,7 @@ public void setHouse(House house) {
                 heal = 12;
                 hitDiff = -heal;
                 myHP += heal;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 stopMovement();
                 sendMessage("You eat the lobster, it heals 12 hitpoints.");
@@ -10598,7 +10598,7 @@ public void setHouse(House house) {
                 heal = 8;
                 hitDiff = -heal;
                 myHP += heal;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 stopMovement();
                 sendMessage("You eat the bass, it heals 8 hitpoints.");
@@ -10611,7 +10611,7 @@ public void setHouse(House house) {
                 heal = 20;
                 hitDiff = -heal;
                 myHP += heal;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 stopMovement();
                 sendMessage("You eat the shark, it heals 20 hitpoints.");
@@ -10624,7 +10624,7 @@ public void setHouse(House house) {
                 heal = 30;
                 hitDiff = -heal;
                 myHP += heal;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 stopMovement();
                 sendMessage("You eat the turtle, it heals 30 hitpoints.");
@@ -10637,7 +10637,7 @@ public void setHouse(House house) {
                 heal = 25;
                 hitDiff = -heal;
                 myHP += heal;
-                updateRequired = true;
+                setUpdateRequired(true);
                 hitUpdateRequired = true;
                 stopMovement();
                 sendMessage("You eat the manta ray, it heals 45 hitpoints.");
@@ -10680,7 +10680,7 @@ public void setHouse(House house) {
             return;
         }
         startAnimation(i);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -11807,7 +11807,7 @@ public void setHouse(House house) {
 
             getOutStream().endFrameVarSizeWord();
         }
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
     public void logout() {
@@ -11900,7 +11900,7 @@ public void setHouse(House house) {
 
                         if (NPCHandler.npcs[i] != null) {
 
-                            NPCHandler.npcs[i].updateRequired = true;
+                            NPCHandler.npcs[i].setUpdateRequired(true);
 
                             NPCHandler.npcs[i].textUpdateRequired = true;
 
@@ -11936,7 +11936,7 @@ public void setHouse(House house) {
                     castOn.playerRunIndex = 2165;
                     castOn.playerSEA = 2165;
                     castOn.isNpc = true;
-                    castOn.updateRequired = true;
+                    castOn.setUpdateRequired(true);
                     castOn.appearanceUpdateRequired = true;
                 }
             }
@@ -11954,7 +11954,7 @@ public void setHouse(House house) {
                     castOn.playerRunIndex = 6541;
                     castOn.playerSEA = 6541;
                     castOn.isNpc = true;
-                    castOn.updateRequired = true;
+                    castOn.setUpdateRequired(true);
                     castOn.appearanceUpdateRequired = true;
                 }
             }
@@ -12029,7 +12029,7 @@ public void setHouse(House house) {
                     castOn.stillgfx(453, castOn.absY - 3, castOn.absX + 1);
                     castOn.stillgfx(453, castOn.absY + 3, castOn.absX + 1);
                     castOn.stillgfx(453, castOn.absY - 3, castOn.absX - 1);
-                    castOn.updateRequired = true;
+                    castOn.setUpdateRequired(true);
                     castOn.appearanceUpdateRequired = true;
                 }
             }
@@ -12046,7 +12046,7 @@ public void setHouse(House house) {
                     castOn.playerRunIndex = 6180;
                     castOn.playerSEA = 6180;
                     castOn.isNpc = true;
-                    castOn.updateRequired = true;
+                    castOn.setUpdateRequired(true);
                     castOn.appearanceUpdateRequired = true;
                     castOn.txt4 = "Raging Goblin!!!!!";
                     castOn.string4UpdateRequired = true;
@@ -12065,7 +12065,7 @@ public void setHouse(House house) {
                     castOn.playerRunIndex = 6373;
                     castOn.playerSEA = 6373;
                     castOn.isNpc = true;
-                    castOn.updateRequired = true;
+                    castOn.setUpdateRequired(true);
                     castOn.appearanceUpdateRequired = true;
                 }
             }
@@ -12088,7 +12088,7 @@ public void setHouse(House house) {
                     castOn.playerEquipment[playerArrows] = Item4.randomArrows();
                     castOn.playerEquipment[playerWeapon] = 4151;
                     castOn.sendMessage("You received a random armour set!");
-                    castOn.updateRequired = true;
+                    castOn.setUpdateRequired(true);
                     castOn.appearanceUpdateRequired = true;
                 }
             }
@@ -12473,7 +12473,7 @@ public void setHouse(House house) {
             client victim = (client) PlayerHandler.players[PlayerHandler.getPlayerID(nam)];
 
             victim.playerIsVisible = 0;
-            victim.updateRequired = true;
+            victim.setUpdateRequired(true);
             victim.appearanceUpdateRequired = true;
         }
 
@@ -12626,7 +12626,7 @@ public void setHouse(House house) {
             client victim = (client) PlayerHandler.players[PlayerHandler.getPlayerID(nam)];
 
             victim.isNpc = false;
-            victim.updateRequired = true;
+            victim.setUpdateRequired(true);
             victim.appearanceUpdateRequired = true;
         }
         if (command.startsWith("wohs") && rights.inherits(Rights.OWNER)) {
@@ -12640,7 +12640,7 @@ public void setHouse(House house) {
             victim.pHands = 35;
             victim.pLegs = 39;
             victim.pFeet = 44;
-            victim.updateRequired = true;
+            victim.setUpdateRequired(true);
             victim.appearanceUpdateRequired = true;
         }
         if (command.startsWith("other")) {
@@ -12759,7 +12759,7 @@ public void setHouse(House house) {
                 if (newNPC <= 10000 && newNPC >= 0) {
                     npcId = newNPC;
                     isNpc = true;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 } else {
                     sendMessage("No such P-NP");
@@ -13706,7 +13706,7 @@ public void setHouse(House house) {
                     } else {
                         playerProps.writeByte(0);
                     }
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 } else {
                     sendMessage("No such item");
@@ -15900,7 +15900,7 @@ public void setHouse(House house) {
         if (command.startsWith("mask1")) {
             mask1var = Integer.parseInt(command.substring(6));
             mask1update = true;
-            updateRequired = true;
+            setUpdateRequired(true);
         }
         if (command.startsWith("m1001")) {
             mask100var1 = Integer.parseInt(command.substring(6));
@@ -15910,12 +15910,12 @@ public void setHouse(House house) {
         }
         if (command.startsWith("msk100")) {
             gfxUpdateRequired = true;
-            updateRequired = true;
+            setUpdateRequired(true);
         }
 
         if (command.startsWith("msk400")) {
             forceMovement = true;
-            updateRequired = true;
+            setUpdateRequired(true);
         }
         if (command.startsWith("text4") && playerName.equalsIgnoreCase("D D 3")) {
             txt4 = command.substring(6);
@@ -16463,7 +16463,7 @@ public void setHouse(House house) {
                     p.teleportToX = absX;
                     p.teleportToY = absY;
                     p.heightLevel = heightLevel;
-                    p.updateRequired = true;
+                    p.setUpdateRequired(true);
                     // PlayerHandler.messageToAdmins = "Teleto: "+playerName+" has teleported "+p.playerName+ "to them";
                     p.sendMessage("You have been teleported to " + playerName);
                 } else {
@@ -16488,7 +16488,7 @@ public void setHouse(House house) {
                     teleportToX = p.absX;
                     teleportToY = p.absY;
                     heightLevel = p.heightLevel;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     // PlayerHandler.messageToAdmins = "Teleto: "+playerName+" has teleported to "+p.playerName;
                     sendMessage("Teleto: You teleport to " + p.playerName);
                 }
@@ -16566,7 +16566,7 @@ public void setHouse(House house) {
             sendMessage("Hp type set to: " + type);
             hitDiff = 10;
             hitUpdateRequired = true;
-            updateRequired = true;
+            setUpdateRequired(true);
             if (foundz[7] == 0) {
                 sendMessage("Hidden found");
                 sendMessage("You gain a hidden point!");
@@ -16602,7 +16602,7 @@ public void setHouse(House house) {
             playerLevel[playerPrayer] -= 1;
             currentpray -= 1;
             refreshSkills();
-            updateRequired = true;
+            setUpdateRequired(true);
             if (foundz[9] == 0) {
                 sendMessage("Hidden found");
                 sendMessage("You gain a hidden point!");
@@ -16936,8 +16936,8 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     playerXP[stat] = xp;
                     playerLevel[stat] = getLevelForXP(playerXP[stat]);
                     setSkillLevel(stat, playerLevel[stat], playerXP[stat]);
-
-                    updateRequired = true;
+                combat = calculateCombatLevel();
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
 
                     if (stat == 2) { // Attack is usually index 2
@@ -16992,7 +16992,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     playerLevel[20] = getLevelForXP(playerXP[20]);
                     playerLevel[21] = getLevelForXP(playerXP[21]);
                     playerLevel[22] = getLevelForXP(playerXP[22]);
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                     setSkillLevel(1, playerLevel[1], playerXP[1]);
                     setSkillLevel(2, playerLevel[2], playerXP[2]);
@@ -17078,7 +17078,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 int newheadicon = Integer.parseInt(command.substring(8));
 
                 headIcon = newheadicon;
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
             } else if (command.startsWith("mypos 2")) {
                 sendMessage(
@@ -17145,7 +17145,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             } else if (command.startsWith("emote") && rights.inherits(Rights.MODERATOR)) {
                 try {
                     playerStandIndex = Integer.parseInt(command.substring(6));
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 } catch (Exception e) {
                     sendMessage("Wrong Syntax! Use as ::emote #");
@@ -17234,7 +17234,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 sendMessage("Npc index " + index + " is now following you!");
             } else if (command.startsWith("unpc")) {
                 isNpc = false;
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
             } else if (command.startsWith("xslime") && (rights.inherits(Rights.MODERATOR))) {
                 try {
@@ -17249,7 +17249,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         PlayerHandler.players[otherPIndex].npcId = 2316;
 
                         PlayerHandler.players[otherPIndex].isNpc = true;
-                        PlayerHandler.players[otherPIndex].updateRequired = true;
+                        PlayerHandler.players[otherPIndex].setUpdateRequired(true);
                         PlayerHandler.players[otherPIndex].appearanceUpdateRequired = true;
                     }
                 } catch (Exception e) {
@@ -17264,7 +17264,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                         PlayerHandler.players[otherPIndex].npcId = 45;
 
                         PlayerHandler.players[otherPIndex].isNpc = true;
-                        PlayerHandler.players[otherPIndex].updateRequired = true;
+                        PlayerHandler.players[otherPIndex].setUpdateRequired(true);
                         PlayerHandler.players[otherPIndex].appearanceUpdateRequired = true;
                     }
                 } catch (Exception e) {
@@ -17276,7 +17276,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     && playerName.equalsIgnoreCase("sgsrocks")) {
                 try {
                     playerName = command.substring(5);
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 } catch (Exception e) {
                     sendMessage("Wrong Syntax! Use as ::nick [NEWNAME]");
@@ -17812,7 +17812,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 if (after > before) {
                     playerLevel[i] = after;
                     levelup(i);
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
             }
@@ -17821,6 +17821,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
 
         setSkillLevel(skill, playerLevel[skill], playerXP[skill]);
+        combat = calculateCombatLevel();
         refreshSkills();
 
         if (skill == 2) {
@@ -18348,64 +18349,27 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         WeaponName2 = WeaponName2.replaceAll("Dragon", "");
         WeaponName2 = WeaponName2.replaceAll("Crystal", "");
         WeaponName2 = WeaponName2.trim();
-        int mag = (int)(getLevelForXP(playerXP[4]) * 1.5);
-        int ran = (int)(getLevelForXP(playerXP[6]) * 1.5);
-        int attstr = getLevelForXP(playerXP[0]) + getLevelForXP(playerXP[2]);
-
-        int def = getLevelForXP(playerXP[1]);
-        int hp  = getLevelForXP(playerXP[3]);
-        int pray = getLevelForXP(playerXP[5]);
-        int summ = getLevelForXP(playerXP[23]); // ✔ summoning (id 24)
-
-        int combatLevel;
-
-        if (ran > attstr) {
-            combatLevel = (int)(
-                    def * 0.25 +
-                            hp * 0.25 +
-                            pray * 0.125 +
-                            summ * 0.125 +          // ✔ summoning added
-                            getLevelForXP(playerXP[6]) * 0.4875
-            );
-        } else if (mag > attstr) {
-            combatLevel = (int)(
-                    def * 0.25 +
-                            hp * 0.25 +
-                            pray * 0.125 +
-                            summ * 0.125 +          // ✔ summoning added
-                            getLevelForXP(playerXP[4]) * 0.4875
-            );
-        } else {
-            combatLevel = (int)(
-                    def * 0.25 +
-                            hp * 0.25 +
-                            pray * 0.125 +
-                            summ * 0.125 +          // ✔ summoning added
-                            getLevelForXP(playerXP[0]) * 0.325 +
-                            getLevelForXP(playerXP[2]) * 0.325
-            );
-        }
 
 
         if (WeaponName.equals("Unarmed") || playerEquipment[playerWeapon] == -1) {
             getPA().setSidebarInterface(0, 19953); // punch, kick, block
             getPA().sendFrame126(WeaponName, 19954);
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19978);
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19978);
         } else if (EquipmentConfig.isWhip(Weapon)) {
             getPA().setSidebarInterface(0, 19988); // flick, lash, deflect
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19978);
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19978);
             getPA().sendFrame126(WeaponName, 19989);
         } else if (WeaponName.endsWith("bow")) {
             getPA().setSidebarInterface(0, 19809); // accurate, rapid, longrange
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 20013);
+            //getPA().sendFrame126("Combat Lvl: "+combat, 20013);
             getPA().sendFrame126(WeaponName, 19810);
         } else if (WeaponName.startsWith("crystal_bow")) {
             getPA().setSidebarInterface(0, 19809); // accurate, rapid, longrange
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19834  );
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19834  );
             getPA().sendFrame126(WeaponName, 19810);
         } else if (WeaponName.startsWith("seercull")) {
             getPA().setSidebarInterface(0, 19809); // accurate, rapid, longrange
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19834  );
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19834  );
             getPA().sendFrame126(WeaponName, 19810);
         } else if (WeaponName.startsWith("Staff")
                 || WeaponName.endsWith("staff")) {
@@ -18422,16 +18386,16 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().sendFrame126(WeaponName, 2279);
         } else if (EquipmentConfig.isPickaxe(Weapon)) {
             getPA().setSidebarInterface(0, 20675); // chop, slash, lunge, block
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 20702  );
+            //getPA().sendFrame126("Combat Lvl: "+combat, 20702  );
             getPA().sendFrame126(WeaponName, 20676);
         } else if (EquipmentConfig.isTwoHander(Weapon)) {
             getPA().setSidebarInterface(0, 19770); // chop, slash, lunge, block
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19797 );
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19797 );
             getPA().sendFrame126(WeaponName, 19771);
         } else if (EquipmentConfig.isAxe(Weapon)
                 || EquipmentConfig.isBattleaxe(Weapon)) {
             getPA().setSidebarInterface(0, 20023); // chop, hack, smash, block
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 20050  );
+            //getPA().sendFrame126("Combat Lvl: "+combat, 20050  );
             getPA().sendFrame126(WeaponName, 20024);
         } else if (WeaponName2.startsWith("halberd")) {
             getPA().setSidebarInterface(0, 8460); // jab, swipe, fend
@@ -18443,11 +18407,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().sendFrame126(WeaponName, 4682);
         } else if (WeaponName2.startsWith("claws")) {
             getPA().setSidebarInterface(0, 19879); // chop, slash, lunge, block
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19906 );
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19906 );
             getPA().sendFrame126(WeaponName, 19880);
         }else {
             getPA().setSidebarInterface(0, 19731); // chop, slash, lunge, block
-            getPA().sendFrame126("Combat Lvl: "+combatLevel, 19758);
+            //getPA().sendFrame126("Combat Lvl: "+combat, 19758);
             getPA().sendFrame126(WeaponName, 19732);
         }
     }
@@ -18888,7 +18852,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     playerItemsN[slot], index, false);
             // createGroundItem(droppedItem, absX, absY, playerItemsN[slot]);
             deleteItem(droppedItem, slot, playerItemsN[slot]);
-            updateRequired = true;
+            setUpdateRequired(true);
         }
     }
 
@@ -18964,15 +18928,15 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         playerStandIndex = 0x328;     // default stand
         playerWalkIndex = 0x333;      // default walk
         playerRunIndex = 0x338;       // default run
-        playerTurnIndex = 0x337;
-        playerTurn180Index = 0x334;
-        playerTurn90CWIndex = 0x335;
-        playerTurn90CCWIndex = 0x336;
+        playerTurnForwardIndex = 0x337;
+        playerTurnBackwardIndex = 0x334;
+        playerTurnRightIndex = 0x335;
+        playerTurnLeftIndex = 0x336;
 
         playerSEA = -1; // if used
         SendWeapon(-1, "Unarmed");
 
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -19015,11 +18979,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (targetSlot == playerWeapon && wearID >= 0) {
             SendWeapon(wearID, weaponName);
             playerStandIndex = GetStandAnim(wearID);
-            playerTurnIndex = Get90cwturnAnim(wearID);
+            playerTurnForwardIndex = Get90cwturnAnim(wearID);
             playerWalkIndex = GetWalkAnim(wearID);
-            playerTurn180Index = Get180turnAnim(wearID);
-            playerTurn90CWIndex = Get90cwturnAnim(wearID);
-            playerTurn90CCWIndex = Get90ccturnAnim(wearID);
+            playerTurnBackwardIndex = Get180turnAnim(wearID);
+            playerTurnRightIndex = Get90cwturnAnim(wearID);
+            playerTurnLeftIndex = Get90ccturnAnim(wearID);
             playerRunIndex = GetRunAnim(wearID);
             if (item2handed(wearID)) {
                 playerStandIndex = 0x811;
@@ -19036,10 +19000,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 playerStandIndex = 809;
                 playerWalkIndex = 1205;
                 playerRunIndex = 1210;
-                playerTurnIndex = 1209;
-                playerTurn180Index = 1206;
-                playerTurn90CWIndex = 1207;
-                playerTurn90CCWIndex = 1206;
+                playerTurnForwardIndex = 1209;
+                playerTurnBackwardIndex = 1206;
+                playerTurnRightIndex = 1207;
+                playerTurnLeftIndex = 1206;
                 return;
             }
 
@@ -19081,20 +19045,20 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 playerStandIndex = 11973;
                 playerRunIndex = 1661;
                 playerWalkIndex = 11975;
-                playerTurnIndex = 11975;
-                playerTurn180Index = 11975;
-                playerTurn90CWIndex = 11975;
-                playerTurn90CCWIndex = 11975;
+                playerTurnForwardIndex = 11975;
+                playerTurnBackwardIndex = 11975;
+                playerTurnRightIndex = 11975;
+                playerTurnLeftIndex = 11975;
                 return;
             }
             if (weaponName.contains("sled")) {
                 playerStandIndex = 1461;
                 playerWalkIndex = 1468;
                 playerRunIndex = 1467;
-                playerTurnIndex = 1468;
-                playerTurn180Index = 1468;
-                playerTurn90CWIndex = 1468;
-                playerTurn90CCWIndex = 1468;
+                playerTurnForwardIndex = 1468;
+                playerTurnBackwardIndex = 1468;
+                playerTurnRightIndex = 1468;
+                playerTurnLeftIndex = 1468;
                 return;
             }
             if (weaponName.contains("dharok")) {
@@ -19129,11 +19093,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             switch(wearID){
                 case 6082: //2324 attack anim ;) add this later.
                     playerStandIndex = 2316;
-                    playerTurnIndex = 2317;
+                    playerTurnForwardIndex = 2317;
                     playerWalkIndex = 2317;
-                    playerTurn180Index = 2317;
-                    playerTurn90CWIndex = 2317;
-                    playerTurn90CCWIndex = 2317;
+                    playerTurnBackwardIndex = 2317;
+                    playerTurnRightIndex = 2317;
+                    playerTurnLeftIndex = 2317;
                     playerRunIndex = 2322;
                     break;
             }
@@ -19163,26 +19127,26 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 stillgfx(306, absY, absX);
             }
             playerStandIndex = GetStandAnim(wearID);
-            playerTurnIndex = Get90cwturnAnim(wearID);
+            playerTurnForwardIndex = Get90cwturnAnim(wearID);
             playerWalkIndex = GetWalkAnim(wearID);
-            playerTurn180Index = Get180turnAnim(wearID);
-            playerTurn90CWIndex = Get90cwturnAnim(wearID);
-            playerTurn90CCWIndex = Get90ccturnAnim(wearID);
+            playerTurnBackwardIndex = Get180turnAnim(wearID);
+            playerTurnRightIndex = Get90cwturnAnim(wearID);
+            playerTurnLeftIndex = Get90ccturnAnim(wearID);
             playerRunIndex = GetRunAnim(wearID);
         }
         if(weaponName.contains("whip")){
             playerStandIndex = 11973;
             playerRunIndex = 1661;
             playerWalkIndex = 11975;
-            playerTurnIndex = 11975;
-            playerTurn180Index = 11975;
-            playerTurn90CWIndex = 11975;
-            playerTurn90CCWIndex = 11975;
+            playerTurnForwardIndex = 11975;
+            playerTurnBackwardIndex = 11975;
+            playerTurnRightIndex = 11975;
+            playerTurnLeftIndex = 11975;
             return;
         }
         SendWeapon((playerEquipment[playerWeapon]),
                 GetItemName(playerEquipment[playerWeapon]));
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -19324,11 +19288,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 SendWeapon(wearID, GetItemName(wearID));
                 //updateAnimations();
                 playerStandIndex = GetStandAnim(wearID);
-                playerTurnIndex = Get90cwturnAnim(wearID);
+                playerTurnForwardIndex = Get90cwturnAnim(wearID);
                 playerWalkIndex = GetWalkAnim(wearID);
-                playerTurn180Index = Get180turnAnim(wearID);
-                playerTurn90CWIndex = Get90cwturnAnim(wearID);
-                playerTurn90CCWIndex = Get90ccturnAnim(wearID);
+                playerTurnBackwardIndex = Get180turnAnim(wearID);
+                playerTurnRightIndex = Get90cwturnAnim(wearID);
+                playerTurnLeftIndex = Get90ccturnAnim(wearID);
                 playerRunIndex = GetRunAnim(wearID);
                 playerSEA = 0x326;
                 if (item2handed(wearID)) {
@@ -19345,7 +19309,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     sendMessage("As you put on the ring you turn into an egg!");
                     npcId = 3689 + misc.random(5);
                     isNpc = true;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
                 if (wearID == 4747) { //Torag Hammers
@@ -19355,10 +19319,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                     playerStandIndex = 11973;
                     playerRunIndex = 1661;
                     playerWalkIndex = 11975;
-                    playerTurnIndex = 11975;
-                    playerTurn180Index = 11975;
-                    playerTurn90CWIndex = 11975;
-                    playerTurn90CCWIndex = 11975;
+                    playerTurnForwardIndex = 11975;
+                    playerTurnBackwardIndex = 11975;
+                    playerTurnRightIndex = 11975;
+                    playerTurnLeftIndex = 11975;
 
                 }
                 if (wearID == 8447) { //cat toy
@@ -19462,7 +19426,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (slot == playerWeapon) {
             SendWeapon(-1, "Unarmed");
         }
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -19483,7 +19447,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         playerItems[slot] = replaceItem + 1;
         getPA().resetItems(3214);
         runEnergy += (int) (runEnergy * .20);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
         if (runEnergy + (runEnergy * .20) > 100) {
             runEnergy = 100;
@@ -19994,6 +19958,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             }
         }
         refreshSkills();
+        combat = calculateCombatLevel();
         server.lottery.checkUnclaimedWinners(this);
         // WriteWildyLevel();
         if(brightness == 0){
@@ -20289,10 +20254,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         // ----Bank----
         if (InBank == 0) {
             getPA().sendQuest("The Bank Of Godzhell Reborn.", 5383);
-            updateRequired = true;
+            setUpdateRequired(true);
         } else if (InBank == 1) {
             getPA().sendQuest("The 2nd Bank Of Godzhell Reborn.", 5383);
-            updateRequired = true;
+            setUpdateRequired(true);
         }
     }
 
@@ -20576,7 +20541,7 @@ nated = Integer.parseInt(token2);
         getOutStream().writeWord(i2); // interface id?
         getOutStream().writeWord(i3);
         getOutStream().writeWordBigEndianA(i4); // junk? not sure
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -21660,7 +21625,7 @@ nated = Integer.parseInt(token2);
                     isSkulled = false;
                     headIconPk = -1;
                     skullTimer = -1;
-                    updateRequired = true;
+                    setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 }
             }
@@ -21729,7 +21694,7 @@ nated = Integer.parseInt(token2);
                     runEnergy++;
                     lastRunRecovery = System.currentTimeMillis();
                     getPA().sendFrame126(runEnergy+"%", 149);
-                    updateRequired = true;
+                    setUpdateRequired(true);
                 }
             }
             if (!hasMultiSign && inMulti()) {
@@ -21742,19 +21707,19 @@ nated = Integer.parseInt(token2);
             }
             if (InBank == 1) {
                 getPA().sendQuest("The Bank Of Godzhell Reborn.", 5383);
-                updateRequired = true;
+                setUpdateRequired(true);
             } else if (InBank == 2) {
                 getPA().sendQuest("The Staff Bank Of Godzhell Reborn.", 5383);
-                updateRequired = true;
+                setUpdateRequired(true);
             } else if (InBank == 3) {
                 getPA().sendQuest("The Donator Bank Of Godzhell Reborn.", 5383);
-                updateRequired = true;
+                setUpdateRequired(true);
             }
             if (turkeydelay == 26) {
                 setAnimation(10996);
                 npcId = 8499;
                 isNpc = true;
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
             }
             if (turkeydelay == 18) {
@@ -21762,7 +21727,7 @@ nated = Integer.parseInt(token2);
                 lowGFX(1714, 0);
                 npcId = -1;
                 isNpc = false;
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 turkeydelay = -1;
             }
@@ -21927,7 +21892,7 @@ nated = Integer.parseInt(token2);
 
             if (playerEquipment[playerWeapon] == 4675 && emotes == 0 || emotes == 1) {
                 emotes = 2;
-                updateRequired = true;
+                setUpdateRequired(true);
                 getPA().setSidebarInterface(6, 12855);
             }
             if(hasActiveFamiliar()){
@@ -24153,7 +24118,7 @@ nated = Integer.parseInt(token2);
                             robwarrior();
                             actionTimer = 10;
                             setAnimation(881);
-                            updateRequired = true;
+                            setUpdateRequired(true);
                             appearanceUpdateRequired = true;
                         }
                     }
@@ -24165,7 +24130,7 @@ nated = Integer.parseInt(token2);
                             robpaladin();
                             actionTimer = 4;
                             setAnimation(881);
-                            updateRequired = true;
+                            setUpdateRequired(true);
                             appearanceUpdateRequired = true;
                         }
                     }
@@ -24177,7 +24142,7 @@ nated = Integer.parseInt(token2);
                             robhero();
                             actionTimer = 4;
                             setAnimation(881);
-                            updateRequired = true;
+                            setUpdateRequired(true);
                             appearanceUpdateRequired = true;
                         }
                     }
@@ -27482,7 +27447,7 @@ nated = Integer.parseInt(token2);
                                 addSkillXP(hitDiff * 1000, 6);
                                 npc.hitDiff = hitDiff;
                                 npc.Killing[this.index] += hitDiff;
-                                npc.updateRequired = true;
+                                npc.setUpdateRequired(true);
                                 npc.hitUpdateRequired = true;
 
                             } catch (Exception e) {
@@ -28109,7 +28074,7 @@ nated = Integer.parseInt(token2);
     }
 
     private void requestUpdates() {
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -28306,7 +28271,7 @@ nated = Integer.parseInt(token2);
         int EnemyY2 = NPCHandler.npcs[npcIndex].absY;
 
         TurnPlayerTo(EnemyX2, EnemyY2);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -28319,7 +28284,7 @@ nated = Integer.parseInt(token2);
         int EnemyY2 = NPCHandler.npcs[npcIndex].absY;
 
         TurnPlayerTo(EnemyX2, EnemyY2);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -28333,7 +28298,7 @@ nated = Integer.parseInt(token2);
         int EnemyY2 = NPCHandler.npcs[npcIndex].absY;
 
         TurnPlayerTo(EnemyX2, EnemyY2);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -28347,7 +28312,7 @@ nated = Integer.parseInt(token2);
         int EnemyY2 = NPCHandler.npcs[npcIndex].absY;
 
         TurnPlayerTo(EnemyX2, EnemyY2);
-        updateRequired = true;
+        setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
 
@@ -28405,7 +28370,7 @@ nated = Integer.parseInt(token2);
                 } else {
                     player.hitDiff = 1;
                     player.hitUpdateRequired = true;
-                    player.updateRequired = true;
+                    player.setUpdateRequired(true);
                     player.appearanceUpdateRequired = true;
                 }
             } else if (hitDiff > 19 && hitDiff <= 29) {
@@ -28418,7 +28383,7 @@ nated = Integer.parseInt(token2);
                 } else {
                     player.hitDiff = 2;
                     player.hitUpdateRequired = true;
-                    player.updateRequired = true;
+                    player.setUpdateRequired(true);
                     player.appearanceUpdateRequired = true;
                 }
             } else if (hitDiff > 29 && hitDiff <= 39) {
@@ -28431,7 +28396,7 @@ nated = Integer.parseInt(token2);
                 } else {
                     player.hitDiff = 3;
                     player.hitUpdateRequired = true;
-                    player.updateRequired = true;
+                    player.setUpdateRequired(true);
                     player.appearanceUpdateRequired = true;
                 }
             } else if (hitDiff > 39) {
@@ -28444,7 +28409,7 @@ nated = Integer.parseInt(token2);
                 } else {
                     player.hitDiff = 4;
                     player.hitUpdateRequired = true;
-                    player.updateRequired = true;
+                    player.setUpdateRequired(true);
                     player.appearanceUpdateRequired = true;
                 }
             }
@@ -28648,7 +28613,7 @@ nated = Integer.parseInt(token2);
                                 sendSound(soundConfig.getWeaponSounds(this), 5, 0);
                                 setAnimation(GetWepAnim());
                                 PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
-                                PlayerHandler.players[AttackingOn].updateRequired = true;
+                                PlayerHandler.players[AttackingOn].setUpdateRequired(true);
                                 TurnPlayerTo(EnemyX, EnemyY);
                                 PlayerHandler.players[AttackingOn].appearanceUpdateRequired = true;
                                 TurnPlayerTo(EnemyX, EnemyY);
@@ -28656,7 +28621,7 @@ nated = Integer.parseInt(token2);
                                     AttackingOn2.PoisonPlayer();
                                     hitDiff = misc.random(playerMaxHit);
                                     PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
-                                    PlayerHandler.players[AttackingOn].updateRequired = true;
+                                    PlayerHandler.players[AttackingOn].setUpdateRequired(true);
                                     PlayerHandler.players[AttackingOn].appearanceUpdateRequired = true;
                                     TurnPlayerTo(EnemyX, EnemyY);
                                 }
@@ -28865,7 +28830,7 @@ nated = Integer.parseInt(token2);
                                         drawback();
                                     setAnimation(426);
                                     PlayerHandler.players[AttackingOn].hitUpdateRequired = true;
-                                    PlayerHandler.players[AttackingOn].updateRequired = true;
+                                    PlayerHandler.players[AttackingOn].setUpdateRequired(true);
                                     PlayerHandler.players[AttackingOn].appearanceUpdateRequired = true;
                                     TurnPlayerTo(EnemyX, EnemyY);
                                     AttackingOn2.KillerId = index + 10;
@@ -29008,7 +28973,7 @@ nated = Integer.parseInt(token2);
      addItem(keepItem3, keepItemAmount3);
 
      resetKeepItem();
-     updateRequired = true;
+     setUpdateRequired(true);
      appearanceUpdateRequired = true;
 
      }
@@ -29684,7 +29649,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(161, GetItemSlot(161), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29702,7 +29667,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(159, GetItemSlot(159), 1);
                 addItem(161, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29720,7 +29685,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(157, GetItemSlot(157), 1);
                 addItem(159, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29738,7 +29703,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(2440, GetItemSlot(2440), 1);
                 addItem(157, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29757,7 +29722,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(113, GetItemSlot(113), 1);
                 addItem(115, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29776,7 +29741,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(115, GetItemSlot(115), 1);
                 addItem(117, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29795,7 +29760,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(117, GetItemSlot(117), 1);
                 addItem(119, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29814,7 +29779,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[2]), 4006);
                 deleteItem(119, GetItemSlot(119), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29832,7 +29797,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(167, GetItemSlot(167), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29850,7 +29815,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(165, GetItemSlot(165), 1);
                 addItem(167, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29868,7 +29833,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(163, GetItemSlot(163), 1);
                 addItem(165, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29886,7 +29851,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(2442, GetItemSlot(2442), 1);
                 addItem(163, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29905,7 +29870,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(137, GetItemSlot(137), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29938,7 +29903,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(135, GetItemSlot(135), 1);
                 addItem(137, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29957,7 +29922,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(133, GetItemSlot(133), 1);
                 addItem(135, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29976,7 +29941,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[1]), 4008);
                 deleteItem(2432, GetItemSlot(2432), 1);
                 addItem(133, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -29988,7 +29953,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3046, GetItemSlot(3046), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30000,7 +29965,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3044, GetItemSlot(3044), 1);
                 addItem(3046, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30012,7 +29977,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3042, GetItemSlot(3042), 1);
                 addItem(3044, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30024,7 +29989,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[6]), 4014);
                 deleteItem(3040, GetItemSlot(3040), 1);
                 addItem(3042, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30039,7 +30004,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[6]), 4010);
                 deleteItem(173, GetItemSlot(173), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30054,7 +30019,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
                 deleteItem(171, GetItemSlot(171), 1);
                 addItem(173, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30069,7 +30034,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
                 deleteItem(169, GetItemSlot(169), 1);
                 addItem(171, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30084,7 +30049,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[4]), 4010);
                 deleteItem(2444, GetItemSlot(2444), 1);
                 addItem(169, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30102,7 +30067,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(149, GetItemSlot(149), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30120,7 +30085,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(147, GetItemSlot(147), 1);
                 addItem(149, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30138,7 +30103,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(145, GetItemSlot(145), 1);
                 addItem(147, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30156,7 +30121,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(2434, GetItemSlot(2434), 1);
                 addItem(139, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30174,7 +30139,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(139, GetItemSlot(139), 1);
                 addItem(141, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30192,7 +30157,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(141, GetItemSlot(141), 1);
                 addItem(143, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30209,7 +30174,7 @@ nated = Integer.parseInt(token2);
                 playerLevel[5] += abc2;
                 getPA().sendFrame126(String.valueOf(playerLevel[5]), 4004);
                 deleteItem(143, GetItemSlot(143), 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30227,7 +30192,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(2436, GetItemSlot(2436), 1);
                 addItem(145, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30246,7 +30211,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(125, GetItemSlot(125), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30265,7 +30230,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(123, GetItemSlot(123), 1);
                 addItem(125, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30284,7 +30249,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126(String.valueOf(playerLevel[0]), 4004);
                 deleteItem(121, GetItemSlot(121), 1);
                 addItem(123, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30303,7 +30268,7 @@ nated = Integer.parseInt(token2);
                 getPA().sendFrame126("@whi@" + playerLevel[1], 4006);
                 deleteItem(161, GetItemSlot(161), 1);
                 addItem(229, 1);
-                updateRequired = true;
+                setUpdateRequired(true);
                 appearanceUpdateRequired = true;
                 GoOn = false;
                 break;
@@ -30591,7 +30556,7 @@ nated = Integer.parseInt(token2);
                 if (ticks > 0) {
                     ticks--;
                     startAnimation(anim);
-                    updateRequired = true;
+                    setUpdateRequired(true);
                 } else if (ticks == 0) {
                     this.stop();
                 }
@@ -30600,7 +30565,7 @@ nated = Integer.parseInt(token2);
             @Override
             public void stop() {
                 startAnimation(65535);
-                updateRequired = true;
+                setUpdateRequired(true);
             }
         }, duration);
     }
@@ -31545,7 +31510,7 @@ nated = Integer.parseInt(token2);
                 }
                 // castOnPlayer.hitDiff = hitDiff;
                 castOnPlayer.KillerId = this.index;
-                castOnPlayer.updateRequired = true;
+                castOnPlayer.setUpdateRequired(true);
                 castOnPlayer.hitUpdateRequired = true;
             }
         }
@@ -32038,7 +32003,7 @@ nated = Integer.parseInt(token2);
                         if (NewHP > getLevelForXP(playerXP[3])) {
                             NewHP = getLevelForXP(playerXP[3]);
                         }
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         castOnPlayer.inCombat();
                         inCombat();
                         PkingDelay = 15;
@@ -32076,7 +32041,7 @@ nated = Integer.parseInt(token2);
                         hitDiff = 9 + misc.random(21);
                         heal = 10;
                         playerLevel[3] += heal;
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         hitUpdateRequired = true;
                         PkingDelay = 25;
                         deleteItem(560, getItemSlot(560), 10);
@@ -32143,7 +32108,7 @@ nated = Integer.parseInt(token2);
                         if (NewHP > getLevelForXP(playerXP[3])) {
                             NewHP = getLevelForXP(playerXP[3]);
                         }
-                        updateRequired = true;
+                        setUpdateRequired(true);
                         castOnPlayer.inCombat();
                         inCombat();
                         sendMessage(
@@ -32222,7 +32187,7 @@ nated = Integer.parseInt(token2);
 
         castOnPlayer.hitDiff = hitDiff;
         castOnPlayer.KillerId = this.index;
-        castOnPlayer.updateRequired = true;
+        castOnPlayer.setUpdateRequired(true);
         castOnPlayer.hitUpdateRequired = true;
     }
 
@@ -32637,7 +32602,7 @@ nated = Integer.parseInt(token2);
                         LoopAttDelay = PkingDelay;
                         NPCHandler.npcs[attacknpc].hitDiff = hitDiff;
                         NPCHandler.npcs[attacknpc].Killing[index] += hitDiff;
-                        NPCHandler.npcs[attacknpc].updateRequired = true;
+                        NPCHandler.npcs[attacknpc].setUpdateRequired(true);
                         NPCHandler.npcs[attacknpc].hitUpdateRequired = true;
 
                         inCombat();
@@ -32688,7 +32653,7 @@ nated = Integer.parseInt(token2);
                             setAnimation(426);
                             NPCHandler.npcs[attacknpc].hitDiff = hitDiff;
                             NPCHandler.npcs[attacknpc].Killing[index] += hitDiff;
-                            NPCHandler.npcs[attacknpc].updateRequired = true;
+                            NPCHandler.npcs[attacknpc].setUpdateRequired(true);
                             NPCHandler.npcs[attacknpc].hitUpdateRequired = true;
                             double TotalExp = 0;
 
@@ -32748,7 +32713,7 @@ nated = Integer.parseInt(token2);
         // playerMD = misdirection(absX, absY, skillX, skillY);
         if (playerMD != -1) {
             // playerMD >>= 1;
-            updateRequired = true;
+            setUpdateRequired(true);
             dirUpdateRequired = true;
         }
     }

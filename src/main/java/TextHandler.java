@@ -63,7 +63,15 @@ public class TextHandler {
         p.getPA().sendQuest("@whi@4", 939);
         p.getPA().sendQuest("@whi@4", 950);
         p.getPA().sendQuest("      @whi@Teleports", 174);
-
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 19758);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 19906);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 20050);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 19797);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 20702);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 19834);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 20013);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 19978);
+        p.getPA().sendQuest("Combat Lvl: "+p.combat, 19978);
         p.getPA().sendQuest(" Change your character looks!", 3649);
         p.getPA().sendQuest("Rearrange mode:", 5390);
         p.getPA().sendQuest("Withdraw as -", 5388);

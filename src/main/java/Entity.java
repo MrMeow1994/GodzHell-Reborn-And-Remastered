@@ -29,6 +29,18 @@ public abstract class Entity {
     protected abstract void appendHitUpdate2(stream str);
    protected abstract void appendAnimationRequest(stream str);
     protected abstract void appendSetFocusDestination(stream str);
+    public boolean isUpdateRequired() {
+        return updateRequired;
+    }
+
+    public void setUpdateRequired(boolean updateRequired) {
+        this.updateRequired = updateRequired;
+    }
+
+    public boolean isAnimationUpdateRequired() {
+        return animationUpdateRequired;
+    }
+
     /**
      * The index value where the {@link Entity} resides along with other common
      * counterparts.

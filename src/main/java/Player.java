@@ -706,7 +706,7 @@ public abstract class Player extends Entity {
 		mask100var1 = gfx;
 		mask100var2 = 65536;
 		gfxUpdateRequired = true;
-		updateRequired = true;
+		setUpdateRequired(true);
 	}
 
 
@@ -766,8 +766,8 @@ public abstract class Player extends Entity {
 	public int turkeydelay = -1;
 	public int pBeard;
 	public int playerStandIndex = 0x328; // this being the original standing state
-	public int  playerTurnIndex = 0x337;
-	public int playerTurn180Index = 0x334;
+	public int playerTurnForwardIndex = 0x337;
+	public int playerTurnBackwardIndex = 0x334;
 	public int pWalk = 0x333; // original walking animation
 	int attackIndex = 422,
 			standIndex = 808,
@@ -1089,7 +1089,7 @@ public abstract class Player extends Entity {
 	public void faceUpdate(int index) {
 		face = index;
 		faceUpdateRequired = true;
-		updateRequired = true;
+		setUpdateRequired(true);
 	}
 
 	public void stopMovement() {
@@ -1203,7 +1203,7 @@ public abstract class Player extends Entity {
 	}
 	public void setPlrAnimation(int i) {
 		playerStandIndex = i;
-		updateRequired = true;
+		setUpdateRequired(true);
 		appearanceUpdateRequired = true;
 	}
 	public int GetPlrBlockAnim(int id)
@@ -1250,7 +1250,7 @@ public abstract class Player extends Entity {
 
 		boolean savedUpdateRequired = npc.updateRequired;
 
-		npc.updateRequired = true;
+		npc.setUpdateRequired(true);
 		npc.appendNPCUpdateBlock(updateBlock);
 		npc.updateRequired = savedUpdateRequired;
 		str.writeBits(1, 1); // update required
@@ -1266,13 +1266,13 @@ public abstract class Player extends Entity {
 		// TODO: properly implement the character appearance handling
 		// send this everytime for now and don't make use of the cached ones in client
 		str.writeBits(1, 1);	// set to true, if player definitions follow below
-		boolean savedFlag = plr.appearanceUpdateRequired;
-		boolean savedUpdateRequired = plr.updateRequired;
-		plr.appearanceUpdateRequired = true;
-		plr.updateRequired = true;
+		boolean savedFlag = plr.isAppearanceUpdateRequired();
+		boolean savedUpdateRequired = plr.isUpdateRequired();
+		plr.setAppearanceUpdateRequired(true);
+		plr.setUpdateRequired(true);
 		plr.appendPlayerUpdateBlock(updateBlock);
-		plr.appearanceUpdateRequired = savedFlag;
-		plr.updateRequired = savedUpdateRequired;
+		plr.setAppearanceUpdateRequired(savedFlag);
+		plr.setUpdateRequired(savedUpdateRequired);
 
 
 		str.writeBits(1, 1);	// set to true, if we want to discard the (clientside) walking queue
@@ -1290,7 +1290,13 @@ public abstract class Player extends Entity {
 	// player appearance related stuff
 	protected boolean appearanceUpdateRequired = true;	// set to true if the player appearance wasn't synchronized
 	// with the clients yet or changed recently
+	public boolean isAppearanceUpdateRequired() {
+		return appearanceUpdateRequired;
+	}
 
+	public void setAppearanceUpdateRequired(boolean appearanceUpdateRequired) {
+		this.appearanceUpdateRequired = appearanceUpdateRequired;
+	}
 	protected static stream playerProps;
 	static {
 		playerProps = new stream(new byte[100]);
@@ -1397,91 +1403,53 @@ public abstract class Player extends Entity {
 		playerProps.writeWord(playerColor[4]);	// skin color (0-6)
 
 		playerProps.writeWord(playerStandIndex);		// standAnimIndex
-		playerProps.writeWord(playerTurnIndex);		// standTurnAnimIndex
+		playerProps.writeWord(playerTurnForwardIndex);		// standTurnAnimIndex
 		playerProps.writeWord(playerWalkIndex);	// walkAnimIndex
-		playerProps.writeWord(playerTurn180Index);		// turn180AnimIndex
-		playerProps.writeWord(playerTurn90CWIndex);		// turn90CWAnimIndex
-		playerProps.writeWord(playerTurn90CCWIndex);		// turn90CCWAnimIndex
+		playerProps.writeWord(playerTurnBackwardIndex);		// turn180AnimIndex
+		playerProps.writeWord(playerTurnRightIndex);		// turn90CWAnimIndex
+		playerProps.writeWord(playerTurnLeftIndex);		// turn90CCWAnimIndex
 		playerProps.writeWord(playerRunIndex);	// runAnimIndex
 
 		playerProps.writeQWord(misc.playerNameToInt64(displayName));
 
-		//Stat fix, combat decreases when your hp or any of these skills get lowerd, this fixes that problem.
-		/*int att = (int)((double)(getLevelForXP(playerXP[0])) * 0.325);
-		int def = (int)((double)(getLevelForXP(playerXP[1])) * 0.25);
-		int str = (int)((double)(getLevelForXP(playerXP[2])) * 0.325);
-		int hit = (int)((double)(getLevelForXP(playerXP[3])) * 0.25);
-		int mag = (int)((double)(getLevelForXP(playerXP[4])) * 0.4875);
-		int pra = (int)((double)(getLevelForXP(playerXP[5])) * 0.125);
-		int ran = (int)((double)(getLevelForXP(playerXP[6])) * 0.4875);*/
-
-		/*int mag = (int)((double)(getLevelForXP(playerXP[4])) * 1.5);
-		int ran = (int)((double)(getLevelForXP(playerXP[6])) * 1.5);
-		int attstr = (int)((double)(getLevelForXP(playerXP[0])) + (double)(getLevelForXP(playerXP[2])));
-
-		int combatLevel = 0;
-		if (ran > attstr) {
-			combatLevel = (int)(((double)(getLevelForXP(playerXP[1])) * 0.25) + ((double)(getLevelForXP(playerXP[3])) * 0.25) + ((double)(getLevelForXP(playerXP[5])) * 0.125) + ((double)(getLevelForXP(playerXP[6])) * 0.4875));
-		} else if (mag > attstr) {
-			combatLevel = (int)(((double)(getLevelForXP(playerXP[1])) * 0.25) + ((double)(getLevelForXP(playerXP[3])) * 0.25) + ((double)(getLevelForXP(playerXP[5])) * 0.125) + ((double)(getLevelForXP(playerXP[4])) * 0.4875));
-		} else {
-			combatLevel = (int)(((double)(getLevelForXP(playerXP[1])) * 0.25) + ((double)(getLevelForXP(playerXP[3])) * 0.25) + ((double)(getLevelForXP(playerXP[5])) * 0.125) + ((double)(getLevelForXP(playerXP[0])) * 0.325) + ((double)(getLevelForXP(playerXP[2])) * 0.325));
-		}
-		playerProps.writeByte(combatLevel);		// combat level
-		playerProps.writeWord(loyaltyRank);			// incase != 0, writes skill-%d
-
-		str.writeByteC(playerProps.currentOffset);		// size of player appearance block
-		str.writeBytes(playerProps.buffer, playerProps.currentOffset, 0);
- 	}*/
 
 
-		int mag = (int)(getLevelForXP(playerXP[4]) * 1.5);
-		int ran = (int)(getLevelForXP(playerXP[6]) * 1.5);
-		int attstr = getLevelForXP(playerXP[0]) + getLevelForXP(playerXP[2]);
+		combat = calculateCombatLevel();
 
-		int def = getLevelForXP(playerXP[1]);
-		int hp  = getLevelForXP(playerXP[3]);
-		int pray = getLevelForXP(playerXP[5]);
-		int summ = getLevelForXP(playerXP[24]); // ✔ summoning (id 24)
-
-		int combatLevel;
-
-		if (ran > attstr) {
-			combatLevel = (int)(
-					def * 0.25 +
-							hp * 0.25 +
-							pray * 0.125 +
-							summ * 0.125 +          // ✔ summoning added
-							getLevelForXP(playerXP[6]) * 0.4875
-			);
-		} else if (mag > attstr) {
-			combatLevel = (int)(
-					def * 0.25 +
-							hp * 0.25 +
-							pray * 0.125 +
-							summ * 0.125 +          // ✔ summoning added
-							getLevelForXP(playerXP[4]) * 0.4875
-			);
-		} else {
-			combatLevel = (int)(
-					def * 0.25 +
-							hp * 0.25 +
-							pray * 0.125 +
-							summ * 0.125 +          // ✔ summoning added
-							getLevelForXP(playerXP[0]) * 0.325 +
-							getLevelForXP(playerXP[2]) * 0.325
-			);
-		}
-
-		combat = combatLevel;
-
-		playerProps.writeByte(combatLevel);		// combat level
+		playerProps.writeByte(combat);		// combat level
 		playerProps.writeWord(loyaltyRank);			// incase != 0, writes skill-%d
 		playerProps.writeWord(0);
 		playerProps.writeWord(playerIsVisible);
 		str.writeByteC(playerProps.currentOffset);		// size of player appearance block
 		str.writeBytes(playerProps.buffer, playerProps.currentOffset, 0);
 	}
+	public int calculateCombatLevel() {
+		int atk = getLevelForXP(playerXP[playerAttack]);
+		int def = getLevelForXP(playerXP[playerDefence]);
+		int str = getLevelForXP(playerXP[playerStrength]);
+		int hp  = getLevelForXP(playerXP[playerHitpoints]);
+		int pray = getLevelForXP(playerXP[playerPrayer]);
+		int range = getLevelForXP(playerXP[playerRanged]);
+		int mage  = getLevelForXP(playerXP[playerMagic]);
+		int summ  = getLevelForXP(playerXP[playerSummoning]);
+
+		double base = (
+				def
+						+ hp
+						+ Math.floor(pray / 2.0)
+						+ Math.floor(summ / 2.0)
+		) * 0.25;
+
+		double melee  = (atk + str) * 0.325;
+		double ranged = Math.floor(range * 1.5) * 0.325;
+		double magic  = Math.floor(mage * 1.5) * 0.325;
+
+		return (int) Math.floor(
+				base + Math.max(melee, Math.max(ranged, magic))
+		);
+	}
+
+
 	protected boolean chatTextUpdateRequired = false;
 	protected byte chatText[] = new byte[4096], chatTextSize = 0;
 	protected int chatTextEffects = 0, chatTextColor = 0;
@@ -1576,7 +1544,7 @@ public abstract class Player extends Entity {
 
 	public void clearUpdateFlags() { // Xerozcheez: ORDER IS CRUCIAL HERE TOO (although it's different order I think LOL) :|
 		FocusPointX = FocusPointY = -1;
-		updateRequired = false;
+		setUpdateRequired(false);
 		//animationRequest = -1;
 		string4UpdateRequired = false;
 		chatTextUpdateRequired = false;
@@ -1765,13 +1733,13 @@ public abstract class Player extends Entity {
 	public final void face(int x, int y) {
 		FocusPointX = 2 * x + 1;
 		FocusPointY = 2 * y + 1;
-		updateRequired = true;
+		setUpdateRequired(true);
 		faceUpdateRequired = true;
 	}
 	public void startAnimation(int animIdx)
 	{
 		animationRequest = animIdx;
-		updateRequired = true;
+		setUpdateRequired(true);
 		animationUpdateRequired = true;
 	}
 	@Override
@@ -1879,8 +1847,8 @@ public abstract class Player extends Entity {
 	public int playerWalkIndex = 0x333; //SEW = Standard Emotion Walking
 	public int playerRunIndex = 0x338; //SER = Standard Emotion Run
 	public int playerSEA = 0x326; //SEA = Standard Emotion Attack
-	public int playerTurn90CWIndex = 0x335; //SEA = Standard Emotion turn 90
-	public int playerTurn90CCWIndex = 0x336; //SEA = Standard Emotion turn 90
+	public int playerTurnRightIndex = 0x335; //SEA = Standard Emotion turn 90
+	public int playerTurnLeftIndex = 0x336; //SEA = Standard Emotion turn 90
 	public int playerMD = -1;
 	public int viewToX = -1;
 	public int viewToY = -1;

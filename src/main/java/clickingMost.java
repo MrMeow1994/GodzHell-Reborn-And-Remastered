@@ -983,6 +983,9 @@ public class clickingMost {
             // These values speak for themselves
             // case 4126: windstrike break;
             case 14067: // Char design accept button
+                c.setAppearanceUpdateRequired(true);
+                c.setUpdateRequired(true);
+                c.canChangeAppearance = false;
                 c.getPA().RemoveAllWindows();
                 break;
 

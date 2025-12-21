@@ -76,7 +76,7 @@ public class NPCHandler {
                 newNpc.NeedRespawn = respawn;
                 newNpc.spawnedBy = -1;
                 newNpc.facePlayer(0);
-                newNpc.updateRequired = true;
+                newNpc.setUpdateRequired(true);
                 newNpc.IsDead = false;
                 newNpc.randomWalk = (walkType == 1);
                 npcs[i] = newNpc;
@@ -460,7 +460,7 @@ public class NPCHandler {
                     npc.facePlayer(playerId);
                     handleClipping(i);
                     npc.getNextNPCMovement(i);
-                    npc.updateRequired = true;
+                    npc.setUpdateRequired(true);
                 }
             }
         } else {
@@ -816,7 +816,7 @@ public class NPCHandler {
             }
             handleClipping(NPCID);
             npcs[NPCID].getNextNPCMovement(NPCID);
-            npcs[NPCID].updateRequired = true;
+            npcs[NPCID].setUpdateRequired(true);
         }
     }
 
@@ -831,7 +831,7 @@ public class NPCHandler {
 
             npcs[NPCID].poisondmg = true;
             npcs[NPCID].hitDiff = hitDiff;
-            npcs[NPCID].updateRequired = true;
+            npcs[NPCID].setUpdateRequired(true);
             npcs[NPCID].hitUpdateRequired = true;
             npcs[NPCID].PoisonClear++;
             npcs[NPCID].PoisonDelay = 40;
@@ -1363,7 +1363,7 @@ public class NPCHandler {
             npc.moveX = dx;
             npc.moveY = dy;
             npc.walkingType = 1;
-            npc.updateRequired = true;
+            npc.setUpdateRequired(true);
             npc.direction = npc.getNextWalkingDirection();
         }
 
@@ -1475,7 +1475,7 @@ public class NPCHandler {
                                if (p != null && !p.IsDead) {
                                    p.hitDiff = npc.pendingDamage;
                                    p.hitUpdateRequired = true;
-                                   p.updateRequired = true;
+                                   p.setUpdateRequired(true);
                                    p.appearanceUpdateRequired = true;
 
                                    // Apply damage to HP
@@ -1637,266 +1637,266 @@ public class NPCHandler {
                                    || npc.npcType == 1767
                                    || npc.npcType == 1768) {
                                if (misc.random2(50) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Moo";
                                }
                            }
                            if (npc.npcType == 8172) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Talk to me to start Desert Treasure!";
                                }
                            }
                            if (npc.npcType == 619) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "This is as close as im getting.";
                                }
                            }
                            if (npc.npcType == 246) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Do ::inside Sir!";
                                }
                            }
                            if (npc.npcType == 532) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Member Shop!";
                                }
                            }
                            if (npc.npcType == 3005) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Ladder For Mems Only! Get's you behind edge bank!";
                                }
                            }
                            if (npc.npcType == 3006) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Come In if your Mem!, if not go to www.Ghreborn.com";
                                }
                            }
                            if (npc.npcType == 660) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "We are the knights of the party room!";
                                }
                            }
                            if (npc.npcType == 2478) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Nigger You Got Jailed";
                                }
                            }
                            if (npc.npcType == 2478) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Don't Think Of Logging Out";
                                }
                            }
                            if (npc.npcType == 2478) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "or Asking To get unjailed";
                                }
                            }
                            if (npc.npcType == 2478) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Ur Here Because You Was not Being Good To Others";
                                }
                            }
                            if (npc.npcType == 2478) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Think What U have Done!!";
                                }
                            }
                            if (npc.npcType == 660) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Here to Party 24/7!";
                                }
                            }
                            if (npc.npcType == 364) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Mod & Admin Portal Only!";
                                }
                            }
                            if (npc.npcType == 280) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Strength Guild, 99 strength to Enter!";
                                }
                            }
                            if (npc.npcType == 172) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Range/Magic Guild, 99 Range and Magic to Enter!";
                                }
                            }
                            if (npc.npcType == 212) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Welcome to the Mod/Admin Zone..Keep up the Good Work!";
                                }
                            }
                            if (npc.npcType == 945) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Talk to me to learn about the server.";
                                }
                            }
                            if (npc.npcType == 225) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Icon Minigame!";
                                }
                            }
                            if (npc.npcType == 648) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Welcome to Training Made To Own N33bs!";
                                }
                            }
                            if (npc.npcType == 793) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Enchanted Minigame!";
                                }
                            }
                            if (npc.npcType == 2253) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Clan Wars Portal!!";
                                }
                            }
                            if (npc.npcType == 541) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Skill Cape Shop!";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "We are the righteous ones in his eyes alone.";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Let them not infest our cities and towns...";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "And lo, we become the power, indeed the force to stop these monsters in their tracks.";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Verily I urge you, my friends to take up your spades and farm your farms to feed our people in this blessed sanctuary.";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "If thine monsters visage does frighten thee, then tear it off I say... tear it off!";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "For Saradomin will guide our sword arms and smash the enemies of humans till their bones become dust.";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "And let us smite these monsters unto their deaths.";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "For they are not the chosen ones in Saradomin's eyes.";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Where do we go for safety from these monsters... here, my brethren!";
                                }
                            }
                            if (npc.npcType == 1713) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "And let there be no cave or shelter for their spawn until the end of days.";
                                }
                            }
                            if (npc.npcType == 2821) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Fishing Portal!";
                                }
                            }
                            if (npc.npcType == 2304) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Farming Shop!By seed's for patch's!";
                                }
                            }
                            if (npc.npcType == 461) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Magic Shop!";
                                }
                            }
                            if (npc.npcType == 57) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    int players = PlayerHandler.getPlayerCount();
                                    npc.textUpdate = "Players Online: " + players;
@@ -1904,7 +1904,7 @@ public class NPCHandler {
                            }
                            if (npc.npcType == 8206) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    int lottery = server.lottery.lotteryFund / 1000000;
                                    npc.textUpdate = "Lottery is at " + lottery + "m";
@@ -1912,126 +1912,126 @@ public class NPCHandler {
                            }
                            if (npc.npcType == 550) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Pk Shop!";
                                }
                            }
                            if (npc.npcType == 1759) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Shops Here!";
                                }
                            }
                            if (npc.npcType == 1699) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Pur3 Sh0p!";
                                }
                            }
                            if (npc.npcType == 2475) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Training Portal!";
                                }
                            }
                            if (npc.npcType == 28) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Train Your Skills Here!";
                                }
                            }
                            if (npc.npcType == 1917) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Rune Armor Shop!!!";
                                }
                            }
                            if (npc.npcType == 522) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "General Store!";
                                }
                            }
                            if (npc.npcType == 522) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Great deals Here!";
                                }
                            }
                            if (npc.npcType == 548) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Gloves, Robes, Boots Shop!";
                                }
                            }
                            if (npc.npcType == 530) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Skillers Shop!";
                                }
                            }
                            if (npc.npcType == 528) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Woodcutting Store!!";
                                }
                            }
                            if (npc.npcType == 949) {
                                if (misc.random2(30) <= 3) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Welcome to Moderator Island!";
                                }
                            }
                            if (npc.npcType == 2244) {
                                if (misc.random2(30) <= 3) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Welcome to Moderator Island!";
                                }
                            }
                            if (npc.npcType == 213) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "You need the frozen key to get in this portal! Kill the troll for key!";
                                }
                            }
                            if (npc.npcType == 555) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Random Stoof!";
                                }
                            }
                            if (npc.npcType == 561) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Hood Shop!";
                                }
                            }
                            if (npc.npcType == 538) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Slayer Shop!";
                                }
                            }
                            if (npc.npcType == 529) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Farming Shop!";
                                }
@@ -2039,35 +2039,35 @@ public class NPCHandler {
 
                            if (npc.npcType == 3117) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Click the chests for slayer exp ..";
                                }
                            }
                            if (npc.npcType == 866) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Et .. Phone .. Home!";
                                }
                            }
                            if (npc.npcType == 549) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Smithin' Shop";
                                }
                            }
                            if (npc.npcType == 558) {
                                if (misc.random2(30) <= 2) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Herblore shop!!";
                                }
                            }
                            if (npc.npcType == 1552) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Merry Christmas!!!";
                                }
@@ -2116,21 +2116,21 @@ public class NPCHandler {
                            }
                            if (npc.npcType == 1451) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Tele to varrock";
                                }
                            }
                            if (npc.npcType == 33) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Tele to varrock";
                                }
                            }
                            if (npc.npcType == 37) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Welcome To Edgeville...";
                                }
@@ -2138,7 +2138,7 @@ public class NPCHandler {
 
                            if (npc.npcType == 1201) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "DO YOU DARE ENTER THE BLACK DRAGONS LAIR?";
                                }
@@ -2146,7 +2146,7 @@ public class NPCHandler {
 
                            if (npc.npcType == 1199) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "GO THROUGH THIS DOOR TO TELEPORT TO THE BLACK DRAGON CAVE";
                                }
@@ -2154,28 +2154,28 @@ public class NPCHandler {
 
                            if (npc.npcType == 2301) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Tele to the monkey training area";
                                }
                            }
                            if (npc.npcType == 1659) {
                                if (misc.random2(30) == 1) {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "Go to www.projectdestiny.co.nr to buy and sell things!";
                                }
                            } else if (npc.npcType == 3832) {
                                if (misc.random2(50) <= 3) // this is the time delay
                                {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    npc.textUpdate = "I shoulda never sold that crack! Ho HO HO!!";
                                }
                            } else if (npc.npcType == 3832) {
                                if (misc.random2(10) <= 3) // this is the time delay
                                {
-                                   npc.updateRequired = true;
+                                   npc.setUpdateRequired(true);
                                    npc.textUpdateRequired = true;
                                    if (PlayerHandler.isPlayerOn("Sgsrocks")) {
                                        npc.textUpdate = "Sgsrocks is ONLINE";
@@ -2196,7 +2196,7 @@ public class NPCHandler {
                                    target.sendSound(getNpcDeathSound(npc.npcType), 4, 0);
                                }
                                npc.animNumber = getNpcDeathAnimation(npc.npcType);
-                               npc.updateRequired = true;
+                               npc.setUpdateRequired(true);
                                npc.animUpdateRequired = true;
                                npc.DeadApply = true;
                                npc.actionTimer = AnimationLength.getFrameLength(npc.animNumber);
@@ -2250,7 +2250,7 @@ public class NPCHandler {
                                npc.absX = npc.makeX;
                                npc.absY = npc.makeY;
                                npc.HP = npc.MaxHP;
-                               npc.updateRequired = true;
+                               npc.setUpdateRequired(true);
                                npc.animUpdateRequired = true;
                            } else if (npc.actionTimer == 0 && npc.NeedRespawn) {
                                if (npc.Respawns) {
@@ -2393,7 +2393,7 @@ public class NPCHandler {
             npc.moveX = 0;
             npc.moveY = 0;
             npc.randomWalk = false;
-            npc.updateRequired = true;
+            npc.setUpdateRequired(true);
         }
 
         // Normal following
@@ -2411,7 +2411,7 @@ public class NPCHandler {
                 if (p != null && !p.IsDead) {
                     p.hitDiff = npc.pendingDamage;
                     p.hitUpdateRequired = true;
-                    p.updateRequired = true;
+                    p.setUpdateRequired(true);
                     p.appearanceUpdateRequired = true;
                     p.NewHP = Math.max(0, p.NewHP - npc.pendingDamage);
                     if (p.NewHP == 0) p.IsDead = true;
@@ -2482,231 +2482,231 @@ public class NPCHandler {
                 || npc.index == 1767
                 || npc.index == 1768) {
             if (misc.random2(50) == 1) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Moo";
             }
         }
         if (npc.index == 8172) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Talk to me to start Desert Treasure!";
             }
         }
         if (npc.index == 619) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "This is as close as im getting.";
             }
         }
         if (npc.index == 246) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Do ::inside Sir!";
             }
         }
         if (npc.index == 532) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Member Shop!";
             }
         }
         if (npc.index == 3005) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Ladder For Mems Only! Get's you behind edge bank!";
             }
         }
         if (npc.index == 3006) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Come In if your Mem!, if not go to www.Ghreborn.com";
             }
         }
         if (npc.index == 660) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "We are the knights of the party room!";
             }
         }
         if (npc.index == 660) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Here to Party 24/7!";
             }
         }
         if (npc.index == 364) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Mod & Admin Portal Only!";
             }
         }
         if (npc.index == 280) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Strength Guild, 99 strength to Enter!";
             }
         }
         if (npc.index == 172) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Range/Magic Guild, 99 Range and Magic to Enter!";
             }
         }
         if (npc.index == 212) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to the Mod/Admin Zone..Keep up the Good Work!";
             }
         }
         if (npc.index == 945) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Talk to me to learn about the server.";
             }
         }
         if (npc.index == 225) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Icon Minigame!";
             }
         }
         if (npc.index == 648) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to Training Made To Own N33bs!";
             }
         }
         if (npc.index == 793) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Enchanted Minigame!";
             }
         }
         if (npc.index == 2253) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Clan Wars Portal!!";
             }
         }
         if (npc.index == 541) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Skill Cape Shop!";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "We are the righteous ones in his eyes alone.";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Let them not infest our cities and towns...";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "And lo, we become the power, indeed the force to stop these monsters in their tracks.";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Verily I urge you, my friends to take up your spades and farm your farms to feed our people in this blessed sanctuary.";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "If thine monsters visage does frighten thee, then tear it off I say... tear it off!";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "For Saradomin will guide our sword arms and smash the enemies of humans till their bones become dust.";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "And let us smite these monsters unto their deaths.";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "For they are not the chosen ones in Saradomin's eyes.";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Where do we go for safety from these monsters... here, my brethren!";
             }
         }
         if (npc.index == 1713) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "And let there be no cave or shelter for their spawn until the end of days.";
             }
         }
         if (npc.index == 2821) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Fishing Portal!";
             }
         }
         if (npc.index == 2304) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Farming Shop!By seed's for patch's!";
             }
         }
         if (npc.index == 461) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Magic Shop!";
             }
         }
         if (npc.index == 57) {
             if (misc.random2(30) == 1) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 int players = PlayerHandler.getPlayerCount();
                 npc.textUpdate = "Players Online: " + players;
@@ -2714,7 +2714,7 @@ public class NPCHandler {
         }
         if (npc.index == 8206) {
             if (misc.random2(30) == 1) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 int lottery = server.lottery.lotteryFund / 1000000;
                 npc.textUpdate = "Lottery is at " + lottery + "m";
@@ -2722,126 +2722,126 @@ public class NPCHandler {
         }
         if (npc.index == 550) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Pk Shop!";
             }
         }
         if (npc.index == 1759) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Shops Here!";
             }
         }
         if (npc.index == 1699) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Pur3 Sh0p!";
             }
         }
         if (npc.index == 2475) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Training Portal!";
             }
         }
         if (npc.index == 28) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Train Your Skills Here!";
             }
         }
         if (npc.index == 1917) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Rune Armor Shop!!!";
             }
         }
         if (npc.index == 522) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "General Store!";
             }
         }
         if (npc.index == 522) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Great deals Here!";
             }
         }
         if (npc.index == 548) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Gloves, Robes, Boots Shop!";
             }
         }
         if (npc.index == 530) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Skillers Shop!";
             }
         }
         if (npc.index == 528) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Woodcutting Store!!";
             }
         }
         if (npc.index == 949) {
             if (misc.random2(30) <= 3) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to Moderator Island!";
             }
         }
         if (npc.index == 2244) {
             if (misc.random2(30) <= 3) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Welcome to Moderator Island!";
             }
         }
         if (npc.index == 213) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "You need the frozen key to get in this portal! Kill the troll for key!";
             }
         }
         if (npc.index == 555) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Random Stoof!";
             }
         }
         if (npc.index == 561) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Hood Shop!";
             }
         }
         if (npc.index == 538) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Slayer Shop!";
             }
         }
         if (npc.index == 529) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Farming Shop!";
             }
@@ -2849,42 +2849,42 @@ public class NPCHandler {
 
         if (npc.index == 3117) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Click the chests for slayer exp ..";
             }
         }
         if (npc.index == 866) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Et .. Phone .. Home!";
             }
         }
         if (npc.index == 549) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Smithin' Shop";
             }
         }
         if (npc.index == 11674) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Prestige Shop";
             }
         }
         if (npc.index == 558) {
             if (misc.random2(30) <= 2) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Herblore shop!!";
             }
         }
         if (npc.index == 1552) {
             if (misc.random2(30) == 1) {
-                npc.updateRequired = true;
+                npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
                 npc.textUpdate = "Merry Christmas!!!";
             }
@@ -2909,7 +2909,7 @@ public class NPCHandler {
             }
 
             npc.animationRequest = getNpcDeathAnimation(npc.index);
-            npc.updateRequired = true;
+            npc.setUpdateRequired(true);
             npc.animationUpdateRequired = true;
             npc.DeadApply = true;
             npc.actionTimer = AnimationLength.getFrameLength(npc.animationRequest);
@@ -2942,7 +2942,7 @@ public class NPCHandler {
             npc.absX = npc.makeX;
             npc.absY = npc.makeY;
             npc.HP = npc.MaxHP;
-            npc.updateRequired = true;
+            npc.setUpdateRequired(true);
             npc.animationUpdateRequired = true;
         }
         else if (npc.actionTimer == 0 && npc.NeedRespawn && npc.Respawns) {
@@ -4528,7 +4528,7 @@ public class NPCHandler {
                     npc.hitDelayTimer = getHitDelay(npc);
                     npc.pendingDamage = splashDamage;
                     c.hitUpdateRequired = true;
-                    c.updateRequired = true;
+                    c.setUpdateRequired(true);
                     c.appearanceUpdateRequired = true;
                     c.startAnimation(
                             c.GetBlockAnim(c.playerEquipment[c.playerWeapon])
@@ -4559,14 +4559,14 @@ public class NPCHandler {
         }
 
         player.hitUpdateRequired = true;
-        player.updateRequired = true;
+        player.setUpdateRequired(true);
         player.appearanceUpdateRequired = true;
         player.startAnimation(
                 player.GetBlockAnim(player.playerEquipment[player.playerWeapon])
         );
         player.sendSound(soundConfig.getPlayerBlockSounds(player), 4, 0);
 
-        npc.updateRequired = true;
+        npc.setUpdateRequired(true);
         npc.hitDelayTimer = getHitDelay(npc);
         npc.pendingDamage = damage;
 
@@ -4842,7 +4842,7 @@ public class NPCHandler {
         player.sendSound(getNpcAttackSound(npc.index), 4, 0);
         npc.animationRequest = getNpcAttackAnimation(npc.index);
         npc.animationUpdateRequired = true;
-        npc.updateRequired = true;
+        npc.setUpdateRequired(true);
 
         if (npc.projectileId > 0) {
             sendProjectile(npc, player);
@@ -4874,7 +4874,7 @@ public class NPCHandler {
 
     private void applyDamage(client player, int damage) {
         player.hitDiff = damage;
-        player.updateRequired = true;
+        player.setUpdateRequired(true);
         player.hitUpdateRequired = true;
         player.appearanceUpdateRequired = true;
     }
@@ -4918,7 +4918,7 @@ public class NPCHandler {
                 // npcs[NPCID].textUpdateRequired = true;
                 npcs[NPCID].animationRequest = 2103;
                 npcs[NPCID].animationUpdateRequired = true;
-                npcs[NPCID].updateRequired = true;
+                npcs[NPCID].setUpdateRequired(true);
             } else {
                 npcs[NPCID].animationRequest = 711; // mage attack
                 if (npcs[NPCID].index == 1645) {
@@ -4950,13 +4950,13 @@ public class NPCHandler {
                     hitDiff = 2 + misc.random(96);
                 }
                 npcs[NPCID].animationUpdateRequired = true;
-                npcs[NPCID].updateRequired = true;
+                npcs[NPCID].setUpdateRequired(true);
                 if ((EnemyHP - hitDiff) < 0) {
                     hitDiff = EnemyHP;
                 }
                 npcs[npcs[NPCID].attacknpc].hitDiff = hitDiff;
                 npcs[npcs[NPCID].attacknpc].attacknpc = NPCID;
-                npcs[npcs[NPCID].attacknpc].updateRequired = true;
+                npcs[npcs[NPCID].attacknpc].setUpdateRequired(true);
                 npcs[npcs[NPCID].attacknpc].hitUpdateRequired = true;
                 npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animationRequest);
                 return true;
@@ -4981,7 +4981,7 @@ public class NPCHandler {
                 // npcs[NPCID].textUpdateRequired = true;
                 npcs[NPCID].animationRequest = 2103;
                 npcs[NPCID].animationUpdateRequired = true;
-                npcs[NPCID].updateRequired = true;
+                npcs[NPCID].setUpdateRequired(true);
             } else {
                 npcs[NPCID].animationRequest = 711; // mage attack
                 if (npcs[NPCID].index == 1645) {
@@ -5013,13 +5013,13 @@ public class NPCHandler {
                     hitDiff = 2 + misc.random(96);
                 }
                 npcs[NPCID].animationUpdateRequired = true;
-                npcs[NPCID].updateRequired = true;
+                npcs[NPCID].setUpdateRequired(true);
                 if ((EnemyHP - hitDiff) < 0) {
                     hitDiff = EnemyHP;
                 }
                 npcs[npcs[NPCID].attacknpc].hitDiff = hitDiff;
                 npcs[npcs[NPCID].attacknpc].attacknpc = NPCID;
-                npcs[npcs[NPCID].attacknpc].updateRequired = true;
+                npcs[npcs[NPCID].attacknpc].setUpdateRequired(true);
                 npcs[npcs[NPCID].attacknpc].hitUpdateRequired = true;
                 npcs[NPCID].actionTimer = AnimationLength.getFrameLength(npcs[NPCID].animationRequest);
                 return true;
@@ -5048,7 +5048,7 @@ public class NPCHandler {
             attacker.textUpdateRequired = true;
             attacker.animationRequest = 2103;
             attacker.animationUpdateRequired = true;
-            attacker.updateRequired = true;
+            attacker.setUpdateRequired(true);
             return true;
         }
 
@@ -5067,14 +5067,14 @@ public class NPCHandler {
         }
 
         attacker.animationUpdateRequired = true;
-        attacker.updateRequired = true;
+        attacker.setUpdateRequired(true);
         attacker.actionTimer = AnimationLength.getFrameLength(attacker.animationRequest);
         attacker.IsAttackingNPC = true;
         attacker.RandomWalk = false;
 
         target.hitDiff = hitDiff;
         target.hitUpdateRequired = true;
-        target.updateRequired = true;
+        target.setUpdateRequired(true);
         target.attacknpc = NPCID;
         target.IsUnderAttackNpc = true;
 
@@ -5088,7 +5088,7 @@ public class NPCHandler {
         npcs[NPCID].RandomWalk = true;
         npcs[NPCID].animationRequest = 0x328;
         npcs[NPCID].animationUpdateRequired = true;
-        npcs[NPCID].updateRequired = true;
+        npcs[NPCID].setUpdateRequired(true);
         return true;
     }
 
@@ -5134,7 +5134,7 @@ public class NPCHandler {
         npcs[NPCID].RandomWalk = true;
         npcs[NPCID].animationRequest = 0x328;
         npcs[NPCID].animationUpdateRequired = true;
-        npcs[NPCID].updateRequired = true;
+        npcs[NPCID].setUpdateRequired(true);
         return true;
     }
 
