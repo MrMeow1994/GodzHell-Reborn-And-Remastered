@@ -3188,6 +3188,7 @@ public void setHouse(House house) {
     public void Deletewalls() {
         deletethatwall(3170, 6791); // door
         deletethatwall(3171, 6783); // door
+        deletethatwall(3352, 3337);
     }
 
     /* END OF BONES AND FOOD*/
@@ -13430,7 +13431,7 @@ public void setHouse(House house) {
             if (teleblock) {
                 sendMessage("A magical force stops you from teleporting."); // made by sgsrocks
             } else {
-                start(new ShopslocationsDialogue());
+                movePlayer(3351, 3343, 0);
             }
         } else if (command.equalsIgnoreCase("teampk")) {
             if (teleblock) {

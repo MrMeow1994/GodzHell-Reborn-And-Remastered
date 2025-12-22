@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.ArrayList;
 
@@ -35,13 +32,16 @@ public class NPCHandler {
 
         try {
             loadNPCList(NPC_LIST_PATH);
-            for (String path : AUTOSPAWN_PATHS) {
-                loadAutoSpawn(path);
-            }
+            loadAllRegionSpawns("./data/cfg/spawns/");
         } catch (RuntimeException e) {
             System.err.println("💥 Failed to initialize NPCHandler: " + e.getMessage());
             e.printStackTrace();
         }
+        //convertTxtSpawnsToRegionFiles(
+            //    "./data/cfg/autospawn.cfg",
+             //   "./data/cfg/spawns"
+        //);
+
     }
 
     public static void removeNPC(NPC npc) {
@@ -5207,6 +5207,166 @@ public class NPCHandler {
         } catch (IOException ioexception) {
         }
         return false;
+    }
+    public void loadAllRegionSpawns(String dirPath) {
+        File dir = new File(dirPath);
+        if (!dir.exists() || !dir.isDirectory()) {
+            misc.println("Spawn directory missing: " + dirPath);
+            return;
+        }
+
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".bin"));
+        if (files == null) return;
+
+        for (File file : files) {
+            try {
+                int regionId = Integer.parseInt(file.getName().replace(".bin", ""));
+                loadRegionBinary(file, regionId);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+    }
+    public void convertTxtSpawnsToRegionFiles(String inputFile, String outputDir) {
+        File dir = new File(outputDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || !line.startsWith("spawn")) continue;
+
+                int spot = line.indexOf('=');
+                if (spot == -1) continue;
+
+                String data = line.substring(spot + 1).trim();
+                data = data.replaceAll("\t+", "\t");
+                String[] t = data.split("\t");
+
+                if (t.length < 9) continue;
+
+                int npcId = Integer.parseInt(t[0]);
+                int x = Integer.parseInt(t[1]);
+                int y = Integer.parseInt(t[2]);
+
+                int regionId = (x >> 6 << 8) | (y >> 6);
+                File regionFile = new File(outputDir + "/" + regionId + ".bin");
+
+                try (DataOutputStream out =
+                             new DataOutputStream(
+                                     new BufferedOutputStream(
+                                             new FileOutputStream(regionFile, true)))) {
+
+                    out.writeInt(npcId);                    // npcId
+                    out.writeShort(Integer.parseInt(t[1])); // x
+                    out.writeShort(Integer.parseInt(t[2])); // y
+                    out.writeByte(Integer.parseInt(t[3]));  // plane
+
+                    out.writeShort(Integer.parseInt(t[4])); // rangeX1
+                    out.writeShort(Integer.parseInt(t[5])); // rangeY1
+                    out.writeShort(Integer.parseInt(t[6])); // rangeX2
+                    out.writeShort(Integer.parseInt(t[7])); // rangeY2
+                    out.writeByte(Integer.parseInt(t[8]));  // walkType
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeBinarySpawn(File file, String[] t) throws IOException {
+        try (DataOutputStream out =
+                     new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, true)))) {
+
+            out.writeInt(Integer.parseInt(t[0]));   // npcId
+            out.writeShort(Integer.parseInt(t[1])); // x
+            out.writeShort(Integer.parseInt(t[2])); // y
+            out.writeByte(Integer.parseInt(t[3]));  // plane
+            out.writeShort(Integer.parseInt(t[4]));
+            out.writeShort(Integer.parseInt(t[5]));
+            out.writeShort(Integer.parseInt(t[6]));
+            out.writeShort(Integer.parseInt(t[7]));
+            out.writeByte(Integer.parseInt(t[8]));  // walkType
+        }
+    }
+    private void loadRegionBinary(File file, int regionId) {
+        try (DataInputStream in =
+                     new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+
+            while (in.available() > 0) {
+                int npcId = in.readInt();
+                int x = in.readShort();
+                int y = in.readShort();
+                int plane = in.readByte();
+
+                int rx1 = in.readShort();
+                int ry1 = in.readShort();
+                int rx2 = in.readShort();
+                int ry2 = in.readShort();
+                int walkType = in.readByte();
+
+                int calculatedRegion = (x >> 6 << 8) | (y >> 6);
+                if (calculatedRegion != regionId)
+                    continue;
+
+                newNPC(
+                        npcId, x, y, plane,
+                        rx1, ry1, rx2, ry2, walkType,
+                        GetNpcListHP(npcId), true
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadRegionSpawnFile(File file, int regionId) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("//")) continue;
+
+                int spot = line.indexOf('=');
+                if (spot == -1) continue;
+
+                String token = line.substring(0, spot).trim();
+                String data = line.substring(spot + 1).trim();
+                String[] t = data.split("\t");
+
+                if (!token.equals("spawn") || t.length < 9)
+                    continue;
+
+                int npcId = Integer.parseInt(t[0]);
+                int x = Integer.parseInt(t[1]);
+                int y = Integer.parseInt(t[2]);
+                int plane = Integer.parseInt(t[3]);
+
+                // Region safety check
+                int calculatedRegion = (x >> 6 << 8) | (y >> 6);
+                if (calculatedRegion != regionId)
+                    continue;
+
+                newNPC(
+                        npcId,
+                        x,
+                        y,
+                        plane,
+                        Integer.parseInt(t[4]),
+                        Integer.parseInt(t[5]),
+                        Integer.parseInt(t[6]),
+                        Integer.parseInt(t[7]),
+                        Integer.parseInt(t[8]),
+                        GetNpcListHP(npcId),
+                        true
+                );
+            }
+        } catch (Exception e) {
+            misc.println("Error loading region spawn file: " + file.getName());
+        }
     }
 
 

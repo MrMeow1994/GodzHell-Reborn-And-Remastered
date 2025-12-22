@@ -1157,6 +1157,8 @@ public class Region {
       //  get(12649).setClipToZero(3180, 6779, 0);
      //   get(12649).setClipToZero(3180, 6780, 0);
      //   get(12649).setClipToZero(3180, 6781, 0);
+        get(13364).setClipToZero(3352, 3337, 0);
+        get(13364).setClipToZero(3352, 3338, 0);
         get(12849).setClipToZero(3244, 3196, 0);
         get(12849).setClipToZero(3244, 3197, 0);
         get(12849).setClipToZero(3244, 3195, 0);

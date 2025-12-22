@@ -40,8 +40,6 @@ public class SpawnConverterTool {
             line = line.trim();
             if (line.isEmpty()) continue;
 
-            // Expected input:
-            // npcId, plane, x, y, -1, false
             String[] parts = line.split(",\\s*");
             if (parts.length < 4) continue;
 
@@ -51,19 +49,37 @@ public class SpawnConverterTool {
                 int x = Integer.parseInt(parts[2]);
                 int y = Integer.parseInt(parts[3]);
 
-                // These are NOT stats — just fixed placeholders to satisfy the format
-                int walkType = 1000;
-                int a = 5151;
-                int b = 4242;
-                int c = 5151;
-                int d = 0;
+                int rangeX1, rangeY1, rangeX2, rangeY2;
 
-                // Name intentionally left blank for you to fill later
+                if (parts.length >= 8) {
+                    // Explicit walk range
+                    rangeX1 = Integer.parseInt(parts[4]);
+                    rangeY1 = Integer.parseInt(parts[5]);
+                    rangeX2 = Integer.parseInt(parts[6]);
+                    rangeY2 = Integer.parseInt(parts[7]);
+                } else {
+                    // Auto-walk: 1-tile radius
+                    rangeX1 = x + 1;
+                    rangeY1 = y + 1;
+                    rangeX2 = x - 1;
+                    rangeY2 = y - 1;
+                }
+
+                int walkType = 1; // Always walkable
                 String name = "";
 
                 sb.append(String.format(
                         "spawn = %d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%s%n",
-                        npcId, x, y, plane, walkType, a, b, c, d, name
+                        npcId,
+                        x,
+                        y,
+                        plane,
+                        rangeX1,
+                        rangeY1,
+                        rangeX2,
+                        rangeY2,
+                        walkType,
+                        name
                 ));
 
             } catch (NumberFormatException ignored) {}
@@ -71,4 +87,5 @@ public class SpawnConverterTool {
 
         return sb.toString();
     }
+
 }
