@@ -64,59 +64,67 @@ public class PrayerAltar {
     }
 
     public void alter(final int amount) {
-        if (!altarBone.isPresent()) {
-            return;
-        }
-        Bone bone = altarBone.get();
-        player.getSkilling().stop();
-        if (!player.playerHasItem(bone.getItemId())) {
-            return;
-        }
-        if (lastAction.elapsed(TimeUnit.MILLISECONDS) < BURY_DELAY) {
-            return;
-        }
-        player.stillgfxz(624, player.getX(), player.getY(), player.heightLevel, 1);
-        player.addSkillXP(bone.getExperience() * Config.PRAYER_EXPERIENCE * 3, Skill.PRAYER.id);
-        player.deleteItem2(bone.getItemId(), 1);
-        player.startAnimation(713);
-        lastAction.reset();
-        lastAction.start();
-        player.getSkilling().setSkill(Skill.PRAYER);
-        player.getSkilling().add(new CycleEvent() {
-            int remaining = amount - 1;
+       if(player.dobones) {
+           if (!altarBone.isPresent()) {
+               return;
+           }
+           Bone bone = altarBone.get();
+           player.getSkilling().stop();
+           if (!player.playerHasItem(bone.getItemId())) {
+               return;
+           }
+           if (lastAction.elapsed(TimeUnit.MILLISECONDS) < BURY_DELAY) {
+               return;
+           }
+           player.TurnPlayerTo(player.objectX, player.objectY);
+           player.stillgfx(624, player.objectY, player.objectX);
+           player.addSkillXP(bone.getExperience() * Config.PRAYER_EXPERIENCE * 3, Skill.PRAYER.id);
+           player.deleteItem2(bone.getItemId(), 1);
+           player.startAnimation(713);
+           player.sendSound(958, 7, 0);
+           lastAction.reset();
+           lastAction.start();
+           player.getSkilling().setSkill(Skill.PRAYER);
+           player.getSkilling().add(new CycleEvent() {
+               int remaining = amount - 1;
 
-            @Override
-            public void execute(CycleEventContainer container) {
-                if(player == null || player.disconnected || player.IsDead) {
-                    container.stop();
-                    return;
-                }
-                if (!player.playerHasItem(bone.getItemId())) {
-                    container.stop();
-                    player.sendMessage("You have run out of " + Item.getItemName(bone.getItemId()) + ".");
-                    return;
+               @Override
+               public void execute(CycleEventContainer container) {
+                   if (player == null || player.disconnected || player.IsDead) {
+                       player.dobones = false;
+                       container.stop();
+                       return;
+                   }
+                   if (!player.playerHasItem(bone.getItemId())) {
+                       player.dobones = false;
+                       container.stop();
+                       player.sendMessage("You have run out of " + Item.getItemName(bone.getItemId()) + ".");
+                       return;
 
-                }
-                if (remaining <= 0) {
-                    container.stop();
-                    return;
-                }
-                remaining--;
-                player.face(player.objectX, player.objectY);
-                player.stillgfxz(624, player.getX(), player.getY(), player.heightLevel, 1);
-                player.addSkillXP(bone.getExperience() * Config.PRAYER_EXPERIENCE * 3, Skill.PRAYER.id);
-                player.deleteItem2(bone.getItemId(), 1);
-                player.startAnimation(713);
-                lastAction.reset();
-                lastAction.start();
-            }
+                   }
+                   if (remaining <= 0) {
+                       player.dobones = false;
+                       container.stop();
+                       return;
+                   }
+                   remaining--;
+                   player.TurnPlayerTo(player.objectX, player.objectY);
+                   player.stillgfx(624, player.objectY, player.objectX);
+                   player.addSkillXP(bone.getExperience() * Config.PRAYER_EXPERIENCE * 3, Skill.PRAYER.id);
+                   player.deleteItem2(bone.getItemId(), 1);
+                   player.startAnimation(713);
+                   player.sendSound(958, 7, 0);
+                   lastAction.reset();
+                   lastAction.start();
+               }
 
-            @Override
-            public void stop() {
+               @Override
+               public void stop() {
 
-            }
+               }
 
-        }, 3);
+           }, AnimationLength.getFrameLength(713));
+       }
     }
 
     /**

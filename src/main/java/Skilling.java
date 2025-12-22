@@ -11,7 +11,7 @@ public class Skilling {
     }
 
     public void add(CycleEvent event, int ticks) {
-        CycleEventHandler.getSingleton().addEvent(player,event, ticks*800);
+        CycleEventHandler.getSingleton().addEvent(player,event, ticks);
     }
 
     public void stop() {

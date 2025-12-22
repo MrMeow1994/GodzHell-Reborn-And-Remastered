@@ -13,11 +13,11 @@ public class Config {
 	public static final String DONATION_LINK = "https://ghreborn.everythingrs.com/services/store";
 	public static final boolean FARMING_ENABLED = true;
     public static final boolean DISABLE_DISCORD_MESSAGING = false;
-    public static final double MINING_EXPERIENCE = 50;
-	public static final double PRAYER_EXPERIENCE = 50;
-    public static final int CRAFTING_EXPERIENCE = 50;
-	public static final int SLAYER_EXPERIENCE = 50;
-	public static final int THIEVING_EXPERIENCE = 50;
+    public static final double MINING_EXPERIENCE = 20;
+	public static final double PRAYER_EXPERIENCE = 20;
+    public static final int CRAFTING_EXPERIENCE = 20;
+	public static final int SLAYER_EXPERIENCE = 20;
+	public static final int THIEVING_EXPERIENCE = 20;
 	public final static int NPC_FOLLOW_DISTANCE = 10;
 	public static boolean ADMIN_DROP_ITEMS = false;
 	public static  boolean ADMIN_CAN_SELL_ITEMS = false;

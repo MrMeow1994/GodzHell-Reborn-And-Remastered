@@ -2875,11 +2875,11 @@ public class NPCHandler {
                 npc.textUpdate = "Prestige Shop";
             }
         }
-        if (npc.index == 558) {
+        if (npc.index == 11699) {
             if (misc.random2(30) <= 2) {
                 npc.setUpdateRequired(true);
                 npc.textUpdateRequired = true;
-                npc.textUpdate = "Herblore shop!!";
+                npc.textUpdate = "Herblore shop!";
             }
         }
         if (npc.index == 1552) {

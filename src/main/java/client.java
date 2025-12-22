@@ -3337,7 +3337,7 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(10687, 3285, 2770, 0, -1, 10));
         server.getGlobalObjects().add(new GlobalObject(6552, 2467, 3176, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(410, 2467, 3179, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(409, 2469, 3182, 0, 0, 10));
+        server.getGlobalObjects().add(new GlobalObject(409, 2470, 3182, 0, 2, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5786, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5787, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2361, 5784, 0, 1, 10));
@@ -22739,31 +22739,33 @@ nated = Integer.parseInt(token2);
                 // int useItemID = inStream.readUnsignedWord();
                 int j6 = inStream.readUnsignedWordA();
                 int atObjectID = inStream.readInteger();
-                int atObjectY = inStream.readUnsignedWordBigEndianA();
+                objectY = inStream.readUnsignedWordBigEndianA();
                 int itemSlot = inStream.readUnsignedWordBigEndian();
-                int atObjectX = inStream.readUnsignedWordBigEndianA();
+                objectX = inStream.readUnsignedWordBigEndianA();
                 int useItemID = inStream.readUnsignedWord();
-                if(!Region.isWorldObject(atObjectID, atObjectX, atObjectY, heightLevel)){
+                int atObjectX = objectX;
+                int atObjectY = objectY;
+                if(!Region.isWorldObject(atObjectID, objectX, objectY, heightLevel)){
                     return;
                 }
                 if (debugMessages) {
                     sM(
-                            "atObjectID: " + atObjectID + " atObjectY: " + atObjectY
-                                    + " itemSlot: " + itemSlot + " atObjectX: " + atObjectX
+                            "atObjectID: " + atObjectID + " atObjectY: " + objectY
+                                    + " itemSlot: " + itemSlot + " atObjectX: " + objectX
                                     + " useItemID: " + useItemID + " j6: " + j6);
 
                 }
 
-                if (getAllotment().curePlant(atObjectX, atObjectY, useItemID)) {
+                if (getAllotment().curePlant(objectX, objectY, useItemID)) {
                     return;
                 }
-                if (getAllotment().putCompost(atObjectX, atObjectY, useItemID)) {
+                if (getAllotment().putCompost(objectX, objectY, useItemID)) {
                     return;
                 }
-                if (getAllotment().clearPatch(atObjectX, atObjectY, useItemID)) {
+                if (getAllotment().clearPatch(objectX, objectY, useItemID)) {
                     return;
                 }
-                face(atObjectX, atObjectY);
+                face(objectX, objectY);
                 switch(atObjectID){
                     case 36881:
                         FlourMill.grainOnHopper(this, atObjectID, useItemID);
@@ -22772,6 +22774,7 @@ nated = Integer.parseInt(token2);
                         Optional<Bone> bone = PrayerAltar.isOperableBone(useItemID);
                         if (bone.isPresent()) {
                             getPrayerAltar().setAltarBone(bone);
+                            dobones = true;
                             getOutStream().createFrame(27);
                             return;
                         }
@@ -22837,11 +22840,11 @@ nated = Integer.parseInt(token2);
                 }
 
                 if (useItemID <= 5340 && useItemID > 5332) {
-                    if (getAllotment().waterPatch(atObjectX, atObjectY, useItemID)) {
+                    if (getAllotment().waterPatch(objectX, objectY, useItemID)) {
                         return;
                     }
                 }
-                if (getAllotment().plantSeed(atObjectX, atObjectY, useItemID)) {
+                if (getAllotment().plantSeed(objectX, objectY, useItemID)) {
                     return;
                 }
                 //Farming.prepareCrop(c, useItemID, atObjectX, atObjectY);
@@ -23545,6 +23548,9 @@ nated = Integer.parseInt(token2);
                 } else if (NPCID == 705) { // staffzone shop
                     PutNPCCoords = true;
                     WanneShop = 100;
+                } else if (NPCID == 8629) { // staffzone shop
+                    PutNPCCoords = true;
+                    WanneShop = 244;
                 } else if (NPCID == 3838 && rights.inherits(Rights.MODERATOR)) { // armo
                     PutNPCCoords = true;
                     WanneShop = 69;
@@ -23841,7 +23847,7 @@ nated = Integer.parseInt(token2);
                     WanneShop = 238; // Gilded Shop
                 } else if (NPCID == 521) { // Gilded Shop
                     PutNPCCoords = true;
-                    WanneShop = 238; // Gilded Shop
+                    WanneShop = 53; // Gilded Shop
                 } else if (NPCID == 550) { // Range Shop
                     PutNPCCoords = true;
                     WanneShop = 49; // Range Shop
@@ -24027,9 +24033,9 @@ nated = Integer.parseInt(token2);
                 } else if (NPCID == 557) { // Wydin
                     PutNPCCoords = true;
                     WanneShop = 32; // Port Sarim Food Shop
-                } else if (NPCID == 2720) { // Gerrant
+                } else if (NPCID == 11699) { // Gerrant
                     PutNPCCoords = true;
-                    WanneShop = 18; // Port Sarim Fishing Shop
+                    WanneShop = 65; // Port Sarim Fishing Shop
                 } else if (NPCID == 559) { // Brian
                     PutNPCCoords = true;
                     WanneShop = 19; // Port Sarim Battleaxe Shop
@@ -27907,7 +27913,12 @@ nated = Integer.parseInt(token2);
 
             case 208: // Enter Amount Part 2
                 int EnteredAmount = inStream.readInteger();
-
+                if(dobones) {
+                    if (getPrayerAltar().getAltarBone().isPresent()) {
+                        getPrayerAltar().alter(EnteredAmount);
+                        return;
+                    }
+                }
                 if (testinterfaceId == 7423) {//remove from dep box to bank
                     bankItem(playerItems[XremoveSlot], XremoveSlot, EnteredAmount);
                     openUpDepBox();
@@ -27954,10 +27965,6 @@ nated = Integer.parseInt(token2);
                         sendMessage(
                                 "Achey Logs: 1 = ogre arrow shafts | 2 = ogre composite bow");
                     }
-                }
-                if (getPrayerAltar().getAltarBone().isPresent()) {
-                    getPrayerAltar().alter(EnteredAmount);
-                    return;
                 }
                 break;
 

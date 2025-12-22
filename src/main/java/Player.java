@@ -39,6 +39,7 @@ public abstract class Player extends Entity {
 	public int runeMist, gertCat, restGhost,
 			romeojuliet, lostCity, vampSlayer, cookAss, doricQuest, blackKnight, shieldArrav,
 			sheepShear, impsC, knightS, witchspot, pirateTreasure, desertTreasure;
+	public boolean dobones = false;
 	private boolean hitUpdateRequired2;
 	boolean stopPlayerSkill = false;
 	int runEnergy = 100,  talkingNpc = -1;
@@ -522,6 +523,7 @@ public abstract class Player extends Entity {
 	public void TurnPlayerTo(int pointX, int pointY) {
 		FocusPointX = 2*pointX+1;
 		FocusPointY = 2*pointY+1;
+		setUpdateRequired(true);
 	}
 	public int pkilledinpit;
 	public int onPin;
@@ -871,6 +873,8 @@ public abstract class Player extends Entity {
 	public int currentX, currentY;			// relative x/y coordinates (to map region)
 	public int lastX;
 	public int lastY;
+	public int frontX;
+	public int frontY;
 	// Note that mapRegionX*8+currentX yields absX
 	// set to true if, in general, updating for this player is required
 	// i.e. this should be set to true whenever any of the other
@@ -956,6 +960,8 @@ public abstract class Player extends Entity {
 		dir >>= 1;
 		lastX = absX;
 		lastY = absY;
+		frontX = absX;
+		frontY = absY - 1;
 		currentX += misc.directionDeltaX[dir];
 		currentY += misc.directionDeltaY[dir];
 		absX += misc.directionDeltaX[dir];
@@ -1030,6 +1036,8 @@ public abstract class Player extends Entity {
 			absY = teleportToY;
 			lastX = absX;
 			lastY = absY - 1;
+			frontX = absX;
+			frontY = absY + 1;
 			resetWalkingQueue();
 			teleportToX = teleportToY = -1;
 			didTeleport = true;

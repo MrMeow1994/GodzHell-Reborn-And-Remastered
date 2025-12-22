@@ -83,7 +83,7 @@ public class Region {
             new WorldObject2(2213, 2465, 3187, 0, 10, 1),
             new WorldObject2(6552, 2467, 3176, 0, 10, 0),
             new WorldObject2(410, 2467, 3179, 0, 10, 0),
-            new WorldObject2(409, 2469, 3182, 0, 10, 0),
+            new WorldObject2(409, 2470, 3182, 0, 10, 2),
             new WorldObject2(2213, 2361, 5786, 0, 10, 1),
             new WorldObject2(2213, 2361, 5787, 0, 10, 1),
             new WorldObject2(2213, 2361, 5784, 0, 10, 1),
