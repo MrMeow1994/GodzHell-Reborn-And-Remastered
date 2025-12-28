@@ -36,6 +36,40 @@ dependencies {
 application {
     mainClass.set("server")
 }
+tasks.register("printRuntimeClasspath") {
+    group = "help"
+    description = "Prints the full runtime classpath, including all dependencies"
+
+    doLast {
+        println configurations.runtimeClasspath.asPath
+    }
+}
+tasks.register("copyRuntimeDeps") {
+    group = "build"
+    description = "Copies all runtime dependencies into the deps folder"
+
+    // Destination folder
+    def depsDir = file("$buildDir/deps")
+
+    doLast {
+        // Make sure the folder exists
+        if (!depsDir.exists()) {
+            depsDir.mkdirs()
+        }
+
+        // Copy each runtime dependency jar
+        configurations.runtimeClasspath.each { file ->
+            if (file.name.endsWith(".jar")) {
+                copy {
+                    from file
+                    into depsDir
+                }
+            }
+        }
+
+        println "Copied ${configurations.runtimeClasspath.files.size()} jars to ${depsDir}"
+    }
+}
 
 tasks.register('runFileServer', JavaExec) {
     group = 'application'

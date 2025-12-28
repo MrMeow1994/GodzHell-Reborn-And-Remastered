@@ -1438,29 +1438,60 @@ object Item2 {
         return Ironrock[(Math.random() * Ironrock.size).toInt()]
     }
 
-    var Phat: IntArray = intArrayOf(
+    private val NORMAL_PHATS = intArrayOf(
         ItemIDs.RED_PARTYHAT,
         ItemIDs.YELLOW_PARTYHAT,
         ItemIDs.BLUE_PARTYHAT,
         ItemIDs.GREEN_PARTYHAT,
         ItemIDs.PURPLE_PARTYHAT,
-        ItemIDs.WHITE_PARTYHAT,
-        ItemIDs.UNKNOWED_WHITE_PARTYHAT,
-        14560,
-        14110,
-        14111,
-        14112,
-        14113,
-        14114,
-        14115,
-        14116,
-        14117,
-        14118,
+        ItemIDs.WHITE_PARTYHAT
     )
+
+    private val CUSTOM_PHATS = intArrayOf(
+        28000,
+        25999,
+        26000,
+        26001,
+        26002,
+        26003,
+        26004,
+        26005,
+        26006,
+        26007,
+        26008,
+        26009,
+        26010,
+        26011,
+        26012,
+        26013,
+        26014,
+        26015,
+        26016,
+        24560,
+        25055,
+        24120,
+        24109,
+        24110,
+        24111,
+        24112,
+        24113,
+        24114,
+        24115,
+        24116,
+        24117,
+        24118,
+        23091
+    )
+
 
     @JvmStatic
     fun randomPhat(): Int {
-        return Phat[(Math.random() * Phat.size).toInt()]
+        // 90% normal, 10% custom
+        return if (Math.random() < 0.90) {
+            NORMAL_PHATS.random()
+        } else {
+            CUSTOM_PHATS.random()
+        }
     }
 
     var Silvchest: IntArray = intArrayOf(601, 758, 788, 983)

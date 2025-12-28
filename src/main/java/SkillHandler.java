@@ -1,5 +1,9 @@
 public class SkillHandler {
-
+    public static boolean FISHING = true, AGILITY = true, COOKING = true,
+            FIREMAKING = true, HERBLORE = true, MINING = true,
+            RUNECRAFTING = true, THIEVING = true, WOODCUTTING = true,
+            PRAYER = true, FLETCHING = true, CRAFTING = true, MAGIC = true,
+            FARMING = false, SLAYER = true, SMITHING = true;
     private static final int SKILLING_XP = 40;
     public static final int AGILITY_XP = SKILLING_XP;
     public static final int PRAYER_XP = SKILLING_XP;
@@ -41,6 +45,9 @@ public class SkillHandler {
             return false;
         }
         return true;
+    }
+    public static String getLine(Player c) {
+        return c.below459 ? "\\n\\n\\n\\n" : "\\n\\n\\n\\n\\n";
     }
 
     public static void deleteTime(client c) {

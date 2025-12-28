@@ -48,6 +48,7 @@ public class Config {
 	public static int WOODCUTTING_EXPERIENCE = 50;
 	public static int SMITHING_EXPERIENCE = 50;
 	public static int FLETCHING_EXPERIENCE = 50;
+	public static boolean pack_spawns = false;
 	static int[][] FirstFloorSos = {
 			{1865, 5227}, {1865, 5226}, {1868, 5226}, {1868, 5227}, {1867, 5217}, {1867, 5218}, {1870, 5217}, {1870, 5218},
 			{1894, 5213}, {1894, 5212}, {1897, 5213}, {1897, 5212}, {1904, 5203}, {1904, 5204}, {1907, 5203}, {1907, 5204},

@@ -84,10 +84,10 @@ public class NPCCacheDefinition {
                     str.readUnsignedWord();
             } else
             if(opcode == 2)
-                name = str.readNewString();
+                name = str.readString();
             else
             if(opcode == 3)
-                examine = str.readNewString();
+                examine = str.readString();
             else
             if(opcode == 12)
                 boundDim = str.readSignedByte();
@@ -104,13 +104,15 @@ public class NPCCacheDefinition {
                 str.readUnsignedWord();
                 str.readUnsignedWord();
                 str.readUnsignedWord();
+            } else if(opcode == 18){
+                int runAnim = str.readUnsignedWord();
             } else
             if(opcode >= 30 && opcode < 40)
             {
                 if(actions == null)
                     actions = new String[10];
                 try {
-                    actions[opcode - 30] = str.readNewString();
+                    actions[opcode - 30] = str.readString();
                     if(actions[opcode - 30].equalsIgnoreCase("hidden"))
                         actions[opcode - 30] = null;
                 } catch(Exception e) { }
@@ -123,6 +125,17 @@ public class NPCCacheDefinition {
                     str.readUnsignedWord();
                     str.readUnsignedWord();
                 }
+            } else
+            if(opcode == 41)
+            {
+                int k = str.readSignedByte();
+                for(int k1 = 0; k1 < k; k1++)
+                {
+                    str.readUnsignedWord();
+                    str.readUnsignedWord();
+                }
+            } else if(opcode == 42){
+                int headIcon = str.readUnsignedWord(); // Add to your field
             } else
             if(opcode == 60)
             {
@@ -175,6 +188,12 @@ public class NPCCacheDefinition {
             } else
             if(opcode == 107) {
 
+            }else
+            if(opcode == 109) {
+
+            }else
+            if(opcode == 111) {
+
             }
         } while(true);
     }
@@ -219,7 +238,7 @@ public class NPCCacheDefinition {
      * @return	size	the size of the NPC
      */
     public int getSize() {
-        return size;
+        return boundDim;
     }
 
     /**

@@ -29,7 +29,12 @@ public class NPCHandler {
         npcs = new NPC[maxNPCs];
         NpcList = new NPCList[maxListedNPCs];
         NpcDrops = new NPCDrops[maxNPCDrops];
-
+        if(Config.pack_spawns) {
+            convertTxtSpawnsToRegionFiles(
+                    "./data/cfg/autospawn.cfg",
+                    "./data/cfg/spawns"
+            );
+        }
         try {
             loadNPCList(NPC_LIST_PATH);
             loadAllRegionSpawns("./data/cfg/spawns/");
@@ -37,10 +42,7 @@ public class NPCHandler {
             System.err.println("💥 Failed to initialize NPCHandler: " + e.getMessage());
             e.printStackTrace();
         }
-        //convertTxtSpawnsToRegionFiles(
-            //    "./data/cfg/autospawn.cfg",
-             //   "./data/cfg/spawns"
-        //);
+
 
     }
 
@@ -659,7 +661,7 @@ public class NPCHandler {
             return;
         }        // no free slot found
         if (HP <= 0) { // This will cause client crashes if we don't use this :) - xero
-            HP = 3000;
+            HP = 30;
         }
         NPC newNPC = new NPC(slot, npcType);
 
@@ -749,40 +751,6 @@ public class NPCHandler {
         System.out.println("Took: " + (System.currentTimeMillis()));
     }
 
-    /*
-     public boolean IsInWorldMap(int coordX, int coordY) {
-     for (int i = 0; i < worldmap[0].length; i++) {
-     //if (worldmap[0][i] == coordX && worldmap[1][i] == coordY) {
-     return true;
-     //}
-     }
-     return false;
-     }
-     public boolean IsInWorldMap2(int coordX, int coordY) {
-     for (int i = 0; i < worldmap2[0].length; i++) {
-     if (worldmap2[0][i] == coordX && worldmap2[1][i] == coordY) {
-     return true;
-     }
-     }
-     return true;
-     }
-
-     public boolean IsInRange(int NPCID, int MoveX, int MoveY) {
-     int NewMoveX = (npcs[NPCID].absX + MoveX);
-     int NewMoveY = (npcs[NPCID].absY + MoveY);
-     if (NewMoveX <= npcs[NPCID].moverangeX1 && NewMoveX >= npcs[NPCID].moverangeX2 && NewMoveY <= npcs[NPCID].moverangeY1 && NewMoveY >= npcs[NPCID].moverangeY2) {
-     if ((npcs[NPCID].walkingType == 1 && IsInWorldMap(NewMoveX, NewMoveY) == true) || (npcs[NPCID].walkingType == 2 && IsInWorldMap2(NewMoveX, NewMoveY) == false)) {
-     if (MoveX == MoveY) {
-     if ((IsInWorldMap(NewMoveX, npcs[NPCID].absY) == true && IsInWorldMap(npcs[NPCID].absX, NewMoveY) == true) || (IsInWorldMap2(NewMoveX, npcs[NPCID].absY) == false && IsInWorldMap2(npcs[NPCID].absX, NewMoveY) == false)) {
-     return true;
-     }
-     return false;
-     }
-     return true;
-     }
-     }
-     return false;
-     }*/
     public int GetMove(int Place1, int Place2) { // Thanks to diablo for this! Fixed my npc follow code <3
         if ((Place1 - Place2) == 0) {
             return 0;
@@ -920,19 +888,7 @@ public class NPCHandler {
                 continue;
 
             client player = (client) p;
-            // 👉 NEW: Do not aggro if player is in the home boundary
-            if (Boundary.isIn(player, Boundary.HOME)) {
-                continue;
-            }
-            if (Boundary.isIn(player, Boundary.gh_train)) {
-                continue;
-            }
-            if (Boundary.isIn(player, Boundary.ghr_train)) {
-                continue;
-            }
-            if (Boundary.isIn(player, Boundary.gh_shop_zone)) {
-                continue;
-            }
+
             if (player.distanceToPoint(npc.absX, npc.absY) > getDistanceForNpc(npc))
                 continue;
 
@@ -940,33 +896,42 @@ public class NPCHandler {
             int playerLevel = player.combat;
 
             long now = System.currentTimeMillis();
-            boolean canAggro;
 
+            boolean canAggro = false;
+
+            // 1. Always aggressive NPCs (bosses, special NPCs)
             if (npc.alwaysAggressive) {
-                canAggro = true;  // Always aggressive NPCs will attack
-            } else {
-                // Allow high-level NPCs to bypass the npcGetsAnnoyed method
-                if (npcLevel > playerLevel * 1.5) {  // Adjust this factor as needed
-                    canAggro = true;  // High-level NPCs attack regardless
-                } else if (npcGetsAnnoyed(npc)) {
-                    canAggro = (playerLevel <= npcLevel * 2) && (now - player.aggrotimer < 600_000);
-                } else {
-                    canAggro = false;
+                canAggro = true;
+            }
+
+            // 2. NPC must be in the "annoyed" list
+            else if (npcGetsAnnoyed(npc)) {
+
+                // 3. OSRS combat level rule
+                if (playerLevel <= npcLevel * 2) {
+
+                    // 4. Aggro timer (10 minutes)
+                    if (now - player.aggrotimer < 600_000) {
+                        canAggro = true;
+                    }
                 }
             }
 
-            if (canAggro) {
-                npc.StartKilling = player.index;
-                npc.IsUnderAttack = true;
-                npc.RandomWalk = false;
-                player.underAttackByNpc = npcId;
+            if (!canAggro)
+                continue;
 
-                attackPlayer(npcId);
-                return true;
-            }
+            // Lock onto player
+            npc.StartKilling = player.index;
+            npc.IsUnderAttack = true;
+            npc.RandomWalk = false;
+            player.underAttackByNpc = npcId;
+
+            attackPlayer(npcId);
+            return true;
         }
         return false;
     }
+
 
     private boolean tryFactionAggro(NPC npc, NPC other, int otherIndex) {
         if (other == null || other == npc || !other.isAlive()) return false;
@@ -981,35 +946,144 @@ public class NPCHandler {
         }
         return false;
     }
+    private boolean canNpcAggroPlayer(NPC npc, client player) {
+
+        // 1. Must be an aggressive NPC
+        if (!npcGetsAnnoyed(npc) && !npc.alwaysAggressive)
+            return false;
+
+        // 2. Combat level rule (OSRS)
+        int npcLevel = npc.combatLevel;
+        int playerLevel = player.combat;
+
+        if (!npc.alwaysAggressive && playerLevel > npcLevel * 2)
+            return false;
+
+        // 3. Aggro timer (10 minutes)
+        long now = System.currentTimeMillis();
+        if (!npc.alwaysAggressive && now - player.aggrotimer >= 600_000)
+            return false;
+
+        // 4. Single-combat rules
+        if (!npc.inMulti() && !player.inMulti()) {
+            if (player.IsAttackingNPC || player.underAttackByNpc > 0)
+                return false;
+        }
+
+        // 5. NPC already engaged
+        if (npc.IsUnderAttack || npc.StartKilling > 0)
+            return false;
+
+        return true;
+    }
+
+
+    private int findAggroPlayer(NPC npc, int npcId) {
+        int bestTarget = -1;
+        int bestDistance = Integer.MAX_VALUE;
+
+        int aggroRange = getNpcAggroRange(npc);
+
+        for (Player p : server.playerHandler.players) {
+            if (p == null || p.IsDead)
+                continue;
+
+            client c = (client) p;
+
+            if (c.heightLevel != npc.heightLevel)
+                continue;
+
+            if (c.respawnTimer > 0)
+                continue;
+
+            if (!canNpcAggroPlayer(npc, c))
+                continue;
+
+            int dist = (int) misc.distance(npc.absX, npc.absY, c.absX, c.absY);
+            if (dist > aggroRange)
+                continue;
+
+            if (dist < bestDistance) {
+                bestDistance = dist;
+                bestTarget = c.index;
+            }
+        }
+
+        return bestTarget;
+    }
+
+    private int getNpcAggroRange(NPC npc) {
+
+        int range = 4; // base OSRS aggression
+
+        // Larger NPCs notice players sooner
+        if (npc.getNPCSize() > 1)
+            range += 1;
+
+        // Dungeon / slayer mobs
+        if (npc.combatLevel >= 60)
+            range += 1;
+
+        // High-level monsters
+        if (npc.combatLevel >= 100)
+            range += 1;
+
+
+        // Hard cap (OSRS rarely exceeds this)
+        return Math.min(range, 8);
+    }
 
 
     public void handleAggro(int npcId) {
-        handleAggro(npcId, -1); // no faction candidate; player-only aggro
+        handleAggro(npcId, -1);
     }
 
     public void handleAggro(int npcId, int candidateOtherIdx) {
         NPC npc = npcs[npcId];
-        if (npc == null || !npc.isAlive() || npc.StartKilling > 0 || npc.targetNpcIndex >= 0) return;
+        if (npc == null || !npc.isAlive()) return;
 
-        // Throttle scan frequency to once every 3 seconds
+        if (npc.StartKilling > 0 || npc.targetNpcIndex >= 0)
+            return;
+
+        // Throttle aggro checks (3s)
         long now = System.currentTimeMillis();
-        if (now - npc.lastAggroCheck < 3000) return;
+        if (now - npc.lastAggroCheck < 3000)
+            return;
+
         npc.lastAggroCheck = now;
 
-        boolean gotAggro = tryPlayerAggro(npc, npcId);
-
-        // Only attempt faction aggro if an outer loop handed us a candidate index
-        if (!gotAggro && candidateOtherIdx >= 0) {
-            NPC other = npcs[candidateOtherIdx];
-            gotAggro = tryFactionAggro(npc, other, candidateOtherIdx);
-        }
-
-        if (!gotAggro) {
+        // Try to acquire a player target
+        int playerIndex = findAggroPlayer(npc, npcId); // same logic as tryPlayerAggro, but returns index
+        if (playerIndex < 0) {
             npc.RandomWalk = true;
-            npc.StartKilling = 0;
-            npc.targetNpcIndex = -1;
-            npc.IsUnderAttack = false;
+            return;
         }
+
+        client player = (client) server.playerHandler.players[playerIndex];
+        if (player == null || player.IsDead) {
+            npc.RandomWalk = true;
+            return;
+        }
+
+        int dist = (int) misc.distance(npc.absX, npc.absY, player.absX, player.absY);
+
+        if (dist > 1) {
+            npc.StartKilling = playerIndex;
+            npc.IsUnderAttack = true;
+            npc.RandomWalk = false;
+            npc.facePlayer(playerIndex);
+            npc.followPlayer = playerIndex;
+            return;
+        }
+
+        // === Adjacent: allow combat ===
+        npc.StartKilling = playerIndex;
+        npc.IsUnderAttack = true;
+        npc.RandomWalk = false;
+        npc.facePlayer(playerIndex);
+
+
+        npc.actionTimer = getNpcAttackSpeed(npc); // 4–6 ticks typical
     }
 
 
@@ -1113,6 +1187,7 @@ public class NPCHandler {
         switch (Npc.index) {
             case 677:
             case 6260:
+            case 5362:
             case 1588:
             case 191:
             case 1913:
@@ -2426,9 +2501,12 @@ public class NPCHandler {
     }
 
     private void handleAggroIfIdle(NPC npc, int index) {
-        if (npc.isAlive() && !npc.IsUnderAttack && npc.StartKilling <= 0 && npc.targetNpcIndex == -1) {
-            handleAggro(index);
-        }
+        if (!npc.isAlive()) return;
+
+        if (npc.IsUnderAttack || npc.StartKilling > 0 || npc.targetNpcIndex != -1)
+            return;
+
+        handleAggro(index);
     }
 
     private void handleCombat(NPC npc, int index) {
@@ -2882,6 +2960,13 @@ public class NPCHandler {
                 npc.textUpdate = "Herblore shop!";
             }
         }
+        if (npc.index == 8629) {
+            if (misc.random2(30) <= 2) {
+                npc.setUpdateRequired(true);
+                npc.textUpdateRequired = true;
+                npc.textUpdate = "Selling Shitty St00f";
+            }
+        }
         if (npc.index == 1552) {
             if (misc.random2(30) == 1) {
                 npc.setUpdateRequired(true);
@@ -3026,12 +3111,12 @@ public class NPCHandler {
                                 ppl.teleportToX = 2713; // Change coordinates
                                 ppl.teleportToY = 4836; // Change coordinates
                             }
-                            if (npcs[NPCID].index == 752) {
+                            if (npcs[NPCID].index == 10493) {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
 
-                                ppl.teleportToX = 2542; // Change coordinates
-                                ppl.teleportToY = 3029; // Change coordinates
+                                ppl.teleportToX = 2350; // Change coordinates
+                                ppl.teleportToY = 5741; // Change coordinates
                             }
                             if (npcs[NPCID].index == 275) {
                                 int Player = npcs[NPCID].StartKilling;
@@ -3172,7 +3257,7 @@ public class NPCHandler {
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.Giantkills += 1;
                             }
-                            if (npcs[NPCID].index == 752) //Lesser Demon
+                            if (npcs[NPCID].index == 10493) //Lesser Demon
                             {
                                 int playerId = npcs[NPCID].StartKilling;
                                 client c = (client) server.playerHandler.players[playerId];
@@ -3190,29 +3275,29 @@ public class NPCHandler {
                                 client c = (client) server.playerHandler.players[playerId];
                                 c.JDemonkills += 1;
                             }
-                            if (npcs[NPCID].index == 752) //Lesser Demon
+                            if (npcs[NPCID].index == 10493) //Lesser Demon
                             {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
                                 ppl.sendMessage("Good! Now kill the General!");
-                                ppl.teleportToX = 3182;
-                                ppl.teleportToY = 6829;
+                                ppl.teleportToX = 2350; // Change coordinates
+                                ppl.teleportToY = 5741; // Change coordinates
                             }
                             if (npcs[NPCID].index == 7552) //General Khazard
                             {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
                                 ppl.sendMessage("Wow, you have made it this far! Kill Him to beat the Mini game!");
-                                ppl.teleportToX = 3136;
-                                ppl.teleportToY = 6853;
+                                ppl.teleportToX = 2304;
+                                ppl.teleportToY = 5765;
                             }
                             if (npcs[NPCID].index == 1472) //Jungle demon
                             {
                                 int Player = npcs[NPCID].StartKilling;
                                 client ppl = (client) server.playerHandler.players[Player];
                                 ppl.sendMessage("You finished the Mini game! Click on the Chest to claim your reward!");
-                                ppl.teleportToX = 3143;
-                                ppl.teleportToY = 6806;
+                                ppl.teleportToX = 2311;
+                                ppl.teleportToY = 5718;
                             }
 
                             if (npcs[NPCID].index == 2027) {
@@ -3643,7 +3728,7 @@ public class NPCHandler {
             case 54:
             case 55:
             case 941:
-                return 92;
+                return 12250;
             case 2615:
             case 2616:
             case 2605:
@@ -3916,7 +4001,7 @@ public class NPCHandler {
             case 54:
             case 55:
             case 941:
-                return 91;
+                return 12252;
             case 2605:
             case 2607:
             case 2616:
@@ -3985,7 +4070,7 @@ public class NPCHandler {
             case 35:
             case 9: return 12311;
             case 3200:
-            case 752: return 0x326;
+            case 10493: return 0x326;
             case 4395: return 4933;
             case 4393:
             case 4394:
@@ -4136,7 +4221,7 @@ public class NPCHandler {
             case 54:
             case 55:
             case 941:
-                return 89;
+                return 12251;
             case 2605:
             case 2616:
             case 2607:
@@ -4472,10 +4557,10 @@ public class NPCHandler {
             return false;
         }
 
-        if (!canNpcAttackPlayer(npc, player)) {
-            npc.RandomWalk = true;
-            return false;
-        }
+//        if (!canNpcAttackPlayer(npc, player)) {
+//            npc.RandomWalk = true;
+//            return false;
+//        }
 
         handleFacing(npc, player);
 
@@ -4567,13 +4652,22 @@ public class NPCHandler {
         player.sendSound(soundConfig.getPlayerBlockSounds(player), 4, 0);
 
         npc.setUpdateRequired(true);
-        npc.hitDelayTimer = getHitDelay(npc);
-        npc.pendingDamage = damage;
 
-        int animLength = AnimationLength.getFrameLength(npc.animationRequest);
-        npc.actionTimer = Math.max(4, animLength);
+// === HIT QUEUE LOCK ===
+        if (npc.hitDelayTimer <= 0) {
+            npc.hitDelayTimer = getHitDelay(npc);
+            npc.pendingDamage = damage;
+        }
 
+        npc.actionTimer = getNpcAttackSpeed(npc);
         return true;
+    }
+    private int getNpcAttackSpeed(NPC npc) {
+        return switch (npc.index) {
+            case 50, 53 -> 6; // dragons
+            case 1265 -> 5;   // rock crab
+            default -> 4;
+        };
     }
 
 

@@ -47,7 +47,11 @@ public abstract class Player extends Entity {
 	public int wcTimer = 0;
 	public boolean isSmething = false;
 	public int pItemX, pItemY, pItemId;
+	public boolean playerIsCooking;
 	public int doAmount;
+	public int cookingItem;
+	public int cookingObject;
+	public boolean below459;
 	public int headIconPk = -1;
 	public int prayerId = -1;
 	public double prayerPoint = 1.0;

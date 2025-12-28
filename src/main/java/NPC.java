@@ -215,7 +215,7 @@ public class NPC extends Entity {
     }
 
     public int getNPCSize() {
-        return NPCSize.getNPCSize(index);
+        return NPCSize.get(index);
     }
 
     public String Glod() {

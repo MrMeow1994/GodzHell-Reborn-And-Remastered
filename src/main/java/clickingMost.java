@@ -47,6 +47,18 @@ public class clickingMost {
 //                        c.bankItem(c.playerItems[t], t, c.playerItemsN[t]);
 //                }
 //                break;
+            case 53152:
+                Cooking.cookItem(c, c.cookingItem, 1, c.cookingObject);
+                break;
+            case 53151:
+                Cooking.cookItem(c, c.cookingItem, 5, c.cookingObject);
+                break;
+            case 53150:
+                Cooking.cookItem(c, c.cookingItem, 10, c.cookingObject);
+                break;
+            case 53149:
+                Cooking.cookItem(c, c.cookingItem, 28, c.cookingObject);
+                break;
             case 250002:
                 c.closeInterface();
                 break;

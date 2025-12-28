@@ -85,6 +85,7 @@ public class PrayerAltar {
            lastAction.reset();
            lastAction.start();
            player.getSkilling().setSkill(Skill.PRAYER);
+           player.requestUpdates();
            player.getSkilling().add(new CycleEvent() {
                int remaining = amount - 1;
 
@@ -111,7 +112,8 @@ public class PrayerAltar {
                    player.TurnPlayerTo(player.objectX, player.objectY);
                    player.stillgfx(624, player.objectY, player.objectX);
                    player.addSkillXP(bone.getExperience() * Config.PRAYER_EXPERIENCE * 3, Skill.PRAYER.id);
-                   player.deleteItem2(bone.getItemId(), 1);
+                  player.requestUpdates();
+                  player.deleteItem2(bone.getItemId(), 1);
                    player.startAnimation(713);
                    player.sendSound(958, 7, 0);
                    lastAction.reset();

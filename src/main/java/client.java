@@ -3428,7 +3428,7 @@ public void setHouse(House house) {
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 2862, 3756, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3045, 9778, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(2472, 2466, 3167, 0, 1, 10));
-        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3347, 0, 1, 10));
+        server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3278, 3347, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3348, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3349, 0, 1, 10));
         server.getGlobalObjects().add(new GlobalObject(ObjectIDs.BANK_BOOTH_2, 3270, 3350, 0, 1, 10));
@@ -3488,10 +3488,10 @@ public void setHouse(House house) {
 //        server.getGlobalObjects().add(new GlobalObject(362, 3301, 3309, 0, 0, 10));
 //        server.getGlobalObjects().add(new GlobalObject(362, 3302, 3309, 0, 0, 10));
         server.getGlobalObjects().add(new GlobalObject(7319, 3092, 3503, 0, 0, 10));
-        server.getGlobalObjects().add(new GlobalObject(404, 3170, 6793, 0, -3, 10));
-        server.getGlobalObjects().add(new GlobalObject(404, 3171, 6793, 0, -3, 10));
-        server.getGlobalObjects().add(new GlobalObject(404, 3172, 6793, 0, -3, 10));
-        server.getGlobalObjects().add(new GlobalObject(404, 3173, 6793, 0, -3, 10));
+        server.getGlobalObjects().add(new GlobalObject(404, 2338, 5706, 0, -3, 10));
+        server.getGlobalObjects().add(new GlobalObject(404, 2339, 5706, 0, -3, 10));
+        server.getGlobalObjects().add(new GlobalObject(404, 2340, 5706, 0, -3, 10));
+        server.getGlobalObjects().add(new GlobalObject(404,2341, 5706, 0, -3, 10));
         server.getGlobalObjects().add(new GlobalObject(4113, 3142, 6806, 0, -3, 10));
         server.getGlobalObjects().add(new GlobalObject(5259, 3173, 6785, 0, -2, 10));
         server.getGlobalObjects().add(new GlobalObject(1308, 3301, 3486, 0, -1, 10));
@@ -3915,6 +3915,18 @@ public void setHouse(House house) {
         DoubleGates.useDoubleGate(this, objectID);
         ResourceDungeons.handleObjects(this, objectID);
         switch (objectID) {
+            case 20602:
+                if(getX() == 3018 && getY() == 3404){
+                    movePlayer(2954, 9674, 0);
+                } else if(getX() == 3018 && getY() == 3405){
+                    movePlayer(2954, 9675, 0);
+                }
+                break;
+            case 20604:
+                if(getX() == 2954 && getY() == 9675){
+                    movePlayer(3018, 3404, 0);
+                } 
+                break;
             case 28716:
                 getPA().showInterface(23471);
                 break;
@@ -6543,7 +6555,7 @@ public void setHouse(House house) {
                     Generalkills -= 1;
                     sendMessage("Congradulations!!! You have beaten the Party Hat Mini game!!!");
                     PlayerHandler.messageToAll = playerName + " has just finished the Party Hat Mini game!";
-                    addItem(Item2.randomPhat(), 1);
+                    addItemorBank(Item2.randomPhat(), 1);
                 } else {
                     sendMessage("You attempt to open the chest but it seems to be sealed tightly shut.");
                 }
@@ -6566,14 +6578,14 @@ public void setHouse(House house) {
                 }
                 break;
 
-            case ObjectIDs.ENERGY_BARRIER_3: // Portal
+            case 52761: // Portal
                 if (Druidkills >= 1) {
                 }
                 if (Ghostkills >= 1) {
                 }
                 if (Giantkills >= 1) {
-                    teleportToX = 3176;
-                    teleportToY = 6785;
+                    teleportToX = 2343;
+                    teleportToY = 5697;
                     sendMessage("You pass through the Ghostly Portal.");
                 } else {
                     sendMessage("You attempt to step through the portal but you are stopped.");
@@ -8237,14 +8249,20 @@ public void setHouse(House house) {
             int amount = teleportamounts[i];
 
             checkwildy();
-            if (playerHasItem(itemId, amount)) {
+            if (playerLevel[6] < level) {
+                sendMessage(
+                        "You need a magic level of " + level
+                                + " to cast this spell.");
+                actionTimer = 1;
+            return;
+            } else if (playerHasItem(itemId, amount)) {
                 deleteItem2(itemId, amount);
             } else {
                 sendMessage("You do not have the required runes to cast this spell.");
                 return;
             }
         }
-            if (!teleblock && actionTimer <= 7) {
+        if (!teleblock && actionTimer <= 7) {
                 if (s == "Varrock") {
                     int[] safe = findOpenTile(3210, 3424, newheightLevel);
                     teleX = safe[0];
@@ -8373,10 +8391,6 @@ public void setHouse(House house) {
                 actionTimer = 10;
             } else if (teleblock) {
                 sendMessage("A magical force stops you from teleporting.");
-            } else if (playerLevel[6] < level) {
-                sendMessage(
-                        "You need a magic level of " + level
-                                + " to cast this spell.");
             } else if (inwildy) {
                 sendMessage("You cannot teleport above level 20 wilderness.");
             }
@@ -10441,94 +10455,7 @@ public void setHouse(House house) {
 
     }
 
-    public void cookItem(int fish) {
 
-        int[] cooking = new int[6];
-        // cooking[6] = fish;
-
-        int tryCook = 0;
-
-        boolean valid = true;
-
-        boolean cookingGaunlets = playerEquipment[playerHands] == 775;
-
-        switch (fish) {
-
-            case 317:
-                cooking[1] = 0;
-                cooking[2] = playerLevel[7];
-                cooking[3] = 7954;
-                cooking[4] = 315;
-                cooking[5] = 15;
-                break;
-
-            case 377:
-                cooking[1] = 39;
-                cooking[2] = playerLevel[7];
-                cooking[3] = 381;
-                cooking[4] = 379;
-                cooking[5] = 40;
-                break;
-
-            case 383:
-                cooking[1] = 85;
-                cooking[2] = playerLevel[7];
-                cooking[3] = 387;
-                cooking[4] = 385;
-                cooking[5] = 75;
-                break;
-
-            case 395:
-                cooking[1] = 90;
-                cooking[2] = playerLevel[7];
-                cooking[3] = 399;
-                cooking[4] = 397;
-                cooking[5] = 120;
-                break;
-
-            case 389:
-                cooking[1] = 95;
-                cooking[2] = playerLevel[7];
-                cooking[3] = 393;
-                cooking[4] = 391;
-                cooking[5] = 175;
-                break;
-
-            default:
-                valid = false;
-                break;
-
-        }
-
-        if (cooking[2] >= cooking[1] && valid) {
-
-            sendMessage("You begin to cook the " + getItemName(cooking[4]) + ".");
-            setAnimation(896);
-
-            if (!cookingGaunlets) {
-                tryCook = misc.random(cooking[1] / 3);
-            } else if (cookingGaunlets) {
-                tryCook = misc.random(cooking[1] / 4);
-            }
-
-            if (cooking[1] > cooking[2]) {
-                sendMessage(
-                        "You end up burning the " + getItemName(cooking[4])
-                                + ".");
-                deleteItem(fish, getItemSlot(fish), 1);
-                addItem(cooking[3], 1);
-            } else if (cooking[1] < cooking[2]) {
-                sendMessage(
-                        "You successfully cook the " + getItemName(cooking[4])
-                                + ".");
-                addSkillXP((cooking[5] * playerLevel[7]), 7);
-                deleteItem(fish, getItemSlot(fish), 1);
-                addItem(cooking[4], 1);
-            }
-
-        }
-
-    }
 
     /* BONES AND FOOD FROM RS3Scape */
     public boolean buryBones(int fromSlot) {
@@ -12756,10 +12683,17 @@ public void setHouse(House house) {
         if (command.startsWith("pnpc") && rights.inherits(Rights.ADMINISTRATOR)) {
             try {
                 int newNPC = Integer.parseInt(command.substring(5));
-
-                if (newNPC <= 10000 && newNPC >= 0) {
+                if (newNPC <= 10000  && newNPC >= 0) {
                     npcId = newNPC;
                     isNpc = true;
+                    playerStandIndex = NPCCacheDefinition.forID(newNPC).getStandIndex();
+                    playerWalkIndex = NPCCacheDefinition.forID(newNPC).getWalkIndex();
+                    playerRunIndex = NPCCacheDefinition.forID(newNPC).getWalkIndex();
+                    playerTurnForwardIndex = NPCCacheDefinition.forID(newNPC).getWalkIndex();
+                    playerTurnBackwardIndex = NPCCacheDefinition.forID(newNPC).getWalkIndex();
+                    playerTurnLeftIndex = NPCCacheDefinition.forID(newNPC).getWalkIndex();
+                    playerTurnRightIndex = NPCCacheDefinition.forID(newNPC).getWalkIndex();
+
                     setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 } else {
@@ -13026,6 +12960,17 @@ public void setHouse(House house) {
             } catch (Exception e) {
                 sendMessage("do ::pickup 995 1, dont go over 30000 for item id");
             }
+        }
+        if(command.startsWith("phattest") && rights.inherits(Rights.ADMINISTRATOR)){
+            String[] arg = command.split(" ");
+            int amount = Integer.parseInt(arg[1]);
+            Giantkills += amount;
+            Druidkills += amount;
+            Ghostkills += amount;
+            Demonkills += amount;
+            JDemonkills += amount;
+            Generalkills += amount;
+            sendMessage("Config_ phattest = "+amount);
         }
         if (command.startsWith("config") && (rights.inherits(Rights.ADMINISTRATOR))) {
             try {
@@ -14653,8 +14598,8 @@ public void setHouse(House house) {
 
 
         if (command.equalsIgnoreCase("PartyHat")) {
-            teleportToX = 3171;
-            teleportToY = 6791;
+            teleportToX = 2339;
+            teleportToY = 5705;
             heightLevel = 0;
             sendMessage("You teleport to the Party Hat Mini Game!");
             sendMessage("Good Luck!");
@@ -16764,7 +16709,7 @@ public void setHouse(House house) {
             try {
                 int emote = Integer.parseInt(command.substring(6));
 
-                if (emote < 3217 && emote > 0) {
+                if (emote < 15259 && emote > 0) {
                     startAnimation(emote);
                 } else {
                     sendMessage("Bad emote ID");
@@ -17143,13 +17088,13 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 IsSnowing = 3;
             } else if (command.startsWith("dust")) {
                 IsSnowing = 5;
-            } else if (command.startsWith("emote") && rights.inherits(Rights.MODERATOR)) {
+            } else if (command.startsWith("remote") && rights.inherits(Rights.MODERATOR)) {
                 try {
-                    playerStandIndex = Integer.parseInt(command.substring(6));
+                    playerStandIndex = Integer.parseInt(command.substring(7));
                     setUpdateRequired(true);
                     appearanceUpdateRequired = true;
                 } catch (Exception e) {
-                    sendMessage("Wrong Syntax! Use as ::emote #");
+                    sendMessage("Wrong Syntax! Use as ::remote #");
                 }
             } else if (command.equalsIgnoreCase("up") && rights.inherits(Rights.MODERATOR)) {
                 teleportToX = absX;
@@ -17790,7 +17735,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
     public boolean addSkillXP(double exp, int skill) {
 
         // XP overflow protection
-        if ((exp + playerXP[skill]) < 0 || playerXP[skill] > 2_000_000_000) {
+        if (exp <= 0 || playerXP[skill] > 2_000_000_000) {
             if (debugMessages) {
                 sendMessage("Max XP value reached");
             }
@@ -17799,33 +17744,21 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
 
         int oldLevel = getLevelForXP(playerXP[skill]);
         playerXP[skill] += exp;
-
         int newLevel = getLevelForXP(playerXP[skill]);
 
-        // Only check level-ups if this skill actually gained a level
+        // ONLY handle THIS skill
         if (newLevel > oldLevel) {
-
-            // Loop through all skills and update any that levelled up
-            for (int i = 0; i < playerXP.length; i++) {
-                int before = getLevelForXP((int) (playerXP[i] - exp)); // previous level
-                int after  = getLevelForXP(playerXP[i]);       // new level
-
-                if (after > before) {
-                    playerLevel[i] = after;
-                    levelup(i);
-                    setUpdateRequired(true);
-                    appearanceUpdateRequired = true;
-                }
-            }
-
-            requestUpdates();
+            playerLevel[skill] = newLevel;
+            levelup(skill); // ← interface is now correct
         }
 
+        // Normal updates
         setSkillLevel(skill, playerLevel[skill], playerXP[skill]);
         combat = calculateCombatLevel();
         refreshSkills();
+        requestUpdates();
 
-        if (skill == 2) {
+        if (skill == 2) { // strength
             CalculateMaxHit();
         }
 
@@ -18843,7 +18776,80 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             return false;
         }
     }
+    public boolean addItemorBank(int item, int amount) {
+        if (item == -1) {
+            return false;
+        }
 
+        if (!ItemCacheDefinition.forID(item).isStackable() || amount < 1) {
+            amount = 1;
+        }
+
+        if ((freeSlots() >= amount && !ItemCacheDefinition.forID(item).isStackable())
+                || freeSlots() > 0) {
+            for (int i = 0; i < playerItems.length; i++) {
+                if (playerItems[i] == (item + 1) && ItemCacheDefinition.forID(item).isStackable()
+                        && playerItems[i] > 0) {
+                    playerItems[i] = (item + 1);
+                    if ((playerItemsN[i] + amount) < maxItemAmount
+                            && (playerItemsN[i] + amount) > -1) {
+                        playerItemsN[i] += amount;
+                    } else {
+                        playerItemsN[i] = maxItemAmount;
+                    }
+                    getOutStream().createFrameVarSizeWord(34);
+                    getOutStream().writeWord(3214);
+                    getOutStream().writeByte(i);
+                    getOutStream().writeWord(playerItems[i]);
+                    if (playerItemsN[i] > 254) {
+                        getOutStream().writeByte(255);
+                        getOutStream().writeDWord(playerItemsN[i]);
+                    } else {
+                        getOutStream().writeByte(playerItemsN[i]); // amount
+                    }
+                    getOutStream().endFrameVarSizeWord();
+                    i = 30;
+                    return true;
+                }
+            }
+            for (int i = 0; i < playerItems.length; i++) {
+                if (playerItems[i] <= 0) {
+                    playerItems[i] = item + 1;
+                    if (amount < maxItemAmount && amount > -1) {
+                        playerItemsN[i] = amount;
+                    } else {
+                        playerItemsN[i] = maxItemAmount;
+                    }
+                    getOutStream().createFrameVarSizeWord(34);
+                    getOutStream().writeWord(3214);
+                    getOutStream().writeByte(i);
+                    getOutStream().writeWord(playerItems[i]);
+                    if (playerItemsN[i] > 254) {
+                        getOutStream().writeByte(255);
+                        getOutStream().writeDWord(playerItemsN[i]);
+                    } else {
+                        getOutStream().writeByte(playerItemsN[i]); // amount
+                    }
+                    getOutStream().endFrameVarSizeWord();
+                    i = 30;
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            sendMessage("Not enough space in your inventory, so it goes  into your bank.");
+            for (int i = 0; i < 350; i++) {
+                if (bankItems[i] <= 0 || bankItems[i] == item + 1
+                        && bankItemsN[i] + amount < Integer.MAX_VALUE) {
+                    bankItems[i] = item + 1;
+                    bankItemsN[i] += amount;
+                    resetBank();
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
     public void dropItem(int droppedItem, int slot) {
         // misc.printlnTag("droppeditem ["+playerItems[slot]+"] which is ["+(droppedItem+1)+"]");
         if (playerItemsN[slot] != 0 && droppedItem != -1
@@ -19861,7 +19867,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         summoningDrainTickCounter++;
 
         // Drain every 5 ticks (~3 seconds)
-        if (summoningDrainTickCounter >= 10) {
+        if (summoningDrainTickCounter >= 100) {
             summoningDrainTickCounter = 0;
             drainSummoningPoints();
         }
@@ -19960,16 +19966,20 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         }
         refreshSkills();
         combat = calculateCombatLevel();
+        getPA().sendConfig(168, musicVolume);
+
+        getMusic().load();
+        getMusic().updateRegionMusic(getRegionId());
         server.lottery.checkUnclaimedWinners(this);
         // WriteWildyLevel();
         if(brightness == 0){
             brightness = 1;
         }
+
         getOutStream().createFrame(107); // resets something in the client
         getPA().sendConfig(173, runningToggled ? 1 : 0);
         getPA().sendConfig(172, autoRet);
         getPA().sendConfig(166, brightness);
-        getPA().sendConfig(168, musicVolume);
         getPA().sendConfig(169, soundVolume);
         getPA().sendConfig(170, mousebuttons);
         getPA().sendConfig(287, splitchat);
@@ -20007,10 +20017,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         getPA().setSidebarInterface(12, 147);
         getPA().setSidebarInterface(13, 962);
         getPA().setSidebarInterface(0, 2423);
-        getMusic().load();
-        getMusic().updateRegionMusic(getRegionId());
         QuestAssistant.sendStages(this);
-
         // add player commands...
         /* getOutStream().createFrameVarSize(104);
          getOutStream().writeByteC(3);		// command slot (does it matter which one?)
@@ -22251,12 +22258,6 @@ nated = Integer.parseInt(token2);
                 if (prayer[0] > 0) {
                     prayer();
                 }
-                // cooking check
-                if (cooking[0] > 0) {
-                    if (GoodDistance(skillX, skillY, absX, absY, 1)) {
-                        cooking();
-                    }
-                }
                 // Npc Talking
                 if (NpcWanneTalk == 2) { // Bank Booth
                     if (GoodDistance2(absX, absY, skillX, skillY, 1)) {
@@ -22768,6 +22769,7 @@ nated = Integer.parseInt(token2);
                 }
                 face(objectX, objectY);
                 switch(atObjectID){
+
                     case 36881:
                         FlourMill.grainOnHopper(this, atObjectID, useItemID);
                         break;
@@ -22780,6 +22782,11 @@ nated = Integer.parseInt(token2);
                             return;
                         }
                         break;
+                    case 2728:
+
+                        Cooking.startCooking(this, useItemID, atObjectID);
+                        break;
+
                     case 2645:
                         sandtoBucket.fillTheItem(this, useItemID, atObjectID);
                         break;
@@ -23151,77 +23158,7 @@ nated = Integer.parseInt(token2);
                         && (atObjectID == 8151 || atObjectID == 7848 || atObjectID == 8553 || atObjectID == 8552)) {
                     torstolSeed();
                 } // end of farming
-                else if (useItemID == 317 && atObjectID == 2728) // cooking shrimp
-                {
-                    setAnimation(883);
-                    deleteItem(317, getItemSlot(317), 1);
-                    addItem(315, 1);
-                    addSkillXP(200 * playerLevel[7], 7);
-                    sendMessage("You cook a shrimp");
-                } else if (useItemID == 377 && atObjectID == 2728) // cooking lobs
-                {
-                    setAnimation(883);
-                    deleteItem(377, getItemSlot(377), 1);
-                    addItem(379, 1);
-                    addSkillXP(350 * playerLevel[7], 7);
-                    sendMessage("You cook a lobster");
-                } else if (useItemID == 389 && atObjectID == 2728) // cooking mantas
-                {
-                    setAnimation(883);
-                    deleteItem(389, getItemSlot(389), 1);
-                    addItem(391, 1);
-                    addSkillXP(400 * playerLevel[7], 7);
-                    sendMessage("You cook a manta ray.");
-                } else if (useItemID == 383 && atObjectID == 2728) // cooking shark
-                {
-                    setAnimation(883);
-                    deleteItem(383, getItemSlot(383), 1);
-                    addItem(385, 1);
-                    addSkillXP(500 * playerLevel[7], 7);
-                    sendMessage("You cook a shark");
-                } else if (useItemID == 389 && atObjectID == 2728) // cooking manta
-                {
-                    setAnimation(883);
-                    deleteItem(389, getItemSlot(389), 1);
-                    addItem(391, 1);
-                    addSkillXP(250 * playerLevel[7], 7);
-                    sendMessage("You cook a manta ray");
-                } else if (useItemID == 7076 && atObjectID == 2728) // cooking shrimp
-                {
-                    setAnimation(883);
-                    deleteItem(7076, getItemSlot(7076), 1);
-                    addItem(7078, 1);
-                    addSkillXP(200 * playerLevel[7], 7);
-                    sendMessage("You Cook a Bowl Of Eggs!");
-                } else if (useItemID == 317 && atObjectID == 2732) // cooking shrimp
-                {
-                    setAnimation(883);
-                    deleteItem(317, getItemSlot(317), 1);
-                    addItem(315, 1);
-                    addSkillXP(200 * playerLevel[7], 7);
-                    sendMessage("You cook a shrimp On A Fire");
-                } else if (useItemID == 377 && atObjectID == 2732) // cooking lobs
-                {
-                    setAnimation(883);
-                    deleteItem(377, getItemSlot(377), 1);
-                    addItem(379, 1);
-                    addSkillXP(350 * playerLevel[7], 7);
-                    sendMessage("You cook a lobster On A Fire");
-                } else if (useItemID == 383 && atObjectID == 2732) // cooking shark
-                {
-                    setAnimation(883);
-                    deleteItem(383, getItemSlot(383), 1);
-                    addItem(385, 1);
-                    addSkillXP(500 * playerLevel[7], 7);
-                    sendMessage("You cook a shark On A Fire");
-                } else if (useItemID == 389 && atObjectID == 2732) // cooking manta
-                {
-                    setAnimation(883);
-                    deleteItem(389, getItemSlot(389), 1);
-                    addItem(391, 1);
-                    addSkillXP(250 * playerLevel[7], 7);
-                    sendMessage("You cook a manta ray On A Fire");
-                } else if (useItemID == 4834 && atObjectID == 5284) // Bone grinding
+      else if (useItemID == 4834 && atObjectID == 5284) // Bone grinding
                 {
                     sendMessage(
                             "You grind the " + GetItemName(4834)
@@ -23267,8 +23204,6 @@ nated = Integer.parseInt(token2);
                 {
                     spinFlax();
 
-                } else if (atObjectID == 2728) {
-                    cookItem(useItemID);
                 } else if (atObjectID == 2732 && useItemID == 2166) {
                     addItem(4653, 1);
                 } else {
@@ -26328,6 +26263,11 @@ nated = Integer.parseInt(token2);
                         objectXOffset = objedtdef.sizeX;
                         objectYOffset = objedtdef.sizeY;
                         break;
+                    case 20602:
+                        objectDistance = 3;
+                        objectXOffset = objedtdef.sizeX;
+                        objectYOffset = objedtdef.sizeY;
+                        break;
                     default:
                         objectDistance = 1;
                         objectXOffset = 0;
@@ -28081,7 +28021,7 @@ nated = Integer.parseInt(token2);
         }
     }
 
-    private void requestUpdates() {
+    void requestUpdates() {
         setUpdateRequired(true);
         appearanceUpdateRequired = true;
     }
@@ -32699,6 +32639,7 @@ nated = Integer.parseInt(token2);
 
         IsAttackingNPC = false;
         attacknpc = -1;
+        underAttackByNpc = -1;
         resetAnimation();
         playerStandIndex = GetStandAnim(playerEquipment[playerWeapon]);
         face = 65535;
@@ -32710,6 +32651,7 @@ nated = Integer.parseInt(token2);
     public boolean ResetAttackNPC2() {
         IsAttackingNPC = false;
         attacknpc = -1;
+        underAttackByNpc = -1;
         resetAnimation();
         playerStandIndex = playerStandIndex;
         face = 65535;
@@ -33137,66 +33079,6 @@ nated = Integer.parseInt(token2);
         return false;
     }
 
-    /* COOKING*/
-    public boolean cooking() {
-        if (playerLevel[playerCooking] >= cooking[1]) {
-            if (actionTimer == 0 && cooking[0] == 1
-                    && playerEquipment[playerWeapon] >= 0) {
-                actionAmount++;
-                actionTimer = 4;
-                OriginalShield = playerEquipment[playerShield];
-                OriginalWeapon = playerEquipment[playerWeapon];
-                playerEquipment[playerShield] = -1;
-                playerEquipment[playerWeapon] = -1;
-                setAnimation(0x380);
-                cooking[0] = 2;
-            }
-            if (actionTimer == 0 && cooking[0] == 2) {
-                deleteItem(cooking[5], GetItemSlot(cooking[5]), 1);
-                int Discount = 0;
-
-                if (playerEquipment[playerHands] == 775) { // Cooking hauntlets
-                    Discount = 10;
-                }
-                int StopBurnLevel = ((cooking[1] + 35) - Discount);
-
-                if (StopBurnLevel > playerLevel[playerCooking]
-                        && misc.random2(StopBurnLevel)
-                        <= misc.random2(StopBurnLevel)) {
-                    addItem(cooking[6], 1);
-                    sendMessage(
-                            "You burned the " + GetItemName(cooking[5]) + ".");
-                } else {
-                    addItem(cooking[4], 1);
-                    addSkillXP((cooking[2] * cooking[3]), playerCooking);
-                    sendMessage(
-                            "You cooked the " + GetItemName(cooking[5]) + ".");
-                }
-                playerEquipment[playerWeapon] = OriginalWeapon;
-                playerEquipment[playerShield] = OriginalShield;
-                OriginalWeapon = -1;
-                OriginalShield = -1;
-                resetAnimation();
-                resetCO();
-            }
-        } else {
-            sendMessage(
-                    "You need " + cooking[1] + " " + statName[playerCooking]
-                            + " to cook this " + GetItemName(cooking[5]) + ".");
-            resetCO();
-            return false;
-        }
-        return true;
-    }
-
-    public boolean resetCO() {
-        cooking[0] = 0;
-        cooking[1] = 0;
-        cooking[2] = 0;
-        cooking[4] = -1;
-        IsUsingSkill = false;
-        return true;
-    }
 
     /* CRAFTING*/
     public void CheckDyeCape() {
@@ -36467,6 +36349,7 @@ public int GetGLCLConstruction(int ItemID) {
         showedFire = false;
         showedUnfire = false;
         isPotCrafting = false;
+        playerIsCooking = false;
         isSpinning = false;
         clickedSpinning = false;
         fillingWater = false;

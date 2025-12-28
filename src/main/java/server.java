@@ -143,9 +143,9 @@ public class server implements Runnable {
      * Starts the minute counter
      */
     public static void main(String[] args) {
-
+        new Thread(new MemoryMonitorGUI(), "MemoryLogger").start();
         startServer();
-        new Thread(new MemoryLogger(), "MemoryLogger").start();
+
     }
 
     public static void startServer() {

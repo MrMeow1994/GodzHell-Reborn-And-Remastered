@@ -9,7 +9,7 @@ public final class NetworkConstants {
 	/**
 	 * The HTTP port.
 	 */
-	public static final int HTTP_PORT = 29435;
+	public static final int HTTP_PORT = 80;
 	
 	/**
 	 * The JAGGRAB port.

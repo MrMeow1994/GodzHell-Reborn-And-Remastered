@@ -1,5 +1,21 @@
 @echo off
-title Ghreborn Old
-COLOR 0A
-"C:\Users\Administrator\.jdks\corretto-1.8.0_382\jre\bin\java.exe" -Xmx7g -cp bin;deps/GTLVote.jar;deps/everythingrs-api.jar;deps/poi.jar;deps/mysql.jar;deps/mina.jar;deps/slf4j.jar;deps/slf4j-nop.jar;deps/jython.jar;log4j-1.2.15.jar; server
+title Ghreborn FileServer (Gradle Runtime)
+color 0A
+
+REM === Java executable ===
+set JAVA_EXE="C:\Users\Sgsrocks\.jdks\corretto-15.0.2\bin\java.exe"
+
+REM === Base project directory ===
+set BASE_DIR=E:\Godzhell-reborn-refixed-v.9
+
+REM === Load Gradle runtime classpath ===
+REM Make sure you previously ran 'gradlew printRuntimeClasspath > classpath.txt'
+set /p CP=<"%BASE_DIR%\classpath.txt"
+
+REM === JVM Options ===
+set JVM_OPTS=-Xmx7g -Xms2g
+
+REM === Launch FileServer ===
+%JAVA_EXE% %JVM_OPTS% -cp build\classes\java\main;deps/*; com.Ghreborn.jagcached.FileServer
+
 pause

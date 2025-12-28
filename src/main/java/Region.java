@@ -489,33 +489,26 @@ public class Region {
      */
     public static void addWorldObject(int id, int x, int y, int height, int face) {
         Region region = getRegion(x, y);
-        if (region == null) {
-            return;
-        }
+        if (region == null) return;
+
         int regionId = region.id;
-        if (worldObjects.containsKey(regionId)) {
-            if (objectExists(regionId, id, x, y, height)) {
-                return;
-            }
-            worldObjects.get(regionId).add(new WorldObject2(id, x, y, height, face));
-        } else {
-            ArrayList<WorldObject2> object = new ArrayList<>(1);
-            object.add(new WorldObject2(id, x, y, height, face));
-            worldObjects.put(regionId, object);
+        List<WorldObject2> objects = worldObjects.computeIfAbsent(regionId, k -> new ArrayList<>());
+
+        // Only add if it doesn't already exist
+        boolean exists = objects.stream()
+                .anyMatch(o -> o != null && o.getId() == id && o.getX() == x && o.getY() == y && o.getHeight() == height);
+        if (!exists) {
+            objects.add(new WorldObject2(id, x, y, height, face));
         }
     }
 
     private static boolean objectExists(int region, int id, int x, int y, int height) {
         List<WorldObject2> objects = worldObjects.get(region);
-        for (WorldObject2 object : objects) {
-            if (object == null) {
-                continue;
-            }
-            if (object.getId() == id && object.getX() == x && object.getY() == y && object.getHeight() == height) {
-                return true;
-            }
-        }
-        return false;
+        if (objects == null) return false;
+
+        return objects.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(o -> o.getId() == id && o.getX() == x && o.getY() == y && o.getHeight() == height);
     }
 
 
@@ -1106,6 +1099,24 @@ public class Region {
             return true;
         }
     }
+    public static void addWorldObjects(Collection<WorldObject2> objects) {
+        Map<Integer, Set<String>> regionKeys = new HashMap<>();
+
+        for (WorldObject2 obj : objects) {
+            Region region = getRegion(obj.getX(), obj.getY());
+            if (region == null) continue;
+
+            int regionId = region.id;
+            Set<String> keys = regionKeys.computeIfAbsent(regionId, k -> new HashSet<>());
+            String key = obj.getId() + "," + obj.getX() + "," + obj.getY() + "," + obj.getHeight();
+
+            if (!keys.contains(key)) {
+                addWorldObject(obj.getId(), obj.getX(), obj.getY(), obj.getHeight(), obj.getFace());
+                keys.add(key);
+            }
+        }
+    }
+
 
     public static void init() {
         try {
@@ -1137,8 +1148,7 @@ public class Region {
             for (RegionData rd : data)
                 Region.loadMap(rd);
 
-            for (WorldObject2 obj : EXISTANT_OBJECTS)
-                Region.addWorldObject(obj);
+            Region.addWorldObjects(List.of(EXISTANT_OBJECTS)); // batch insert
 
             System.out.println("Loaded " + size + " region maps.");
         } catch (Exception e) {
