@@ -4,6 +4,29 @@ public class clickingMost {
 
     public void clicking(int a) throws Exception {
         client c = (client) PlayerHandler.players[a];
+        if(Boundary.isIn( c, Boundary.jail)){
+            if(c.jailitemcount > 0){
+                switch(c.actionButtonId){
+                    case 75247:
+                    case 75222:
+                        c.getPA().setSidebarInterface(2, 18859);
+                        break;
+                    case 73167:
+                    case 75248:
+                        c.getPA().setSidebarInterface(2, 19409);
+                        break;
+                    case 9154: // Log out
+
+                        c.logout();
+                        c.savechar();
+                        server.lottery.saveLists();
+                        c.savefile = true;
+                        break;
+                }
+                c.sendMessage("You cant do this while jailed.");
+                return;
+            }
+        }
         if (c.debugMessages) {
             c.sM("Button id " + c.actionButtonId);
         }
@@ -1755,7 +1778,7 @@ public class clickingMost {
             case 80201: // block (pickaxe)
             case 1078: // focus - block (staff)
             case 78059: // block (axe)
-            case 33019: // fend (hally)
+            case 78114: // fend (hally)
             case 18078: // block (spear)
             case 8235: // block (dagger)
                 c.sendMessage("Defensive");
@@ -1766,7 +1789,7 @@ public class clickingMost {
             case 9127: // Controlled
             case 77024:
             case 78024: // lash (whip)
-            case 33018: // jab (hally)
+            case 78112: // jab (hally)
             case 77101: // longrange (long bow)
             case 18077: // lunge (spear)
             case 18080: // swipe (spear)
@@ -1783,6 +1806,7 @@ public class clickingMost {
             case 78083:
             case 77047:
             case 80223:
+            case 78135:
                 if (c.autoRet == 0) {
                     c.autoRet = 1;
                 } else {
@@ -1800,7 +1824,7 @@ public class clickingMost {
             case 1079: // pound (staff)
             case 78061: // hack (axe)
             case 78060: // smash (axe)
-            case 33020: // swipe (hally)
+            case 78113: // swipe (hally)
             case 77102: // rapid (long bow)
             case 17101: // repid (darts)
             case 8237: // lunge (dagger)
@@ -1811,17 +1835,11 @@ public class clickingMost {
                 break;
 
             case 9154: // Log out
-            {
-                if (c.jailed == 1) {
-                    c.sendMessage("You cant log out when jailed.");
-                    return;
-                } else if (c.jailed == 0) {
+
                     c.logout();
                     c.savechar();
                     server.lottery.saveLists();
                     c.savefile = true;
-                }
-            }
             break;
 
             case 21011:

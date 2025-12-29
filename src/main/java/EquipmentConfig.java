@@ -37,6 +37,17 @@ public class EquipmentConfig {
             26028, 26029, 25624, 25618, 25612, 25344, 25000, 25001, 24555, 24562, 24119, 24108,
             24107, 24106, 24105, 24104, 24103, 24102, 24101
     };
+    public static final int[] HALBERDS = {
+            ItemIDs.BRONZE_HALBERD,
+            ItemIDs.IRON_HALBERD,
+            ItemIDs.STEEL_HALBERD,
+            ItemIDs.BLACK_HALBERD,
+            ItemIDs.MITHRIL_HALBERD,
+            ItemIDs.ADAMANT_HALBERD,
+            ItemIDs.RUNE_HALBERD,
+            ItemIDs.DRAGON_HALBERD,
+            28935
+    };
     public static boolean isBattleaxe(int itemId) {
         for (int id : BATTLEAXES) {
             if (id == itemId) return true;
@@ -63,6 +74,12 @@ public class EquipmentConfig {
     }
     public static  boolean isTwoHander(int itemId) {
         for (int id : CRUSH_SWORDS) {
+            if (id == itemId) return true;
+        }
+        return false;
+    }
+    public static  boolean isHalberd(int itemId) {
+        for (int id : HALBERDS) {
             if (id == itemId) return true;
         }
         return false;

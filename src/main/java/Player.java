@@ -52,6 +52,7 @@ public abstract class Player extends Entity {
 	public int cookingItem;
 	public int cookingObject;
 	public boolean below459;
+	public int jailitemcount;
 	public int headIconPk = -1;
 	public int prayerId = -1;
 	public double prayerPoint = 1.0;

@@ -409,6 +409,7 @@ public class Boundary {
             new Boundary(3191, 3236, 3265, 3302)
     };
     public static final Boundary gameres_gottoa = new Boundary(2944, 9664, 3007, 9727);
+    public static final Boundary jail = new Boundary(2886, 5068, 2928, 5116);
     public static final Boundary rdleveloftrain = new Boundary(2366,4669,2434,4737);
     public static final Boundary TzHarr_City = new Boundary(2432, 5056, 2558, 5183);
     //public static final Boundary FOUNTAIN_OF_RUNE_BOUNDARY = new Boundary(3367, 3888, 3380, 3899);

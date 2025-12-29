@@ -9,12 +9,14 @@ import java.util.List;
 public class NPCSpawnEditor extends JFrame {
 
     private JTextArea fileContent;
-    private JTextField searchField;
 
     private final File spawnDir = new File("./Data/cfg/spawns");
 
     private final Map<Integer, List<RegionSpawn>> spawnsByRegion = new HashMap<>();
     private int currentRegion = -1;
+    private JTextField searchField;
+    private JList<Integer> regionList;
+    private DefaultListModel<Integer> regionListModel;
 
     public NPCSpawnEditor() {
         super("NPC Spawn Editor (BIN)");
@@ -23,28 +25,68 @@ public class NPCSpawnEditor extends JFrame {
     }
 
     private void initUI() {
-        setSize(900, 600);
+        setSize(1000, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // ===== Region list =====
+        regionListModel = new DefaultListModel<>();
+        regionList = new JList<>(regionListModel);
+        regionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        regionList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                Integer regionId = regionList.getSelectedValue();
+                if (regionId != null) {
+                    loadRegion(regionId);
+                }
+            }
+        });
+
+        JScrollPane regionScroll = new JScrollPane(regionList);
+        regionScroll.setPreferredSize(new Dimension(160, 0));
+        add(regionScroll, BorderLayout.WEST);
+
+        // ===== Editor =====
         fileContent = new JTextArea();
         add(new JScrollPane(fileContent), BorderLayout.CENTER);
 
+        // ===== Top bar =====
         JPanel top = new JPanel();
-        searchField = new JTextField(10);
-        JButton search = new JButton("Load Region");
+
+        searchField = new JTextField(8);
+        JButton load = new JButton("Load Region");
         JButton save = new JButton("Save Region");
 
-        search.addActionListener(e -> loadRegion());
+        load.addActionListener(e -> searchRegion());
         save.addActionListener(e -> saveRegion());
 
         top.add(new JLabel("Region ID:"));
         top.add(searchField);
-        top.add(search);
+        top.add(load);
         top.add(save);
 
         add(top, BorderLayout.NORTH);
     }
+
+    private void searchRegion() {
+        try {
+            int regionId = Integer.parseInt(searchField.getText());
+
+            int index = regionListModel.indexOf(regionId);
+            if (index == -1) {
+                JOptionPane.showMessageDialog(this, "Region not found: " + regionId);
+                return;
+            }
+
+            regionList.setSelectedIndex(index);
+            regionList.ensureIndexIsVisible(index);
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid region ID");
+        }
+    }
+
 
     // ======================
     // Core BIN handling
@@ -70,28 +112,31 @@ public class NPCSpawnEditor extends JFrame {
                 e.printStackTrace();
             }
         }
+        regionListModel.clear();
+
+        List<Integer> regions = new ArrayList<>(spawnsByRegion.keySet());
+        Collections.sort(regions);
+
+        for (int regionId : regions) {
+            regionListModel.addElement(regionId);
+        }
+
     }
 
-    private void loadRegion() {
-        try {
-            int regionId = Integer.parseInt(searchField.getText());
-            currentRegion = regionId;
+    private void loadRegion(int regionId) {
+        currentRegion = regionId;
 
-            List<RegionSpawn> list = spawnsByRegion.get(regionId);
-            if (list == null || list.isEmpty()) {
-                fileContent.setText("// No spawns for region " + regionId);
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            for (RegionSpawn s : list) {
-                sb.append(s).append('\n');
-            }
-            fileContent.setText(sb.toString());
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid region ID");
+        List<RegionSpawn> list = spawnsByRegion.get(regionId);
+        if (list == null || list.isEmpty()) {
+            fileContent.setText("// No spawns for region " + regionId);
+            return;
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (RegionSpawn s : list) {
+            sb.append(s).append('\n');
+        }
+        fileContent.setText(sb.toString());
     }
 
     private void saveRegion() {

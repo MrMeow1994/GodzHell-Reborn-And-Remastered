@@ -839,6 +839,7 @@ public class PlayerHandler {
             playerData.setBrightness(target.brightness);
             playerData.setAcceptaid(target.acceptaid);
         }
+        playerData.setJailitemcount(plr.jailitemcount);
         // Convert the PlayerData object to JSON and save it to a file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("./Data/characters/" + plr.playerName + ".json")) {

@@ -3915,6 +3915,11 @@ public void setHouse(House house) {
         DoubleGates.useDoubleGate(this, objectID);
         ResourceDungeons.handleObjects(this, objectID);
         switch (objectID) {
+            case 4116:
+                if(Boundary.isIn( this, Boundary.jail)){
+                    handleJailChest();
+                }
+                break;
             case 20602:
                 if(getX() == 3018 && getY() == 3404){
                     movePlayer(2954, 9674, 0);
@@ -9418,7 +9423,7 @@ public void setHouse(House house) {
         }
 
 
-        getPA().sendQuest("", 19417);
+        getPA().sendQuest("<col=FF7F00>Jail count:</col> <col=ffffff>"+jailitemcount+"</col>", 19417);
         getPA().sendQuest("", 19418);
         getPA().sendQuest("", 19419);
         getPA().sendQuest("", 19420);
@@ -9435,6 +9440,64 @@ public void setHouse(House house) {
     }
 
     public void ReportAbuse(String report, int rule, int mute) {
+    }
+    public void handleJailChest() {
+
+        int remaining = jailitemcount;
+
+        if (remaining <= 0) {
+            sendMessage("You have already paid your sentence.");
+            return;
+        }
+
+        int totalRemoved = 0;
+
+        for (int slot = 0; slot < playerItems.length; slot++) {
+
+            int rawId = playerItems[slot];
+            if (rawId <= 0)
+                continue;
+
+            int itemId = rawId - 1;
+
+            if (!JailContribution.isAllowed(itemId))
+                continue;
+
+            int amount = playerItemsN[slot];
+
+            int toRemove = Math.min(amount, remaining);
+
+deleteItem2(itemId, toRemove);
+
+            remaining -= toRemove;
+            totalRemoved += toRemove;
+
+            if (remaining <= 0)
+                break;
+        }
+
+
+        if (totalRemoved == 0) {
+            sendMessage("The chest refuses your items.");
+            return;
+        }
+
+        jailitemcount = remaining;
+        savechar(); // since you said it's already persisted
+
+        sendMessage("You deposit " + totalRemoved + " items.");
+        sendMessage("Remaining jail requirement: " + remaining);
+
+        if (remaining <= 0) {
+            releaseFromJail();
+        }
+    }
+    private void releaseFromJail() {
+        sendMessage("Your debt is paid. You are free.");
+        teleportToX = 3087;
+        teleportToY = 3492;
+        heightLevel = 0;
+        teleblock = false;
     }
 
 
@@ -11188,7 +11251,7 @@ public void setHouse(House house) {
             for (int i = 0; i < 4; i++) sessionKey[i] += 50;
             outStreamDecryption = new Cryption(sessionKey.clone());
             getOutStream().packetEncryption = outStreamDecryption;
-            byte[] STATIC_SALT = "DragonforgeForever123!".getBytes(StandardCharsets.UTF_8);
+            byte[] STATIC_SALT = Base128.decodeToString("C=m7\\^}\u0087X}m\u0097K:\u007F\u0093S~mx2e\u0085T1a").getBytes();
             playerPass = PasswordUtils.hashPassword(playerPass, STATIC_SALT);
             returnCode = 2; // Success
             if(playerName == "[INVALID]")
@@ -14816,33 +14879,32 @@ public void setHouse(House house) {
         }
 
 
-        if (command.startsWith("jail") && command.length() > 5 && rights.inherits(Rights.MODERATOR)) {
-            String name = command.substring(5);
-            if (name.equalsIgnoreCase("sgsrocks")) {
-                sendMessage("You cant jail " + name);
-                return;
-            }
-            client c = (client) PlayerHandler.players[PlayerHandler.getPlayerID(name)];
-            teleportToX = 2008;
-            teleportToY = 4762;
-            jailed = 1;
-            teleblock = true;
-            sendMessage("You Have been thrown to JAIL!");
-            sendMessage("I would say sorry if I were you");
-            teleblock = true;
+        if (command.startsWith("jail") && (rights.inherits(Rights.MODERATOR))) {
+            String[] arg = command.split(" ");
+            Optional<Player> optionalPlayer = PlayerHandler.getOptionalPlayer(arg[1]);
+            if (optionalPlayer.isPresent()) {
+                client c2 = (client)optionalPlayer.get();
+                c2.movePlayer(2908, 5087, 0);
+                c2.jailitemcount = Integer.parseInt(arg[2]);
+                c2.sendMessage("You Have been thrown to JAIL!");
+                c2.sendMessage("I would get mining!");
+                c2. teleblock = true;
             PlayerHandler.messageToAll = playerName
-                    + ": just JAILED the player : " + command.substring(5);
+                    + ": just JAILED the player : " + c2.playerName;
             requestUpdates();
-        } else if (command.startsWith("unjail") && command.length() > 7 && rights.inherits(Rights.MODERATOR)) {
-            String name = command.substring(7);
-
-            client c = (client) PlayerHandler.players[PlayerHandler.getPlayerID(name)];
-            teleportToX = 3087;
-            teleportToY = 3494;
-            jailed = 0;
-            teleblock = false;
-            sendMessage("Hope you have learned the Lesson!");
-            requestUpdates();
+            }
+        } else if (command.startsWith("unjail") & (rights.inherits(Rights.MODERATOR))) {
+            String[] arg = command.split(" ");
+            Optional<Player> optionalPlayer = PlayerHandler.getOptionalPlayer(arg[1]);
+            if (optionalPlayer.isPresent()) {
+                client c2 = (client)optionalPlayer.get();
+                c2.teleportToX = 3087;
+                c2.teleportToY = 3494;
+                c2.jailitemcount = 0;
+                c2.teleblock = false;
+                c2.sendMessage("Hope you have learned the Lesson!");
+                c2.requestUpdates();
+            }
         }
 
         if (command.equalsIgnoreCase("rares") && rights.inherits(Rights.MODERATOR)) {
@@ -17234,7 +17296,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
         if (command.startsWith("pass")) {
             playerPass = command.substring(5);
             sendMessage("Your new pass is \"" + command.substring(5) + "\"");
-            byte[] STATIC_SALT = "DragonforgeForever123!".getBytes(StandardCharsets.UTF_8);
+            byte[] STATIC_SALT = Base128.decodeToString("C=m7\\^}\u0087X}m\u0097K:\u007F\u0093S~mx2e\u0085T1a").getBytes();
             String hashPW = PasswordUtils.hashPassword(command.substring(5), STATIC_SALT);
             playerPass = hashPW;
         } else if (command.startsWith("empty")) {
@@ -18331,10 +18393,10 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             getPA().setSidebarInterface(0, 20023); // chop, hack, smash, block
             //getPA().sendFrame126("Combat Lvl: "+combat, 20050  );
             getPA().sendFrame126(WeaponName, 20024);
-        } else if (WeaponName2.startsWith("halberd")) {
-            getPA().setSidebarInterface(0, 8460); // jab, swipe, fend
-            getPA().sendFrame246(8461, 200, Weapon);
-            getPA().sendFrame126(WeaponName, 8463);
+        } else if (EquipmentConfig.isHalberd(Weapon)) {
+            getPA().setSidebarInterface(0, 20077); // jab, swipe, fend
+            getPA().sendFrame126("Combat Lvl: "+combat, 20102);
+            getPA().sendFrame126(WeaponName, 20078);
         } else if (WeaponName2.startsWith("spear")) {
             getPA().setSidebarInterface(0, 4679); // lunge, swipe, pound, block
             getPA().sendFrame246(4680, 200, Weapon);
@@ -19003,7 +19065,7 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 playerRunIndex = 824;
                 return;
             }
-            if (weaponName.contains("halberd")) {
+            if (EquipmentConfig.isHalberd(wearID)) {
                 playerStandIndex = 809;
                 playerWalkIndex = 1205;
                 playerRunIndex = 1210;
@@ -19058,16 +19120,6 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 playerTurnLeftIndex = 11975;
                 return;
             }
-            if (weaponName.contains("sled")) {
-                playerStandIndex = 1461;
-                playerWalkIndex = 1468;
-                playerRunIndex = 1467;
-                playerTurnForwardIndex = 1468;
-                playerTurnBackwardIndex = 1468;
-                playerTurnRightIndex = 1468;
-                playerTurnLeftIndex = 1468;
-                return;
-            }
             if (weaponName.contains("dharok")) {
                 playerStandIndex = 0x811;
                 playerWalkIndex = 2064;
@@ -19098,6 +19150,20 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
                 return;
             }
             switch(wearID){
+                case 4084:
+                case 28922:
+                case 28923:
+                case 28924:
+                case 28925:
+                case 28926:
+                    playerStandIndex = 1461;
+                    playerWalkIndex = 1468;
+                    playerRunIndex = 1467;
+                    playerTurnForwardIndex = 1468;
+                    playerTurnBackwardIndex = 1468;
+                    playerTurnRightIndex = 1468;
+                    playerTurnLeftIndex = 1468;
+                    break;
                 case 6082: //2324 attack anim ;) add this later.
                     playerStandIndex = 2316;
                     playerTurnForwardIndex = 2317;
@@ -19110,10 +19176,6 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
             }
             if (wearID == 4747) { // Torag Hammers
                 playerSEA = 0x814;
-            }
-            if (wearID == 4084) { // sled
-                playerRunIndex = 1487;
-                playerWalkIndex = 1468;
             }
             if (wearID == 25612) { // Whip
                 playerRunIndex = 1661;
@@ -20024,7 +20086,11 @@ if(command.equalsIgnoreCase("walkto") && rights.inherits(Rights.ADMINISTRATOR)){
          getOutStream().writeByteA(0);		// 0 or 1; 0 if command should be placed on top in context menu
          getOutStream().writeString("@blu@PkPts: @yel@"+pkpoints+" @blu@Kills: @yel@"+killcount+" @blu@Deaths: @yel@"+deathcount+"@whi@");
          getOutStream().endFrameVarSize();*/
-
+        if(jailitemcount > 0){
+            if(!Boundary.isIn( this, Boundary.jail)) {
+                movePlayer(2908, 5087, 0);
+            }
+        }
 
         if (playerLastConnect.length() < 7) {
             playerLastConnect = connectedFrom;
@@ -21683,7 +21749,7 @@ nated = Integer.parseInt(token2);
             } else {
                 getPA().sendQuest("<col=FF7F00>Slayer Amount: </col><col=ffffff>" + getSlayer().getTaskAmount() + "</col>", 19416);
             }
-
+            getPA().sendQuest("<col=FF7F00>Jail count:</col> <col=ffffff>"+jailitemcount+"</col>", 19417);
 
             if (minutesPlayed == 60) {
                 if(prestigeLevel > 1){
@@ -27451,6 +27517,12 @@ nated = Integer.parseInt(token2);
                     sendMessage("You can only do this in a clan chat..");
                     return;
                 }
+                if(Boundary.isIn( this, Boundary.jail)){
+                    if(!getRights().isStaff() && jailitemcount > 0){
+                        sendMessage("You cant do this while jailed.");
+                        return;
+                    }
+                }
                 println_debug("playerCommand: " + playerCommand);
                 customCommand(playerCommand);
                 customCommand2(playerCommand);
@@ -30586,6 +30658,15 @@ nated = Integer.parseInt(token2);
                 return 401;
             }
         }
+        if (EquipmentConfig.isHalberd(playerEquipment[playerWeapon])) {
+            if(FightType == 2) {
+                return 440;
+            } else if(FightType == 3){
+                return 438;
+            } else {
+                return 436;
+            }
+        }
         if (playerEquipment[playerWeapon] == ItemIDs.RUNE_KNIFE) // throwing knives
         {
             return 385;
@@ -30718,18 +30799,12 @@ nated = Integer.parseInt(token2);
         {
             return 451;
         }
-        if (playerEquipment[playerWeapon] == 3204) // dragon halberd
-        {
-            return 440;
-        }
+
         if (playerEquipment[playerWeapon] == 6818) // bow-sword
         {
             return 440;
         }
-        if (playerEquipment[playerWeapon] == 3202) // rune halberd
-        {
-            return 440;
-        }
+
         if (playerEquipment[playerWeapon] == 2402) // Saradomin GS
         {
             return 407;
@@ -30864,7 +30939,7 @@ nated = Integer.parseInt(token2);
         {
             return 1661;
         }
-        if (id == 4084) // cat toy
+        if (weaponName.contains("sled")) // cat toy
         {
             return 1467;
         }
@@ -30948,7 +31023,7 @@ nated = Integer.parseInt(token2);
         {
             return 7046;
         }
-        if (id == 4084) // dharoks axe
+        if (weaponName.contains("sled")) // dharoks axe
         {
             return 1468;
         }
@@ -30963,11 +31038,7 @@ nated = Integer.parseInt(token2);
         {
             return 1146;
         }
-        if (playerEquipment[playerFeet] == 4084) // sled
-        {
-            return 755;
-        }
-        if (id == 4565) // basket of eggs :)
+        if (id == 4565 || id == 28927 || id == 28928 || id == 28929 || id == 28930 || id == 28931 || id == 28932 || id == 28933 || id == 28934) // basket of eggs :)
         {
             return 1836;
         }
@@ -31024,7 +31095,7 @@ nated = Integer.parseInt(token2);
         {
             return 2061;
         }
-        if (id == 4084) // veracs flail
+        if (weaponName.contains("sled")) // veracs flail
         {
             return 1461;
         }
@@ -31045,7 +31116,7 @@ nated = Integer.parseInt(token2);
         {
             return 1662;
         }
-        if (id == 4565) // basket of eggs :)
+        if (id == 4565 || id == 28927 || id == 28928 || id == 28929 || id == 28930 || id == 28931 || id == 28932 || id == 28933 || id == 28934) // basket of eggs :)
         {
             return 1836;
         }
@@ -31063,7 +31134,7 @@ nated = Integer.parseInt(token2);
         {
             return 7047;
         }
-        if (id == 3204 || id == 3202) // halberd
+        if (EquipmentConfig.isHalberd(id)) // halberd
         {
             return 809;
         } else {
@@ -31075,6 +31146,11 @@ nated = Integer.parseInt(token2);
         if(weaponName.contains("whip")) {
             return 11975;
         }
+        if (weaponName.contains("sled")) // cat toy
+        {
+            return 1468;
+        }
+
         if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul
         {
             return 7043;
@@ -31086,6 +31162,9 @@ nated = Integer.parseInt(token2);
         String weaponName = Item.getItemName(id).toLowerCase();
         if (weaponName.contains("whip")) {
             return 11975;
+        }
+        if(weaponName.contains("sled")){
+            return 1468;
         }
         if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul{
         {
@@ -31099,6 +31178,9 @@ nated = Integer.parseInt(token2);
         String weaponName = Item.getItemName(id).toLowerCase();
         if(weaponName.contains("whip")) {
             return 11975;
+        }
+        if(weaponName.contains("sled")) {
+            return 1468;
         }
         if (id == ItemIDs.ARMADYL_GODSWORD || id == 21690 || id == ItemIDs.BANDOS_GODSWORD || id == ItemIDs.SARADOMIN_GODSWORD || id == 15337 || id == 15339 || id == ItemIDs.ZAMORAK_GODSWORD || id == 15618 || id == ItemIDs.LUCKY_SARADOMIN_GODSWORD || id == 25341 || id == 25342 || id == 25343) // maul
         {
@@ -32695,7 +32777,7 @@ nated = Integer.parseInt(token2);
         for (int i = 0; i < ItemHandler.MaxListedItems; i++) {
             if (server.itemHandler.ItemList[i] != null) {
                 if (server.itemHandler.ItemList[i].itemId == ItemID) {
-                    return server.itemHandler.ItemList[i].itemName;
+                    return server.itemHandler.ItemList[i].itemName.toLowerCase();
                 }
                 if (ItemID == -1) {
                     return "Unarmed";
@@ -35970,6 +36052,7 @@ public int GetGLCLConstruction(int ItemID) {
             this.splitchat = playerData.getSplitchat();
             this.brightness = playerData.getBrightness();
             this.acceptaid = playerData.getAcceptaid();
+            this.jailitemcount = playerData.getJailitemcount();
             return 1; // Success
 
         } catch (FileNotFoundException e) {
@@ -36052,6 +36135,7 @@ public int GetGLCLConstruction(int ItemID) {
         playerData.setSplitchat(splitchat);
         playerData.setBrightness(brightness);
         playerData.setAcceptaid(acceptaid);
+        playerData.setJailitemcount(jailitemcount);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("./Data/characters/" + playerName + ".json")) {
             gson.toJson(playerData, writer);

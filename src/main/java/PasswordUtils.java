@@ -6,8 +6,8 @@ import javax.crypto.spec.PBEKeySpec;
 public class PasswordUtils {
 
     public static final int SALT_LENGTH = 16; // bytes
-    public static final int ITERATIONS = 65536;
-    public static final int KEY_LENGTH = 128;
+    public static final int ITERATIONS = 120_000;
+    public static final int KEY_LENGTH = 256;
 
     public static byte[] generateSalt() {
         byte[] salt = new byte[SALT_LENGTH];
@@ -17,7 +17,7 @@ public class PasswordUtils {
 
     public static String hashPassword(String password, byte[] salt) throws Exception {
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         byte[] hash = factory.generateSecret(spec).getEncoded();
         return bytesToHex(hash);
     }

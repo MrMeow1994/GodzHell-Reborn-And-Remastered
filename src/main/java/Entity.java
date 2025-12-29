@@ -105,6 +105,9 @@ public abstract class Entity {
         if(Boundary.isIn( this, Boundary.gameres_gottoa)){
             return true;
         }
+        if(Boundary.isIn( this, Boundary.jail)){
+            return true;
+        }
         if(Boundary.isIn( this, Boundary.LUMRIDGE_BOUNDARY)){
             return true;
         }

@@ -83,6 +83,7 @@ public class PlayerData {
     private int splitchat;
     private int brightness;
     private int acceptaid;
+    private int jailitemcount;
     public static PlayerData from(Player plr) {
         PlayerData data = new PlayerData();
 
@@ -170,6 +171,7 @@ public class PlayerData {
         data.splitchat = plr.splitchat;
         data.brightness = plr.brightness;
         data.acceptaid = plr.acceptaid;
+        data.jailitemcount = plr.jailitemcount;
         return data;
     }
     // Add these methods to the class:
@@ -867,6 +869,12 @@ public void setSpirit_shard_pack_Amount(int Spirit_shard_pack_Amount){
     }
     public void setAcceptaid(int acceptaid){
         this.acceptaid = acceptaid;
+    }
+    public int getJailitemcount(){
+        return jailitemcount;
+    }
+    public void setJailitemcount(int jailitemcount){
+        this.jailitemcount = jailitemcount;
     }
 }
 
